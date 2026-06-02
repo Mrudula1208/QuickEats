@@ -3,6 +3,62 @@
   "WorkspaceRootPath": "C:\\Users\\manal\\OneDrive\\Desktop\\QuickEats\\backend\\QuickEats.API\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{AFD172F8-30EE-4A5E-A6A1-1E024F0554EE}|QuickEats.API\\QuickEats.API.csproj|c:\\users\\manal\\onedrive\\desktop\\quickeats\\backend\\quickeats.api\\quickeats.api\\data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AFD172F8-30EE-4A5E-A6A1-1E024F0554EE}|QuickEats.API\\QuickEats.API.csproj|solutionrelative:quickeats.api\\data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\manal\\OneDrive\\Desktop\\QuickEats\\backend\\QuickEats.API\\QuickEats.API\\Migrations\\20260602053102_UpdatedField.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:QuickEats.API\\Migrations\\20260602053102_UpdatedField.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AFD172F8-30EE-4A5E-A6A1-1E024F0554EE}|QuickEats.API\\QuickEats.API.csproj|c:\\users\\manal\\onedrive\\desktop\\quickeats\\backend\\quickeats.api\\quickeats.api\\migrations\\20260601161151_addcoreentities.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AFD172F8-30EE-4A5E-A6A1-1E024F0554EE}|QuickEats.API\\QuickEats.API.csproj|solutionrelative:quickeats.api\\migrations\\20260601161151_addcoreentities.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AFD172F8-30EE-4A5E-A6A1-1E024F0554EE}|QuickEats.API\\QuickEats.API.csproj|c:\\users\\manal\\onedrive\\desktop\\quickeats\\backend\\quickeats.api\\quickeats.api\\models\\menuitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AFD172F8-30EE-4A5E-A6A1-1E024F0554EE}|QuickEats.API\\QuickEats.API.csproj|solutionrelative:quickeats.api\\models\\menuitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AFD172F8-30EE-4A5E-A6A1-1E024F0554EE}|QuickEats.API\\QuickEats.API.csproj|c:\\users\\manal\\onedrive\\desktop\\quickeats\\backend\\quickeats.api\\quickeats.api\\migrations\\20260531153019_initialcreate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AFD172F8-30EE-4A5E-A6A1-1E024F0554EE}|QuickEats.API\\QuickEats.API.csproj|solutionrelative:quickeats.api\\migrations\\20260531153019_initialcreate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AFD172F8-30EE-4A5E-A6A1-1E024F0554EE}|QuickEats.API\\QuickEats.API.csproj|c:\\users\\manal\\onedrive\\desktop\\quickeats\\backend\\quickeats.api\\quickeats.api\\models\\order.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AFD172F8-30EE-4A5E-A6A1-1E024F0554EE}|QuickEats.API\\QuickEats.API.csproj|solutionrelative:quickeats.api\\models\\order.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AFD172F8-30EE-4A5E-A6A1-1E024F0554EE}|QuickEats.API\\QuickEats.API.csproj|c:\\users\\manal\\onedrive\\desktop\\quickeats\\backend\\quickeats.api\\quickeats.api\\models\\orderdelivery.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AFD172F8-30EE-4A5E-A6A1-1E024F0554EE}|QuickEats.API\\QuickEats.API.csproj|solutionrelative:quickeats.api\\models\\orderdelivery.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AFD172F8-30EE-4A5E-A6A1-1E024F0554EE}|QuickEats.API\\QuickEats.API.csproj|c:\\users\\manal\\onedrive\\desktop\\quickeats\\backend\\quickeats.api\\quickeats.api\\models\\restaurantrating.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AFD172F8-30EE-4A5E-A6A1-1E024F0554EE}|QuickEats.API\\QuickEats.API.csproj|solutionrelative:quickeats.api\\models\\restaurantrating.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AFD172F8-30EE-4A5E-A6A1-1E024F0554EE}|QuickEats.API\\QuickEats.API.csproj|c:\\users\\manal\\onedrive\\desktop\\quickeats\\backend\\quickeats.api\\quickeats.api\\models\\payment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AFD172F8-30EE-4A5E-A6A1-1E024F0554EE}|QuickEats.API\\QuickEats.API.csproj|solutionrelative:quickeats.api\\models\\payment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AFD172F8-30EE-4A5E-A6A1-1E024F0554EE}|QuickEats.API\\QuickEats.API.csproj|c:\\users\\manal\\onedrive\\desktop\\quickeats\\backend\\quickeats.api\\quickeats.api\\models\\orderitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AFD172F8-30EE-4A5E-A6A1-1E024F0554EE}|QuickEats.API\\QuickEats.API.csproj|solutionrelative:quickeats.api\\models\\orderitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AFD172F8-30EE-4A5E-A6A1-1E024F0554EE}|QuickEats.API\\QuickEats.API.csproj|c:\\users\\manal\\onedrive\\desktop\\quickeats\\backend\\quickeats.api\\quickeats.api\\migrations\\20260531154204_addrestauranttable.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AFD172F8-30EE-4A5E-A6A1-1E024F0554EE}|QuickEats.API\\QuickEats.API.csproj|solutionrelative:quickeats.api\\migrations\\20260531154204_addrestauranttable.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AFD172F8-30EE-4A5E-A6A1-1E024F0554EE}|QuickEats.API\\QuickEats.API.csproj|c:\\users\\manal\\onedrive\\desktop\\quickeats\\backend\\quickeats.api\\quickeats.api\\models\\restaurant.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AFD172F8-30EE-4A5E-A6A1-1E024F0554EE}|QuickEats.API\\QuickEats.API.csproj|solutionrelative:quickeats.api\\models\\restaurant.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AFD172F8-30EE-4A5E-A6A1-1E024F0554EE}|QuickEats.API\\QuickEats.API.csproj|c:\\users\\manal\\onedrive\\desktop\\quickeats\\backend\\quickeats.api\\quickeats.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{AFD172F8-30EE-4A5E-A6A1-1E024F0554EE}|QuickEats.API\\QuickEats.API.csproj|solutionrelative:quickeats.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AFD172F8-30EE-4A5E-A6A1-1E024F0554EE}|QuickEats.API\\QuickEats.API.csproj|c:\\users\\manal\\onedrive\\desktop\\quickeats\\backend\\quickeats.api\\quickeats.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AFD172F8-30EE-4A5E-A6A1-1E024F0554EE}|QuickEats.API\\QuickEats.API.csproj|solutionrelative:quickeats.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{AFD172F8-30EE-4A5E-A6A1-1E024F0554EE}|QuickEats.API\\QuickEats.API.csproj|c:\\users\\manal\\onedrive\\desktop\\quickeats\\backend\\quickeats.api\\quickeats.api\\.gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}",
       "RelativeMoniker": "D:0:0:{AFD172F8-30EE-4A5E-A6A1-1E024F0554EE}|QuickEats.API\\QuickEats.API.csproj|solutionrelative:quickeats.api\\.gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}"
     },
@@ -18,7 +74,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Bookmark",
@@ -26,7 +82,180 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "20260602053102_UpdatedField.cs",
+              "DocumentMoniker": "C:\\Users\\manal\\OneDrive\\Desktop\\QuickEats\\backend\\QuickEats.API\\QuickEats.API\\Migrations\\20260602053102_UpdatedField.cs",
+              "RelativeDocumentMoniker": "QuickEats.API\\Migrations\\20260602053102_UpdatedField.cs",
+              "ToolTip": "C:\\Users\\manal\\OneDrive\\Desktop\\QuickEats\\backend\\QuickEats.API\\QuickEats.API\\Migrations\\20260602053102_UpdatedField.cs",
+              "RelativeToolTip": "QuickEats.API\\Migrations\\20260602053102_UpdatedField.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-02T05:31:02.634Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "AppDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\manal\\OneDrive\\Desktop\\QuickEats\\backend\\QuickEats.API\\QuickEats.API\\Data\\AppDbContext.cs",
+              "RelativeDocumentMoniker": "QuickEats.API\\Data\\AppDbContext.cs",
+              "ToolTip": "C:\\Users\\manal\\OneDrive\\Desktop\\QuickEats\\backend\\QuickEats.API\\QuickEats.API\\Data\\AppDbContext.cs",
+              "RelativeToolTip": "QuickEats.API\\Data\\AppDbContext.cs",
+              "ViewState": "AgIAABYAAAAAAAAAAADwvzIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-31T15:04:44.312Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "20260601161151_AddCoreEntities.cs",
+              "DocumentMoniker": "C:\\Users\\manal\\OneDrive\\Desktop\\QuickEats\\backend\\QuickEats.API\\QuickEats.API\\Migrations\\20260601161151_AddCoreEntities.cs",
+              "RelativeDocumentMoniker": "QuickEats.API\\Migrations\\20260601161151_AddCoreEntities.cs",
+              "ToolTip": "C:\\Users\\manal\\OneDrive\\Desktop\\QuickEats\\backend\\QuickEats.API\\QuickEats.API\\Migrations\\20260601161151_AddCoreEntities.cs",
+              "RelativeToolTip": "QuickEats.API\\Migrations\\20260601161151_AddCoreEntities.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAABEAAAA/AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-01T16:11:52.016Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "MenuItem.cs",
+              "DocumentMoniker": "C:\\Users\\manal\\OneDrive\\Desktop\\QuickEats\\backend\\QuickEats.API\\QuickEats.API\\Models\\MenuItem.cs",
+              "RelativeDocumentMoniker": "QuickEats.API\\Models\\MenuItem.cs",
+              "ToolTip": "C:\\Users\\manal\\OneDrive\\Desktop\\QuickEats\\backend\\QuickEats.API\\QuickEats.API\\Models\\MenuItem.cs",
+              "RelativeToolTip": "QuickEats.API\\Models\\MenuItem.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-01T15:54:10.233Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "OrderDelivery.cs",
+              "DocumentMoniker": "C:\\Users\\manal\\OneDrive\\Desktop\\QuickEats\\backend\\QuickEats.API\\QuickEats.API\\Models\\OrderDelivery.cs",
+              "RelativeDocumentMoniker": "QuickEats.API\\Models\\OrderDelivery.cs",
+              "ToolTip": "C:\\Users\\manal\\OneDrive\\Desktop\\QuickEats\\backend\\QuickEats.API\\QuickEats.API\\Models\\OrderDelivery.cs",
+              "RelativeToolTip": "QuickEats.API\\Models\\OrderDelivery.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-01T16:05:14.415Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "RestaurantRating.cs",
+              "DocumentMoniker": "C:\\Users\\manal\\OneDrive\\Desktop\\QuickEats\\backend\\QuickEats.API\\QuickEats.API\\Models\\RestaurantRating.cs",
+              "RelativeDocumentMoniker": "QuickEats.API\\Models\\RestaurantRating.cs",
+              "ToolTip": "C:\\Users\\manal\\OneDrive\\Desktop\\QuickEats\\backend\\QuickEats.API\\QuickEats.API\\Models\\RestaurantRating.cs",
+              "RelativeToolTip": "QuickEats.API\\Models\\RestaurantRating.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAA7AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-01T16:02:43.527Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Payment.cs",
+              "DocumentMoniker": "C:\\Users\\manal\\OneDrive\\Desktop\\QuickEats\\backend\\QuickEats.API\\QuickEats.API\\Models\\Payment.cs",
+              "RelativeDocumentMoniker": "QuickEats.API\\Models\\Payment.cs",
+              "ToolTip": "C:\\Users\\manal\\OneDrive\\Desktop\\QuickEats\\backend\\QuickEats.API\\QuickEats.API\\Models\\Payment.cs",
+              "RelativeToolTip": "QuickEats.API\\Models\\Payment.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-01T16:00:59.078Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "OrderItem.cs",
+              "DocumentMoniker": "C:\\Users\\manal\\OneDrive\\Desktop\\QuickEats\\backend\\QuickEats.API\\QuickEats.API\\Models\\OrderItem.cs",
+              "RelativeDocumentMoniker": "QuickEats.API\\Models\\OrderItem.cs",
+              "ToolTip": "C:\\Users\\manal\\OneDrive\\Desktop\\QuickEats\\backend\\QuickEats.API\\QuickEats.API\\Models\\OrderItem.cs",
+              "RelativeToolTip": "QuickEats.API\\Models\\OrderItem.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAA3AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-01T15:58:46.548Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "20260531153019_InitialCreate.cs",
+              "DocumentMoniker": "C:\\Users\\manal\\OneDrive\\Desktop\\QuickEats\\backend\\QuickEats.API\\QuickEats.API\\Migrations\\20260531153019_InitialCreate.cs",
+              "RelativeDocumentMoniker": "QuickEats.API\\Migrations\\20260531153019_InitialCreate.cs",
+              "ToolTip": "C:\\Users\\manal\\OneDrive\\Desktop\\QuickEats\\backend\\QuickEats.API\\QuickEats.API\\Migrations\\20260531153019_InitialCreate.cs",
+              "RelativeToolTip": "QuickEats.API\\Migrations\\20260531153019_InitialCreate.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAApAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-31T15:30:20.067Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Order.cs",
+              "DocumentMoniker": "C:\\Users\\manal\\OneDrive\\Desktop\\QuickEats\\backend\\QuickEats.API\\QuickEats.API\\Models\\Order.cs",
+              "RelativeDocumentMoniker": "QuickEats.API\\Models\\Order.cs",
+              "ToolTip": "C:\\Users\\manal\\OneDrive\\Desktop\\QuickEats\\backend\\QuickEats.API\\QuickEats.API\\Models\\Order.cs",
+              "RelativeToolTip": "QuickEats.API\\Models\\Order.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-01T15:56:00.453Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "20260531154204_AddRestaurantTable.cs",
+              "DocumentMoniker": "C:\\Users\\manal\\OneDrive\\Desktop\\QuickEats\\backend\\QuickEats.API\\QuickEats.API\\Migrations\\20260531154204_AddRestaurantTable.cs",
+              "RelativeDocumentMoniker": "QuickEats.API\\Migrations\\20260531154204_AddRestaurantTable.cs",
+              "ToolTip": "C:\\Users\\manal\\OneDrive\\Desktop\\QuickEats\\backend\\QuickEats.API\\QuickEats.API\\Migrations\\20260531154204_AddRestaurantTable.cs",
+              "RelativeToolTip": "QuickEats.API\\Migrations\\20260531154204_AddRestaurantTable.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-31T15:42:04.403Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "Restaurant.cs",
+              "DocumentMoniker": "C:\\Users\\manal\\OneDrive\\Desktop\\QuickEats\\backend\\QuickEats.API\\QuickEats.API\\Models\\Restaurant.cs",
+              "RelativeDocumentMoniker": "QuickEats.API\\Models\\Restaurant.cs",
+              "ToolTip": "C:\\Users\\manal\\OneDrive\\Desktop\\QuickEats\\backend\\QuickEats.API\\QuickEats.API\\Models\\Restaurant.cs",
+              "RelativeToolTip": "QuickEats.API\\Models\\Restaurant.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-31T15:36:35.792Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\manal\\OneDrive\\Desktop\\QuickEats\\backend\\QuickEats.API\\QuickEats.API\\appsettings.json",
+              "RelativeDocumentMoniker": "QuickEats.API\\appsettings.json",
+              "ToolTip": "C:\\Users\\manal\\OneDrive\\Desktop\\QuickEats\\backend\\QuickEats.API\\QuickEats.API\\appsettings.json",
+              "RelativeToolTip": "QuickEats.API\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAACEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-05-31T15:10:12.795Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\manal\\OneDrive\\Desktop\\QuickEats\\backend\\QuickEats.API\\QuickEats.API\\Program.cs",
+              "RelativeDocumentMoniker": "QuickEats.API\\Program.cs",
+              "ToolTip": "C:\\Users\\manal\\OneDrive\\Desktop\\QuickEats\\backend\\QuickEats.API\\QuickEats.API\\Program.cs",
+              "RelativeToolTip": "QuickEats.API\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAjAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-31T15:10:04.448Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
               "Title": ".gitignore",
               "DocumentMoniker": "C:\\Users\\manal\\OneDrive\\Desktop\\QuickEats\\backend\\QuickEats.API\\QuickEats.API\\.gitignore",
               "RelativeDocumentMoniker": "QuickEats.API\\.gitignore",
@@ -34,12 +263,11 @@
               "RelativeToolTip": "QuickEats.API\\.gitignore",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAFAAAAAAAAAA==",
               "Icon": "00000000-0000-0000-0000-000000000000.000000|iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAG/SURBVDhPrZRNTgIxFMerDIaEhHgU97JxwUKGGaNeQJdyCY0XUBDWGhg4AB\u002BuvQk7OQCRFTP1fXWmMxUMCT94ee177eu/LVQdFK31kTSJ0WgEIa0SMJ2A6QTHcF9iicQqlYpa/6zv2\u002B2HD5nuEkWR/l4udRzHZBtjGzFor1YrPR6P9WKx0MNhpN96vTuZThyLJ1AJLK/iJFFxjBanBsXIozqkWq2qev1c1Wq19063e0ZBwBNP4JaQ6WRC/i8ajQb5wWBAvnxyghpOqQPkC8L5IEEQKjgxaqOTFsCd65tb6nmlkur1\u002BxwXCgX58KfT7QptwvCK52wrSLcJvtUKOABkQ6HFXwbGsmMRBkchzpjNphLZDSrEn5G1qnsp\u002BPEtheloXouRnXDTTjhb5tXmeyg0IgzuliHp\u002By0OANbiOCDXp1IYo3mMUxBT8/mMA/8QhGH6ZzC4Zwi5ZqoQB9M3h62I/\u002B/SAQpniBmtPvdQyGeYUdgyX8pl05eIBSxmTzQYEYbc42AuJQWLGJNQEcrJG4A4BTHneSW2sqfKOyybkxXMPbAvrx3IsyLzkPJFmUcWYtDntjG6lIvnp8cvKXNIlPoFvstpJRlQPIAAAAAASUVORK5CYII=",
-              "WhenOpened": "2026-05-31T12:53:08.393Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-31T12:53:08.393Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 15,
               "Title": "User.cs",
               "DocumentMoniker": "C:\\Users\\manal\\OneDrive\\Desktop\\QuickEats\\backend\\QuickEats.API\\QuickEats.API\\Models\\User.cs",
               "RelativeDocumentMoniker": "QuickEats.API\\Models\\User.cs",

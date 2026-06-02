@@ -1,4 +1,7 @@
 
+using Microsoft.EntityFrameworkCore;
+using QuickEats.API.Data;
+
 namespace QuickEats.API
 {
     public class Program
@@ -13,6 +16,7 @@ namespace QuickEats.API
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             var app = builder.Build();
 
