@@ -1,0 +1,6 @@
+﻿namespace QuickEats.API.Repositories
+{
+    public class RestaurantRepository
+    {
+    }
+}

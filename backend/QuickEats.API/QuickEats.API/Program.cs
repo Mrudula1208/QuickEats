@@ -1,6 +1,10 @@
 
 using Microsoft.EntityFrameworkCore;
 using QuickEats.API.Data;
+using QuickEats.API.Repositories;
+using QuickEats.API.Repositories.Interfaces;
+using QuickEats.API.Services;
+using QuickEats.API.Services.Interfaces;
 
 namespace QuickEats.API
 {
@@ -17,7 +21,8 @@ namespace QuickEats.API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IUserService, UserService>();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
