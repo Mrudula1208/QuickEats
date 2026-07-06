@@ -1,4 +1,5 @@
 
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using QuickEats.API.Data;
 using QuickEats.API.Repositories;
@@ -23,6 +24,11 @@ namespace QuickEats.API
             builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IUserService, UserService>();
+
+                //    Whenever someone asks for
+               //IRestaurantRepository, create RestaurantRepository and give it.
+            builder.Services.AddScoped<IRestaurantRepository, RestaurantRepository>();
+            builder.Services.AddScoped<IRestaurantService, RestaurantService>();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

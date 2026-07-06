@@ -1,6 +1,71 @@
-﻿namespace QuickEats.API.Repositories
+﻿using Microsoft.EntityFrameworkCore;
+using QuickEats.API.Data;
+using QuickEats.API.Models;
+
+namespace QuickEats.API.Repositories
 {
     public class RestaurantRepository
     {
+        private readonly AppDbContext _context;
+        public RestaurantRepository(AppDbContext context)
+        {
+            _context = context;
+        }  
+
+        public async Task<IEnumerable<Restaurant>> GerAllAsync()
+        {
+            return await _context.Restaurants.ToListAsync();
+        }
+
+        public async Task<Restaurant?>GetByIdAsync(int id)
+        {
+            return await _context.Restaurants.FirstOrDefaultAsync(r => r.Id == id);
+        }
+
+        public async Task  AddAsync(Restaurant restaurant)
+        {
+            await _context.AddAsync(restaurant);
+        }
+
+        public void UpdateAsync(Restaurant restaurant)
+        {
+            _context.Restaurants.Update(restaurant);
+        }
+
+        public void DeleteAsync(Restaurant restaurant)
+        {
+            _context.Restaurants.Remove(restaurant);
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
     }
 }
+//Examples:
+
+//GetByIdAsync()
+//Database Talk?
+//YES
+//→ Task
+
+//GetAllAsync()
+//Database Talk?
+//YES
+//→ Task
+
+//SaveChangesAsync()
+//Database Talk?
+//YES
+//→ Task
+
+//Update()
+//Database Talk?
+//NO
+//→ void
+
+//Delete()
+//Database Talk?
+//NO
+//→ void

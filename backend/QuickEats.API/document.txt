@@ -1,0 +1,19 @@
+
+Entity = Complete Database Object
+
+Response DTO = Only the data we WANT to show to the frontend
+
+
+
+
+
+
+One-Line Interview Answer
+
+Why don't we return Entities directly to the frontend?
+
+Because Entities represent the database structure. 
+They may contain internal or sensitive fields that 
+should not be exposed. Response DTOs allow us to send
+only the required data, improving security and keeping
+the API independent of the database model.
