@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using QuickEats.API.Data;
 using QuickEats.API.Models;
+using QuickEats.API.Repositories.Interfaces;
 
 namespace QuickEats.API.Repositories
 {
-    public class RestaurantRepository
+    public class RestaurantRepository: IRestaurantRepository
     {
         private readonly AppDbContext _context;
         public RestaurantRepository(AppDbContext context)
@@ -12,7 +13,7 @@ namespace QuickEats.API.Repositories
             _context = context;
         }  
 
-        public async Task<IEnumerable<Restaurant>> GerAllAsync()
+        public async Task<IEnumerable<Restaurant>> GetAllAsync()
         {
             return await _context.Restaurants.ToListAsync();
         }
@@ -27,12 +28,12 @@ namespace QuickEats.API.Repositories
             await _context.AddAsync(restaurant);
         }
 
-        public void UpdateAsync(Restaurant restaurant)
+        public void Update(Restaurant restaurant)
         {
             _context.Restaurants.Update(restaurant);
         }
 
-        public void DeleteAsync(Restaurant restaurant)
+        public void Delete(Restaurant restaurant)
         {
             _context.Restaurants.Remove(restaurant);
         }
