@@ -25,7 +25,7 @@ namespace QuickEats.API.Repositories
 
         public async Task  AddAsync(Restaurant restaurant)
         {
-            await _context.AddAsync(restaurant);
+            await _context.Restaurants.AddAsync(restaurant);
         }
 
         public void Update(Restaurant restaurant)
@@ -70,3 +70,29 @@ namespace QuickEats.API.Repositories
 //Database Talk?
 //NO
 //→ void
+
+
+//Update() → Only marks entity as modified → void
+
+//Delete() → Only marks entity for deletion → void
+
+//SaveChangesAsync() → Saves changes to SQL Server → Task
+
+
+
+//If the method only marks or modifies the entity in EF Core memory (like Update() or Remove()), use void because the actual database operation happens later in SaveChangesAsync().
+//Since it goes to SQL Server, it takes some time.
+
+//So C# says:
+
+//"Wait until SQL Server sends the data."
+
+//That's why we use Task.
+
+
+
+//async → Marks a method as asynchronous.
+
+//await → Waits for an asynchronous operation to complete before executing the next line.
+
+//We use async and await to avoid blocking the application while waiting for database operations, making the application faster and more responsive.

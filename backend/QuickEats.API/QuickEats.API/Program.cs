@@ -29,6 +29,8 @@ namespace QuickEats.API
                //IRestaurantRepository, create RestaurantRepository and give it.
             builder.Services.AddScoped<IRestaurantRepository, RestaurantRepository>();
             builder.Services.AddScoped<IRestaurantService, RestaurantService>();
+            builder.Services.AddScoped<IMenuRepository, MenuRepository>();
+            builder.Services.AddScoped<IMenuService, MenuService>();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
