@@ -39,6 +39,9 @@ namespace QuickEats.API
 
             builder.Services.AddScoped<IRestaurantRatingRepository, RestaurantRatingRepository>();
             builder.Services.AddScoped<IRestaurantRatingService, RestaurantRatingService>();
+            builder.Services.AddScoped<IOrderDeliveryRepository, OrderDeliveryRepository>();
+            builder.Services.AddScoped<IOrderDeliveryService, OrderDeliveryService>();
+         
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
