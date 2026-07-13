@@ -4,7 +4,12 @@ namespace QuickEats.API.Repositories.Interfaces
 {
     public interface IOrderRepository
     {
-        Task <User?> GetByEmailAsync(string email);
-        Task AddAsync(User User);
+        Task<IEnumerable<Order>> GetAllAsync();
+        Task<Order?> GetByIdAsync(int id);
+        Task<IEnumerable<Order>>GetByUserIdAsync(int userId);
+        Task AddAsync(Order order);
+        void Update(Order order);
+        void Delete(Order order);
+        Task SaveChangesAsync();
     }
 }

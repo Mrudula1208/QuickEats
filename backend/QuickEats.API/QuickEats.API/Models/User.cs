@@ -9,5 +9,7 @@
         public string PhoneNumber { get; set; } = string.Empty;
         public string Role { get;set; }=string.Empty; // e.g., "Customer", "Admin","Owner","Delivery Partner"
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public ICollection<Order> Orders { get; set; } = new List<Order>();
     }
 }

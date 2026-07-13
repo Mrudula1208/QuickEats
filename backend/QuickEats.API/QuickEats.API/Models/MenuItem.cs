@@ -11,5 +11,7 @@
         public bool IsAvailable { get; set; }= true;    
 
         public Restaurant Restaurant { get; set; } = null!;
+        public ICollection<Order> Orders { get; set; } = new List<Order>();
+
     }
 }
