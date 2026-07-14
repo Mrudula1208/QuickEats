@@ -2,8 +2,8 @@
 {
     public class CreateOrderDto
     {
+        public int RestaurantId { get; set; }
 
-        public int UserId { get; set; }
-        public List<OrderItemDto>Items { get; set; } = new List<OrderItemDto>();
+        public List<OrderItemDto> Items { get; set; }
     }
 }

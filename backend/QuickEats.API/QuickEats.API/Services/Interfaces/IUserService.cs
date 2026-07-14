@@ -6,6 +6,6 @@ namespace QuickEats.API.Services.Interfaces
     {
 
         Task RegisterAsync(RegisterRequestDto request);
-        Task<string>LoginAsync(LoginRequestDto request);
+        Task<LoginResponseDto?>LoginAsync(LoginRequestDto request);
     }
 }

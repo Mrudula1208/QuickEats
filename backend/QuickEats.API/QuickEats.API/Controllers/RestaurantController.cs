@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QuickEats.API.DTos.Restaurant;
 using QuickEats.API.Services.Interfaces;
@@ -6,6 +7,7 @@ using System.Resources;
 
 namespace QuickEats.API.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class RestaurantController : ControllerBase
@@ -24,7 +26,9 @@ namespace QuickEats.API.Controllers
             var restaurants = await _restaurantService.GetAllAsync();
             return Ok(restaurants);
         }
+        [Authorize(Roles = "Admin")]
         [HttpGet("{id}")]
+
         public async Task<IActionResult> GetById(int id)
         {
             var restaurant = await _restaurantService.GetByIdAsync(id);
@@ -43,14 +47,15 @@ namespace QuickEats.API.Controllers
             return Ok("Restaurant created successfully.");
         }
 
-
-        [HttpPost("{id}")]
+        [Authorize(Roles = "Admin")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateRestaurantDto dto)
         {
             await _restaurantService.UpdateAsync(id, dto);
             return Ok("Restaurant updated successfully.");
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QuickEats.API.DTos.Menu;
 using QuickEats.API.Services.Interfaces;
@@ -6,6 +7,8 @@ using System.Threading.Tasks;
 
 namespace QuickEats.API.Controllers
 {
+    [Authorize]
+
     [Route("api/[controller]")]
     [ApiController]
     public class MenuController : ControllerBase
@@ -54,7 +57,7 @@ namespace QuickEats.API.Controllers
             await _menuService.UpdateAsync(id, dto);
             return Ok("Menu Item Updated successfully");
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task <IActionResult> Delete(int id)
         {

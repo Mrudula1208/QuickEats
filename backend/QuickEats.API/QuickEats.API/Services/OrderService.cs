@@ -8,10 +8,11 @@ namespace QuickEats.API.Services
     public class OrderService : IOrderService
     {
         private readonly IOrderRepository _orderRepository;
-        public OrderService(IOrderRepository orderRepository)
+        private readonly IMenuRepository _menuRepository;
+        public OrderService(IOrderRepository orderRepository, IMenuRepository menuRepository)
         {
             _orderRepository = orderRepository;
-
+            _menuRepository = menuRepository;
         }
 
         public async Task<IEnumerable<OrderResponseDto>> GetAllAsync()
@@ -98,25 +99,45 @@ namespace QuickEats.API.Services
 
 
 
-        public async Task CreateAsync(CreateOrderDto dto)
+        public async Task CreateAsync(CreateOrderDto dto,int userId)
         {
             var order = new Order
             {
-                UserId = dto.UserId,
-                Status = "pending",
+                UserId = userId,
+                Status = "Pending",
                 CreatedAt = DateTime.UtcNow
             };
-
             decimal totalAmount = 0;
+
             foreach (var item in dto.Items)
             {
+                // Get Menu Item
+                var menuItem =
+                    await _menuRepository.GetByIdAsync(item.MenuItemId);
+
+                if (menuItem == null)
+                {
+                    throw new Exception(
+                        $"Menu Item {item.MenuItemId} not found.");
+                }
+
+                decimal unitPrice = menuItem.Price;
+
+                decimal totalPrice =
+                    unitPrice * item.Quantity;
+
+                totalAmount += totalPrice;
+
                 var orderItem = new OrderItem
                 {
                     MenuItemId = item.MenuItemId,
                     Quantity = item.Quantity,
-                    UnitPrice = 0,
-                    TotalPrice = 0,
+
+                    UnitPrice = unitPrice,
+
+                    TotalPrice = totalPrice
                 };
+
                 order.OrderItems.Add(orderItem);
             }
             order.TotalAmount = totalAmount;

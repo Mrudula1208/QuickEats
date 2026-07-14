@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QuickEats.API.DTos.OrderDelivery;
 using QuickEats.API.Services.Interfaces;
 
 namespace QuickEats.API.Controllers
 {
+    [Authorize]
+
     [Route("api/[controller]")]
     [ApiController]
     public class OrderDeliveryController : ControllerBase
@@ -34,7 +37,7 @@ namespace QuickEats.API.Controllers
         }
 
         [HttpGet("order/{orderId}")]
-        public async Task <IActionResult> getByorderId(int orderId)
+        public async Task <IActionResult> GetByOrderId(int orderId)
         {
             var delivery = await _orderDeliveryService.GetByOrderidAsync(orderId);
             if (delivery == null)
@@ -43,14 +46,14 @@ namespace QuickEats.API.Controllers
             }
             return Ok(delivery);
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create(CreateOrderDeliveryDto dto)
         {
             await _orderDeliveryService.CreateAsync(dto);
             return Ok("Delivery created successfully.");
         }
-
+        [Authorize(Roles = "DeliveryPartner")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateStatus(int id, UpdateDeliveryStatusDto dto)
         {

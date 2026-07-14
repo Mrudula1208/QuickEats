@@ -26,9 +26,18 @@ namespace QuickEats.API.Controllers
         [HttpPost("Login")]
         public async Task<IActionResult> Login(LoginRequestDto request)
         {
+            // Ask Service to Login User.
             var result = await _userService.LoginAsync(request);
+
+            // Invalid Email or Password.
+            if (result == null)
+            {
+                return Unauthorized("Invalid Email or Password.");
+            }
+
+            // Return JWT Token.
             return Ok(result);
         }
-    
+
     }
 }

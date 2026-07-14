@@ -10,5 +10,6 @@ namespace QuickEats.API.Repositories.Interfaces
         Task<User?> GetByIdAsync(int id);
         Task UpdateAsync(User user);
         Task DeleteAsync(User user);
+        Task SaveChangesAsync();
     }
 }

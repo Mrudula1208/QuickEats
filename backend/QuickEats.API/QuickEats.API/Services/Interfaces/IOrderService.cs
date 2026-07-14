@@ -7,7 +7,7 @@ namespace QuickEats.API.Services.Interfaces
         Task<IEnumerable<OrderResponseDto>> GetAllAsync();
         Task<OrderResponseDto?> GetByIdAsync(int id);
         Task<IEnumerable<OrderResponseDto>> GetByUserIdAsync(int userId);
-        Task CreateAsync(CreateOrderDto createOrderDto);
+        Task CreateAsync(CreateOrderDto dto, int userId);
         Task UpdateStatusAsync(int id, UpdateOrderStatusDto dto);
         Task DeleteAsync(int id);
     }
