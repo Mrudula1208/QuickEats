@@ -5,7 +5,9 @@ namespace QuickEats.API.Services.Interfaces
     public interface IPaymentService
     {
         Task<IEnumerable<PaymentResponseDto>> GetAllAsync();
+
         Task<PaymentResponseDto?> GetByIdAsync(int id);
+
         Task<PaymentResponseDto?> GetByOrderIdAsync(int orderId);
 
         Task CreateAsync(CreatePaymentDto dto);

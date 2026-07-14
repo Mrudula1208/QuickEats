@@ -8,45 +8,54 @@ namespace QuickEats.API.Services
     public class PaymentService : IPaymentService
     {
         private readonly IPaymentRepository _paymentRepository;
-        public PaymentService(IPaymentRepository paymentRepository)
+        private readonly IOrderRepository _orderRepository;
+
+        public PaymentService(
+            IPaymentRepository paymentRepository,
+            IOrderRepository orderRepository)
         {
             _paymentRepository = paymentRepository;
+            _orderRepository = orderRepository;
         }
+
+        //========================================================
+        // Get All Payments
+        //========================================================
 
         public async Task<IEnumerable<PaymentResponseDto>> GetAllAsync()
         {
             var payments = await _paymentRepository.GetAllAsync();
+
             var response = new List<PaymentResponseDto>();
 
             foreach (var payment in payments)
             {
                 response.Add(new PaymentResponseDto
                 {
-
                     Id = payment.Id,
                     OrderId = payment.OrderId,
                     Amount = payment.Amount,
                     PaymentMethod = payment.PaymentMethod,
                     PaymentStatus = payment.PaymentStatus,
                     PaidAt = payment.PaidAt
-
                 });
             }
-                return response;
-            }
 
+            return response;
+        }
 
+        //========================================================
+        // Get Payment By Id
+        //========================================================
 
-
-        public async Task <PaymentResponseDto> GetByIdAsync(int id)
+        public async Task<PaymentResponseDto?> GetByIdAsync(int id)
         {
-            var payment=await _paymentRepository.GetByIdAsync(id);
+            var payment = await _paymentRepository.GetByIdAsync(id);
+
             if (payment == null)
-            {
                 return null;
-            }
 
-            var response = new PaymentResponseDto
+            return new PaymentResponseDto
             {
                 Id = payment.Id,
                 OrderId = payment.OrderId,
@@ -55,18 +64,20 @@ namespace QuickEats.API.Services
                 PaymentStatus = payment.PaymentStatus,
                 PaidAt = payment.PaidAt
             };
-            return response;
         }
 
+        //========================================================
+        // Get Payment By Order Id
+        //========================================================
 
-        public async Task<PaymentResponseDto> GetByOrderIdAsync(int orderId)
+        public async Task<PaymentResponseDto?> GetByOrderIdAsync(int orderId)
         {
-            var payment=await _paymentRepository.GetByOrderIdAsync(orderId);
-            if(payment == null)
-            {
+            var payment = await _paymentRepository.GetByOrderIdAsync(orderId);
+
+            if (payment == null)
                 return null;
-            }
-            var response = new PaymentResponseDto
+
+            return new PaymentResponseDto
             {
                 Id = payment.Id,
                 OrderId = payment.OrderId,
@@ -75,52 +86,66 @@ namespace QuickEats.API.Services
                 PaymentStatus = payment.PaymentStatus,
                 PaidAt = payment.PaidAt
             };
-            return response;
         }
-
-
-
 
         public async Task CreateAsync(CreatePaymentDto dto)
         {
+            // Get Order
+            var order = await _orderRepository.GetByIdAsync(dto.OrderId);
+
+            if (order == null)
+            {
+                throw new Exception($"Order with Id {dto.OrderId} not found.");
+            }
+
             var payment = new Payment
             {
                 OrderId = dto.OrderId,
-                Amount = dto.Amount,
-                PaymentMethod = dto.Paymentmethod,
+
+                // Take amount from Order table
+                Amount = order.TotalAmount,
+
+                PaymentMethod = dto.PaymentMethod,
+
                 PaymentStatus = "Pending",
-                PaidAt=DateTime.UtcNow
+
+                PaidAt = DateTime.UtcNow
             };
+
             await _paymentRepository.AddAsync(payment);
             await _paymentRepository.SaveChangesAsync();
         }
 
-
+      
         public async Task UpdateStatusAsync(int id, UpdatePaymentStatusDto dto)
         {
             var payment = await _paymentRepository.GetByIdAsync(id);
+
             if (payment == null)
             {
                 throw new Exception($"Payment with Id {id} not found.");
             }
-            payment.PaymentStatus = dto.PaymentStatus;
-            _paymentRepository.Update(payment);
-            await _paymentRepository.SaveChangesAsync();
 
+            payment.PaymentStatus = dto.PaymentStatus;
+
+            _paymentRepository.Update(payment);
+
+            await _paymentRepository.SaveChangesAsync();
         }
 
-
-
+      
         public async Task DeleteAsync(int id)
         {
             var payment = await _paymentRepository.GetByIdAsync(id);
+
             if (payment == null)
             {
                 throw new Exception($"Payment with Id {id} not found.");
             }
 
             _paymentRepository.Delete(payment);
+
             await _paymentRepository.SaveChangesAsync();
         }
     }
-    }
+}

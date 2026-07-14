@@ -77,7 +77,9 @@ namespace QuickEats.API.Services
 
 
         //Create Restaurant 
-        public async Task CreateAsync(CreateRestaurantDto dto)
+        public async Task CreateAsync(CreateRestaurantDto dto, int ownerId)
+
+
         {
             if (string.IsNullOrWhiteSpace(dto.Name))
             {
@@ -96,6 +98,7 @@ namespace QuickEats.API.Services
                 Description = dto.Description,
                 Address = dto.Address,
                 PhoneNumber = dto.PhoneNumber,
+                OwnerId = ownerId,
                 ImageUrl = dto.ImageUrl,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow
