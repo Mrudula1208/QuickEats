@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using QuickEats.API.DTos.Order;
+using QuickEats.API.Repositories.Interfaces;
 using QuickEats.API.Services.Interfaces;
+using System.Security.Claims;
 
 namespace QuickEats.API.Controllers
 {
@@ -34,12 +35,21 @@ namespace QuickEats.API.Controllers
             }
             return Ok(order);
         }
-        [HttpGet("user/{userId}")]
-        public async Task<IActionResult> GetByUserId(int userId)
-        {
-            var orders = await _orderService.GetByUserIdAsync(userId);
-            return Ok(orders);
-        }
+        
+    
+
+    [HttpGet("user/{userId}")]
+            public async Task<IActionResult> GetByUserId(int userId)
+            {
+                Console.WriteLine($"UserId from URL = {userId}");
+
+                var orders = await _orderService.GetByUserIdAsync(userId);
+
+                Console.WriteLine($"Orders Count = {orders.Count()}");
+
+                return Ok(orders);
+            }
+        
         [Authorize(Roles = "Customer")]
         [HttpPost]
         public async Task<IActionResult> Create(CreateOrderDto dto)

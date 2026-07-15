@@ -28,11 +28,13 @@ namespace QuickEats.API.Repositories
             return await _context.Orders.Include(o => o.OrderItems).FirstOrDefaultAsync(o => o.Id == id);
         }
 
-        public async Task<IEnumerable<Order>> GetByUserIdAsync(int userId)
-        {
-            return await _context.Orders.Include(o => o.OrderItems).Where(o => o.Id == userId).ToListAsync();
-        }
-
+      public async Task<List<Order>> GetByUserIdAsync(int userId)
+{
+    return await _context.Orders
+        .Where(o => o.UserId == userId)
+        .Include(o => o.OrderItems)
+        .ToListAsync();
+}
 
 
         public async Task AddAsync(Order order)
