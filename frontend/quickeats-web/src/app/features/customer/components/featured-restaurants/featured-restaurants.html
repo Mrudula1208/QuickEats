@@ -1,4 +1,4 @@
-<section class="featured-section">
+<p>Total Restaurants: {{ restaurants.length }}</p><section class="featured-section">
 
     <div class="section-title">
         <h2>
@@ -10,16 +10,22 @@
     </div>
 
     <div class="restaurant-grid">
-
+@for (restaurant of restaurants; track restaurant.id){
         <div class="restaurant-card">
 
             <div class="image-container">
 
-                <img src="assets/images/restaurants/pizza-palace.jpg"
-                     alt="Pizza Palace">
+                <!-- <img src="assets/images/restaurants/pizza-palace.png"
+                     alt="Pizza Palace"> -->
+
+
+
+                <img [src]="restaurant.image"
+                     [alt]="restaurant.name">
+
 
                 <span class="discount-badge">
-                    🔥 20% OFF
+                    🔥 {{restaurant.discount}} 
                 </span>
 
                 <button class="favorite-btn">
@@ -30,32 +36,35 @@
 
             <div class="restaurant-info">
 
-                <h3>Pizza Palace</h3>
+                <h3>{{restaurant.name}}</h3>
 
                 <div class="restaurant-meta">
 
                     <span>
-                        ⭐ 4.5
+                       {{restaurant.rating}} ⭐
                     </span>
 
                     <span>
-                        ⏱ 25 min
+                        ⏱ {{restaurant.deliveryTime}}
                     </span>
 
                 </div>
 
-                <p>📍 Andheri, Mumbai</p>
+                <p>📍 {{restaurant.location}}</p>
 
-                <p>₹400 for two</p>
-
+                <p>                    ₹{{restaurant.priceForTwo}} for two
+</p>
+                @if (restaurant.freeDelivery) {
                 <span class="delivery">
                     Free Delivery
                 </span>
+            }
 
             </div>
 
-        </div>
+          </div>
 
+    }
     </div>
 
 </section>

@@ -11,21 +11,13 @@ import { Restaurant } from '../../../core/models/restaurant.model';
 import { RestaurantService } from '../../../core/services/restaurant.service';
 
 @Component({
-
-  // HTML selector.
   selector: 'app-home',
-
-  // Components used inside home.html.
+  standalone: true,
   imports: [
     FeaturedRestaurantsComponent
   ],
-
-  // HTML file.
   templateUrl: './home.html',
-
-  // SCSS file.
   styleUrl: './home.scss'
-
 })
 
 export class Home {
