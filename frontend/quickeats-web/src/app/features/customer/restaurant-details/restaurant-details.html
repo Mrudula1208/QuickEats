@@ -1,0 +1,67 @@
+<!-- ============================= -->
+<!-- Restaurant Menu Section -->
+<!-- ============================= -->
+
+<h2 class="menu-title">
+    🍽 Our Menu
+</h2>
+
+<div class="menu-grid">
+
+    <!-- Loop through every menu item -->
+    @for(menu of menus; track menu.id){
+
+    <div class="menu-card">
+
+        <!-- Menu Image -->
+        <img
+            [src]="menu.image"
+            [alt]="menu.name">
+
+        <!-- Menu Information -->
+        <div class="menu-info">
+
+            <!-- Menu Name -->
+            <h3>
+                {{menu.name}}
+            </h3>
+
+            <!-- Category -->
+            <p class="category">
+                {{menu.category}}
+            </p>
+
+            <!-- Price -->
+            <p class="price">
+                ₹{{menu.price}}
+            </p>
+
+            <!-- Veg / Non Veg -->
+            @if(menu.isVeg){
+
+            <span class="veg">
+                🟢 Veg
+            </span>
+
+            }
+
+            @else{
+
+            <span class="nonveg">
+                🔴 Non Veg
+            </span>
+
+            }
+
+        </div>
+
+        <!-- Add Button -->
+      <button
+    (click)="addToCart(menu)">
+    Add
+</button>
+    </div>
+
+    }
+
+</div>

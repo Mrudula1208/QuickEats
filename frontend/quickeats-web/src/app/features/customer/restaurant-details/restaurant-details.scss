@@ -1,0 +1,163 @@
+/* ========================= */
+/* Menu Title */
+/* ========================= */
+
+.menu-title{
+
+    margin-top:50px;
+
+    margin-bottom:30px;
+
+    font-size:32px;
+
+    font-weight:bold;
+
+}
+
+/* ========================= */
+/* Grid */
+/* ========================= */
+
+.menu-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+
+    gap:25px;
+
+}
+
+/* ========================= */
+/* Card */
+/* ========================= */
+
+.menu-card{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    background:white;
+
+    border-radius:16px;
+
+    padding:20px;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+
+    transition:.3s;
+
+}
+
+/* Hover */
+
+.menu-card:hover{
+
+    transform:translateY(-5px);
+
+}
+
+/* ========================= */
+/* Image */
+/* ========================= */
+
+.menu-card img{
+
+    width:90px;
+
+    height:90px;
+
+    object-fit:cover;
+
+    border-radius:12px;
+
+}
+
+/* ========================= */
+/* Info */
+/* ========================= */
+
+.menu-info{
+
+    flex:1;
+
+    margin-left:20px;
+
+}
+
+.menu-info h3{
+
+    margin-bottom:10px;
+
+}
+
+.category{
+
+    color:gray;
+
+}
+
+.price{
+
+    font-weight:bold;
+
+    margin-top:8px;
+
+}
+
+/* ========================= */
+/* Veg Badge */
+/* ========================= */
+
+.veg{
+
+    color:green;
+
+    font-weight:bold;
+
+}
+
+/* ========================= */
+/* Non Veg Badge */
+/* ========================= */
+
+.nonveg{
+
+    color:red;
+
+    font-weight:bold;
+
+}
+
+/* ========================= */
+/* Add Button */
+/* ========================= */
+
+.add-btn{
+
+    background:#ff5722;
+
+    color:white;
+
+    border:none;
+
+    padding:12px 22px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    font-weight:bold;
+
+    transition:.3s;
+
+}
+
+.add-btn:hover{
+
+    background:#e64a19;
+
+}

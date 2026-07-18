@@ -111,5 +111,11 @@ export class RestaurantService {
     return this.restaurants;
 
   }
+getRestaurantById(id: number): Restaurant | undefined {
 
+  return this.restaurants.find(
+    restaurant => restaurant.id === id
+  );
+
+}
 }

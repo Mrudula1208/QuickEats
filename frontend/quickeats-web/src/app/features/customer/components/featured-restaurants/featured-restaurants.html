@@ -1,5 +1,6 @@
-<p>Total Restaurants: {{ restaurants.length }}</p><section class="featured-section">
+<section class="featured-section">
 
+    <!-- Section Title -->
     <div class="section-title">
         <h2>
             <i class="fa-solid fa-utensils"></i>
@@ -9,62 +10,78 @@
         <p>Discover the highest rated restaurants near you</p>
     </div>
 
+    <!-- Restaurant Grid -->
     <div class="restaurant-grid">
-@for (restaurant of restaurants; track restaurant.id){
-        <div class="restaurant-card">
 
+        @for (restaurant of restaurants; track restaurant.id) {
+
+        <!-- Restaurant Card -->
+        <div
+    class="restaurant-card"
+    [routerLink]="['/restaurant', restaurant.id]">
+
+            <!-- Restaurant Image -->
             <div class="image-container">
 
-                <!-- <img src="assets/images/restaurants/pizza-palace.png"
-                     alt="Pizza Palace"> -->
+                <img
+                    [src]="restaurant.image"
+                    [alt]="restaurant.name">
 
-
-
-                <img [src]="restaurant.image"
-                     [alt]="restaurant.name">
-
-
+                <!-- Discount Badge -->
                 <span class="discount-badge">
-                    🔥 {{restaurant.discount}} 
+                    🔥 {{ restaurant.discount }}
                 </span>
 
-                <button class="favorite-btn">
+                <!-- Favourite Button -->
+                <button
+                    class="favorite-btn"
+                    (click)="$event.stopPropagation()">
+
                     <i class="fa-regular fa-heart"></i>
+
                 </button>
 
             </div>
 
+            <!-- Restaurant Details -->
             <div class="restaurant-info">
 
-                <h3>{{restaurant.name}}</h3>
+                <h3>{{ restaurant.name }}</h3>
 
                 <div class="restaurant-meta">
 
                     <span>
-                       {{restaurant.rating}} ⭐
+                        ⭐ {{ restaurant.rating }}
                     </span>
 
                     <span>
-                        ⏱ {{restaurant.deliveryTime}}
+                        ⏱ {{ restaurant.deliveryTime }}
                     </span>
 
                 </div>
 
-                <p>📍 {{restaurant.location}}</p>
+                <p>
+                    📍 {{ restaurant.location }}
+                </p>
 
-                <p>                    ₹{{restaurant.priceForTwo}} for two
-</p>
+                <p>
+                    ₹{{ restaurant.priceForTwo }} for two
+                </p>
+
                 @if (restaurant.freeDelivery) {
-                <span class="delivery">
-                    Free Delivery
-                </span>
-            }
+
+                    <span class="delivery">
+                        Free Delivery
+                    </span>
+
+                }
 
             </div>
 
-          </div>
+        </div>
 
-    }
+        }
+
     </div>
 
 </section>
