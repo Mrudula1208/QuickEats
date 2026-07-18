@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CartItem } from '../models/cart-item.model';
-import {Menu} from "../models/menu.model"
+import {MenuItem} from "../models/menu.model"
 
 
 @Injectable({
@@ -13,7 +13,7 @@ export class CartService {
     return this.cart;
 
    }
-addToCart(menu:Menu):void{
+addToCart(menu:MenuItem):void{
   const existingItem=this.cart.find(
     item=>item.menuItem.id===menu.id);
 if(existingItem){existingItem.quantity++;
@@ -31,7 +31,7 @@ else{
 
 
 
-removeFromCart(menu:Menu):void{
+removeFromCart(menu:MenuItem):void{
   const existingItem=this.cart.find(
     item=>item.menuItem.id===menu.id
  );

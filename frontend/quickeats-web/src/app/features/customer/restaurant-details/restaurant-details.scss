@@ -138,26 +138,28 @@
 
 .add-btn{
 
-    background:#ff5722;
+    background:#ff5a1f;
 
     color:white;
 
     border:none;
 
-    padding:12px 22px;
+    padding:10px 22px;
 
     border-radius:10px;
 
     cursor:pointer;
 
-    font-weight:bold;
+    font-size:16px;
+
+    font-weight:600;
 
     transition:.3s;
-
 }
 
 .add-btn:hover{
 
-    background:#e64a19;
+    background:#e74c0c;
 
+    transform:scale(1.05);
 }

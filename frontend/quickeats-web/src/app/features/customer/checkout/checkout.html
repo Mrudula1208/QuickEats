@@ -1,0 +1,72 @@
+<div class="checkout-container">
+
+    <!-- Page Title -->
+    <h1>Checkout</h1>
+
+    <!-- Delivery Address -->
+    <div class="form-group">
+
+        <label>Delivery Address</label>
+
+        <input
+            type="text"
+            [(ngModel)]="address"
+            placeholder="Enter your address">
+
+    </div>
+
+    <!-- Phone Number -->
+    <div class="form-group">
+
+        <label>Phone Number</label>
+
+        <input
+            type="text"
+            [(ngModel)]="phone"
+            placeholder="Enter phone number">
+
+    </div>
+
+    <!-- Place Order Button -->
+    <button
+        class="place-order-btn"
+        (click)="PlaceOrder()">
+
+        Place Order
+
+    </button>
+
+    <!-- Order Summary -->
+    <h2>Order Summary</h2>
+
+    @for (item of cartItems; track item.menuItem.id) {
+
+    <div class="summary-item">
+
+        <span>
+
+            {{ item.menuItem.name }}
+
+        </span>
+
+        <span>
+
+            ₹{{ item.menuItem.price }}
+            ×
+            {{ item.quantity }}
+
+        </span>
+
+    </div>
+
+    }
+
+    <hr>
+
+    <h3 class="total">
+
+        Total ₹{{ total }}
+
+    </h3>
+
+</div>

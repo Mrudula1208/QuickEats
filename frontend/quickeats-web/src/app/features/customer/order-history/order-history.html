@@ -1,0 +1,84 @@
+<div class="orders-page">
+
+    <div class="page-title">
+
+        <h1>🛍 My Orders</h1>
+
+        <p>Track all your previous orders</p>
+
+    </div>
+
+    @if (orders.length === 0) {
+
+        <div class="empty-orders">
+
+            <h2>No Orders Yet 🍕</h2>
+
+            <p>Looks like you haven't placed any order.</p>
+
+        </div>
+
+    }
+
+    @else {
+
+        <div class="orders-grid">
+
+            @for(order of orders; track order.id){
+
+            <div class="order-card">
+
+                <div class="order-header">
+
+                    <h3>Order #{{order.id}}</h3>
+
+                    <span class="status">
+                        Delivered
+                    </span>
+
+                </div>
+
+                <hr>
+
+                <p>
+                    📅
+                    {{order.date | date:'medium'}}
+                </p>
+
+                <p>
+                    📍
+                    {{order.address}}
+                </p>
+
+              <p><strong>Items Ordered</strong></p>
+
+@for(item of order.items; track item.menuItem.id){
+
+<div class="ordered-item">
+
+    <span>
+        🍕 {{ item.menuItem.name }}
+    </span>
+
+    <span>
+        × {{ item.quantity }}
+    </span>
+
+</div>
+
+}
+
+                <h2>
+                    ₹{{order.total}}
+                </h2>
+
+            </div>
+
+            }
+
+        </div>
+
+
+    }
+
+</div>

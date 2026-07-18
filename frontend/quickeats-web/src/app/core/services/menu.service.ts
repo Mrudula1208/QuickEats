@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Menu } from '../models/menu.model';
+import { MenuItem } from '../models/menu.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MenuService {
 
-  menus: Menu[] = [
+  menus: MenuItem[] = [
 
     {
       id: 1,
@@ -50,10 +50,10 @@ export class MenuService {
 
   ];
 
-  getMenus(): Menu[] {
+  getMenus(): MenuItem[] {
     return this.menus;
   }
-getMenusByRestaurantId(restaurantId: number): Menu[] {
+getMenusByRestaurantId(restaurantId: number): MenuItem[] {
 
   return this.menus.filter(
 

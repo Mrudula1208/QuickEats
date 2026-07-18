@@ -1,0 +1,54 @@
+<div class="cart-container">
+
+    <h1>🛒 My Cart</h1>
+
+    @if(cartItems.length===0){
+
+        <h2>Your cart is empty.</h2>
+
+    }
+
+    @else {
+
+        @for(item of cartItems;track item.menuItem.id){
+
+            <div class="cart-card">
+
+                <img
+                    [src]="item.menuItem.image"
+                    [alt]="item.menuItem.name">
+
+                <div class="details">
+
+                    <h3>{{item.menuItem.name}}</h3>
+
+                    <p>₹{{item.menuItem.price}}</p>
+
+                    <p>Quantity : {{item.quantity}}</p>
+
+                </div>
+
+            </div>
+
+        }
+
+        <div class="total">
+
+            Total : ₹{{getTotalPrice()}}
+
+        </div>
+        <!-- Opens Checkout page -->
+
+<button
+
+class="checkout-btn"
+
+routerLink="/checkout">
+
+Proceed to Checkout
+
+</button>
+
+    }
+
+</div>

@@ -1,10 +1,29 @@
+// Import Component decorator.
 import { Component } from '@angular/core';
+
+// Import ActivatedRoute.
 import { ActivatedRoute } from '@angular/router';
-import { Menu } from '../../../core/models/menu.model';
-import { MenuService } from '../../../core/services/menu.service';
+
+// Import Router.
+import { Router } from '@angular/router';
+
+// Import Menu model.
+
+// Import Restaurant model.
 import { Restaurant } from '../../../core/models/restaurant.model';
+
+// Import Menu Service.
+import { MenuService } from '../../../core/services/menu.service';
+
+// Import Restaurant Service.
 import { RestaurantService } from '../../../core/services/restaurant.service';
+
+// Import Cart Service.
 import { CartService } from '../../../core/services/cart.service';
+
+// Import MenuItem model.
+import { MenuItem } from '../../../core/models/menu.model';
+
 @Component({
   selector: 'app-restaurant-details',
   standalone: true,
@@ -12,53 +31,56 @@ import { CartService } from '../../../core/services/cart.service';
   styleUrl: './restaurant-details.scss'
 })
 export class RestaurantDetailsComponent {
-menus: Menu[] = [];
+
+  // Stores all menu items.
+  menus: MenuItem[] = [];
+
+  // Stores selected restaurant.
   restaurant?: Restaurant;
 
- constructor(
+  // Only ONE constructor.
+  constructor(
 
-  
-  private route: ActivatedRoute,
+    // Gets menu data.
+    private menuService: MenuService,
 
-  // Used to load restaurant details.
-  private restaurantService: RestaurantService,
+    // Reads id from URL.
+    private route: ActivatedRoute,
 
-  // Used to load menu items.
-  private menuService: MenuService,
-  private CartService:CartService
+    // Gets restaurant details.
+    private restaurantService: RestaurantService,
 
-) {
+    // Adds items into cart.
+    private cartService: CartService,
 
-  // Read restaurant id
-  // from URL.
-  const id = Number(
+    // Used to navigate pages.
+    private router: Router
 
-    this.route.snapshot.paramMap.get('id')
+  ) {
 
-  );
+    // Read restaurant id from URL.
+    const id = Number(
+      this.route.snapshot.paramMap.get('id')
+    );
 
-  this.restaurant =
+    // Load restaurant.
+    this.restaurant =
+      this.restaurantService.getRestaurantById(id);
 
-    this.restaurantService.getRestaurantById(id);
+    // Load menu.
+    this.menus =
+      this.menuService.getMenusByRestaurantId(id);
 
+  }
 
-  this.menus =
+  // Add item into cart.
+  addToCart(menuItem: MenuItem): void {
 
-    this.menuService.getMenusByRestaurantId(id);
+    this.cartService.addToCart(menuItem);
 
-}
-addToCart(menuItem: Menu): void {
+    // Open cart page.
+    this.router.navigate(['/cart']);
 
-  // Send selected menu item
-  // to CartService.
-  this.CartService.addToCart(menuItem);
-
-  // Temporary confirmation.
-  //
-  // Later we'll replace this
-  // with a Snackbar.
-  alert(menuItem.name + ' added to cart.');
-
-}
+  }
 
 }

@@ -1,6 +1,6 @@
-import {Menu} from './menu.model';
+import {MenuItem} from './menu.model';
 
 export interface CartItem{
-    menuItem:Menu;
+    menuItem:MenuItem;
     quantity:number;
 }
