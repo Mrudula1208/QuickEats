@@ -1,0 +1,274 @@
+/* =====================================================
+   PAGE
+===================================================== */
+
+:host {
+
+    display: block;
+
+    background: #f8f9fb;
+
+    min-height: 100vh;
+
+    padding: 40px;
+
+}
+
+/* =====================================================
+   PAGE TITLE
+===================================================== */
+
+h1 {
+
+    text-align: center;
+
+    font-size: 34px;
+
+    margin-bottom: 35px;
+
+    color: #222;
+
+}
+
+/* =====================================================
+   ORDER CARD
+===================================================== */
+
+.order-container {
+
+    max-width: 900px;
+
+    margin: auto;
+
+    background: white;
+
+    border-radius: 18px;
+
+    padding: 35px;
+
+    box-shadow: 0 12px 30px rgba(0,0,0,.08);
+
+}
+
+/* =====================================================
+   ORDER HEADING
+===================================================== */
+
+.order-container h2 {
+
+    margin-bottom: 15px;
+
+    color: #ff5722;
+
+}
+
+/* =====================================================
+   ORDER INFORMATION
+===================================================== */
+
+.order-container p {
+
+    margin: 12px 0;
+
+    font-size: 16px;
+
+    color: #555;
+
+}
+
+/* =====================================================
+   LINE
+===================================================== */
+
+hr {
+
+    margin: 25px 0;
+
+    border: none;
+
+    border-top: 1px solid #eee;
+
+}
+
+/* =====================================================
+   ORDER ITEMS
+===================================================== */
+
+.order-item {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding: 18px;
+
+    margin-bottom: 12px;
+
+    background: #fafafa;
+
+    border-radius: 12px;
+
+    transition: .3s;
+
+}
+
+.order-item:hover {
+
+    background: #fff3ee;
+
+    transform: translateY(-2px);
+
+}
+
+/* =====================================================
+   FOOD NAME
+===================================================== */
+
+.order-item span:first-child {
+
+    font-weight: 600;
+
+    color: #333;
+
+}
+
+/* =====================================================
+   QUANTITY
+===================================================== */
+
+.order-item span:nth-child(2) {
+
+    color: #777;
+
+}
+
+/* =====================================================
+   PRICE
+===================================================== */
+
+.order-item span:last-child {
+
+    font-weight: bold;
+
+    color: #ff5722;
+
+}
+
+/* =====================================================
+   TOTAL
+===================================================== */
+
+.order-container h2:last-child {
+
+    text-align: right;
+
+    color: #27ae60;
+
+    margin-top: 20px;
+
+}
+
+/* =====================================================
+   ORDER NOT FOUND
+===================================================== */
+
+.empty-order {
+
+    max-width: 500px;
+
+    margin: auto;
+
+    background: white;
+
+    border-radius: 16px;
+
+    padding: 40px;
+
+    text-align: center;
+
+    box-shadow: 0 8px 25px rgba(0,0,0,.08);
+
+}
+
+.empty-order h2 {
+
+    color: #888;
+
+}
+
+/*
+
+=========================================================
+WHY DO WE WRITE THIS FILE?
+=========================================================
+
+This file gives a modern design to the
+Order Details page.
+
+Without this file,
+
+the page works,
+
+but looks plain.
+
+=========================================================
+WHERE IS THIS FILE USED?
+=========================================================
+
+order-details.ts
+
+↓
+
+@Component
+
+↓
+
+styleUrl
+
+↓
+
+order-details.scss (THIS FILE)
+
+↓
+
+Beautiful UI
+
+=========================================================
+WHAT THIS FILE STYLES?
+=========================================================
+
+✓ Background
+
+✓ Order Card
+
+✓ Order Information
+
+✓ Ordered Items
+
+✓ Total Amount
+
+✓ Hover Effect
+
+✓ Empty Order Page
+
+=========================================================
+FLOW
+=========================================================
+
+order-details.html
+
+↓
+
+CSS Classes
+
+↓
+
+order-details.scss
+
+↓
+
+Beautiful Order Details Page
+
+*/

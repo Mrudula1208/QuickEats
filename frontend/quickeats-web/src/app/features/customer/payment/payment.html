@@ -1,0 +1,116 @@
+<div class="payment-container">
+
+    <!-- Page Title -->
+
+    <h1>💳 Payment</h1>
+
+    <p class="subtitle">
+        Choose your preferred payment method
+    </p>
+
+    <!-- Payment Summary -->
+
+    <div class="summary-box">
+
+        <h2>Payment Summary</h2>
+
+        <div class="summary-row">
+
+            <span>Subtotal</span>
+
+            <strong>₹{{amount}}</strong>
+
+        </div>
+
+        <div class="summary-row">
+
+            <span>Delivery Fee</span>
+
+            <strong>FREE</strong>
+
+        </div>
+
+        <hr>
+
+        <div class="summary-row total">
+
+            <span>Total</span>
+
+            <strong>₹{{amount}}</strong>
+
+        </div>
+
+    </div>
+
+    <!-- Payment Method -->
+
+    <h2>Select Payment Method</h2>
+
+    <label class="payment-option">
+
+        <input
+            type="radio"
+            name="payment"
+            value="UPI"
+            [(ngModel)]="paymentMethod">
+
+        📱 UPI
+
+    </label>
+
+    <label class="payment-option">
+
+        <input
+            type="radio"
+            name="payment"
+            value="Credit Card"
+            [(ngModel)]="paymentMethod">
+
+        💳 Credit Card
+
+    </label>
+
+    <label class="payment-option">
+
+        <input
+            type="radio"
+            name="payment"
+            value="Debit Card"
+            [(ngModel)]="paymentMethod">
+
+        💳 Debit Card
+
+    </label>
+
+    <label class="payment-option">
+
+        <input
+            type="radio"
+            name="payment"
+            value="Cash On Delivery"
+            [(ngModel)]="paymentMethod">
+
+        💵 Cash On Delivery
+
+    </label>
+
+    <!-- Selected Method -->
+
+    <div class="selected-method">
+
+        Selected Payment :
+        <strong>{{paymentMethod}}</strong>
+
+    </div>
+
+    <!-- Button -->
+
+    <button
+        class="pay-btn"
+        (click)="payNow()">
+
+        Pay ₹{{amount}}
+
+    </button>
+
+</div>

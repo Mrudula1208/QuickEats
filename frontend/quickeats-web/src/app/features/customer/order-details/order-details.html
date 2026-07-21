@@ -1,0 +1,27 @@
+<h1>Order Detail</h1>
+@if(order){
+    <div class="order-container">
+        <h2>Order #{{order.id}}</h2>
+        <P> 📅 {{ order.date | date:'medium' }}</P>
+        <p> 📍 {{ order.address }}</p>
+        <p>📞 {{ order.phone }}</p>
+        <h3>Ordered Items</h3>
+
+        @for(item of order.items;track item.menuItem.id){
+            <div class="order-item">
+                <span> {{ item.menuItem.name }}</span>
+                <span>Qty : {{ item.quantity }}</span>
+                <span>₹{{ item.menuItem.price }}</span>
+            </div>
+        }
+        <hr>
+        <h2>Total : ₹{{ order.total }}</h2>
+  <hr>
+
+    </div>
+}
+@else {
+    <div class="empty-order">
+        <h2> Order Not Found 😔</h2>
+    </div>
+}
