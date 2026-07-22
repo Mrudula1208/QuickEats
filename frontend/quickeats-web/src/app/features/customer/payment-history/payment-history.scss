@@ -1,0 +1,67 @@
+.page-title{
+
+text-align:center;
+
+margin:40px;
+
+}
+
+.page-title h1{
+
+color:#ff5a5f;
+
+font-size:38px;
+
+}
+
+.payment-grid{
+
+display:grid;
+
+grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+
+gap:25px;
+
+padding:30px;
+
+}
+
+.payment-card{
+
+background:white;
+
+padding:25px;
+
+border-radius:15px;
+
+box-shadow:0 8px 25px rgba(0,0,0,.08);
+
+transition:.3s;
+
+}
+
+.payment-card:hover{
+
+transform:translateY(-5px);
+
+}
+
+.payment-card h2{
+
+color:#ff5a5f;
+
+}
+
+.payment-card p{
+
+margin:10px 0;
+
+}
+
+.empty{
+
+text-align:center;
+
+margin-top:100px;
+
+}

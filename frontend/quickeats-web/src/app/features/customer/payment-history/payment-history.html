@@ -1,0 +1,65 @@
+<div class="payment-page">
+
+    <div class="page-title">
+
+        <h1>💳 Payment History</h1>
+
+        <p>View all completed payments</p>
+
+    </div>
+
+    @if (payments.length === 0) {
+
+        <div class="empty">
+
+            <h2>No Payments Yet</h2>
+
+        </div>
+
+    }
+
+    @else {
+
+        <div class="payment-grid">
+
+            @for (payment of payments; track payment.id) {
+
+                <div class="payment-card">
+
+                    <h3>Payment #{{payment.id}}</h3>
+
+                    <hr>
+
+                    <p>
+                        📦 Order ID :
+                        {{payment.orderId}}
+                    </p>
+
+                    <p>
+                        💳 Method :
+                        {{payment.method}}
+                    </p>
+
+                    <p>
+                        📅 Date :
+                        {{payment.date | date:'medium'}}
+                    </p>
+
+                    <p>
+                        ✅ Status :
+                        {{payment.status}}
+                    </p>
+
+                    <h2>
+                        ₹{{payment.amount}}
+                    </h2>
+
+                </div>
+
+            }
+
+        </div>
+
+    }
+
+</div>

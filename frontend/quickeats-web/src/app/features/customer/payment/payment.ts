@@ -1,40 +1,191 @@
+// Import Component decorator.
 import { Component } from '@angular/core';
+
+// Import CommonModule.
 import { CommonModule } from '@angular/common';
+
+// Required for ngModel.
 import { FormsModule } from '@angular/forms';
+
+// Used for page navigation.
 import { Router } from '@angular/router';
+
+// Checkout data service.
+import { CheckoutDataService } from '../../../core/services/checkout-data.service';
+
+// Order model.
+import { Order } from '../../../core/models/order';
+
+// Order service.
+import { OrderService } from '../../../core/services/order';
+
+// Payment model.
 import { Payment } from '../../../core/models/payment.model';
+
+// Payment service.
 import { PaymentService } from '../../../core/services/payment.service';
+
+// Cart service.
 import { CartService } from '../../../core/services/cart.service';
 
 @Component({
   selector: 'app-payment',
-  imports: [CommonModule,FormsModule],
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule
+  ],
   templateUrl: './payment.html',
-  styleUrl: './payment.scss',
+  styleUrl: './payment.scss'
 })
+
 export class PaymentComponent {
-  total=0;
-  selectedMethod="Cash On Delivery";
+
+  // Stores total amount to display on screen.
+  amount = 0;
+
+  // Stores selected payment method.
+  paymentMethod = 'Cash On Delivery';
+
   constructor(
-    private CartService:CartService,
-    private paymentService:PaymentService,
-    private router:Router
-  ){
-this.total=this.CartService.getTotalPrice();
+
+    // Reads data entered on Checkout page.
+    private checkoutData: CheckoutDataService,
+
+    // Saves completed orders.
+    private orderService: OrderService,
+
+    // Clears cart after successful payment.
+    private cartService: CartService,
+
+    // Saves payment information.
+    private paymentService: PaymentService,
+
+    // Used for page navigation.
+    private router: Router
+
+  ) {
+
+    // Read total amount from Checkout.
+    this.amount = this.checkoutData.total;
+
   }
 
-    payNow():void{
-   const payment:Payment={
-       orderId: Date.now(),
-    id:Date.now(),
-    amount:this.total,
-    method:this.selectedMethod,
-    status:"Paid",
-    date:new Date()
-   
-   } ;
-   this.paymentService.savePayment(payment);
-   alert("Payment Successful");
-   this.router.navigate(['/orders']);
+  // Runs when user clicks "Pay Now".
+  payNow(): void {
+
+    // Create one unique id.
+    // We use the same id for both
+    // Order and Payment.
+    const orderId = Date.now();
+
+    // Create Order object.
+    const order: Order = {
+
+      id: orderId,
+
+      address: this.checkoutData.address,
+
+      phone: this.checkoutData.phone,
+
+      items: this.checkoutData.cartItems,
+
+      total: this.checkoutData.total,
+
+      date: new Date()
+
+    };
+
+    // Save order into OrderService.
+    this.orderService.PlaceOrder(order);
+
+    // Create Payment object.
+    const payment: Payment = {
+
+      // Payment Id.
+      id: orderId,
+
+      // Connected Order Id.
+      orderId: orderId,
+
+      // Total amount paid.
+      amount: order.total,
+
+      // Selected payment method.
+      method: this.paymentMethod,
+
+      // Payment status.
+      status: 'Paid',
+
+      // Payment date.
+      date: new Date()
+
+    };
+
+    // Save payment into PaymentService.
+    this.paymentService.savePayment(payment);
+
+    // Empty cart after successful payment.
+    this.cartService.clearCart();
+
+    // Show success message.
+    alert('✅ Payment Successful');
+
+    // Open Payment History page.
+    this.router.navigate(['/payments']);
+
   }
+
 }
+
+/*
+
+WHY DO WE WRITE THIS FILE?
+
+This component performs the complete
+payment process.
+
+Flow
+
+Cart
+   ↓
+
+Checkout
+   ↓
+
+CheckoutDataService
+   ↓
+
+Payment (THIS FILE)
+   ↓
+
+Create Order Object
+   ↓
+
+Save Order
+   ↓
+
+Create Payment Object
+   ↓
+
+Save Payment
+   ↓
+
+Clear Cart
+   ↓
+
+Payment History
+
+This component:
+
+1. Reads Checkout data.
+2. Displays total amount.
+3. Lets user select payment method.
+4. Creates an Order object.
+5. Saves the Order.
+6. Creates a Payment object.
+7. Saves the Payment.
+8. Clears the shopping cart.
+9. Opens Payment History.
+
+*/

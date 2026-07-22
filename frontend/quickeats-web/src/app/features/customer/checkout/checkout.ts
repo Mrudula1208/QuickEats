@@ -1,6 +1,11 @@
 // Import Component decorator.
 import { Component } from '@angular/core';
+
+// Used for page navigation.
 import { Router } from '@angular/router';
+
+// Stores checkout information.
+import { CheckoutDataService } from '../../../core/services/checkout-data.service';
 
 // Import CommonModule.
 import { CommonModule } from '@angular/common';
@@ -10,18 +15,21 @@ import { CartService } from '../../../core/services/cart.service';
 
 // Import CartItem model.
 import { CartItem } from '../../../core/models/cart-item.model';
+
+// Required for [(ngModel)].
 import { FormsModule } from '@angular/forms';
 
-// Import Order model.
-import { Order } from '../../../core/models/order';import { OrderService } from '../../../core/services/order';
-// Import Order Service.
 @Component({
   selector: 'app-checkout',
   standalone: true,
-  imports: [CommonModule,FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule
+  ],
   templateUrl: './checkout.html',
   styleUrl: './checkout.scss'
 })
+
 export class CheckoutComponent {
 
   // Stores all cart items.
@@ -38,77 +46,78 @@ export class CheckoutComponent {
 
   constructor(
 
-    // Used to access cart items.
+    // Reads cart items.
     private cartService: CartService,
 
-    // Used to save orders.
-    private orderService: OrderService,
-    private router:Router
+    // Stores checkout information
+    // temporarily until payment.
+    private checkoutData: CheckoutDataService,
+
+    // Used for page navigation.
+    private router: Router
 
   ) {
 
     // Load cart items.
     this.cartItems = this.cartService.getCartItems();
 
-    // Load total price.
+    // Load total amount.
     this.total = this.cartService.getTotalPrice();
 
   }
 
-  // Runs when Place Order button is clicked.
+  // Runs when user clicks
+  // Proceed To Payment.
   PlaceOrder(): void {
 
- const order: Order = {
-  id: Date.now(),
-  address: this.address,
-  phone: this.phone,
+    // Save delivery address.
+    this.checkoutData.address = this.address;
 
-  items: this.cartItems.map(item => ({
-    menuItem: item.menuItem,
-    quantity: item.quantity
-  })),
+    // Save phone number.
+    this.checkoutData.phone = this.phone;
 
-  total: this.total,
-  date: new Date()
-};
+    // Save cart items.
+    this.checkoutData.cartItems = this.cartItems.map(item => ({
+      menuItem: item.menuItem,
+      quantity: item.quantity
+    }));
 
-console.log(this.cartItems);
-console.log(order);
+    // Save total amount.
+    this.checkoutData.total = this.total;
 
-this.orderService.PlaceOrder(order);
+    // Open Payment page.
+    this.router.navigate(['/payment']);
 
-  this.cartService.clearCart();
-
-  alert("🎉 Order Placed Successfully!");
-
-  this.router.navigate(['/orders']);
+  }
 
 }
 
 /*
+
 WHY DO WE WRITE THIS FILE?
 
-CheckoutComponent is the bridge between
-Cart and Orders.
+CheckoutComponent collects
+customer information before payment.
 
-Flow:
+Flow
 
 Restaurant
-   ↓
+      ↓
 Cart
-   ↓
+      ↓
 Checkout (THIS FILE)
-   ↓
-OrderService
-   ↓
-Order History
+      ↓
+CheckoutDataService
+      ↓
+Payment
 
 This component:
+
 1. Reads cart items.
-2. Shows total price.
-3. Takes address.
+2. Calculates total amount.
+3. Takes delivery address.
 4. Takes phone number.
-5. Creates an Order object.
-6. Sends the order to OrderService.
-7. Clears the cart.
-*/}
+5. Saves checkout information.
+6. Opens Payment page.
+
+*/

@@ -6,8 +6,12 @@ import { Payment } from "../models/payment.model";
 export class PaymentService{
     private payments:Payment[]=[];
     savePayment(payment:Payment):void{
-        this.payments.push(payment);
-    }
+ console.log("Saving Payment...");
+  console.log(payment);
+
+  this.payments.push(payment);
+
+  console.log(this.payments);    }
     getPayments():Payment[]{
         return this.payments;
     }

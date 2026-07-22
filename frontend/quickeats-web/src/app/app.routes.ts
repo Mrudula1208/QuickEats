@@ -6,7 +6,7 @@ import {CheckoutComponent} from './features/customer/checkout/checkout';
 import { OrderHistoryComponent } from './features/customer/order-history/order-history';
 import { OrderDetailsComponent } from './features/customer/order-details/order-details';
 import { PaymentComponent } from './features/customer/payment/payment';
-
+import { PaymentHistoryComponent } from './features/customer/payment-history/payment-history';
 
 
 export const routes: Routes = [
@@ -40,5 +40,8 @@ export const routes: Routes = [
 },{
   path:'payment',
   component:PaymentComponent
+},{
+    path:'payments',
+    component:PaymentHistoryComponent
 }
 ];
