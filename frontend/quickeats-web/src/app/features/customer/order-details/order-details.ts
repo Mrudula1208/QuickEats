@@ -3,12 +3,13 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { Order } from '../../../core/models/order';
 import { OrderService } from '../../../core/services/order';
+import { RouterLink } from '@angular/router';
 
 
 @Component({
   selector: 'app-order-details',
   standalone:true,
-  imports: [CommonModule],
+  imports: [CommonModule,RouterLink],
   templateUrl: './order-details.html',
   styleUrl: './order-details.scss',
 })

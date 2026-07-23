@@ -1,0 +1,161 @@
+<p>delivery-tracking works!</p>
+<!-- ===================================================== -->
+<!-- STEP 1 -->
+<!-- ===================================================== -->
+<!--
+This page displays ONE delivery.
+
+The delivery object comes from
+
+DeliveryTrackingComponent
+
+↓
+
+delivery
+
+↓
+
+HTML reads it.
+
+-->
+
+<div class="delivery-page">
+
+    <!-- ================================================ -->
+    <!-- STEP 2 -->
+    <!-- ================================================ -->
+    <!--
+    Page Title
+    -->
+
+    <h1>🚚 Delivery Tracking</h1>
+
+    <p>
+        Track your delivery partner
+    </p>
+
+
+    <!-- ================================================ -->
+    <!-- STEP 3 -->
+    <!--
+    Check whether delivery exists.
+
+    If DeliveryService found a delivery,
+
+    show it.
+
+    Otherwise,
+
+    show "Delivery Not Found".
+    -->
+    @if(delivery){
+
+    <!-- ================================================ -->
+    <!-- STEP 4 -->
+    <!--
+    Delivery Card
+    -->
+
+    <div class="delivery-card">
+
+        <h2>Delivery Partner</h2>
+
+        <hr>
+
+        <!-- ============================================ -->
+        <!-- STEP 5 -->
+        <!--
+        HTML reads
+
+        delivery.partnerName
+
+        from
+
+        delivery object.
+        -->
+
+        <p>
+
+            <strong>👤 Partner :</strong>
+
+            {{delivery.partnerName}}
+
+        </p>
+
+
+        <!-- ============================================ -->
+
+        <p>
+
+            <strong>📞 Phone :</strong>
+
+            {{delivery.partnerPhone}}
+
+        </p>
+
+
+        <!-- ============================================ -->
+
+        <p>
+
+            <strong>🏍 Bike :</strong>
+
+            {{delivery.bikeNumber}}
+
+        </p>
+
+
+        <!-- ============================================ -->
+
+        <p>
+
+            <strong>⏱ Estimated Time :</strong>
+
+            {{delivery.estimatedTime}}
+
+        </p>
+
+
+        <!-- ============================================ -->
+
+        <p>
+
+            <strong>📦 Status :</strong>
+
+            <span class="status">
+
+                {{delivery.status}}
+
+            </span>
+
+        </p>
+
+    </div>
+
+    }
+
+    @else{
+
+    <!-- ================================================ -->
+    <!-- STEP 6 -->
+    <!--
+    If delivery is undefined,
+
+    show this.
+    -->
+
+    <div class="not-found">
+
+        <h2>❌ Delivery Not Found</h2>
+
+        <p>
+
+            No delivery information available.
+
+        </p>
+
+    </div>
+
+    }
+
+</div>

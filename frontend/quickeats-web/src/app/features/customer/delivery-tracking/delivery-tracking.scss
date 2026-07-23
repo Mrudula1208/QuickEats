@@ -1,0 +1,264 @@
+/* =========================================================
+
+STEP 1
+
+This styles the whole page.
+
+margin:auto
+→ Center the page.
+
+max-width
+→ Prevent the page from becoming too wide.
+
+padding
+→ Space inside the page.
+
+========================================================= */
+
+.delivery-page{
+
+    max-width:900px;
+
+    margin:auto;
+
+    padding:40px;
+
+}
+
+
+
+/* =========================================================
+
+STEP 2
+
+Page Heading
+
+========================================================= */
+
+.delivery-page h1{
+
+    text-align:center;
+
+    color:#ff5a5f;
+
+    font-size:38px;
+
+}
+
+
+
+/* =========================================================
+
+Subtitle
+
+========================================================= */
+
+.delivery-page p{
+
+    text-align:center;
+
+    color:#666;
+
+}
+
+
+
+/* =========================================================
+
+STEP 3
+
+Delivery Card
+
+White background
+
+Rounded corners
+
+Shadow
+
+========================================================= */
+
+.delivery-card{
+
+    margin-top:40px;
+
+    background:white;
+
+    border-radius:15px;
+
+    padding:30px;
+
+    box-shadow:0 8px 25px rgba(0,0,0,.08);
+
+}
+
+
+
+/* =========================================================
+
+Card Heading
+
+========================================================= */
+
+.delivery-card h2{
+
+    color:#ff5a5f;
+
+    margin-bottom:15px;
+
+}
+
+
+
+/* =========================================================
+
+Horizontal Line
+
+========================================================= */
+
+.delivery-card hr{
+
+    margin-bottom:20px;
+
+}
+
+
+
+/* =========================================================
+
+Every Row
+
+Partner
+
+Phone
+
+Bike
+
+Status
+
+ETA
+
+========================================================= */
+
+.delivery-card p{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:15px 0;
+
+    border-bottom:1px solid #eee;
+
+    font-size:18px;
+
+}
+
+
+
+/* =========================================================
+
+Last Row
+
+Remove Border
+
+========================================================= */
+
+.delivery-card p:last-child{
+
+    border-bottom:none;
+
+}
+
+
+
+/* =========================================================
+
+Status Badge
+
+========================================================= */
+
+.status{
+
+    background:#fff3cd;
+
+    color:#856404;
+
+    padding:8px 18px;
+
+    border-radius:25px;
+
+    font-weight:bold;
+
+}
+
+
+
+/* =========================================================
+
+Delivery Not Found Card
+
+========================================================= */
+
+.not-found{
+
+    margin-top:80px;
+
+    text-align:center;
+
+    background:white;
+
+    padding:40px;
+
+    border-radius:15px;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+
+}
+
+
+
+/* =========================================================
+
+Not Found Heading
+
+========================================================= */
+
+.not-found h2{
+
+    color:red;
+
+    margin-bottom:15px;
+
+}
+
+
+
+/* =========================================================
+
+Responsive Design
+
+Mobile Screen
+
+========================================================= */
+
+@media(max-width:768px){
+
+    .delivery-card{
+
+        padding:20px;
+
+    }
+
+    .delivery-card p{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:8px;
+
+    }
+
+}

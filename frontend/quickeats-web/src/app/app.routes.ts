@@ -7,7 +7,7 @@ import { OrderHistoryComponent } from './features/customer/order-history/order-h
 import { OrderDetailsComponent } from './features/customer/order-details/order-details';
 import { PaymentComponent } from './features/customer/payment/payment';
 import { PaymentHistoryComponent } from './features/customer/payment-history/payment-history';
-
+import { DeliveryTrackingComponent } from './features/customer/delivery-tracking/delivery-tracking';
 
 export const routes: Routes = [
 
@@ -43,5 +43,8 @@ export const routes: Routes = [
 },{
     path:'payments',
     component:PaymentHistoryComponent
+},{
+  path: 'delivery/:orderId',
+  component: DeliveryTrackingComponent
 }
 ];

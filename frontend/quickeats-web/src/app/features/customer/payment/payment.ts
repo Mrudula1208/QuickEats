@@ -27,6 +27,9 @@ import { PaymentService } from '../../../core/services/payment.service';
 
 // Cart service.
 import { CartService } from '../../../core/services/cart.service';
+import { Delivery } from '../../../core/models/delivery.model';
+
+import { DeliveryService } from '../../../core/services/delivery.service';
 
 @Component({
   selector: 'app-payment',
@@ -62,7 +65,8 @@ export class PaymentComponent {
     private paymentService: PaymentService,
 
     // Used for page navigation.
-    private router: Router
+    private router: Router,
+    private deliveryService: DeliveryService,
 
   ) {
 
@@ -124,6 +128,27 @@ export class PaymentComponent {
 
     // Save payment into PaymentService.
     this.paymentService.savePayment(payment);
+    // Create Delivery Object.
+const delivery: Delivery = {
+
+    id: orderId,
+
+    orderId: orderId,
+
+    partnerName: "Rahul Sharma",
+
+    partnerPhone: "9876543210",
+
+    bikeNumber: "MH12AB1234",
+
+    estimatedTime: "30 Minutes",
+
+    status: "Preparing"
+
+};
+
+// Save Delivery.
+this.deliveryService.saveDelivery(delivery);
 
     // Empty cart after successful payment.
     this.cartService.clearCart();
