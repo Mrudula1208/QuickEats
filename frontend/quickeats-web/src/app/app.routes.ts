@@ -8,7 +8,9 @@ import { OrderDetailsComponent } from './features/customer/order-details/order-d
 import { PaymentComponent } from './features/customer/payment/payment';
 import { PaymentHistoryComponent } from './features/customer/payment-history/payment-history';
 import { DeliveryTrackingComponent } from './features/customer/delivery-tracking/delivery-tracking';
-
+import { authGuard } from './guards/auth.guard';
+import { LoginComponent } from './features/auth/login/login';
+import { RegisterComponent } from './features/auth/register/register';
 export const routes: Routes = [
 
   {
@@ -32,7 +34,8 @@ export const routes: Routes = [
   },
  {
   path: 'orders',
-  component: OrderHistoryComponent
+  component: OrderHistoryComponent,
+  canActivate:[authGuard]
 }
 ,{
     path: 'orders/:id',
@@ -42,9 +45,22 @@ export const routes: Routes = [
   component:PaymentComponent
 },{
     path:'payments',
-    component:PaymentHistoryComponent
+    component:PaymentHistoryComponent,
+    canActivate:[authGuard]
 },{
   path: 'delivery/:orderId',
   component: DeliveryTrackingComponent
-}
+},  // Register Page
+  {
+    path: 'register',
+
+    component: RegisterComponent
+  },
+
+  // Login Page
+  {
+    path: 'login',
+
+    component: LoginComponent
+  }
 ];

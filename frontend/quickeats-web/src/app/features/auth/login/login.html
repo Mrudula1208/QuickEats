@@ -1,0 +1,53 @@
+<h1>Login</h1>
+
+<p>Enter your email and password</p>
+
+<label>Email</label>
+
+<input
+type="email"
+[(ngModel)]="login.email"
+placeholder="Enter Email">
+
+<!-- Whatever user types
+goes into login.email -->
+
+<label>Password</label>
+
+<input
+type="password"
+[(ngModel)]="login.password"
+placeholder="Enter Password">
+
+<!-- Whatever user types
+goes into login.password -->
+
+<button
+(click)="loginUser()">
+
+Login
+
+</button>
+
+<!-- Button click
+
+↓
+
+loginUser()
+
+↓
+
+AuthService.login()
+
+↓
+
+Backend API
+
+↓
+
+JWT Token
+
+↓
+
+Home Page
+-->
