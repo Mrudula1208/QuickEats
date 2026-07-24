@@ -1,21 +1,46 @@
 import { Injectable } from '@angular/core';
 import { Delivery } from '../models/delivery.model';
+
 @Injectable({
-    providedIn:'root'
+  providedIn: 'root'
 })
-export class DeliveryService{
-    private deliveries:Delivery[]=[];
-    saveDelivery(delivery:Delivery):void{
-        this.deliveries.push(delivery);
+export class DeliveryService {
+
+  private deliveries: Delivery[] = [];
+
+  constructor() {
+
+    const data = localStorage.getItem('deliveries');
+
+    if (data) {
+      this.deliveries = JSON.parse(data);
     }
 
+  }
 
-getDeliveries():Delivery[]{
+  saveDelivery(delivery: Delivery): void {
+
+    this.deliveries.push(delivery);
+
+    localStorage.setItem(
+      'deliveries',
+      JSON.stringify(this.deliveries)
+    );
+
+  }
+
+  getDeliveries(): Delivery[] {
     return this.deliveries;
-}
-getDeliveryByOrderId(orderId:number):Delivery |undefined{
-    return this.deliveries.find(delivery=>delivery.orderId===orderId)
-}
+  }
+
+  getDeliveryByOrderId(orderId: number): Delivery | undefined {
+
+    return this.deliveries.find(
+      delivery => delivery.orderId === orderId
+    );
+
+  }
+
 }
 // Go through every delivery in the deliveries array. Check whether the current delivery's orderId matches the orderId passed to this function. If a match is found, immediately return that delivery object.
 // }}Easy Formula

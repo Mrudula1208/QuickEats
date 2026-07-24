@@ -127,42 +127,48 @@ export class PaymentComponent {
     };
 
     // Save payment into PaymentService.
-    this.paymentService.savePayment(payment);
-    // Create Delivery Object.
+  // Save payment.
+this.paymentService.savePayment(payment);
+
+// Create Delivery object.
 const delivery: Delivery = {
 
-    id: orderId,
+  id: orderId,
 
-    orderId: orderId,
+  orderId: orderId,
 
-    partnerName: "Rahul Sharma",
+  partnerName: "Rahul Sharma",
 
-    partnerPhone: "9876543210",
+  partnerPhone: "9876543210",
 
-    bikeNumber: "MH12AB1234",
+  bikeNumber: "MH12AB1234",
 
-    estimatedTime: "30 Minutes",
+  estimatedTime: "30 Minutes",
 
-    status: "Preparing"
+  status: "Preparing"
 
 };
 
 // Save Delivery.
 this.deliveryService.saveDelivery(delivery);
 
-    // Empty cart after successful payment.
-    this.cartService.clearCart();
+// ===== DEBUG =====
+console.log("Delivery Saved");
+console.log(delivery);
 
-    // Show success message.
-    alert('✅ Payment Successful');
+console.log("All Deliveries");
+console.log(this.deliveryService.getDeliveries());
 
-    // Open Payment History page.
-    this.router.navigate(['/payments']);
+// Empty cart.
+this.cartService.clearCart();
 
+// Success message.
+alert("✅ Payment Successful");
+
+// Navigate.
+this.router.navigate(['/payments']);
   }
-
 }
-
 /*
 
 WHY DO WE WRITE THIS FILE?

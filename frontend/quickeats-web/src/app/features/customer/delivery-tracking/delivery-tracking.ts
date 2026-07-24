@@ -13,17 +13,32 @@ import { CommonModule } from '@angular/common';
 export class DeliveryTrackingComponent {
   delivery ?:Delivery;
   constructor(
-    private route :ActivatedRoute,
-    private deliveryService:DeliveryService
-  ){
-    const orderId =Number(
-      this.route.snapshot.paramMap.get('id')
-    )
-    // )"Give me Delivery whose OrderId is 101."
-    this.delivery=this.deliveryService.getDeliveryByOrderId(orderId);
 
-  }
+  private route: ActivatedRoute,
 
+  private deliveryService: DeliveryService
+
+) {
+
+  // Read Order Id from URL.
+  const orderId = Number(
+    this.route.snapshot.paramMap.get('orderId')
+  );
+
+  console.log("Order Id from URL");
+  console.log(orderId);
+
+  console.log("All Deliveries");
+  console.log(this.deliveryService.getDeliveries());
+
+  // Search delivery.
+  this.delivery =
+    this.deliveryService.getDeliveryByOrderId(orderId);
+
+  console.log("Found Delivery");
+  console.log(this.delivery);
+
+}
   
 }
 // 1. app.routes.ts

@@ -10,10 +10,15 @@ export class OrderService {
 
   constructor() {
 
-    const data = localStorage.getItem('orders');
+    // Only browser has localStorage
+    if (typeof window !== 'undefined') {
 
-    if (data) {
-      this.orders = JSON.parse(data);
+      const data = localStorage.getItem('orders');
+
+      if (data) {
+        this.orders = JSON.parse(data);
+      }
+
     }
 
   }
@@ -22,22 +27,27 @@ export class OrderService {
 
     this.orders.push(order);
 
-    localStorage.setItem(
-      'orders',
-      JSON.stringify(this.orders)
-    );
+    // Save only in browser
+    if (typeof window !== 'undefined') {
+
+      localStorage.setItem(
+        'orders',
+        JSON.stringify(this.orders)
+      );
+
+    }
 
   }
 
   getOrders(): Order[] {
-
     return this.orders;
-
   }
 
   getOrderById(id: number): Order | undefined {
 
-    return this.orders.find(order => order.id === id);
+    return this.orders.find(
+      order => order.id === id
+    );
 
   }
 
