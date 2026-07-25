@@ -25,8 +25,7 @@ export class AuthService {
 
   // Backend API URL
 
-  private apiUrl = "https://localhost:7044/api/auth";
-
+private apiUrl = 'https://localhost:7278/api/Auth';
   constructor(
 
     // Used for calling API

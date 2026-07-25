@@ -14,42 +14,41 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './register.scss',
 })
 export class RegisterComponent {
-  user:Register={
-    name :'',
-    email :'',
-    password:''
-  }
+ user: Register = {
+
+  name: '',
+
+  email: '',
+
+  password: '',
+ phoneNumber: '',
+  role: 'Customer'
+
+};
   constructor (
     private authService :AuthService,
     private router :Router
   ){}
 
-  register ():void {
-//     RegisterComponent
+register(): void {
 
-// ↓
+  console.log("Register button clicked");
 
-// I have one object.
+  console.log(this.user);
 
-// ↓
+  this.authService.register(this.user)
+  .subscribe({
+    next: () => {
+      alert("Registration Successful");
+      this.router.navigate(['/login']);
+    },
+    error: (err) => {
+      console.log(err);
+      alert("Registration Failed");
+    }
+  });
 
-// this.user
-    this.authService.register(this.user)
-    .subscribe({
-      next:()=>{
-   alert('Registration Successful');
-
-          // Open Login Page.
-          this.router.navigate(['/login']);
-
-        },   
-      error :()=>{
-        alert("Registration Failed");
-      }   
-    });
-  }  
-  
-}
+}}
 
 // Execution Flow
 

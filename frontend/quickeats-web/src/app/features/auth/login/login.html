@@ -1,53 +1,22 @@
-<h1>Login</h1>
+<div class="login-container">
 
-<p>Enter your email and password</p>
+    <h1>Login</h1>
 
-<label>Email</label>
+    <input
+        type="email"
+        placeholder="Email"
+        [(ngModel)]="loginUser.email">
 
-<input
-type="email"
-[(ngModel)]="login.email"
-placeholder="Enter Email">
+    <input
+        type="password"
+        placeholder="Password"
+        [(ngModel)]="loginUser.password">
 
-<!-- Whatever user types
-goes into login.email -->
+    <button
+        (click)="login()">
 
-<label>Password</label>
+        Login
 
-<input
-type="password"
-[(ngModel)]="login.password"
-placeholder="Enter Password">
+    </button>
 
-<!-- Whatever user types
-goes into login.password -->
-
-<button
-(click)="loginUser()">
-
-Login
-
-</button>
-
-<!-- Button click
-
-↓
-
-loginUser()
-
-↓
-
-AuthService.login()
-
-↓
-
-Backend API
-
-↓
-
-JWT Token
-
-↓
-
-Home Page
--->
+</div>

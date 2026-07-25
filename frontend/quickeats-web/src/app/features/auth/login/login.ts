@@ -1,20 +1,17 @@
-// Component decorator.
+// Import Component decorator.
 import { Component } from '@angular/core';
 
 // Common Angular directives.
 import { CommonModule } from '@angular/common';
 
-// Required for ngModel.
+// For ngModel.
 import { FormsModule } from '@angular/forms';
 
-// Used for page navigation.
+// Used to navigate pages.
 import { Router } from '@angular/router';
 
 // Login model.
 import { Login } from '../../../core/models/login.model';
-
-// Auth response model.
-import { AuthResponse } from '../../../core/models/auth-response.model';
 
 // Auth Service.
 import { AuthService } from '../../../core/services/auth.service';
@@ -32,8 +29,8 @@ import { AuthService } from '../../../core/services/auth.service';
 
 export class LoginComponent {
 
-  // Stores email and password entered by user.
-  login: Login = {
+  // Object that stores user input.
+  loginUser: Login = {
 
     email: '',
 
@@ -43,40 +40,47 @@ export class LoginComponent {
 
   constructor(
 
-    // Calls Login API.
+    // Used to call Login API.
     private authService: AuthService,
 
-    // Opens another page.
+    // Used to move to another page.
     private router: Router
 
   ) { }
 
   // Runs when Login button is clicked.
-  loginUser(): void {
+  login(): void {
 
-    // Send Login object to backend.
-    this.authService.login(this.login)
+    console.log("Login Button Clicked");
 
-      // Wait for backend response.
+    console.log(this.loginUser);
+
+    // Call Backend Login API.
+    this.authService.login(this.loginUser)
+
       .subscribe({
 
-        // Login successful.
-        next: (response: AuthResponse) => {
+        // Login Successful.
+        next: (response) => {
 
-          // Save JWT token.
+          console.log(response);
+
+          // Save JWT Token.
           this.authService.saveToken(response.token);
 
-          alert('✅ Login Successful');
+          alert("Login Successful");
 
-          // Open Home page.
+          // Open Home Page.
           this.router.navigate(['/']);
 
         },
 
-        // Login failed.
-        error: () => {
+        // Login Failed.
+        error: (err) => {
 
-          alert('❌ Invalid Email or Password');
+          console.log(err);
+
+          alert("Invalid Email or Password");
 
         }
 
@@ -88,32 +92,84 @@ export class LoginComponent {
 
 /*
 
-Execution Order
+EXECUTION FLOW
 
-1. Login page opens.
+1. Angular opens Login Page
 
-2. LoginComponent created.
+↓
 
-3. login object created.
+2. LoginComponent created
 
-4. HTML loads.
+↓
 
-5. User enters Email.
+3. loginUser object created
 
-6. User enters Password.
+↓
 
-7. Click Login.
+4. Constructor runs
 
-8. loginUser() runs.
+↓
 
-9. AuthService.login()
+5. HTML loads
 
-10. ASP.NET API
+↓
 
-11. JWT Token returned.
+6. User enters Email
 
-12. saveToken()
+↓
 
-13. Navigate Home.
+loginUser.email updated
+
+↓
+
+7. User enters Password
+
+↓
+
+loginUser.password updated
+
+↓
+
+8. Click Login
+
+↓
+
+9. login() executes
+
+↓
+
+10. AuthService.login()
+
+↓
+
+11. ASP.NET Login API
+
+↓
+
+12. Database checks Email
+
+↓
+
+13. Password Verified
+
+↓
+
+14. JWT Token Generated
+
+↓
+
+15. Angular receives token
+
+↓
+
+16. saveToken()
+
+↓
+
+17. localStorage
+
+↓
+
+18. Navigate Home Page
 
 */

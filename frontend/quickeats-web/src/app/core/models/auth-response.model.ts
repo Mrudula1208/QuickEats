@@ -1,4 +1,11 @@
 export interface AuthResponse {
-    token :string;
-    expiration:string;
+
+  token: string;
+
+  name: string;
+
+  email: string;
+
+  role: string;
+
 }
