@@ -1,30 +1,30 @@
-import { CanActivateFn } from '@angular/router';
+import { inject, PLATFORM_ID } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
+import { isPlatformBrowser } from '@angular/common';
 
-import { inject } from '@angular/core';
-
-import { Router } from '@angular/router';
-
-import { AuthService } from '../core/services/auth.service';
 export const authGuard: CanActivateFn = () => {
 
-  const authService = inject(AuthService);
+  console.log('✅ AUTH GUARD EXECUTED');
 
   const router = inject(Router);
+  const platformId = inject(PLATFORM_ID);
 
-  // Check token.
-  if(authService.isLoggedIn()){
-
-      return true;
-
+  if (!isPlatformBrowser(platformId)) {
+    console.log('Running on server');
+    return true;
   }
 
-  // No token.
+  const token = localStorage.getItem('token');
+
+  console.log('Token =', token);
+
+  if (token) {
+    return true;
+  }
+
   router.navigate(['/login']);
-
   return false;
-
 };
-
 // What does this file contain? (Simple)
 
 // This file contains one function.

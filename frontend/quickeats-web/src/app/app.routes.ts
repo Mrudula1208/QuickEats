@@ -13,54 +13,66 @@ import { LoginComponent } from './features/auth/login/login';
 import { RegisterComponent } from './features/auth/register/register';
 export const routes: Routes = [
 
-  {
-    path: '',
-    component: Home
-  },
+{
+  path: '',
+  component: Home
+},
 
-  {
-    path: 'restaurant/:id',
-    component: RestaurantDetailsComponent
-  },
+{
+  path: 'restaurant/:id',
+  component: RestaurantDetailsComponent
+},
 
-  {
-    path: 'cart',
-    component: CartComponent
-  },
-  {
-    path :'checkout',
-    component:CheckoutComponent
+{
+  path: 'cart',
+  component: CartComponent,
+  canActivate: [authGuard]
+},
 
-  },
- {
+{
+  path: 'checkout',
+  component: CheckoutComponent,
+  canActivate: [authGuard]
+},
+
+{
   path: 'orders',
   component: OrderHistoryComponent,
-  canActivate:[authGuard]
-}
-,{
-    path: 'orders/:id',
-    component: OrderDetailsComponent
-},{
-  path:'payment',
-  component:PaymentComponent
-},{
-    path:'payments',
-    component:PaymentHistoryComponent,
-    canActivate:[authGuard]
-},{
+  canActivate: [authGuard]
+},
+
+{
+  path: 'orders/:id',
+  component: OrderDetailsComponent,
+  canActivate: [authGuard]
+},
+
+{
+  path: 'payment',
+  component: PaymentComponent,
+  canActivate: [authGuard]
+},
+
+{
+  path: 'payments',
+  component: PaymentHistoryComponent,
+  canActivate: [authGuard]
+},
+
+{
   path: 'delivery/:orderId',
-  component: DeliveryTrackingComponent
-},  // Register Page
-  {
-    path: 'register',
+  component: DeliveryTrackingComponent,
+  canActivate: [authGuard]
+},
 
-    component: RegisterComponent
-  },
+{
+  path: 'register',
+  component: RegisterComponent
+},
 
-  // Login Page
-  {
-    path: 'login',
+{
+  path: 'login',
+  component: LoginComponent
+}
 
-    component: LoginComponent
-  }
 ];

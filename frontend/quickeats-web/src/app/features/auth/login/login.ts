@@ -56,39 +56,29 @@ export class LoginComponent {
     console.log(this.loginUser);
 
     // Call Backend Login API.
-    this.authService.login(this.loginUser)
+  this.authService.login(this.loginUser).subscribe({
+  next: (response) => {
 
-      .subscribe({
+    console.log(response);
 
-        // Login Successful.
-        next: (response) => {
+    // Save user data
+    localStorage.setItem('token', response.token);
+    localStorage.setItem('name', response.name);
+    localStorage.setItem('email', response.email);
+    localStorage.setItem('role', response.role);
 
-          console.log(response);
+    alert("Login Successful");
 
-          // Save JWT Token.
-          this.authService.saveToken(response.token);
+    this.router.navigate(['/']);
+  },
 
-          alert("Login Successful");
-
-          // Open Home Page.
-          this.router.navigate(['/']);
-
-        },
-
-        // Login Failed.
-        error: (err) => {
-
-          console.log(err);
-
-          alert("Invalid Email or Password");
-
-        }
-
-      });
-
+  error: (err) => {
+    console.log(err);
+    alert("Invalid Email or Password");
   }
+});
 
-}
+}}
 
 /*
 
