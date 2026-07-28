@@ -1,3 +1,21 @@
 <header class="header">
+
     <h2>QuickEats</h2>
+
+    @if(isLoggedIn){
+
+        <a routerLink="/notifications" class="notification-bell">
+
+            🔔
+
+            @if(unreadCount > 0){
+
+                <span class="unread-badge">{{ unreadCount }}</span>
+
+            }
+
+        </a>
+
+    }
+
 </header>

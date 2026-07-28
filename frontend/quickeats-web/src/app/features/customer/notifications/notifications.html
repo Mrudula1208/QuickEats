@@ -1,55 +1,141 @@
 <div class="notifications-page">
 
     <div class="notifications-header">
+
         <div class="header-left">
+
             <h1>Notifications</h1>
+
             @if(unreadCount > 0) {
-                <span class="unread-badge">{{unreadCount}} unread</span>
+
+                <span class="unread-badge">{{ unreadCount }} unread</span>
+
             }
+
         </div>
+
         <div class="header-actions">
+
             @if(unreadCount > 0) {
-                <button class="mark-all-btn" (click)="markAllAsRead()">Mark All Read</button>
+
+                <button
+
+                    class="mark-all-btn"
+
+                    (click)="markAllAsRead()">
+
+                    Mark All Read
+
+                </button>
+
             }
+
             @if(notifications.length > 0) {
-                <button class="clear-btn" (click)="clearAll()">Clear All</button>
+
+                <button
+
+                    class="clear-btn"
+
+                    (click)="clearAll()">
+
+                    Clear All
+
+                </button>
+
             }
+
         </div>
+
     </div>
 
     <p>Your latest updates</p>
 
     @if(notifications.length === 0) {
+
         <div class="empty-notification">
+
+            <span class="empty-icon">🔔</span>
+
             <h2>No Notifications</h2>
+
             <p>You're all caught up.</p>
+
         </div>
+
     }
+
     @else {
+
         <div class="notification-list">
+
             @for(notification of notifications; track notification.notificationId) {
-                <div class="notification-card" [class.unread]="!notification.isRead">
+
+                <div
+
+                    class="notification-card"
+
+                    [class.unread]="!notification.isRead">
+
+                    <span class="notification-icon">
+
+                        {{ getNotificationIcon(notification) }}
+
+                    </span>
+
                     <div class="notification-content">
-                        <h2>{{notification.title}}</h2>
-                        <p>{{notification.message}}</p>
-                        <small>{{notification.notificationDate | date:'medium'}}</small>
+
+                        <h2>{{ notification.title }}</h2>
+
+                        <p>{{ notification.message }}</p>
+
+                        <small>
+
+                            {{ notification.notificationDate | date:'medium' }}
+
+                        </small>
+
                     </div>
+
                     <div class="notification-actions">
+
                         @if(!notification.isRead) {
-                            <button class="read-btn" (click)="markAsRead(notification.notificationId)">
+
+                            <button
+
+                                class="read-btn"
+
+                                (click)="markAsRead(notification.notificationId)">
+
                                 Mark Read
+
                             </button>
+
                         }
+
                         @else {
+
                             <span class="read-label">Read</span>
+
                         }
-                        <button class="delete-btn" (click)="deleteNotification(notification.notificationId)">
+
+                        <button
+
+                            class="delete-btn"
+
+                            (click)="deleteNotification(notification.notificationId)">
+
                             Delete
+
                         </button>
+
                     </div>
+
                 </div>
+
             }
+
         </div>
+
     }
 
 </div>

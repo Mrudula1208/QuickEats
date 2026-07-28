@@ -1,7 +1,17 @@
 import { Component } from '@angular/core';
+// Import Component because this is an Angular Component.
+
 import { CommonModule } from '@angular/common';
+// Import CommonModule because HTML uses @if and @for.
+
 import { NotificationService } from '../../../core/services/notification.service';
+// Used to call Notification APIs.
+
 import { NotificationModel } from '../../../core/models/notification.model';
+// NotificationModel stores one notification.
+
+import { ToastrService } from 'ngx-toastr';
+// Used to show success/error notifications.
 
 @Component({
   selector: 'app-notifications',
@@ -12,86 +22,208 @@ import { NotificationModel } from '../../../core/models/notification.model';
   templateUrl: './notifications.html',
   styleUrl: './notifications.scss'
 })
+
 export class NotificationsComponent {
 
+  // Store all Notifications.
   notifications: NotificationModel[] = [];
-  unreadCount: number = 0;
+
+  // Number of unread Notifications.
+  unreadCount = 0;
 
   constructor(
-    private notificationService: NotificationService
+
+    private notificationService: NotificationService,
+
+    private toastr: ToastrService
+
   ) {
+
     this.loadNotifications();
+
     this.loadUnreadCount();
+
   }
 
+  // Load all Notifications.
   loadNotifications(): void {
-    this.notificationService.getNotifications().subscribe({
-      next: (data: NotificationModel[]) => {
-        this.notifications = data;
-      },
-      error: (err: any) => {
-        console.log(err);
-      }
-    });
+
+    this.notificationService
+      .getNotifications()
+      .subscribe({
+
+        // API Success.
+        next: (data: NotificationModel[]) => {
+
+          this.notifications = data;
+
+        },
+
+        // API Failed.
+        error: (err: any) => {
+
+          console.log(err);
+
+        }
+
+      });
+
   }
 
+  // Load unread Notification count.
   loadUnreadCount(): void {
-    this.notificationService.getUnreadCount().subscribe({
-      next: (count: number) => {
-        this.unreadCount = count;
-      },
-      error: (err: any) => {
-        console.log(err);
-      }
-    });
+
+    this.notificationService
+      .getUnreadCount()
+      .subscribe({
+
+        // API Success.
+        next: (count: number) => {
+
+          this.unreadCount = count;
+
+        },
+
+        // API Failed.
+        error: (err: any) => {
+
+          console.log(err);
+
+        }
+
+      });
+
   }
 
+  // Mark one Notification as Read.
   markAsRead(notificationId: number): void {
-    this.notificationService.markAsRead(notificationId).subscribe({
-      next: () => {
-        this.loadNotifications();
-        this.loadUnreadCount();
-      },
-      error: (err: any) => {
-        console.log(err);
-      }
-    });
+
+    this.notificationService
+      .markAsRead(notificationId)
+      .subscribe({
+
+        // API Success.
+        next: () => {
+
+          this.loadNotifications();
+          this.loadUnreadCount();
+          this.toastr.success('Marked as read');
+
+        },
+
+        // API Failed.
+        error: (err: any) => {
+
+          console.log(err);
+
+        }
+
+      });
+
   }
 
+  // Mark all Notifications as Read.
   markAllAsRead(): void {
-    this.notificationService.markAllAsRead().subscribe({
-      next: () => {
-        this.loadNotifications();
-        this.loadUnreadCount();
-      },
-      error: (err: any) => {
-        console.log(err);
-      }
-    });
+
+    this.notificationService
+      .markAllAsRead()
+      .subscribe({
+
+        // API Success.
+        next: () => {
+
+          this.loadNotifications();
+          this.loadUnreadCount();
+          this.toastr.success('All marked as read');
+
+        },
+
+        // API Failed.
+        error: (err: any) => {
+
+          console.log(err);
+
+        }
+
+      });
+
   }
 
+  // Delete one Notification.
   deleteNotification(notificationId: number): void {
-    this.notificationService.deleteNotification(notificationId).subscribe({
-      next: () => {
-        this.loadNotifications();
-        this.loadUnreadCount();
-      },
-      error: (err: any) => {
-        console.log(err);
-      }
-    });
+
+    this.notificationService
+      .deleteNotification(notificationId)
+      .subscribe({
+
+        // API Success.
+        next: () => {
+
+          this.loadNotifications();
+          this.loadUnreadCount();
+          this.toastr.success('Notification deleted');
+
+        },
+
+        // API Failed.
+        error: (err: any) => {
+
+          console.log(err);
+
+        }
+
+      });
+
   }
 
+  // Clear all Notifications.
   clearAll(): void {
-    this.notificationService.clearAll().subscribe({
-      next: () => {
-        this.notifications = [];
-        this.unreadCount = 0;
-      },
-      error: (err: any) => {
-        console.log(err);
-      }
-    });
+
+    this.notificationService
+      .clearAll()
+      .subscribe({
+
+        // API Success.
+        next: () => {
+
+          this.notifications = [];
+          this.unreadCount = 0;
+          this.toastr.success('All notifications cleared');
+
+        },
+
+        // API Failed.
+        error: (err: any) => {
+
+          console.log(err);
+
+        }
+
+      });
+
+  }
+
+  // Return icon based on Notification title.
+  // Order notifications get a package icon.
+  // Other notifications get a bell icon.
+  getNotificationIcon(notification: NotificationModel): string {
+
+    const title = notification.title.toLowerCase();
+
+    if (title.includes('order')) {
+
+      return '📦';
+
+    }
+
+    if (title.includes('cancelled')) {
+
+      return '❌';
+
+    }
+
+    return '🔔';
+
   }
 
 }
