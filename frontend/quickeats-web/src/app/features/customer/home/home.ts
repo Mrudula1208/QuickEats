@@ -1,5 +1,5 @@
-// Import Component decorator.
-import { Component } from '@angular/core';
+// Import Component decorator and signal.
+import { Component, signal } from '@angular/core';
 
 // Import Featured Restaurants Component.
 import { FeaturedRestaurantsComponent } from '../components/featured-restaurants/featured-restaurants';
@@ -22,10 +22,10 @@ import { RestaurantService } from '../../../core/services/restaurant.service';
 
 export class Home {
 
-  // Stores all restaurants.
+  // Stores all restaurants as a reactive signal.
   //
   // Initially this list is empty.
-  restaurants: Restaurant[] = [];
+  restaurants = signal<Restaurant[]>([]);
 
   // Dependency Injection.
   //
@@ -36,10 +36,33 @@ export class Home {
     private restaurantService: RestaurantService
 
   ) {
+    this.loadRestaurants();
+  }
+    loadRestaurants(): void {
 
-    // Load all restaurants
-    // from the service.
-    this.restaurants = this.restaurantService.getRestaurants();
+    // Call Restaurant API.
+    this.restaurantService.getRestaurants().subscribe({
+
+      // API Success
+      next: (data) => {
+
+        // Store API data
+        // inside restaurants signal.
+        this.restaurants.set(data);
+
+        console.log("Restaurants Loaded Successfully");
+        console.log(this.restaurants());
+      },
+
+      // API Failed
+      error: (err) => {
+
+        console.log("Failed to Load Restaurants");
+        console.log(err);
+
+      }
+
+    });
 
   }
 

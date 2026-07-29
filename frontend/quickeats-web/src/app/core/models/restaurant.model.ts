@@ -1,31 +1,26 @@
-
 export interface Restaurant {
 
-    // Unique Id
-    id:number;
+  // Primary Key
+  id: number;
 
-    // Restaurant Name
-    name:string;
+  // Restaurant Name
+  name: string;
 
-    // Image Path
-    image:string;
+  // Description
+  description: string;
 
-    // Rating
-    rating:number;
+  // Address
+  address: string;
 
-    // Delivery Time
-    deliveryTime:string;
+  // Phone Number
+  phoneNumber: string;
 
-    // Restaurant Location
-    location:string;
+  // Restaurant Image
+  imageUrl: string;
 
-    // Average Cost
-    priceForTwo:number;
+  // Restaurant Active Status
+  isActive: boolean;
 
-    // Discount Text
-    discount:string;
-
-    // Free Delivery Available?
-    freeDelivery:boolean;
-
+  // Created Date
+  createdAt: string;
 }

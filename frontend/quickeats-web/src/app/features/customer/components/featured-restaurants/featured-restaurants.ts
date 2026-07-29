@@ -1,15 +1,24 @@
-import { Component,Input } from '@angular/core';
+import { Component, input, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Restaurant } from '../../../../core/models/restaurant.model';
 import { RouterLink } from '@angular/router';
+import { Restaurant } from '../../../../core/models/restaurant.model';
+
 @Component({
   selector: 'app-featured-restaurants',
   standalone: true,
-  imports: [CommonModule,RouterLink],
+  imports: [CommonModule, RouterLink],
   templateUrl: './featured-restaurants.html',
-  styleUrl: './featured-restaurants.scss'
+  styleUrls: ['./featured-restaurants.scss']
 })
 export class FeaturedRestaurantsComponent {
-  @Input()
-restaurants: Restaurant[] = [];
+
+  restaurants = input<Restaurant[]>([]);
+
+  constructor() {
+    effect(() => {
+      console.log("Child Received:");
+      console.log(this.restaurants());
+    });
+  }
+
 }

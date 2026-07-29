@@ -1,87 +1,91 @@
-<section class="featured-section">
+ Section Title
+<p>Total Restaurants : {{ restaurants().length }}</p> 
+<div class="section-title">
+    <h2>
+        <i class="fa-solid fa-utensils"></i>
+        Featured Restaurants
+    </h2>
 
-    <!-- Section Title -->
-    <div class="section-title">
-        <h2>
-            <i class="fa-solid fa-utensils"></i>
-            Featured Restaurants
-        </h2>
+    <p>Discover restaurants near you</p>
+</div>
 
-        <p>Discover the highest rated restaurants near you</p>
-    </div>
+<!-- Restaurant Grid -->
+<div class="restaurant-grid">
 
-    <!-- Restaurant Grid -->
-    <div class="restaurant-grid">
+    @for (restaurant of restaurants(); track restaurant.id) {
 
-        @for (restaurant of restaurants; track restaurant.id) {
+    <!-- Restaurant Card-->
+    <div
+        class="restaurant-card"
+        [routerLink]="['/restaurant', restaurant.id]">
 
-        <!-- Restaurant Card -->
-        <div
-    class="restaurant-card"
-    [routerLink]="['/restaurant', restaurant.id]">
+        <!-- Restaurant Image -->
+        <div class="image-container">
 
-            <!-- Restaurant Image -->
-            <div class="image-container">
+            <img
+                [src]="'assets/images/restaurants/' + restaurant.imageUrl"
+                [alt]="restaurant.name">
 
-                <img
-                    [src]="restaurant.image"
-                    [alt]="restaurant.name">
-
-                <!-- Discount Badge -->
+            <!-- Restaurant Status -->
+            @if (restaurant.isActive) {
                 <span class="discount-badge">
-                    🔥 {{ restaurant.discount }}
+                    🟢 Open
                 </span>
+            }
+            @else {
+                <span class="discount-badge">
+                    🔴 Closed
+                </span>
+            }
 
-                <!-- Favourite Button -->
-                <button
-                    class="favorite-btn"
-                    (click)="$event.stopPropagation()">
+            <!-- Favourite Button -->
+            <button
+                class="favorite-btn"
+                (click)="$event.stopPropagation()">
 
-                    <i class="fa-regular fa-heart"></i>
+                <i class="fa-regular fa-heart"></i>
 
-                </button>
-
-            </div>
-
-            <!-- Restaurant Details -->
-            <div class="restaurant-info">
-
-                <h3>{{ restaurant.name }}</h3>
-
-                <div class="restaurant-meta">
-
-                    <span>
-                        ⭐ {{ restaurant.rating }}
-                    </span>
-
-                    <span>
-                        ⏱ {{ restaurant.deliveryTime }}
-                    </span>
-
-                </div>
-
-                <p>
-                    📍 {{ restaurant.location }}
-                </p>
-
-                <p>
-                    ₹{{ restaurant.priceForTwo }} for two
-                </p>
-
-                @if (restaurant.freeDelivery) {
-
-                    <span class="delivery">
-                        Free Delivery
-                    </span>
-
-                }
-
-            </div>
+            </button>
 
         </div>
 
-        }
+        Restaurant Details 
+        <div class="restaurant-info">
+
+            <h3>{{ restaurant.name }}</h3>
+
+            <p class="description">
+                {{ restaurant.description }}
+            </p>
+
+            <p>
+                📍 {{ restaurant.address }}
+            </p>
+
+            <p>
+                📞 {{ restaurant.phoneNumber }}
+            </p>
+
+        </div>
 
     </div>
 
-</section>
+    }
+
+</div> 
+
+<!-- <-- <h2>Restaurant Count : {{ restaurants().length }}</h2>
+
+@for (restaurant of restaurants(); track restaurant.id) {
+
+<div style="border:2px solid red; padding:20px; margin:20px;">
+
+    <h3>{{ restaurant.name }}</h3>
+
+    <p>{{ restaurant.description }}</p>
+
+    <p>{{ restaurant.address }}</p>
+
+</div>
+
+} --> -->

@@ -22,48 +22,51 @@
 </section>
 
 
-<!-- for cateagory seection -->
+<!-- for category section -->
 
-<section class ="categories">
+<section class="categories">
+
     <div class="section-title">
         <h2>Popular Categories</h2>
         <p>Explore your favourite food categories</p>
     </div>
 
     <div class="category-grid">
-        
-    <div class="category-card">
-<img src="assets/images/categories/pizza.png">
-  <h3>Pizza</h3>
+
+        <div class="category-card">
+            <img src="assets/images/categories/pizza.png">
+            <h3>Pizza</h3>
+        </div>
+
+        <div class="category-card">
+            <img src="assets/images/categories/burger.png">
+            <h3>Burger</h3>
+        </div>
+
+        <div class="category-card">
+            <img src="assets/images/categories/biryani.png">
+            <h3>Biryani</h3>
+        </div>
+
+        <div class="category-card">
+            <img src="assets/images/categories/sushi.png">
+            <h3>Sushi</h3>
+        </div>
+
+        <div class="category-card">
+            <img src="assets/images/categories/dessert.png">
+            <h3>Dessert</h3>
+        </div>
+
+        <div class="category-card">
+            <img src="assets/images/categories/drink.png">
+            <h3>Drinks</h3>
+        </div>
+
     </div>
-
-    <div class="category-card">
-<img src="assets/images/categories/burger.png">
-      <h3>Burger</h3>
-    </div>
-
-    <div class="category-card">
-<img src="assets/images/categories/biryani.png">
-      <h3>Biryani</h3>
-    </div>
-
-    <div class="category-card">
-<img src="assets/images/categories/sushi.png">
-      <h3>Sushi</h3>
-    </div>
-
-    <div class="category-card">
-<img src="assets/images/categories/dessert.png">
-      <h3>Dessert</h3>
-    </div>
-
-    <div class="category-card">
-<img src="assets/images/categories/drink.png">  
-    <h3>Drinks</h3>
-    </div>
-
-  </div>
-
 
 </section>
-<app-featured-restaurants [restaurants]="restaurants"></app-featured-restaurants>
+<h1>Total Restaurants : {{ restaurants().length }}</h1>
+<app-featured-restaurants
+    [restaurants]="restaurants()">
+</app-featured-restaurants>
