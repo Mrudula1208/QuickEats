@@ -1,68 +1,144 @@
-<!-- ============================= -->
-<!-- Restaurant Menu Section -->
-<!-- ============================= -->
 
-<h2 class="menu-title">
-    🍽 Our Menu
-</h2>
+@if (restaurant) {
+
+<div class="restaurant-banner">
+
+   
+
+    <img
+        [src]="'assets/images/restaurants/' + restaurant.imageUrl"
+        [alt]="restaurant.name">
+
+   
+</div>
+
+
+
+<div class="restaurant-details">
+
+  
+
+    <h1>{{ restaurant.name }}</h1>
+
+   
+
+    <p>{{ restaurant.description }}</p>
+
+
+    <p>📍 {{ restaurant.address }}</p>
+
+   
+
+    <p>📞 {{ restaurant.phoneNumber }}</p>
+
+    
+
+    @if(restaurant.isActive){
+
+        <span class="status open">
+
+            🟢 Open
+
+        </span>
+
+       
+
+    }
+
+    @else{
+
+        <span class="status closed">
+
+            🔴 Closed
+
+        </span>
+
+      
+
+    }
+
+</div>
+
+
+
+
+<div class="menu-title">
+
+    <h2>Our Menu</h2>
+
+</div>
+
+
 
 <div class="menu-grid">
 
-    <!-- Loop through every menu item -->
+    
     @for(menu of menus; track menu.id){
+
+  
 
     <div class="menu-card">
 
         <!-- Menu Image -->
         <img
-            [src]="menu.image"
+            [src]="'assets/images/menu/' + menu.imageUrl"
             [alt]="menu.name">
 
-        <!-- Menu Information -->
-        <div class="menu-info">
+      
 
-            <!-- Menu Name -->
-            <h3>
-                {{menu.name}}
-            </h3>
+        <h3>{{ menu.name }}</h3>
 
-            <!-- Category -->
-            <p class="category">
-                {{menu.category}}
-            </p>
+       
+        <p>{{ menu.description }}</p>
 
-            <!-- Price -->
-            <p class="price">
-                ₹{{menu.price}}
-            </p>
+       
+        <h4>₹{{ menu.price }}</h4>
 
-            <!-- Veg / Non Veg -->
-            @if(menu.isVeg){
+       
 
-            <span class="veg">
-                🟢 Veg
+        @if(menu.isAvailable){
+
+            <span class="available">
+
+                ✅ Available
+
             </span>
 
-            }
+           
 
-            @else{
+        }
 
-            <span class="nonveg">
-                🔴 Non Veg
+        @else{
+
+            <span class="unavailable">
+
+                ❌ Not Available
+
             </span>
 
-            }
 
-        </div>
+        }
 
-        <!-- Add Button -->
-     <button
-    class="add-btn"
-    (click)="addToCart(menu)">
-    Add
-</button>
+        <button
+            (click)="addToCart(menu)">
+
+            Add To Cart
+
+        </button>
+
+
     </div>
 
     }
 
 </div>
+
+}
+
+@else {
+
+<h2>Loading Restaurant...</h2>
+
+
+}
+```

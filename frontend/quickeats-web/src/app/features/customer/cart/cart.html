@@ -1,53 +1,87 @@
 <div class="cart-container">
 
-    <h1>🛒 My Cart</h1>
+    <h1>My Cart</h1>
 
-    @if(cartItems.length===0){
+    @if(cartItems().length === 0){
 
-        <h2>Your cart is empty.</h2>
+        <div class="empty-cart">
+
+            <h2>Your Cart is Empty</h2>
+
+            <p>Add some delicious food.</p>
+
+        </div>
 
     }
+    @else{
 
-    @else {
+        @for(item of cartItems(); track item.menu.id){
 
-        @for(item of cartItems;track item.menuItem.id){
+        <div class="cart-card">
 
-            <div class="cart-card">
+            <img
+                [src]="'assets/images/menu/' + item.menu.imageUrl"
+                [alt]="item.menu.name">
 
-                <img
-                    [src]="item.menuItem.image"
-                    [alt]="item.menuItem.name">
+            <div class="cart-details">
 
-                <div class="details">
+                <h3>{{ item.menu.name }}</h3>
 
-                    <h3>{{item.menuItem.name}}</h3>
+                <p>{{ item.menu.description }}</p>
 
-                    <p>₹{{item.menuItem.price}}</p>
-
-                    <p>Quantity : {{item.quantity}}</p>
-
-                </div>
+                <h4>₹{{ item.menu.price }}</h4>
 
             </div>
 
-        }
+            <div class="quantity-section">
 
-        <div class="total">
+                <button
+                    (click)="decreaseQuantity(item.menu.id)">
 
-            Total : ₹{{getTotalPrice()}}
+                    -
+
+                </button>
+
+                <span>{{ item.quantity }}</span>
+
+                <button
+                    (click)="increaseQuantity(item.menu.id)">
+
+                    +
+
+                </button>
+
+            </div>
+
+            <button
+                class="remove-btn"
+                (click)="removeItem(item.menu.id)">
+
+                Remove
+
+            </button>
 
         </div>
-        <!-- Opens Checkout page -->
 
-<button
+        }
 
-class="checkout-btn"
+        <div class="cart-total">
 
-routerLink="/checkout">
+            <h2>
 
-Proceed to Checkout
+                Total :
 
-</button>
+                ₹{{ getTotalPrice() }}
+
+            </h2>
+
+            <button>
+
+                Proceed To Checkout
+
+            </button>
+
+        </div>
 
     }
 

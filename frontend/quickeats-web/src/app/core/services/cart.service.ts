@@ -1,65 +1,117 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { CartItem } from '../models/cart-item.model';
-import {MenuItem} from "../models/menu.model"
-
+import { MenuItem } from '../models/menu.model';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class CartService {
-   private cart: CartItem[] = [];
 
-   getCartItems():CartItem[]{
-    return this.cart;
+  // Stores all cart items.
+  cartItems = signal<CartItem[]>([]);
 
-   }
-addToCart(menu:MenuItem):void{
-  const existingItem=this.cart.find(
-    item=>item.menuItem.id===menu.id);
-if(existingItem){existingItem.quantity++;
+  // Add food into cart.
+  addToCart(menu: MenuItem): void {
 
-}
-  
-else{
-  this.cart.push({
-    menuItem:menu,
-    quantity:1
-  })
-}
-}
+    // Copy current cart items.
+    const items = [...this.cartItems()];
 
+    // Find if item already exists.
+    const existingItem = items.find(x => x.menu.id === menu.id);
 
+    if (existingItem) {
 
+      // Increase quantity.
+      existingItem.quantity++;
 
-removeFromCart(menu:MenuItem):void{
-  const existingItem=this.cart.find(
-    item=>item.menuItem.id===menu.id
- );
-if(existingItem){
-  existingItem.quantity --;
-  if(existingItem.quantity===0){
-    this.cart=this.cart.filter( item => item.menuItem.id !== menu.id
-)
+    }
+    else {
+
+      // Add new item.
+      items.push({
+
+        menu: menu,
+
+        quantity: 1
+
+      });
+
+    }
+
+    // Update Signal.
+    this.cartItems.set(items);
+
+    console.log("Cart Updated");
+
+    console.log(this.cartItems());
+
   }
-}
- }
- clearCart():void{
-  this.cart=[];
- }
- getTotalItem ():number{
-  let total=0;
-  this.cart.forEach(item=>{
-     total+=item.quantity;
-   });
- 
- return total;
-}
-getTotalPrice():number{
-  let total =0;
-  this.cart.forEach(item =>{
-    total+=item.menuItem.price * item.quantity;
-  });
-  return total;
-}
-}
 
+  // Remove item from cart.
+  removeItem(menuId: number): void {
+
+    this.cartItems.set(
+
+      this.cartItems().filter(x => x.menu.id !== menuId)
+
+    );
+
+  }
+
+  // Increase quantity.
+  increaseQuantity(menuId: number): void {
+
+    const items = [...this.cartItems()];
+
+    const item = items.find(x => x.menu.id === menuId);
+
+    if (item) {
+
+      item.quantity++;
+
+    }
+
+    this.cartItems.set(items);
+
+  }
+
+  // Decrease quantity.
+  decreaseQuantity(menuId: number): void {
+
+    const items = [...this.cartItems()];
+
+    const item = items.find(x => x.menu.id === menuId);
+
+    if (!item) return;
+
+    if (item.quantity > 1) {
+
+      item.quantity--;
+
+    }
+    else {
+
+      this.removeItem(menuId);
+
+      return;
+
+    }
+
+    this.cartItems.set(items);
+
+  }
+
+  // Calculate grand total.
+  getTotalPrice(): number {
+
+    return this.cartItems().reduce(
+
+      (total, item) => total + (item.menu.price * item.quantity),
+
+      0
+
+    );
+
+  }
+
+}

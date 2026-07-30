@@ -1,12 +1,24 @@
 import { Component } from '@angular/core';
+// Import Component because this is an Angular Component.
+
 import { ActivatedRoute, Router } from '@angular/router';
+// ActivatedRoute reads restaurant id from URL.
+// Router opens another page.
 
 import { Restaurant } from '../../../core/models/restaurant.model';
+// Restaurant model stores restaurant details.
+
 import { MenuItem } from '../../../core/models/menu.model';
+// Menu model stores menu items.
+
+import { RestaurantService } from '../../../core/services/restaurant.service';
+// Used to call Restaurant APIs.
 
 import { MenuService } from '../../../core/services/menu.service';
-import { RestaurantService } from '../../../core/services/restaurant.service';
+// Used to call Menu APIs.
+
 import { CartService } from '../../../core/services/cart.service';
+// Used to add food into cart.
 
 @Component({
   selector: 'app-restaurant-details',
@@ -14,51 +26,100 @@ import { CartService } from '../../../core/services/cart.service';
   templateUrl: './restaurant-details.html',
   styleUrl: './restaurant-details.scss'
 })
+
 export class RestaurantDetailsComponent {
 
-  // Stores all menu items.
-  menus: MenuItem[] = [];
-
-  // Stores selected restaurant.
+  // Store restaurant details.
   restaurant?: Restaurant;
 
+  // Store menu items.
+  menus: MenuItem[] = [];
+
+  // Angular injects all required services.
   constructor(
-    private menuService: MenuService,
+
     private route: ActivatedRoute,
+
     private restaurantService: RestaurantService,
+
+    private menuService: MenuService,
+
     private cartService: CartService,
+
     private router: Router
+
   ) {
 
     // Read restaurant id from URL.
-    const id = Number(this.route.snapshot.paramMap.get('id'));
+    const restaurantId =
+      Number(this.route.snapshot.paramMap.get('id'));
 
-    // Load restaurant from Backend API.
-    this.restaurantService.getRestaurantById(id).subscribe({
 
-      next: (data) => {
-        this.restaurant = data;
-        console.log("Restaurant Loaded Successfully");
-      },
 
-      error: (err) => {
-        console.log("Failed to Load Restaurant");
-        console.log(err);
-      }
+    // Load restaurant details.
+    this.restaurantService
+      .getRestaurantById(restaurantId)
+      .subscribe({
 
-    });
+        // API Success.
+        next: (data) => {
 
-    // Load menu.
-    this.menus = this.menuService.getMenusByRestaurantId(id);
+          // Store restaurant.
+          this.restaurant = data;
+
+          console.log(this.restaurant);
+
+        },
+
+        // API Failed.
+        error: (err) => {
+
+          console.log(err);
+
+        }
+
+      });
+
+
+
+    // Load restaurant menu.
+    this.menuService
+      .getMenuByRestaurantId(restaurantId)
+      .subscribe({
+
+        // API Success.
+        next: (data) => {
+
+          // Store menus.
+          this.menus = data;
+
+          console.log(this.menus);
+
+        },
+
+        // API Failed.
+        error: (err) => {
+
+          console.log(err);
+
+        }
+
+      });
+
   }
 
-  // Add item into cart.
+
+
+  // Runs when Add To Cart button is clicked.
   addToCart(menuItem: MenuItem): void {
 
+    // Add selected food into cart.
     this.cartService.addToCart(menuItem);
 
-    // Open cart page.
+    // Open Cart Page.
     this.router.navigate(['/cart']);
+
   }
 
 }
+

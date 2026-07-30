@@ -28,25 +28,22 @@ import { RouterLink } from '@angular/router';
 export class CartComponent {
 
   // Stores all cart items.
-  cartItems: CartItem[] = [];
+  cartItems=this.cartService.cartItems;
 
-  constructor(
+  constructor(private cartService:CartService){}
 
-    // Access cart data.
-    private cartService: CartService
-
-  ) {
-
-    // Load cart items.
-    this.cartItems = this.cartService.getCartItems();
-
+  increaseQuantity(menuId:number):void {
+    this.cartService.increaseQuantity(menuId);
   }
 
-  // Returns total price.
-  getTotalPrice(): number {
-
+  descreaseQuantity(menuId:number):void {
+    this.cartService.decreaseQuantity(menuId);
+  }
+  removeItem(menuId:number):void {
+    this.cartService.removeItem(menuId)
+  }
+  getTotalPrice():number {
     return this.cartService.getTotalPrice();
-
   }
 
 }
