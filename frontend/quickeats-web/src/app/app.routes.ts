@@ -43,6 +43,7 @@ import { FavoritesComponent } from './features/customer/favorites/favorites';
 import { CouponsComponent } from './features/customer/coupons/coupons';
 import { NotificationsComponent } from './features/customer/notifications/notifications';
 import { SavedAddressComponent } from './features/customer/saved-address/saved-address';
+import { ReviewsComponent } from './features/customer/reviews/reviews';
 export const routes: Routes = [
 
 {
@@ -140,6 +141,11 @@ export const routes: Routes = [
 {
     path: 'saved-address',
     component: SavedAddressComponent,
+    canActivate: [authGuard]
+},
+{
+    path: 'reviews',
+    component: ReviewsComponent,
     canActivate: [authGuard]
 },
         {

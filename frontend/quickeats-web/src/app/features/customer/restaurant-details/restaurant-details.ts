@@ -39,6 +39,9 @@ import { Review } from '../../../core/models/review.model';
 import { AuthService } from '../../../core/services/auth.service';
 // Used to check whether the Customer is logged in.
 
+import { ToastrService } from 'ngx-toastr';
+// Used to show success/error notifications.
+
 @Component({
   selector: 'app-restaurant-details',
   standalone: true,
@@ -100,6 +103,12 @@ export class RestaurantDetailsComponent {
   // Star values used to draw rating stars.
   stars = [1, 2, 3, 4, 5];
 
+  // Validation error message shown below the textarea.
+  commentError = '';
+
+  // true = show success message after review submission.
+  reviewSuccess = false;
+
   // Angular injects all required services.
   constructor(
 
@@ -116,6 +125,8 @@ export class RestaurantDetailsComponent {
     private reviewService: ReviewService,
 
     private authService: AuthService,
+
+    private toastr: ToastrService,
 
     private router: Router
 
@@ -261,11 +272,54 @@ export class RestaurantDetailsComponent {
 
   }
 
+  // Validate the comment field.
+  // Returns true if the comment is valid.
+  validateComment(): boolean {
+
+    if (!this.newComment.trim()) {
+
+      this.commentError = 'Please write a review before submitting.';
+
+      return false;
+
+    }
+
+    if (this.newComment.trim().length < 5) {
+
+      this.commentError = 'Review must be at least 5 characters.';
+
+      return false;
+
+    }
+
+    this.commentError = '';
+
+    return true;
+
+  }
+
+  // true = the Submit Review button should be enabled.
+  canSubmitReview(): boolean {
+
+    return this.newComment.trim().length > 0;
+
+  }
+
   // Runs when the Customer clicks Submit Review.
   submitReview(): void {
 
+    // Validate before submitting.
+    if (!this.validateComment()) {
+
+      return;
+
+    }
+
     const restaurantId =
       Number(this.route.snapshot.paramMap.get('id'));
+
+    // Hide previous success message.
+    this.reviewSuccess = false;
 
     const review: Review = {
 
@@ -297,6 +351,11 @@ export class RestaurantDetailsComponent {
           // Clear the form.
           this.newRating = 5;
           this.newComment = '';
+          this.commentError = '';
+
+          // Show success message.
+          this.reviewSuccess = true;
+          this.toastr.success('Review submitted successfully!');
 
           // Reload Reviews and average Rating.
           this.loadReviews(restaurantId);
@@ -307,7 +366,7 @@ export class RestaurantDetailsComponent {
         // API Failed.
         error: (err) => {
 
-          console.log(err);
+          this.toastr.error('Failed to submit review. Please try again.');
 
         }
 

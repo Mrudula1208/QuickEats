@@ -4,63 +4,236 @@
 
     <p>Share your experience</p>
 
-    <div class="review-form">
+    <!-- Average Rating Summary -->
 
-        <input
-            type="text"
-            placeholder="Your Name"
-            [(ngModel)]="newReview.customerName">
+    @if(reviewCount > 0){
 
-        <input
-            type="text"
-            placeholder="Restaurant Name"
-            [(ngModel)]="newReview.restaurantName">
+        <div class="rating-summary">
 
-        <input
-            type="number"
-            min="1"
-            max="5"
-            [(ngModel)]="newReview.rating">
+            <span class="big-star">⭐</span>
 
-        <textarea
-            rows="4"
-            placeholder="Write your review"
-            [(ngModel)]="newReview.comment">
-        </textarea>
+            <span class="rating-value">
 
-        <button
-            (click)="submitReview()">
+                {{ averageRating | number:'1.1-1' }}
 
-            Submit Review
+            </span>
 
-        </button>
+            <div class="rating-stars">
 
-    </div>
+                @for(star of stars; track star){
 
-    <div class="review-list">
+                    <span
 
-        @for(review of customerReviews; track review.id){
+                        class="star"
 
-        <div class="review-card">
+                        [class.filled]="isStarFilled(star, averageRating)">
 
-            <h2>{{review.restaurantName}}</h2>
+                        ★
 
-            <h3>{{review.customerName}}</h3>
+                    </span>
 
-            <p>⭐ {{review.rating}} / 5</p>
+                }
 
-            <p>{{review.comment}}</p>
+            </div>
 
-            <small>
+            <span class="rating-count">
 
-                {{review.createdAt | date:'mediumDate'}}
+                ({{ reviewCount }} Reviews)
 
-            </small>
+            </span>
 
         </div>
 
-        }
+    }
 
-    </div>
+    <!-- Review Form -->
+
+    @if(isLoggedIn){
+
+        <div class="review-form">
+
+            <h3>Write a Review</h3>
+
+            <!-- Restaurant Selector -->
+
+            <select
+
+                [(ngModel)]="selectedRestaurantId"
+
+                class="restaurant-select">
+
+                <option [value]="0" disabled>
+
+                    Select a Restaurant
+
+                </option>
+
+                @for(restaurant of restaurants; track restaurant.id){
+
+                    <option [value]="restaurant.id">
+
+                        {{ restaurant.name }}
+
+                    </option>
+
+                }
+
+            </select>
+
+            <!-- Star Selector -->
+
+            <div class="star-selector">
+
+                @for(star of stars; track star){
+
+                    <button
+
+                        type="button"
+
+                        class="star-btn"
+
+                        [class.active]="star <= newRating"
+
+                        (click)="setRating(star)">
+
+                        ★
+
+                    </button>
+
+                }
+
+                <span>{{ newRating }} / 5</span>
+
+            </div>
+
+            <!-- Comment Textarea -->
+
+            <textarea
+
+                rows="4"
+
+                placeholder="Write your review..."
+
+                [(ngModel)]="newComment"
+
+                (ngModelChange)="validateComment()">
+
+            </textarea>
+
+            @if(commentError){
+
+                <p class="review-error">{{ commentError }}</p>
+
+            }
+
+            @if(reviewSuccess){
+
+                <p class="review-success">Review submitted successfully!</p>
+
+            }
+
+            <!-- Submit Button -->
+
+            <button
+
+                class="submit-review-btn"
+
+                [disabled]="!canSubmitReview()"
+
+                (click)="submitReview()">
+
+                Submit Review
+
+            </button>
+
+        </div>
+
+    }
+
+    @else {
+
+        <p class="login-hint">
+
+            <a routerLink="/login">Log in</a>
+
+            to write a review.
+
+        </p>
+
+    }
+
+    <!-- Empty State -->
+
+    @if(customerReviews.length === 0){
+
+        <div class="no-reviews">
+
+            <h3>No Reviews Yet</h3>
+
+            <p>Be the first one to share your experience!</p>
+
+        </div>
+
+    }
+
+    @else {
+
+        <!-- Review List -->
+
+        <div class="review-list">
+
+            @for(review of customerReviews; track review.id){
+
+                <div class="review-card">
+
+                    <div class="review-top">
+
+                        <div class="review-info">
+
+                            <h4>{{ review.customerName }}</h4>
+
+                            <small class="restaurant-name">
+
+                                {{ review.restaurantName }}
+
+                            </small>
+
+                        </div>
+
+                        <div class="rating-stars">
+
+                            @for(star of stars; track star){
+
+                                <span
+
+                                    class="star"
+
+                                    [class.filled]="isStarFilled(star, review.rating)">
+
+                                    ★
+
+                                </span>
+
+                            }
+
+                        </div>
+
+                    </div>
+
+                    <p>{{ review.comment }}</p>
+
+                    <small>
+
+                        {{ review.createdAt | date:'mediumDate' }}
+
+                    </small>
+
+                </div>
+
+            }
+
+        </div>
+
+    }
 
 </div>

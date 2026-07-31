@@ -351,11 +351,25 @@
             <textarea
                 rows="4"
                 placeholder="Share your experience..."
-                [(ngModel)]="newComment">
+                [(ngModel)]="newComment"
+                (ngModelChange)="validateComment()">
             </textarea>
+
+            @if(commentError){
+
+                <p class="review-error">{{ commentError }}</p>
+
+            }
+
+            @if(reviewSuccess){
+
+                <p class="review-success">Review submitted successfully!</p>
+
+            }
 
             <button
                 class="submit-review-btn"
+                [disabled]="!canSubmitReview()"
                 (click)="submitReview()">
 
                 Submit Review

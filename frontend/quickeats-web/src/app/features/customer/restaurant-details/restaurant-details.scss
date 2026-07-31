@@ -490,6 +490,26 @@
     box-shadow:0 12px 25px rgba(255,95,0,.35);
 }
 
+.submit-review-btn:disabled{
+    background:#ccc;
+    cursor:not-allowed;
+    transform:none;
+    box-shadow:none;
+}
+
+.review-error{
+    color:#dc3545;
+    font-size:14px;
+    margin-bottom:10px;
+}
+
+.review-success{
+    color:#28a745;
+    font-size:14px;
+    margin-bottom:10px;
+    font-weight:600;
+}
+
 .login-hint{
     color:#888;
     margin-bottom:25px;
