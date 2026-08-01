@@ -73,6 +73,12 @@ export const routes: Routes = [
 {
   path: 'login',
   component: LoginComponent
+},
+{
+    path: 'dashboard',
+    loadComponent: () =>
+        import('./features/customer/customer-dashboard/customer-dashboard')
+            .then(m => m.CustomerDashboardComponent)
 }
 
 ];
