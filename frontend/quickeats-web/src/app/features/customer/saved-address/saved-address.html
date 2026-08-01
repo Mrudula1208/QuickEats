@@ -1,0 +1,152 @@
+<div class="saved-address-page">
+
+    <h1>
+
+        Saved Addresses
+
+    </h1>
+
+    <div class="address-form">
+
+        <input
+            type="text"
+            placeholder="Customer Name"
+            [(ngModel)]="newAddress.customerName">
+
+        <input
+            type="text"
+            placeholder="Phone Number"
+            [(ngModel)]="newAddress.phoneNumber">
+
+        <input
+            type="text"
+            placeholder="House Number"
+            [(ngModel)]="newAddress.houseNumber">
+
+        <input
+            type="text"
+            placeholder="Area"
+            [(ngModel)]="newAddress.area">
+
+        <input
+            type="text"
+            placeholder="Landmark"
+            [(ngModel)]="newAddress.landmark">
+
+        <input
+            type="text"
+            placeholder="City"
+            [(ngModel)]="newAddress.city">
+
+        <input
+            type="text"
+            placeholder="State"
+            [(ngModel)]="newAddress.state">
+
+        <input
+            type="text"
+            placeholder="Pincode"
+            [(ngModel)]="newAddress.pincode">
+
+        <select
+            [(ngModel)]="newAddress.addressType">
+
+            <option>Home</option>
+
+            <option>Office</option>
+
+            <option>Other</option>
+
+        </select>
+
+        <button
+
+            (click)="addNewAddress()">
+
+            Add Address
+
+        </button>
+
+    </div>
+
+    <div class="address-list">
+
+        @for(address of customerAddresses; track address.addressId){
+
+        <div class="address-card">
+
+            <h3>
+
+                {{address.addressType}}
+
+            </h3>
+
+            <p>
+
+                {{address.customerName}}
+
+            </p>
+
+            <p>
+
+                {{address.phoneNumber}}
+
+            </p>
+
+            <p>
+
+                {{address.houseNumber}},
+                {{address.area}}
+
+            </p>
+
+            <p>
+
+                {{address.city}},
+                {{address.state}}
+
+            </p>
+
+            <p>
+
+                {{address.pincode}}
+
+            </p>
+
+            @if(address.isDefault){
+
+            <span>
+
+                ⭐ Default Address
+
+            </span>
+
+            }
+
+            <div>
+
+                <button
+
+                    (click)="makeDefault(address.addressId)">
+
+                    Set Default
+
+                </button>
+
+                <button
+
+                    (click)="deleteAddress(address.addressId)">
+
+                    Delete
+
+                </button>
+
+            </div>
+
+        </div>
+
+        }
+
+    </div>
+
+</div>

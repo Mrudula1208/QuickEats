@@ -1,0 +1,147 @@
+.saved-address-page{
+    max-width:1200px;
+    margin:40px auto;
+    padding:20px;
+}
+
+.saved-address-page h1{
+    text-align:center;
+    color:#fc8019;
+    margin-bottom:30px;
+    font-size:34px;
+}
+
+.address-form{
+    background:#ffffff;
+    padding:30px;
+    border-radius:18px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+    margin-bottom:35px;
+
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:18px;
+}
+
+.address-form input,
+.address-form select{
+    width:100%;
+    padding:14px;
+    border:1px solid #dcdcdc;
+    border-radius:10px;
+    font-size:15px;
+    outline:none;
+    transition:.3s;
+}
+
+.address-form input:focus,
+.address-form select:focus{
+    border-color:#fc8019;
+}
+
+.address-form button{
+    grid-column:span 2;
+
+    padding:15px;
+    border:none;
+    border-radius:12px;
+    background:#fc8019;
+    color:white;
+    font-size:17px;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.address-form button:hover{
+    background:#e56f00;
+}
+
+.address-list{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(330px,1fr));
+    gap:25px;
+}
+
+.address-card{
+    background:white;
+    padding:25px;
+    border-radius:18px;
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+    transition:.3s;
+}
+
+.address-card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 15px 30px rgba(0,0,0,.12);
+}
+
+.address-card h3{
+    color:#fc8019;
+    margin-bottom:15px;
+}
+
+.address-card p{
+    color:#555;
+    margin:8px 0;
+    line-height:1.6;
+}
+
+.address-card span{
+    display:inline-block;
+    margin-top:15px;
+    padding:8px 14px;
+    background:#fff3e0;
+    color:#fc8019;
+    border-radius:30px;
+    font-weight:600;
+}
+
+.address-card div{
+    margin-top:22px;
+    display:flex;
+    gap:12px;
+}
+
+.address-card button{
+    flex:1;
+    border:none;
+    padding:12px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:15px;
+    transition:.3s;
+}
+
+.address-card button:first-child{
+    background:#fc8019;
+    color:white;
+}
+
+.address-card button:first-child:hover{
+    background:#e56f00;
+}
+
+.address-card button:last-child{
+    background:#ef5350;
+    color:white;
+}
+
+.address-card button:last-child:hover{
+    background:#d32f2f;
+}
+
+@media(max-width:768px){
+
+.address-form{
+grid-template-columns:1fr;
+}
+
+.address-form button{
+grid-column:span 1;
+}
+
+.saved-address-page{
+padding:15px;
+}
+
+}

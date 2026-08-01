@@ -1,0 +1,243 @@
+<div class="wishlist-page">
+
+    <h1>
+
+        ❤️ My Wishlist
+
+    </h1>
+
+    <p>
+
+        Save your favourite food items here.
+
+    </p>
+
+    <!--
+        @if
+        Means:
+        Check condition.
+
+        If Wishlist is empty,
+        show "No Wishlist Items".
+
+        Otherwise,
+        show Wishlist Cards.
+    -->
+
+    @if(wishlistItems.length===0){
+
+    <div class="empty-wishlist">
+
+        <h2>
+
+            Wishlist is Empty
+
+        </h2>
+
+        <p>
+
+            Add your favourite food items.
+
+        </p>
+
+    </div>
+
+    }
+
+    @else{
+
+    <div class="wishlist-grid">
+
+        <!--
+            @for
+            Means:
+            Repeat this card
+            for every Wishlist Item.
+
+            wishlistItems
+            ↓
+            Item 1
+            Item 2
+            Item 3
+            ...
+        -->
+
+        @for(item of wishlistItems; track item.wishlistId){
+
+        <div class="wishlist-card">
+
+            <!-- Food Image -->
+
+            <img
+
+                [src]="item.imageUrl"
+
+                [alt]="item.foodName">
+
+            <!-- Restaurant Name -->
+
+            <h2>
+
+                {{item.restaurantName}}
+
+            </h2>
+
+            <!-- Food Name -->
+
+            <h3>
+
+                {{item.foodName}}
+
+            </h3>
+
+            <!-- Food Category -->
+
+            <p>
+
+                {{item.category}}
+
+            </p>
+
+            <!-- Food Price -->
+
+            <h4>
+
+                ₹{{item.price}}
+
+            </h4>
+
+            <div class="button-group">
+
+                <!--
+                    Open Restaurant Page
+                -->
+
+                <button
+
+                    (click)="openRestaurant(item.restaurantId)">
+
+                    View Restaurant
+
+                </button>
+
+                <!--
+                    Remove Item
+
+                    Pass Menu Id
+                    to removeWishlistItem()
+                -->
+
+                <button
+
+                    (click)="removeWishlistItem(item.menuId)">
+
+                    Remove
+
+                </button>
+
+            </div>
+
+        </div>
+
+        }
+
+    </div>
+
+    }
+
+</div>
+
+<!--
+
+=========================
+EXECUTION FLOW
+=========================
+
+1️⃣ Wishlist Page Opens
+
+↓
+
+2️⃣ Angular loads wishlist.html
+
+↓
+
+3️⃣ @if checks
+
+wishlistItems.length
+
+↓
+
+4️⃣ If Empty
+
+↓
+
+Show Empty Message
+
+OR
+
+↓
+
+5️⃣ @for starts looping
+
+↓
+
+Item 1
+
+↓
+
+Item 2
+
+↓
+
+Item 3
+
+↓
+
+6️⃣ Create one Card
+for every Wishlist Item
+
+↓
+
+7️⃣ Customer clicks
+
+View Restaurant
+
+↓
+
+wishlist.ts
+
+↓
+
+openRestaurant()
+
+↓
+
+Restaurant Details Page
+
+OR
+
+↓
+
+Customer clicks Remove
+
+↓
+
+wishlist.ts
+
+↓
+
+removeWishlistItem()
+
+↓
+
+WishlistService
+
+↓
+
+Signal Updates
+
+↓
+
+HTML Refreshes Automatically
+
+-->
