@@ -1,72 +1,170 @@
-<div class="checkout-container">
+<div class="checkout-page">
 
-    <!-- Page Title -->
-    <h1>Checkout</h1>
+    <h1>QuickEats Checkout</h1>
 
-    <!-- Delivery Address -->
-    <div class="form-group">
+    <div class="checkout-layout">
 
-        <label>Delivery Address</label>
+        <!-- Left Section -->
 
-        <input
-            type="text"
-            [(ngModel)]="address"
-            placeholder="Enter your address">
+        <div class="checkout-form">
+
+            <div class="checkout-card">
+
+                <h2>Delivery Address</h2>
+
+                <input
+                    type="text"
+                    placeholder="Enter Delivery Address"
+                    [(ngModel)]="customerCheckout.deliveryAddress">
+
+                <input
+                    type="text"
+                    placeholder="Nearby Landmark"
+                    [(ngModel)]="customerCheckout.landmark">
+
+                <input
+                    type="text"
+                    placeholder="Mobile Number"
+                    [(ngModel)]="customerCheckout.phoneNumber">
+
+            </div>
+
+            <div class="checkout-card">
+
+                <h2>Delivery Instructions</h2>
+
+                <textarea
+
+                    rows="4"
+
+                    placeholder="Example : Leave food at the security gate."
+
+                    [(ngModel)]="customerCheckout.deliveryInstruction">
+
+                </textarea>
+
+            </div>
+
+            <div class="checkout-card">
+
+                <h2>Payment Method</h2>
+
+                <!-- Why radio?
+                     Only ONE payment method should be selected.
+                     Radio button allows single selection.
+                -->
+
+                <label>
+
+                    <input
+                        type="radio"
+                        value="Cash On Delivery"
+                        [(ngModel)]="customerCheckout.paymentMethod">
+
+                    Cash On Delivery
+
+                </label>
+
+                <label>
+
+                    <input
+                        type="radio"
+                        value="UPI"
+                        [(ngModel)]="customerCheckout.paymentMethod">
+
+                    UPI
+
+                </label>
+
+                <label>
+
+                    <input
+                        type="radio"
+                        value="Card"
+                        [(ngModel)]="customerCheckout.paymentMethod">
+
+                    Debit / Credit Card
+
+                </label>
+
+            </div>
+
+        </div>
+
+        <!-- Right Section -->
+
+        <div class="bill-summary">
+
+            <div class="checkout-card">
+
+                <h2>Bill Summary</h2>
+
+                <div class="bill-row">
+
+                    <span>Food Total</span>
+
+                    <span>₹{{ customerCheckout.subTotal }}</span>
+
+                </div>
+
+                <div class="bill-row">
+
+                    <span>GST (5%)</span>
+
+                    <span>₹{{ customerCheckout.gstAmount }}</span>
+
+                </div>
+
+                <div class="bill-row">
+
+                    <span>Delivery Charge</span>
+
+                    <span>₹{{ customerCheckout.deliveryCharge }}</span>
+
+                </div>
+
+                <div class="bill-row">
+
+                    <span>Platform Fee</span>
+
+                    <span>₹{{ customerCheckout.platformFee }}</span>
+
+                </div>
+
+                <hr>
+
+                <div class="bill-row total">
+
+                    <span>Grand Total</span>
+
+                    <span>₹{{ customerCheckout.grandTotal }}</span>
+
+                </div>
+
+            </div>
+
+            <div class="checkout-card reward-card">
+
+                <h2>QuickEat Rewards</h2>
+
+                <h1>+{{ customerCheckout.rewardPoints }}</h1>
+
+                <p>You will earn reward points after placing this order.</p>
+
+            </div>
+
+            <button
+
+                class="place-order-btn"
+
+                (click)="placeOrder()">
+
+                Place Order
+
+            </button>
+
+        </div>
 
     </div>
-
-    <!-- Phone Number -->
-    <div class="form-group">
-
-        <label>Phone Number</label>
-
-        <input
-            type="text"
-            [(ngModel)]="phone"
-            placeholder="Enter phone number">
-
-    </div>
-
-    <!-- Place Order Button -->
-    <button
-        class="place-order-btn"
-        (click)="PlaceOrder()">
-
-        Place Order
-
-    </button>
-
-    <!-- Order Summary -->
-    <h2>Order Summary</h2>
-
-    @for (item of cartItems; track item.menuItem.id) {
-
-    <div class="summary-item">
-
-        <span>
-
-            {{ item.menuItem.name }}
-
-        </span>
-
-        <span>
-
-            ₹{{ item.menuItem.price }}
-            ×
-            {{ item.quantity }}
-
-        </span>
-
-    </div>
-
-    }
-
-    <hr>
-
-    <h3 class="total">
-
-        Total ₹{{ total }}
-
-    </h3>
 
 </div>

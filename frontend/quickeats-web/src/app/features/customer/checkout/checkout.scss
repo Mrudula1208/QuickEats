@@ -1,67 +1,123 @@
-.checkout-container{
-
-max-width:600px;
-
-margin:50px auto;
-
-padding:30px;
-
-background:white;
-
-border-radius:15px;
-
-box-shadow:0 8px 20px rgba(0,0,0,.1);
-
+.checkout-page{
+    width:90%;
+    max-width:1400px;
+    margin:40px auto;
 }
 
-.checkout-container input{
-
-width:100%;
-
-padding:12px;
-
-margin-bottom:20px;
-
-border:1px solid #ddd;
-
-border-radius:8px;
-
+.checkout-page h1{
+    font-size:42px;
+    margin-bottom:35px;
+    color:#222;
 }
 
-.checkout-container button{
-
-width:100%;
-
-padding:15px;
-
-background:#ff5a1f;
-
-color:white;
-
-border:none;
-
-border-radius:8px;
-
-font-size:18px;
-
-cursor:pointer;
-
-}.order-item{
-
-display:flex;
-
-justify-content:space-between;
-
-padding:12px 0;
-
-border-bottom:1px solid #eee;
-
+.checkout-layout{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:30px;
 }
 
-h3{
+.checkout-card{
+    background:#fff;
+    border-radius:18px;
+    padding:25px;
+    margin-bottom:25px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+}
 
-margin-top:20px;
+.checkout-card h2{
+    margin-bottom:20px;
+    color:#222;
+}
 
-color:#ff5a1f;
+.checkout-form input,
+.checkout-form textarea{
+    width:100%;
+    padding:15px;
+    margin-bottom:15px;
+    border:1px solid #ddd;
+    border-radius:12px;
+    font-size:16px;
+    outline:none;
+}
+
+.checkout-form input:focus,
+.checkout-form textarea:focus{
+    border-color:#ff6b00;
+}
+
+.checkout-form label{
+    display:block;
+    margin-bottom:15px;
+    cursor:pointer;
+    font-size:17px;
+}
+
+.checkout-form input[type="radio"]{
+    width:auto;
+    margin-right:10px;
+}
+
+.bill-summary{
+    position:sticky;
+    top:100px;
+    height:max-content;
+}
+
+.bill-row{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:15px;
+    font-size:17px;
+}
+
+.total{
+    font-size:22px;
+    font-weight:700;
+    color:#ff6b00;
+}
+
+.reward-card{
+    background:linear-gradient(135deg,#ff7a18,#ff5f00);
+    color:white;
+    text-align:center;
+}
+
+.reward-card h1{
+    color:white;
+    font-size:50px;
+    margin:15px 0;
+}
+
+.reward-card p{
+    color:#fff;
+}
+
+.place-order-btn{
+    width:100%;
+    padding:18px;
+    border:none;
+    border-radius:14px;
+    background:#22c55e;
+    color:white;
+    font-size:20px;
+    font-weight:700;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.place-order-btn:hover{
+    transform:translateY(-3px);
+    box-shadow:0 15px 30px rgba(34,197,94,.35);
+}
+
+@media(max-width:992px){
+
+    .checkout-layout{
+        grid-template-columns:1fr;
+    }
+
+    .bill-summary{
+        position:static;
+    }
 
 }

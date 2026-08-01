@@ -1,28 +1,126 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
-import { Order } from '../../../core/models/order';
-import { OrderService } from '../../../core/services/order';
-import { RouterLink } from '@angular/router';
+// We import Component because this file controls the Order Details page.
+// Every Angular page or UI starts with a Component.
 
+import { CommonModule } from '@angular/common';
+// We import CommonModule because HTML uses Angular features like @if.
+
+import { ActivatedRoute, Router } from '@angular/router';
+// ActivatedRoute reads data from the URL.
+// Router is used to move the user to another page.
+
+import { OrderService } from '../../../core/services/order';
+// We import OrderService because all order-related logic is written there.
+// Components should not directly manage order data.
+
+import { OrderModel } from '../../../core/models/order.model';
+// We import OrderModel because it defines the structure of one order.
 
 @Component({
   selector: 'app-order-details',
-  standalone:true,
-  imports: [CommonModule,RouterLink],
-  templateUrl: './order-details.html',
-  styleUrl: './order-details.scss',
-})
-export class OrderDetailsComponent {
-  order?:Order;
-  constructor(
-    private route :ActivatedRoute,
-    private orderService:OrderService
+  // Angular uses this selector if this component is used inside another HTML page.
 
-  ){
-    const id=Number(
-      this.route.snapshot.paramMap.get('id')
-    );
-    this.order=this.orderService.getOrders().find(order=>order.id==id);
+  standalone: true,
+  // standalone:true means this component works independently.
+  // We don't need to declare it inside app.module.ts.
+
+  imports: [CommonModule],
+  // We import CommonModule because HTML uses Angular directives.
+
+  templateUrl: './order-details.html',
+  // Connect this TypeScript file with order-details.html.
+
+  styleUrl: './order-details.scss'
+  // Connect this TypeScript file with order-details.scss.
+})
+
+export class OrderDetailsComponent {
+
+  // Store one selected order.
+  // Initially nothing is loaded.
+  // '?' means value can be undefined.
+  selectedOrder?: OrderModel;
+
+  constructor(
+
+    private currentRoute: ActivatedRoute,
+    // Angular automatically gives ActivatedRoute object.
+    // We use it to read Order Id from URL.
+    // Example:
+    // /order-details/101
+
+    private orderService: OrderService,
+    // Angular automatically gives OrderService object.
+    // We don't create it using:
+    // new OrderService()
+    // Dependency Injection manages it.
+
+    private router: Router
+    // Router helps us open another page.
+    // Example:
+    // Order Details → Delivery Tracking
+
+  ) {
+
+    // As soon as page opens,
+    // immediately load selected order.
+    this.loadSelectedOrder();
+
   }
+
+  loadSelectedOrder(): void {
+  // This method loads only ONE order.
+  // Customer clicked one order from Orders page.
+  // So we display only that order.
+
+    const selectedOrderId =
+      Number(this.currentRoute.snapshot.paramMap.get('id'));
+
+    // Read Order Id from URL.
+    // paramMap.get('id') always returns string.
+    // Number() converts string into integer.
+    // Example:
+    // URL:
+    // /order-details/105
+    // selectedOrderId = 105
+
+    const customerOrders =
+      this.orderService.getAllOrders();
+
+    // Get all orders stored inside OrderService.
+    // We need the complete list before finding one order.
+
+    this.selectedOrder =
+      customerOrders.find(
+
+(order: OrderModel) => order.id === selectedOrderId
+      );
+
+    // find() searches the array.
+    // It returns only ONE matching object.
+    // We compare every order's orderId
+    // with selectedOrderId.
+    // When both become equal,
+    // that order is stored inside selectedOrder.
+
+    console.log(this.selectedOrder);
+    // Print selected order in browser console.
+    // Useful for debugging.
+
+  }
+
+  openDeliveryTracking(): void {
+  // Runs when customer clicks
+  // "Track My Order" button.
+
+    this.router.navigate([
+
+      '/delivery-tracking'
+
+    ]);
+
+    // Navigate to Delivery Tracking page.
+
+  }
+
 }

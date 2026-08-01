@@ -1,134 +1,184 @@
-<p>delivery-tracking works!</p>
-<!-- ===================================================== -->
-<!-- STEP 1 -->
-<!-- ===================================================== -->
-<!--
-This page displays ONE delivery.
+<div class="tracking-page">
 
-The delivery object comes from
+    <h1>Track Your Order</h1>
 
-DeliveryTrackingComponent
-
-↓
-
-delivery
-
-↓
-
-HTML reads it.
-
--->
-
-<div class="delivery-page">
-
-    <!-- ================================================ -->
-    <!-- STEP 2 -->
-    <!-- ================================================ -->
-    <!--
-    Page Title
-    -->
-
-    <h1>🚚 Delivery Tracking</h1>
-
-    <p>
-        Track your delivery partner
+    <p class="sub-title">
+        Follow your order in real time.
     </p>
 
-
-    <!-- ================================================ -->
-    <!-- STEP 3 -->
-    <!--
-    Check whether delivery exists.
-
-    If DeliveryService found a delivery,
-
-    show it.
-
-    Otherwise,
-
-    show "Delivery Not Found".
-    -->
-    @if(delivery){
-
-    <!-- ================================================ -->
-    <!-- STEP 4 -->
-    <!--
-    Delivery Card
-    -->
+    @if(currentDelivery){
 
     <div class="delivery-card">
 
-        <h2>Delivery Partner</h2>
+        <div class="delivery-header">
 
-        <hr>
-
-        <!-- ============================================ -->
-        <!-- STEP 5 -->
-        <!--
-        HTML reads
-
-        delivery.partnerName
-
-        from
-
-        delivery object.
-        -->
-
-        <p>
-
-            <strong>👤 Partner :</strong>
-
-            {{delivery.partnerName}}
-
-        </p>
-
-
-        <!-- ============================================ -->
-
-        <p>
-
-            <strong>📞 Phone :</strong>
-
-            {{delivery.partnerPhone}}
-
-        </p>
-
-
-        <!-- ============================================ -->
-
-        <p>
-
-            <strong>🏍 Bike :</strong>
-
-            {{delivery.bikeNumber}}
-
-        </p>
-
-
-        <!-- ============================================ -->
-
-        <p>
-
-            <strong>⏱ Estimated Time :</strong>
-
-            {{delivery.estimatedTime}}
-
-        </p>
-
-
-        <!-- ============================================ -->
-
-        <p>
-
-            <strong>📦 Status :</strong>
+            <h2>Delivery Partner</h2>
 
             <span class="status">
 
-                {{delivery.status}}
+                {{currentDelivery.status}}
 
             </span>
 
-        </p>
+        </div>
+
+        <div class="partner-details">
+
+            <div class="detail-item">
+
+                <h4>Partner Name</h4>
+
+                <p>
+
+                    {{currentDelivery.partnerName}}
+
+                </p>
+
+            </div>
+
+            <div class="detail-item">
+
+                <h4>Phone Number</h4>
+
+                <p>
+
+                    {{currentDelivery.partnerPhone}}
+
+                </p>
+
+            </div>
+
+            <div class="detail-item">
+
+                <h4>Bike Number</h4>
+
+                <p>
+
+                    {{currentDelivery.bikeNumber}}
+
+                </p>
+
+            </div>
+
+            <div class="detail-item">
+
+                <h4>Estimated Delivery</h4>
+
+                <p>
+
+                    {{currentDelivery.estimatedTime}}
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="tracking-timeline">
+
+        <div class="timeline-item active">
+
+            <div class="circle">
+
+                ✓
+
+            </div>
+
+            <div class="content">
+
+                <h3>Order Confirmed</h3>
+
+                <p>
+
+                    Your order has been confirmed.
+
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="timeline-item active">
+
+            <div class="circle">
+
+                ✓
+
+            </div>
+
+            <div class="content">
+
+                <h3>Preparing Food</h3>
+
+                <p>
+
+                    Restaurant is preparing your meal.
+
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="timeline-item">
+
+            <div class="circle">
+
+                🚴
+
+            </div>
+
+            <div class="content">
+
+                <h3>Out For Delivery</h3>
+
+                <p>
+
+                    Delivery partner is on the way.
+
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="timeline-item">
+
+            <div class="circle">
+
+                🏠
+
+            </div>
+
+            <div class="content">
+
+                <h3>Delivered</h3>
+
+                <p>
+
+                    Enjoy your delicious food.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="button-section">
+
+        <button
+
+            class="back-btn"
+
+            (click)="backToOrders()">
+
+            Back To Orders
+
+        </button>
 
     </div>
 
@@ -136,23 +186,29 @@ HTML reads it.
 
     @else{
 
-    <!-- ================================================ -->
-    <!-- STEP 6 -->
-    <!--
-    If delivery is undefined,
+    <div class="empty-delivery">
 
-    show this.
-    -->
+        <h2>
 
-    <div class="not-found">
+            No Active Delivery
 
-        <h2>❌ Delivery Not Found</h2>
+        </h2>
 
         <p>
 
-            No delivery information available.
+            You don't have any delivery in progress.
 
         </p>
+
+        <button
+
+            class="back-btn"
+
+            (click)="backToOrders()">
+
+            Back To Orders
+
+        </button>
 
     </div>
 

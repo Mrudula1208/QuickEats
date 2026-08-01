@@ -1,23 +1,25 @@
-// Import Component decorator.
 import { Component } from '@angular/core';
+// Import Component because this file controls the Checkout page.
 
-// Used for page navigation.
-import { Router } from '@angular/router';
-
-// Stores checkout information.
-import { CheckoutDataService } from '../../../core/services/checkout-data.service';
-
-// Import CommonModule.
 import { CommonModule } from '@angular/common';
+// Import CommonModule because we use Angular directives inside HTML.
 
-// Import Cart Service.
-import { CartService } from '../../../core/services/cart.service';
-
-// Import CartItem model.
-import { CartItem } from '../../../core/models/cart-item.model';
-
-// Required for [(ngModel)].
 import { FormsModule } from '@angular/forms';
+// Import FormsModule because checkout form uses ngModel.
+
+import { Router } from '@angular/router';
+// Router helps us navigate to another page after placing an order.
+
+import { CheckoutService } from '../../../core/services/checkout.service';
+// CheckoutService stores checkout information.
+
+import { CartService } from '../../../core/services/cart.service';
+// CartService gives all cart items and total amount.
+
+import { CheckoutModel } from '../../../core/models/checkout.model';
+import { signal } from '@angular/core';
+import { CartItem } from '../../../core/models/cart-item.model';
+// CheckoutModel defines the structure of checkout data.
 
 @Component({
   selector: 'app-checkout',
@@ -32,92 +34,99 @@ import { FormsModule } from '@angular/forms';
 
 export class CheckoutComponent {
 
-  // Stores all cart items.
-  cartItems: CartItem[] = [];
+  // Get all food items added into the cart.
+customerCartItems = signal<CartItem[]>([]);
 
-  // Stores total bill.
-  total = 0;
+constructor(
+  private cartService: CartService,
+  private checkoutService: CheckoutService,
+  private router: Router
+) {
 
-  // Stores delivery address.
-  address = '';
+  this.customerCartItems = this.cartService.cartItems;
 
-  // Stores phone number.
-  phone = '';
+  this.calculateBill();
 
-  constructor(
+}
+  // Create Checkout object.
+  // Default values are shown when page opens.
+  customerCheckout: CheckoutModel = {
 
-    // Reads cart items.
-    private cartService: CartService,
+    deliveryAddress: '',
 
-    // Stores checkout information
-    // temporarily until payment.
-    private checkoutData: CheckoutDataService,
+    landmark: '',
 
-    // Used for page navigation.
-    private router: Router
+    phoneNumber: '',
 
-  ) {
+    deliveryInstruction: '',
 
-    // Load cart items.
-    this.cartItems = this.cartService.getCartItems();
+    paymentMethod: 'Cash On Delivery',
 
-    // Load total amount.
-    this.total = this.cartService.getTotalPrice();
+    couponCode: '',
+
+    subTotal: 0,
+
+    gstAmount: 0,
+
+    deliveryCharge: 0,
+
+    platformFee: 10,
+
+    discountAmount: 0,
+
+    grandTotal: 0,
+
+    rewardPoints: 0
+
+  };
+
+  // Angular automatically injects required services.
+
+
+  // Calculate complete bill.
+  calculateBill(): void {
+
+    // Total food amount.
+    this.customerCheckout.subTotal =
+      this.cartService.getTotalPrice();
+
+    // GST = 5%
+    this.customerCheckout.gstAmount =
+      this.customerCheckout.subTotal * 0.05;
+
+    // Free delivery above ₹500.
+    this.customerCheckout.deliveryCharge =
+      this.customerCheckout.subTotal >= 500 ? 0 : 40;
+
+    // Reward points.
+    this.customerCheckout.rewardPoints =
+      Math.floor(this.customerCheckout.subTotal / 100);
+
+    // Grand Total.
+    this.customerCheckout.grandTotal =
+
+      this.customerCheckout.subTotal +
+
+      this.customerCheckout.gstAmount +
+
+      this.customerCheckout.deliveryCharge +
+
+      this.customerCheckout.platformFee -
+
+      this.customerCheckout.discountAmount;
 
   }
 
-  // Runs when user clicks
-  // Proceed To Payment.
-  PlaceOrder(): void {
+  // Save checkout details and move to payment page.
+  placeOrder(): void {
 
-    // Save delivery address.
-    this.checkoutData.address = this.address;
+    // Save checkout information.
+    this.checkoutService
+      .saveCheckoutDetails(this.customerCheckout);
 
-    // Save phone number.
-    this.checkoutData.phone = this.phone;
-
-    // Save cart items.
-    this.checkoutData.cartItems = this.cartItems.map(item => ({
-      menuItem: item.menuItem,
-      quantity: item.quantity
-    }));
-
-    // Save total amount.
-    this.checkoutData.total = this.total;
-
-    // Open Payment page.
+    // Open Payment Page.
     this.router.navigate(['/payment']);
 
   }
 
 }
-
-/*
-
-WHY DO WE WRITE THIS FILE?
-
-CheckoutComponent collects
-customer information before payment.
-
-Flow
-
-Restaurant
-      ↓
-Cart
-      ↓
-Checkout (THIS FILE)
-      ↓
-CheckoutDataService
-      ↓
-Payment
-
-This component:
-
-1. Reads cart items.
-2. Calculates total amount.
-3. Takes delivery address.
-4. Takes phone number.
-5. Saves checkout information.
-6. Opens Payment page.
-
-*/

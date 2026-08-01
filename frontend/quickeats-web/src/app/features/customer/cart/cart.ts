@@ -1,5 +1,6 @@
 // Import Component decorator.
 import { Component } from '@angular/core';
+import { signal } from '@angular/core';
 
 // Import CommonModule.
 import { CommonModule } from '@angular/common';
@@ -27,16 +28,18 @@ import { RouterLink } from '@angular/router';
 
 export class CartComponent {
 
-  // Stores all cart items.
-  cartItems=this.cartService.cartItems;
+ cartItems = signal<CartItem[]>([]);
 
-  constructor(private cartService:CartService){}
+constructor(private cartService: CartService){
 
+    this.cartItems = this.cartService.cartItems;
+
+}
   increaseQuantity(menuId:number):void {
     this.cartService.increaseQuantity(menuId);
   }
 
-  descreaseQuantity(menuId:number):void {
+  decreaseQuantity(menuId:number):void {
     this.cartService.decreaseQuantity(menuId);
   }
   removeItem(menuId:number):void {

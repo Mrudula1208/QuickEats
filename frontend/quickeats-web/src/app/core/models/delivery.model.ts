@@ -7,6 +7,7 @@ export interface Delivery {
     estimatedTime:string;
     status:
         | 'Preparing'
+        | 'Picked Up'
         | 'Out For Delivery'
         | 'Delivered';
 

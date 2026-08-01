@@ -1,274 +1,101 @@
-/* =====================================================
-   PAGE
-===================================================== */
-
-:host {
-
-    display: block;
-
-    background: #f8f9fb;
-
-    min-height: 100vh;
-
-    padding: 40px;
-
+.order-details-page{
+    width:90%;
+    max-width:900px;
+    margin:40px auto;
 }
 
-/* =====================================================
-   PAGE TITLE
-===================================================== */
-
-h1 {
-
-    text-align: center;
-
-    font-size: 34px;
-
-    margin-bottom: 35px;
-
-    color: #222;
-
+.order-card{
+    background:#fff;
+    padding:35px;
+    border-radius:20px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
 }
 
-/* =====================================================
-   ORDER CARD
-===================================================== */
-
-.order-container {
-
-    max-width: 900px;
-
-    margin: auto;
-
-    background: white;
-
-    border-radius: 18px;
-
-    padding: 35px;
-
-    box-shadow: 0 12px 30px rgba(0,0,0,.08);
-
+.order-card h1{
+    color:#222;
+    margin-bottom:10px;
 }
 
-/* =====================================================
-   ORDER HEADING
-===================================================== */
-
-.order-container h2 {
-
-    margin-bottom: 15px;
-
-    color: #ff5722;
-
+.order-card p{
+    color:#666;
+    margin-bottom:20px;
 }
 
-/* =====================================================
-   ORDER INFORMATION
-===================================================== */
-
-.order-container p {
-
-    margin: 12px 0;
-
-    font-size: 16px;
-
-    color: #555;
-
+.order-information{
+    margin-top:30px;
 }
 
-/* =====================================================
-   LINE
-===================================================== */
-
-hr {
-
-    margin: 25px 0;
-
-    border: none;
-
-    border-top: 1px solid #eee;
-
+.information-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:18px 0;
+    border-bottom:1px solid #ececec;
 }
 
-/* =====================================================
-   ORDER ITEMS
-===================================================== */
-
-.order-item {
-
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: center;
-
-    padding: 18px;
-
-    margin-bottom: 12px;
-
-    background: #fafafa;
-
-    border-radius: 12px;
-
-    transition: .3s;
-
+.information-row span:first-child{
+    color:#666;
+    font-weight:500;
 }
 
-.order-item:hover {
-
-    background: #fff3ee;
-
-    transform: translateY(-2px);
-
+.information-row span:last-child{
+    font-weight:600;
+    color:#222;
 }
 
-/* =====================================================
-   FOOD NAME
-===================================================== */
-
-.order-item span:first-child {
-
-    font-weight: 600;
-
-    color: #333;
-
+.status{
+    color:#2e7d32 !important;
+    background:#e8f5e9;
+    padding:6px 18px;
+    border-radius:30px;
 }
 
-/* =====================================================
-   QUANTITY
-===================================================== */
-
-.order-item span:nth-child(2) {
-
-    color: #777;
-
+.order-card button{
+    width:100%;
+    margin-top:35px;
+    padding:16px;
+    border:none;
+    border-radius:12px;
+    background:linear-gradient(135deg,#ff7a18,#ff5f00);
+    color:white;
+    font-size:18px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.3s;
 }
 
-/* =====================================================
-   PRICE
-===================================================== */
-
-.order-item span:last-child {
-
-    font-weight: bold;
-
-    color: #ff5722;
-
+.order-card button:hover{
+    transform:translateY(-3px);
+    box-shadow:0 12px 25px rgba(255,95,0,.35);
 }
 
-/* =====================================================
-   TOTAL
-===================================================== */
-
-.order-container h2:last-child {
-
-    text-align: right;
-
-    color: #27ae60;
-
-    margin-top: 20px;
-
+.order-not-found{
+    background:#fff;
+    padding:80px;
+    text-align:center;
+    border-radius:20px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
 }
 
-/* =====================================================
-   ORDER NOT FOUND
-===================================================== */
-
-.empty-order {
-
-    max-width: 500px;
-
-    margin: auto;
-
-    background: white;
-
-    border-radius: 16px;
-
-    padding: 40px;
-
-    text-align: center;
-
-    box-shadow: 0 8px 25px rgba(0,0,0,.08);
-
+.order-not-found h2{
+    margin-bottom:15px;
+    color:#222;
 }
 
-.empty-order h2 {
-
-    color: #888;
-
+.order-not-found p{
+    color:#777;
 }
 
-/*
+@media(max-width:768px){
 
-=========================================================
-WHY DO WE WRITE THIS FILE?
-=========================================================
+    .order-details-page{
+        width:95%;
+    }
 
-This file gives a modern design to the
-Order Details page.
+    .information-row{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:8px;
+    }
 
-Without this file,
-
-the page works,
-
-but looks plain.
-
-=========================================================
-WHERE IS THIS FILE USED?
-=========================================================
-
-order-details.ts
-
-↓
-
-@Component
-
-↓
-
-styleUrl
-
-↓
-
-order-details.scss (THIS FILE)
-
-↓
-
-Beautiful UI
-
-=========================================================
-WHAT THIS FILE STYLES?
-=========================================================
-
-✓ Background
-
-✓ Order Card
-
-✓ Order Information
-
-✓ Ordered Items
-
-✓ Total Amount
-
-✓ Hover Effect
-
-✓ Empty Order Page
-
-=========================================================
-FLOW
-=========================================================
-
-order-details.html
-
-↓
-
-CSS Classes
-
-↓
-
-order-details.scss
-
-↓
-
-Beautiful Order Details Page
-
-*/
+}

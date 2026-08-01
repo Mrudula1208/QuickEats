@@ -1,35 +1,135 @@
-<h1>Order Detail</h1>
-@if(order){
-    <div class="order-container">
-        <h2>Order #{{order.id}}</h2>
-        <P> 📅 {{ order.date | date:'medium' }}</P>
-        <p> 📍 {{ order.address }}</p>
-        <p>📞 {{ order.phone }}</p>
-        <h3>Ordered Items</h3>
+<div class="order-details-page">
 
-        @for(item of order.items;track item.menuItem.id){
-            <div class="order-item">
-                <span> {{ item.menuItem.name }}</span>
-                <span>Qty : {{ item.quantity }}</span>
-                <span>₹{{ item.menuItem.price }}</span>
-            </div>
-        }
+    @if(selectedOrder){
+    <!-- @if checks whether selectedOrder contains data.
+         If data exists, Angular displays the complete Order Details page.
+         Otherwise it goes to the @else block.
+    -->
+
+    <div class="order-card">
+
+        <h1>{{ selectedOrder.restaurantName }}</h1>
+        <!-- {{ }} is called Interpolation.
+             It displays TypeScript data inside HTML.
+             Here it prints Restaurant Name.
+        -->
+
+        <p>
+            Order ID :
+            <strong>#{{ selectedOrder.id }}</strong>
+        </p>
+
         <hr>
-        <h2>Total : ₹{{ order.total }}</h2>
-  <hr>
-<button
 
-class="track-btn"
+        <div class="order-information">
 
-[routerLink]="['/delivery', order.id]">
+            <div class="information-row">
 
-🚚 Track Delivery
+                <span>Payment Method</span>
 
-</button>
+                <span>
+
+                    {{ selectedOrder.paymentMethod }}
+
+                </span>
+
+            </div>
+            <!-- Shows customer's selected payment method. -->
+
+            <div class="information-row">
+
+                <span>Total Amount</span>
+
+                <span>
+
+                    ₹{{ selectedOrder.total }}
+
+                </span>
+
+            </div>
+            <!-- Displays final order amount. -->
+
+            <div class="information-row">
+
+                <span>Delivery Address</span>
+
+                <span>
+
+                    {{ selectedOrder.address }}
+
+                </span>
+
+            </div>
+            <!-- Displays delivery location. -->
+
+            <div class="information-row">
+
+                <span>Order Status</span>
+
+                <span class="status">
+
+                    {{ selectedOrder.status }}
+
+                </span>
+
+            </div>
+            <!-- Displays current order status.
+                 Example:
+                 Preparing
+                 Out For Delivery
+                 Delivered
+            -->
+
+            <div class="information-row">
+
+                <span>Estimated Delivery</span>
+
+                <span>
+
+                    {{ selectedOrder.estimatedDeliveryTime }}
+
+                </span>
+
+            </div>
+            <!-- Shows estimated delivery time. -->
+
+        </div>
+
+        <button
+
+            (click)="openDeliveryTracking()">
+
+            Track My Order
+
+        </button>
+        <!-- (click) is Event Binding.
+             When customer clicks this button,
+             Angular executes openDeliveryTracking()
+             inside order-details.ts
+        -->
+
     </div>
-}
-@else {
-    <div class="empty-order">
-        <h2> Order Not Found 😔</h2>
+
+    }
+
+    @else{
+
+    <!-- If no order is found,
+         Angular displays this message.
+    -->
+
+    <div class="order-not-found">
+
+        <h2>Order Not Found</h2>
+
+        <p>
+
+            We couldn't find the requested order.
+
+        </p>
+
     </div>
-}
+
+    }
+
+</div>

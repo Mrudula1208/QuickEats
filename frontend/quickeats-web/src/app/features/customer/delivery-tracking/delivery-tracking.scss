@@ -1,264 +1,190 @@
-/* =========================================================
-
-STEP 1
-
-This styles the whole page.
-
-margin:auto
-→ Center the page.
-
-max-width
-→ Prevent the page from becoming too wide.
-
-padding
-→ Space inside the page.
-
-========================================================= */
-
-.delivery-page{
-
-    max-width:900px;
-
-    margin:auto;
-
-    padding:40px;
-
+.tracking-page {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 30px;
 }
 
-
-
-/* =========================================================
-
-STEP 2
-
-Page Heading
-
-========================================================= */
-
-.delivery-page h1{
-
-    text-align:center;
-
-    color:#ff5a5f;
-
-    font-size:38px;
-
+.tracking-page h1 {
+  font-size: 34px;
+  font-weight: 700;
+  color: #222;
 }
 
-
-
-/* =========================================================
-
-Subtitle
-
-========================================================= */
-
-.delivery-page p{
-
-    text-align:center;
-
-    color:#666;
-
+.sub-title {
+  color: #666;
+  margin-bottom: 35px;
 }
 
-
-
-/* =========================================================
-
-STEP 3
-
-Delivery Card
-
-White background
-
-Rounded corners
-
-Shadow
-
-========================================================= */
-
-.delivery-card{
-
-    margin-top:40px;
-
-    background:white;
-
-    border-radius:15px;
-
-    padding:30px;
-
-    box-shadow:0 8px 25px rgba(0,0,0,.08);
-
+.delivery-card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 25px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.08);
+  margin-bottom: 35px;
 }
 
-
-
-/* =========================================================
-
-Card Heading
-
-========================================================= */
-
-.delivery-card h2{
-
-    color:#ff5a5f;
-
-    margin-bottom:15px;
-
+.delivery-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
 }
 
-
-
-/* =========================================================
-
-Horizontal Line
-
-========================================================= */
-
-.delivery-card hr{
-
-    margin-bottom:20px;
-
+.delivery-header h2 {
+  font-size: 24px;
 }
 
-
-
-/* =========================================================
-
-Every Row
-
-Partner
-
-Phone
-
-Bike
-
-Status
-
-ETA
-
-========================================================= */
-
-.delivery-card p{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    padding:15px 0;
-
-    border-bottom:1px solid #eee;
-
-    font-size:18px;
-
+.status {
+  background: #1ba672;
+  color: white;
+  padding: 8px 18px;
+  border-radius: 30px;
+  font-weight: 600;
 }
 
-
-
-/* =========================================================
-
-Last Row
-
-Remove Border
-
-========================================================= */
-
-.delivery-card p:last-child{
-
-    border-bottom:none;
-
+.partner-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+  gap: 20px;
 }
 
-
-
-/* =========================================================
-
-Status Badge
-
-========================================================= */
-
-.status{
-
-    background:#fff3cd;
-
-    color:#856404;
-
-    padding:8px 18px;
-
-    border-radius:25px;
-
-    font-weight:bold;
-
+.detail-item {
+  background: #f7f7f7;
+  padding: 18px;
+  border-radius: 12px;
 }
 
-
-
-/* =========================================================
-
-Delivery Not Found Card
-
-========================================================= */
-
-.not-found{
-
-    margin-top:80px;
-
-    text-align:center;
-
-    background:white;
-
-    padding:40px;
-
-    border-radius:15px;
-
-    box-shadow:0 8px 20px rgba(0,0,0,.08);
-
+.detail-item h4 {
+  color: #777;
+  margin-bottom: 8px;
 }
 
-
-
-/* =========================================================
-
-Not Found Heading
-
-========================================================= */
-
-.not-found h2{
-
-    color:red;
-
-    margin-bottom:15px;
-
+.detail-item p {
+  font-size: 18px;
+  font-weight: 600;
+  color: #222;
 }
 
+.tracking-timeline {
+  background: white;
+  border-radius: 18px;
+  padding: 30px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.08);
+}
 
+.timeline-item {
+  display: flex;
+  gap: 25px;
+  margin-bottom: 40px;
+  position: relative;
+}
 
-/* =========================================================
+.timeline-item:last-child {
+  margin-bottom: 0;
+}
 
-Responsive Design
+.timeline-item::after {
+  content: "";
+  position: absolute;
+  left: 20px;
+  top: 45px;
+  width: 3px;
+  height: calc(100% + 15px);
+  background: #d9d9d9;
+}
 
-Mobile Screen
+.timeline-item:last-child::after {
+  display: none;
+}
 
-========================================================= */
+.timeline-item.active::after {
+  background: #1ba672;
+}
 
-@media(max-width:768px){
+.circle {
+  width: 42px;
+  height: 42px;
+  background: #e8e8e8;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+  font-weight: bold;
+  flex-shrink: 0;
+}
 
-    .delivery-card{
+.timeline-item.active .circle {
+  background: #1ba672;
+  color: white;
+}
 
-        padding:20px;
+.content h3 {
+  margin-bottom: 8px;
+  color: #222;
+}
 
-    }
+.content p {
+  color: #666;
+}
 
-    .delivery-card p{
+.button-section {
+  text-align: center;
+  margin-top: 35px;
+}
 
-        flex-direction:column;
+.back-btn {
+  border: none;
+  background: #fc8019;
+  color: white;
+  padding: 14px 35px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 17px;
+  font-weight: 600;
+  transition: .3s;
+}
 
-        align-items:flex-start;
+.back-btn:hover {
+  background: #e86f0b;
+}
 
-        gap:8px;
+.empty-delivery {
+  background: white;
+  padding: 50px;
+  text-align: center;
+  border-radius: 18px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.08);
+}
 
-    }
+.empty-delivery h2 {
+  margin-bottom: 15px;
+}
+
+.empty-delivery p {
+  color: #666;
+  margin-bottom: 30px;
+}
+
+@media (max-width:768px){
+
+.partner-details{
+grid-template-columns:1fr;
+}
+
+.delivery-header{
+flex-direction:column;
+align-items:flex-start;
+gap:15px;
+}
+
+.timeline-item{
+gap:15px;
+}
+
+.circle{
+width:36px;
+height:36px;
+}
 
 }

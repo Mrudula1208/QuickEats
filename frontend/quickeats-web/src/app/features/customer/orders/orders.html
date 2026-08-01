@@ -1,0 +1,57 @@
+<div class="orders-page">
+
+    <h1>My Orders</h1>
+
+    <p>Your recent food orders</p>
+
+    @if(customerOrders.length===0){
+
+    <div class="empty-order">
+
+        <h2>No Orders Found</h2>
+
+        <p>Looks like you haven't ordered anything yet.</p>
+
+    </div>
+
+    }
+
+    @else{
+
+    <div class="orders-grid">
+
+        @for(order of customerOrders; track order.id){
+
+        <div class="order-card">
+
+            <h2>{{order.restaurantName}}</h2>
+
+            <p>Order #{{order.id}}</p>
+
+            <p>{{order.date}}</p>
+
+            <p>₹{{order.total}}</p>
+
+            <span class="status">
+
+                {{order.status}}
+
+            </span>
+
+            <button
+
+                (click)="openOrderDetails(order.id)">
+
+                View Details
+
+            </button>
+
+        </div>
+
+        }
+
+    </div>
+
+    }
+
+</div>

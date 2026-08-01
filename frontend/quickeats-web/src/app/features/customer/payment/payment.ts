@@ -14,7 +14,7 @@ import { Router } from '@angular/router';
 import { CheckoutDataService } from '../../../core/services/checkout-data.service';
 
 // Order model.
-import { Order } from '../../../core/models/order';
+import { OrderModel } from '../../../core/models/order.model';
 
 // Order service.
 import { OrderService } from '../../../core/services/order';
@@ -84,24 +84,34 @@ export class PaymentComponent {
     const orderId = Date.now();
 
     // Create Order object.
-    const order: Order = {
+ const order: OrderModel = {
 
-      id: orderId,
+  id: orderId,
 
-      address: this.checkoutData.address,
+  customerName: "Mrudula More",
 
-      phone: this.checkoutData.phone,
+  restaurantName: "Quick Eats",
 
-      items: this.checkoutData.cartItems,
+  address: this.checkoutData.address,
 
-      total: this.checkoutData.total,
+  phone: this.checkoutData.phone,
 
-      date: new Date()
+  items: this.checkoutData.cartItems,
 
-    };
+  total: this.checkoutData.total,
+
+  paymentMethod: this.paymentMethod,
+
+  status: "Preparing",
+
+  estimatedDeliveryTime: "30 Minutes",
+
+  date: new Date()
+
+};
 
     // Save order into OrderService.
-    this.orderService.PlaceOrder(order);
+    this.orderService.placeOrder(order);
 
     // Create Payment object.
     const payment: Payment = {
@@ -150,15 +160,14 @@ const delivery: Delivery = {
 };
 
 // Save Delivery.
-this.deliveryService.saveDelivery(delivery);
+this.deliveryService.updateDelivery(delivery);
 
 // ===== DEBUG =====
 console.log("Delivery Saved");
 console.log(delivery);
 
 console.log("All Deliveries");
-console.log(this.deliveryService.getDeliveries());
-
+console.log(this.deliveryService.getDelivery());
 // Empty cart.
 this.cartService.clearCart();
 

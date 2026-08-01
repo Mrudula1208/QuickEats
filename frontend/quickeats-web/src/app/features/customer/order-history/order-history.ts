@@ -5,10 +5,9 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 // Import Order model.
-import { Order } from '../../../core/models/order';
-
 // Import Order Service.
 import { OrderService } from '../../../core/services/order';
+import { OrderModel } from '../../../core/models/order.model';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -23,7 +22,7 @@ import { RouterLink } from '@angular/router';
 export class OrderHistoryComponent {
 
   // Stores all placed orders.
-  orders: Order[] = [];
+  orders: OrderModel[] = [];
 
   constructor(
 
@@ -33,7 +32,7 @@ export class OrderHistoryComponent {
   ) {
 
     // Load all orders.
-    this.orders = this.orderService.getOrders();
+    this.orders = this.orderService.getAllOrders();
 
   }
 

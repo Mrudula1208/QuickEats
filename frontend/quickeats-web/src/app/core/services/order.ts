@@ -1,53 +1,33 @@
-import { Injectable } from '@angular/core';
-import { Order } from '../models/order';
+import { Injectable, signal } from '@angular/core';
+import { OrderModel } from '../models/order.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class OrderService {
 
-  private orders: Order[] = [];
+  // Store all customer orders.
+  customerOrders = signal<OrderModel[]>([]);
 
-  constructor() {
+  // Save newly placed order.
+  placeOrder(newOrder: OrderModel): void {
 
-    // Only browser has localStorage
-    if (typeof window !== 'undefined') {
+    const currentOrders = [...this.customerOrders()];
 
-      const data = localStorage.getItem('orders');
+    currentOrders.push(newOrder);
 
-      if (data) {
-        this.orders = JSON.parse(data);
-      }
+    this.customerOrders.set(currentOrders);
 
-    }
+    console.log("Order Placed Successfully");
 
-  }
-
-  PlaceOrder(order: Order): void {
-
-    this.orders.push(order);
-
-    // Save only in browser
-    if (typeof window !== 'undefined') {
-
-      localStorage.setItem(
-        'orders',
-        JSON.stringify(this.orders)
-      );
-
-    }
+    console.log(this.customerOrders());
 
   }
 
-  getOrders(): Order[] {
-    return this.orders;
-  }
+  // Return all customer orders.
+  getAllOrders(): OrderModel[] {
 
-  getOrderById(id: number): Order | undefined {
-
-    return this.orders.find(
-      order => order.id === id
-    );
+    return this.customerOrders();
 
   }
 

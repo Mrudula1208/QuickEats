@@ -113,5 +113,10 @@ export class CartService {
     );
 
   }
+  
+clearCart(): void {
 
+    this.cartItems.set([]);
+
+}
 }
