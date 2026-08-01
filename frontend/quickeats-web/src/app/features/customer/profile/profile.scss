@@ -1,0 +1,102 @@
+.profile-page{
+    max-width:700px;
+    margin:40px auto;
+    padding:20px;
+}
+
+.profile-page h1{
+    text-align:center;
+    margin-bottom:30px;
+    color:#fc8019;
+}
+
+.profile-card{
+    background:white;
+    border-radius:20px;
+    padding:35px;
+    box-shadow:0 10px 30px rgba(0,0,0,.12);
+}
+
+.profile-card img{
+    width:140px;
+    height:140px;
+    border-radius:50%;
+    object-fit:cover;
+    display:block;
+    margin:auto;
+    margin-bottom:30px;
+    border:5px solid #fc8019;
+}
+
+.form-group{
+    display:flex;
+    flex-direction:column;
+    margin-bottom:20px;
+}
+
+.form-group label{
+    font-weight:600;
+    margin-bottom:8px;
+    color:#444;
+}
+
+.form-group input{
+    padding:14px;
+    border:1px solid #ddd;
+    border-radius:10px;
+    font-size:16px;
+    outline:none;
+}
+
+.form-group input:focus{
+    border-color:#fc8019;
+}
+
+.reward-box{
+    margin-top:25px;
+    padding:20px;
+    background:#fff4e8;
+    border-radius:15px;
+    text-align:center;
+}
+
+.reward-box h3{
+    color:#444;
+    margin-bottom:10px;
+}
+
+.reward-box p{
+    font-size:30px;
+    color:#fc8019;
+    font-weight:bold;
+}
+
+button{
+    width:100%;
+    margin-top:25px;
+    padding:16px;
+    border:none;
+    border-radius:12px;
+    background:#fc8019;
+    color:white;
+    font-size:18px;
+    cursor:pointer;
+    transition:.3s;
+}
+
+button:hover{
+    background:#e56f00;
+}
+
+@media(max-width:768px){
+
+.profile-card{
+padding:20px;
+}
+
+.profile-card img{
+width:110px;
+height:110px;
+}
+
+}

@@ -1,0 +1,155 @@
+<div class="profile-page">
+
+    <h1>
+
+        My Profile
+
+    </h1>
+
+    <div class="profile-card">
+
+        <img
+
+            [src]="profile.profileImage"
+
+            alt="Profile">
+
+        <div class="form-group">
+
+            <label>
+
+                Full Name
+
+            </label>
+
+            <input
+
+                type="text"
+
+                [(ngModel)]="profile.fullName">
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+
+                Email
+
+            </label>
+
+            <input
+
+                type="email"
+
+                [(ngModel)]="profile.email">
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+
+                Phone Number
+
+            </label>
+
+            <input
+
+                type="text"
+
+                [(ngModel)]="profile.phoneNumber">
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+
+                Gender
+
+            </label>
+
+            <input
+
+                type="text"
+
+                [(ngModel)]="profile.gender">
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+
+                Date Of Birth
+
+            </label>
+
+            <input
+
+                type="text"
+
+                [(ngModel)]="profile.dateOfBirth">
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+
+                City
+
+            </label>
+
+            <input
+
+                type="text"
+
+                [(ngModel)]="profile.city">
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+
+                State
+
+            </label>
+
+            <input
+
+                type="text"
+
+                [(ngModel)]="profile.state">
+
+        </div>
+
+        <div class="reward-box">
+
+            <h3>
+
+                Reward Points
+
+            </h3>
+
+            <p>
+
+                {{profile.rewardPoints}}
+
+            </p>
+
+        </div>
+
+        <button
+
+            (click)="saveProfile()">
+
+            Save Profile
+
+        </button>
+
+    </div>
+
+</div>
