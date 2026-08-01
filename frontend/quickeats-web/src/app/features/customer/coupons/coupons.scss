@@ -1,0 +1,203 @@
+.coupons-page{
+
+    max-width:1200px;
+
+    margin:40px auto;
+
+    padding:20px;
+
+}
+
+.coupons-page h1{
+
+    text-align:center;
+
+    color:#fc8019;
+
+    font-size:36px;
+
+    margin-bottom:10px;
+
+}
+
+.coupons-page p{
+
+    text-align:center;
+
+    color:#666;
+
+    margin-bottom:30px;
+
+}
+
+.empty-coupon{
+
+    background:white;
+
+    padding:60px;
+
+    border-radius:18px;
+
+    text-align:center;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+
+}
+
+.empty-coupon h2{
+
+    color:#fc8019;
+
+    margin-bottom:15px;
+
+}
+
+.coupon-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+
+    gap:30px;
+
+}
+
+.coupon-card{
+
+    background:white;
+
+    border-radius:18px;
+
+    padding:25px;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+
+    transition:.3s;
+
+    border-left:6px solid #fc8019;
+
+}
+
+.coupon-card:hover{
+
+    transform:translateY(-8px);
+
+    box-shadow:0 15px 35px rgba(0,0,0,.15);
+
+}
+
+.coupon-card h2{
+
+    color:#fc8019;
+
+    font-size:28px;
+
+    margin-bottom:15px;
+
+}
+
+.coupon-card p{
+
+    text-align:left;
+
+    margin:10px 0;
+
+    color:#555;
+
+}
+
+.coupon-card h3{
+
+    color:#2e7d32;
+
+    margin:20px 0;
+
+}
+
+.active{
+
+    display:inline-block;
+
+    background:#4caf50;
+
+    color:white;
+
+    padding:6px 14px;
+
+    border-radius:20px;
+
+    margin-bottom:20px;
+
+    font-size:14px;
+
+}
+
+.expired{
+
+    display:inline-block;
+
+    background:#e53935;
+
+    color:white;
+
+    padding:6px 14px;
+
+    border-radius:20px;
+
+    margin-bottom:20px;
+
+    font-size:14px;
+
+}
+
+.coupon-card button{
+
+    width:100%;
+
+    padding:14px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#fc8019;
+
+    color:white;
+
+    cursor:pointer;
+
+    font-size:16px;
+
+    transition:.3s;
+
+}
+
+.coupon-card button:hover{
+
+    background:#e56d00;
+
+}
+
+.coupon-card button:disabled{
+
+    background:#bdbdbd;
+
+    cursor:not-allowed;
+
+}
+
+@media(max-width:768px){
+
+    .coupons-page{
+
+        padding:15px;
+
+    }
+
+    .coupon-card{
+
+        padding:20px;
+
+    }
+
+}

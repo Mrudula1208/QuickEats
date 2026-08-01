@@ -1,0 +1,238 @@
+<div class="coupons-page">
+
+    <h1>
+
+        🎁 Available Coupons
+
+    </h1>
+
+    <p>
+
+        Apply a coupon and save more on your order.
+
+    </p>
+
+    <!--
+        @if
+        Means:
+        Check whether coupons are available.
+
+        If coupons array is empty,
+        show Empty Message.
+
+        Otherwise,
+        show all coupons.
+    -->
+
+    @if(coupons.length===0){
+
+    <div class="empty-coupon">
+
+        <h2>
+
+            No Coupons Available
+
+        </h2>
+
+        <p>
+
+            Please check again later.
+
+        </p>
+
+    </div>
+
+    }
+
+    @else{
+
+    <div class="coupon-grid">
+
+        <!--
+            @for
+            Means:
+            Repeat this card
+            for every coupon.
+
+            coupons
+
+            ↓
+
+            Coupon 1
+
+            Coupon 2
+
+            Coupon 3
+        -->
+
+        @for(coupon of coupons; track coupon.couponId){
+
+        <div class="coupon-card">
+
+            <!-- Coupon Code -->
+
+            <h2>
+
+                {{coupon.couponCode}}
+
+            </h2>
+
+            <!-- Coupon Description -->
+
+            <p>
+
+                {{coupon.description}}
+
+            </p>
+
+            <!-- Minimum Order -->
+
+            <p>
+
+                Minimum Order :
+
+                ₹{{coupon.minimumOrderAmount}}
+
+            </p>
+
+            <!-- Discount -->
+
+            <h3>
+
+                Save ₹{{coupon.discountAmount}}
+
+            </h3>
+
+            <!-- Expiry Date -->
+
+            <p>
+
+                Valid Till :
+
+                {{coupon.expiryDate | date:'mediumDate'}}
+
+            </p>
+
+            <!-- Coupon Status -->
+
+            @if(coupon.isActive){
+
+            <span class="active">
+
+                Active
+
+            </span>
+
+            }
+
+            @else{
+
+            <span class="expired">
+
+                Expired
+
+            </span>
+
+            }
+
+            <!-- Apply Button -->
+
+            <button
+
+                (click)="applyCoupon(coupon)"
+
+                [disabled]="!coupon.isActive">
+
+                Apply Coupon
+
+            </button>
+
+        </div>
+
+        }
+
+    </div>
+
+    }
+
+</div>
+
+<!--
+
+=====================================
+
+EXECUTION FLOW
+
+=====================================
+
+1️⃣ Coupons Page Opens
+
+↓
+
+2️⃣ Angular loads coupons.html
+
+↓
+
+3️⃣ @if checks
+
+coupons.length
+
+↓
+
+4️⃣ If Empty
+
+↓
+
+Show
+
+"No Coupons Available"
+
+OR
+
+↓
+
+5️⃣ @for starts looping
+
+↓
+
+Coupon 1
+
+↓
+
+Coupon 2
+
+↓
+
+Coupon 3
+
+↓
+
+6️⃣ One Coupon Card
+
+is created
+
+for every coupon
+
+↓
+
+7️⃣ Customer clicks
+
+Apply Coupon
+
+↓
+
+coupons.ts
+
+↓
+
+applyCoupon(coupon)
+
+↓
+
+Selected Coupon
+
+↓
+
+Checkout Page
+
+-->
