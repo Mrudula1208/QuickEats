@@ -1,0 +1,77 @@
+<div class="notifications-page">
+
+    <h1>Notifications</h1>
+
+    <p>Your latest updates</p>
+
+    @if(notifications.length===0){
+
+    <div class="empty-notification">
+
+        <h2>No Notifications</h2>
+
+        <p>You're all caught up.</p>
+
+    </div>
+
+    }
+
+    @else{
+
+    <div class="notification-list">
+
+        @for(notification of notifications; track notification.notificationId){
+
+        <div class="notification-card">
+
+            <h2>
+
+                {{notification.title}}
+
+            </h2>
+
+            <p>
+
+                {{notification.message}}
+
+            </p>
+
+            <small>
+
+                {{notification.notificationDate | date:'medium'}}
+
+            </small>
+
+            <br><br>
+
+            @if(notification.isRead){
+
+            <span class="read">
+
+                Read
+
+            </span>
+
+            }
+
+            @else{
+
+            <button
+
+                (click)="markAsRead(notification.notificationId)">
+
+                Mark As Read
+
+            </button>
+
+            }
+
+        </div>
+
+        }
+
+    </div>
+
+    }
+
+</div>
