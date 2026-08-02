@@ -1,0 +1,133 @@
+.favorites-page{
+
+    max-width:1200px;
+
+    margin:40px auto;
+
+    padding:20px;
+
+}
+
+.favorites-page h1{
+
+    text-align:center;
+
+    color:#fc8019;
+
+}
+
+.favorites-page p{
+
+    text-align:center;
+
+    color:#666;
+
+}
+
+.favorite-grid{
+
+    margin-top:35px;
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+
+    gap:25px;
+
+}
+
+.favorite-card{
+
+    background:white;
+
+    border-radius:12px;
+
+    overflow:hidden;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+
+    transition:.3s;
+
+}
+
+.favorite-card:hover{
+
+    transform:translateY(-5px);
+
+}
+
+.favorite-card img{
+
+    width:100%;
+
+    height:180px;
+
+    object-fit:cover;
+
+}
+
+.favorite-card h2{
+
+    padding:15px 15px 5px;
+
+    color:#fc8019;
+
+}
+
+.favorite-card p{
+
+    text-align:left;
+
+    padding:0 15px 15px;
+
+    color:#555;
+
+}
+
+.favorite-card button{
+
+    margin:15px;
+
+    width:calc(100% - 30px);
+
+    padding:12px;
+
+    border:none;
+
+    border-radius:8px;
+
+    background:#fc8019;
+
+    color:white;
+
+    cursor:pointer;
+
+    font-size:15px;
+
+    font-weight:bold;
+
+}
+
+.favorite-card button:hover{
+
+    background:#e56d00;
+
+}
+
+.empty-favorite{
+
+    margin-top:60px;
+
+    text-align:center;
+
+}
+
+@media(max-width:768px){
+
+    .favorites-page{
+
+        padding:15px;
+
+    }
+
+}

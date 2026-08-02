@@ -1,0 +1,51 @@
+<div class="favorites-page">
+
+    <h1>My Favorite Restaurants</h1>
+
+    <p>Your saved restaurants</p>
+
+    @if(customerFavorites.length===0){
+
+    <div class="empty-favorite">
+
+        <h2>No Favorites Found</h2>
+
+        <p>You haven't added any restaurants yet.</p>
+
+    </div>
+
+    }
+
+    @else{
+
+    <div class="favorite-grid">
+
+        @for(favorite of customerFavorites; track favorite.favoriteId){
+
+        <div class="favorite-card">
+
+            <img
+
+                [src]="favorite.restaurantImage"
+
+                alt="Restaurant Image">
+
+            <h2>{{favorite.restaurantName}}</h2>
+
+            <p>{{favorite.restaurantLocation}}</p>
+
+            <button>
+
+                View Restaurant
+
+            </button>
+
+        </div>
+
+        }
+
+    </div>
+
+    }
+
+</div>
