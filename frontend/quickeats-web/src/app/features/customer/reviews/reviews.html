@@ -1,0 +1,66 @@
+<div class="reviews-page">
+
+    <h1>Customer Reviews</h1>
+
+    <p>Share your experience</p>
+
+    <div class="review-form">
+
+        <input
+            type="text"
+            placeholder="Your Name"
+            [(ngModel)]="newReview.customerName">
+
+        <input
+            type="text"
+            placeholder="Restaurant Name"
+            [(ngModel)]="newReview.restaurantName">
+
+        <input
+            type="number"
+            min="1"
+            max="5"
+            [(ngModel)]="newReview.rating">
+
+        <textarea
+            rows="4"
+            placeholder="Write your review"
+            [(ngModel)]="newReview.reviewMessage">
+        </textarea>
+
+        <button
+            (click)="submitReview()">
+
+            Submit Review
+
+        </button>
+
+    </div>
+
+    <div class="review-list">
+
+        @for(review of customerReviews; track review.reviewId){
+
+        <div class="review-card">
+
+            <h2>{{review.restaurantName}}</h2>
+
+            <h3>{{review.customerName}}</h3>
+
+            <p>⭐ {{review.rating}} / 5</p>
+
+            <p>{{review.reviewMessage}}</p>
+
+            <small>
+
+                {{review.reviewDate | date:'mediumDate'}}
+
+            </small>
+
+        </div>
+
+        }
+
+    </div>
+
+</div>
