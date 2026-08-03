@@ -196,6 +196,19 @@ namespace QuickEats.API.Services
             _menuRepository.Update(menuItem);
             await _menuRepository.SaveChangesAsync();
         }
+
+        // Toggle the availability of a menu item (Available / Out of Stock).
+        public async Task ToggleAvailabilityAsync(int id)
+        {
+            var menuItem = await _menuRepository.GetByIdAsync(id);
+            if (menuItem == null)
+                throw new NotFoundException($"Menu item with id {id} not found.");
+
+            menuItem.IsAvailable = !menuItem.IsAvailable;
+            _menuRepository.Update(menuItem);
+            await _menuRepository.SaveChangesAsync();
+        }
+
         public async Task DeleteAsync(int id)
         {
             var menuItem = await _menuRepository.GetByIdAsync(id);

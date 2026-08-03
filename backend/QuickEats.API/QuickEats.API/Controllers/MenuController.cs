@@ -118,6 +118,28 @@ namespace QuickEats.API.Controllers
             return Ok("Menu Item Deleted successfully");
         }
 
+        // Quick toggle menu item availability (Available / Out of Stock).
+        [Authorize(Roles = "Admin,Owner")]
+        [HttpPatch("{id}/toggle-availability")]
+        public async Task<IActionResult> ToggleAvailability(int id)
+        {
+            if (User.IsInRole("Owner"))
+            {
+                var menuItem = await _menuService.GetByIdAsync(id);
+                if (menuItem == null)
+                {
+                    return NotFound("Menu Item not found");
+                }
+                if (!await IsOwnerOfRestaurant(menuItem.RestaurantId))
+                {
+                    return Forbid();
+                }
+            }
+
+            await _menuService.ToggleAvailabilityAsync(id);
+            return Ok("Availability updated successfully.");
+        }
+
         // Check whether the logged in Owner owns this restaurant.
         private async Task<bool> IsOwnerOfRestaurant(int restaurantId)
         {

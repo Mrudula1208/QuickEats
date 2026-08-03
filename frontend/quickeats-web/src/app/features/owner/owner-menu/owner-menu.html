@@ -29,7 +29,7 @@
 
             @for(item of menuItems; track item.id){
 
-            <div class="menu-card">
+            <div class="menu-card" [class.unavailable]="!item.isAvailable">
 
                 <h2>{{ item.name }}</h2>
 
@@ -54,9 +54,35 @@
                     @else{
                         Non-Veg
                     }
+                    @if(item.isBestseller){
+                        • 🔥 Bestseller
+                    }
+                </p>
+
+                <p class="availability">
+                    @if(item.isAvailable){
+                        ✅ Available
+                    }
+                    @else{
+                        ❌ Out of Stock
+                    }
                 </p>
 
                 <div class="actions">
+
+                    <button
+                        [class.toggle-on]="item.isAvailable"
+                        [class.toggle-off]="!item.isAvailable"
+                        (click)="toggleAvailability(item.id)">
+
+                        @if(item.isAvailable){
+                            Mark Out of Stock
+                        }
+                        @else{
+                            Mark Available
+                        }
+
+                    </button>
 
                     <button routerLink="/owner/menu/{{ restaurantId }}/{{ item.id }}/edit">
                         Edit
@@ -64,7 +90,7 @@
 
                     <button
                         class="delete-btn"
-                        (click)="deleteItem(item.id)">
+                        (click)="deleteItem(item.id, item.name)">
 
                         Delete
 

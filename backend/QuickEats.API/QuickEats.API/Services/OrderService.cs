@@ -282,6 +282,32 @@ namespace QuickEats.API.Services
 
             }
 
+            // Validate status transition.
+            // Defines which status can follow which.
+            var allowedTransitions = new Dictionary<string, string[]>
+            {
+                { "Pending",              new[] { "Confirmed", "Cancelled" } },
+                { "Confirmed",            new[] { "Preparing", "Cancelled" } },
+                { "Preparing",            new[] { "Out for Delivery", "Cancelled" } },
+                { "Out for Delivery",     new[] { "Delivered" } }
+            };
+
+            if (allowedTransitions.ContainsKey(order.Status))
+            {
+                var allowed = allowedTransitions[order.Status];
+                if (!allowed.Contains(dto.Status))
+                {
+                    throw new BadRequestException(
+                        $"Cannot change order status from \"{order.Status}\" to \"{dto.Status}\".");
+                }
+            }
+            else
+            {
+                // Delivered or Cancelled orders cannot be changed.
+                throw new BadRequestException(
+                    $"Order with status \"{order.Status}\" cannot be updated.");
+            }
+
             order.Status=dto.Status;
             _orderRepository.Update(order);
             await _orderRepository.SaveChangesAsync();

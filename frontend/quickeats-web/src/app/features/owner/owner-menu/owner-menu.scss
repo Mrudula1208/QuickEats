@@ -41,6 +41,11 @@
     padding:25px;
 }
 
+.menu-card.unavailable{
+    opacity:.6;
+    border:2px dashed #ccc;
+}
+
 .menu-card h2{
     color:#222;
     margin-bottom:8px;
@@ -84,4 +89,17 @@
 
 .actions .delete-btn{
     background:#d32f2f;
+}
+
+.availability{
+    font-weight:700;
+    font-size:14px;
+}
+
+.actions .toggle-on{
+    background:#ff9800;
+}
+
+.actions .toggle-off{
+    background:#4caf50;
 }

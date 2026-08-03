@@ -44,7 +44,22 @@ export class OwnerOrdersComponent {
       .getOwnerOrders()
       .subscribe({
         next: (data) => {
-          this.orders = data;
+          // Sort: Pending first, then Confirmed, then rest by date.
+          this.orders = data.sort((a, b) => {
+            const priority: Record<string, number> = {
+              'Pending': 0,
+              'Confirmed': 1,
+              'Preparing': 2,
+              'Out for Delivery': 3,
+              'Delivered': 4,
+              'Cancelled': 5
+            };
+            const aVal = priority[a.status] ?? 3;
+            const bVal = priority[b.status] ?? 3;
+            if (aVal !== bVal) return aVal - bVal;
+            return new Date(b.createdAt).getTime() -
+                   new Date(a.createdAt).getTime();
+          });
         },
         error: (err) => {
           console.log(err);
@@ -64,9 +79,62 @@ export class OwnerOrdersComponent {
         },
         error: (err) => {
           console.log(err);
+          alert(err.error || 'Failed to update status.');
+          this.loadOrders();
         }
       });
 
+  }
+
+  // Quick advance to next status.
+  // Pending → Confirmed → Preparing → Out for Delivery → Delivered
+  getNextStatus(current: string): string {
+    const flow: Record<string, string> = {
+      'Pending': 'Confirmed',
+      'Confirmed': 'Preparing',
+      'Preparing': 'Out for Delivery',
+      'Out for Delivery': 'Delivered'
+    };
+    return flow[current] || '';
+  }
+
+  // Get label for the next status button.
+  getNextStatusLabel(current: string): string {
+    const next = this.getNextStatus(current);
+    if (!next) return '';
+    return '→ ' + next;
+  }
+
+  // Advance order to next status.
+  advanceStatus(order: OrderModel): void {
+    const next = this.getNextStatus(order.status);
+    if (!next) return;
+
+    this.orderService
+      .updateOrderStatusApi(order.id, next)
+      .subscribe({
+        next: () => {
+          this.loadOrders();
+        },
+        error: (err) => {
+          console.log(err);
+          alert(err.error || 'Failed to update status.');
+        }
+      });
+
+  }
+
+  // Get CSS class for status badge.
+  getStatusClass(status: string): string {
+    const classes: Record<string, string> = {
+      'Pending': 'status-pending',
+      'Confirmed': 'status-confirmed',
+      'Preparing': 'status-preparing',
+      'Out for Delivery': 'status-out',
+      'Delivered': 'status-delivered',
+      'Cancelled': 'status-cancelled'
+    };
+    return classes[status] || '';
   }
 
 }

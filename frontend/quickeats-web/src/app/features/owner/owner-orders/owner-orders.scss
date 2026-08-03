@@ -29,6 +29,11 @@
     padding:25px;
 }
 
+.order-card.order-pending{
+    border-left:4px solid #ff9800;
+    background:#fffdf5;
+}
+
 .order-head{
     display:flex;
     justify-content:space-between;
@@ -41,12 +46,40 @@
 }
 
 .status{
-    background:#ffe0b2;
-    color:#e65100;
     padding:6px 14px;
     border-radius:20px;
     font-weight:700;
     font-size:14px;
+}
+
+.status-pending{
+    background:#fff3e0;
+    color:#e65100;
+}
+
+.status-confirmed{
+    background:#e3f2fd;
+    color:#1565c0;
+}
+
+.status-preparing{
+    background:#f3e5f5;
+    color:#7b1fa2;
+}
+
+.status-out{
+    background:#e8f5e9;
+    color:#2e7d32;
+}
+
+.status-delivered{
+    background:#e8f5e9;
+    color:#1b5e20;
+}
+
+.status-cancelled{
+    background:#ffebee;
+    color:#c62828;
 }
 
 .order-card p{
@@ -90,4 +123,28 @@
     border-radius:20px;
     font-weight:700;
     cursor:pointer;
+}
+
+.order-time{
+    font-size:13px;
+    color:#999;
+}
+
+.quick-actions{
+    margin-top:12px;
+}
+
+.btn-advance{
+    background:linear-gradient(135deg,#4caf50,#388e3c);
+    color:#fff;
+    border:none;
+    padding:10px 20px;
+    border-radius:20px;
+    font-weight:700;
+    font-size:14px;
+    cursor:pointer;
+}
+
+.btn-advance:hover{
+    opacity:.9;
 }

@@ -13,6 +13,7 @@ namespace QuickEats.API.Services.Interfaces
         Task<IEnumerable<MenuResponseDto>> GetByRestaurantIdAsync(int restaurantId);
         Task CreateAsync(CreateMenuDto dto);
         Task UpdateAsync(int id, UpdateMenuDto dto);
+        Task ToggleAvailabilityAsync(int id);
         Task DeleteAsync(int id);
     }
 }

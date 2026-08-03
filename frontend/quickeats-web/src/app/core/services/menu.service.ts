@@ -139,4 +139,11 @@ return this.http.delete(
 );
 
 }
+
+// Toggle menu item availability (Available / Out of Stock).
+toggleAvailability(id: number): Observable<any> {
+
+  return this.http.patch(`${this.apiUrl}/${id}/toggle-availability`, {});
+
+}
 }

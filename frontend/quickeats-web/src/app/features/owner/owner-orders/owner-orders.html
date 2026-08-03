@@ -21,13 +21,15 @@
 
             @for(order of orders; track order.id){
 
-            <div class="order-card">
+            <div class="order-card" [class.order-pending]="order.status === 'Pending'">
 
                 <div class="order-head">
 
                     <h2>Order #{{ order.id }}</h2>
 
-                    <span class="status">{{ order.status }}</span>
+                    <span class="status" [ngClass]="getStatusClass(order.status)">
+                        {{ order.status }}
+                    </span>
 
                 </div>
 
@@ -49,6 +51,10 @@
                     ₹{{ order.totalAmount }}
                 </p>
 
+                <p class="order-time">
+                    {{ order.createdAt | date:'medium' }}
+                </p>
+
                 <div class="items">
 
                     @for(item of order.items; track item.menuItemId){
@@ -63,9 +69,23 @@
 
                 </div>
 
+                <!-- Quick advance button (when next status exists) -->
+                @if (getNextStatus(order.status)) {
+                    <div class="quick-actions">
+                        <button
+                            class="btn-advance"
+                            (click)="advanceStatus(order)">
+
+                            {{ getNextStatusLabel(order.status) }}
+
+                        </button>
+                    </div>
+                }
+
+                <!-- Manual status dropdown -->
                 <div class="status-row">
 
-                    <label>Update Status</label>
+                    <label>Change Status</label>
 
                     <select
                         [(ngModel)]="order.status"

@@ -64,8 +64,30 @@ export class OwnerMenuComponent {
 
   }
 
-  // Delete a menu item.
-  deleteItem(id: number): void {
+  // Toggle availability of a menu item (Available / Out of Stock).
+  toggleAvailability(id: number): void {
+
+    this.menuService
+      .toggleAvailability(id)
+      .subscribe({
+        next: () => {
+          this.loadMenu();
+        },
+        error: (err) => {
+          console.log(err);
+        }
+      });
+
+  }
+
+  // Delete a menu item after confirmation.
+  deleteItem(id: number, name: string): void {
+
+    const confirmed = confirm(
+      `Are you sure you want to delete "${name}"?`
+    );
+
+    if (!confirmed) return;
 
     this.menuService
       .deleteMenu(id)
