@@ -96,41 +96,45 @@ export class WishlistComponent {
     // This method returns nothing.
     // It only loads data.
 
-    this.wishlistItems =
 
-      this.wishlistService.getWishlist();
+      this.wishlistService.getWishlist().subscribe({
+        next :(data :WishlistModel[]) => {
+          this.wishlistItems=data;
+        },
 
-    // Get complete Wishlist
-    // from WishlistService.
+            error: (err: any) => {
+
+                console.log(err);
+
+            }
+      });
+    
+    
 
   }
-
-  removeWishlistItem(
-
+removeWishlistItem(
     selectedMenuId: number
+): void {
 
-  ): void {
+    this.wishlistService
+        .removeFromWishlist(selectedMenuId)
+        .subscribe({
 
-    // selectedMenuId: number
-    //
-    // Means:
-    // Receives Menu Id.
-    // number because Menu Id is numeric.
+            next: () => {
 
-    this.wishlistService.removeFromWishlist(
+                this.loadWishlist();
 
-      selectedMenuId
+            },
 
-    );
+            error: (err: any) => {
 
-    // Remove selected item.
+                console.log(err);
 
-    this.loadWishlist();
+            }
 
-    // Refresh Wishlist.
+        });
 
-  }
-
+}
   openRestaurant(
 
     selectedRestaurantId: number

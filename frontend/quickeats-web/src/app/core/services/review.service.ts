@@ -4,128 +4,25 @@ import { Injectable, signal } from '@angular/core';
 
 import { ReviewModel } from '../models/review.model';
 // Import Review Model.
-
+import {Observable} from 'rxjs';
+import {HttpClient} from '@angular/common/http';
 @Injectable({
 
 providedIn:'root'
 // Angular creates only one ReviewService.
 
 })
+export class ReviewService {
+    private apiUrl = 'http://localhost:8080/reviews';
+    constructor(private http: HttpClient) { }
 
-export class ReviewService{
-
-// ======================================
-//
-// EXECUTION FLOW
-//
-// 1 Angular creates ReviewService.
-//
-// 2 Reviews are stored.
-//
-// 3 Review Component asks reviews.
-//
-// 4 Service returns reviews.
-//
-// 5 HTML displays reviews.
-//
-// ======================================
-
-reviews=
-
-signal<ReviewModel[]>([
-
-{
-
-reviewId:1,
-
-customerName:'Rahul',
-
-restaurantName:'Pizza Hub',
-
-rating:5,
-
-reviewMessage:'Amazing food and fast delivery.',
-
-reviewDate:new Date()
-
-},
-
-{
-
-reviewId:2,
-
-customerName:'Sneha',
-
-restaurantName:'Burger Point',
-
-rating:4,
-
-reviewMessage:'Food was tasty.',
-
-reviewDate:new Date()
-
-},
-
-{
-
-reviewId:3,
-
-customerName:'Amit',
-
-restaurantName:'Chinese Corner',
-
-rating:5,
-
-reviewMessage:'Highly Recommended.',
-
-reviewDate:new Date()
-
+    getReviews (): Observable<ReviewModel[]> {
+        return this.http.get<ReviewModel[]>(this.apiUrl);
 }
 
-]);
-
-// Store all reviews.
-
-constructor(){
-
+addReviews(review :ReviewModel): Observable<ReviewModel> {{
+    // "Go to this URL, send this object, save it, and return the saved object."
+    return this.http.post<ReviewModel>(this.apiUrl, review);
 }
-
-// Return all reviews.
-getReviews():ReviewModel[]{
-
-return this.reviews();
-
 }
-
-// Add new review.
-addReview(
-
-newReview:ReviewModel
-
-):void{
-
-const allReviews=[
-
-...this.reviews()
-
-];
-
-allReviews.push(
-
-newReview
-
-);
-
-this.reviews.set(
-
-allReviews
-
-);
-
-console.log("Review Added");
-
-console.log(this.reviews());
-
-}
-
 }

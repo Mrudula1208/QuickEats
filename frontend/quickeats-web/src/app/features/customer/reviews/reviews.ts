@@ -61,48 +61,85 @@ export class ReviewsComponent {
   // Load all reviews.
   loadReviews(): void {
 
-    this.customerReviews =
-      this.reviewService.getReviews();
+    this.reviewService
+      .getReviews()
+      .subscribe({
 
-    console.log(this.customerReviews);
+        // next
+        // Runs if API Success.
+        next: (data:ReviewModel[]) => {
 
-  }
+          // data
+          // Reviews from Backend.
+          this.customerReviews = data;
 
+          console.log(this.customerReviews);
+
+        },
+
+        // error
+        // Runs if API Fails.
+        error: (err:any) => {
+
+          console.log(err);
+
+        }
+
+      });
+
+    }
   // Runs when customer clicks Submit Review.
-  submitReview(): void {
+   submitReview(): void {
 
-    // Generate temporary id.
+    // Generate Review Id.
     this.newReview.reviewId = Date.now();
 
-    // Store today's date.
+    // Store Current Date.
     this.newReview.reviewDate = new Date();
 
-    // Save review.
-    this.reviewService.addReview(
+    // Go to Backend.
+    // Save Review.
+    this.reviewService
+      .addReviews(this.newReview)
+      .subscribe({
 
-      this.newReview
+        // next
+        // Runs if API Success.
+        next: () => {
 
-    );
+          // Reload Reviews.
+          this.loadReviews();
 
-    // Reload reviews.
-    this.loadReviews();
+          // Clear Form.
+          this.newReview = {
 
-    // Clear form.
-    this.newReview = {
+            reviewId: 0,
 
-      reviewId: 0,
+            customerName: '',
 
-      customerName: '',
+            restaurantName: '',
 
-      restaurantName: '',
+            rating: 5,
 
-      rating: 5,
+            reviewMessage: '',
 
-      reviewMessage: '',
+            reviewDate: new Date()
 
-      reviewDate: new Date()
+          };
 
-    };
+          alert("Review Added");
+
+        },
+
+        // error
+        // Runs if API Fails.
+        error: (err:any) => {
+
+          console.log(err);
+
+        }
+
+      });
 
   }
 

@@ -1,149 +1,81 @@
-import { Injectable, signal } from '@angular/core';
-// Import Injectable because this is an Angular Service.
-// Import signal because notifications change live.
+// Service Annotation.
+// Makes this file an Angular Service.
+import { Injectable } from '@angular/core';
 
+// Backend Caller.
+// Calls ASP.NET Core APIs.
+import { HttpClient } from '@angular/common/http';
+
+// Wait for Backend.
+// Receives API response later.
+import { Observable } from 'rxjs';
+
+// Notification Structure.
+// Defines one Notification object.
 import { NotificationModel } from '../models/notification.model';
-// Import Notification Model.
 
 @Injectable({
 
-providedIn:'root'
-// Angular creates only one NotificationService.
+  // One Service Instance.
+  // Used everywhere.
+  providedIn: 'root'
 
 })
+export class NotificationService {
 
-export class NotificationService{
+  // API URL Variable.
+  // Stores Backend Address.
+  private apiUrl = 'https://localhost:7278/api/Notification';
 
-// ======================================
-//
-// EXECUTION FLOW
-//
-// 1 Constructor executes.
-//
-// 2 Notifications are stored.
-//
-// 3 Component asks notifications.
-//
-// 4 Service returns notifications.
-//
-// 5 HTML displays notifications.
-//
-// ======================================
+  constructor(
 
-notifications=
+    // private
+    // Used only inside Service.
+    //
+    // http
+    // HttpClient variable.
+    //
+    // HttpClient
+    // Calls Backend APIs.
+    private http: HttpClient
 
-signal<NotificationModel[]>([
+  ) { }
 
-{
+  // getNotifications
+  // Gets all Notifications.
+  //
+  // ()
+  // No Input.
+  //
+  // Observable<NotificationModel[]>
+  // Wait and return all Notifications.
+  getNotifications(): Observable<NotificationModel[]> {
 
-notificationId:1,
+    // Go to Backend.
+    // Get Notifications.
+    return this.http.get<NotificationModel[]>(this.apiUrl);
 
-title:'Order Confirmed',
+  }
 
-message:'Your order has been placed successfully.',
+  // markAsRead
+  // Updates Notification.
+  //
+  // notificationId
+  // Selected Notification Id.
+  //
+  // Observable<any>
+  // Wait for Backend response.
+  markAsRead(
+    notificationId: number
+  ): Observable<any> {
 
-notificationDate:new Date(),
+    // Go to Backend.
+    // Mark Notification as Read.
+    return this.http.put(
+      `${this.apiUrl}/${notificationId}`,
+      {}
+    );
 
-isRead:false
-
-},
-
-{
-
-notificationId:2,
-
-title:'Order Preparing',
-
-message:'Restaurant started preparing your food.',
-
-notificationDate:new Date(),
-
-isRead:false
-
-},
-
-{
-
-notificationId:3,
-
-title:'Delivery Partner Assigned',
-
-message:'Rahul Sharma is coming to deliver your order.',
-
-notificationDate:new Date(),
-
-isRead:false
-
-}
-
-]);
-
-// signal<NotificationModel[]>
-//
-// Means:
-//
-// Store multiple notifications.
-//
-// Later these notifications
-// will come from Backend.
-
-constructor(){
-
-}
-// Constructor executes automatically.
-
-getNotifications():NotificationModel[]{
-
-// Returns all notifications.
-
-return this.notifications();
-
-}
-
-markAsRead(
-
-notificationId:number
-
-):void{
-
-// notificationId:number
-//
-// Receive selected notification id.
-
-const allNotifications=[
-
-...this.notifications()
-
-];
-
-// Copy signal array.
-
-const selectedNotification=
-
-allNotifications.find(
-
-notification=>
-
-notification.notificationId===notificationId
-
-);
-
-// Search notification.
-
-if(selectedNotification){
-
-selectedNotification.isRead=true;
-
-}
-
-// Update signal.
-
-this.notifications.set(
-
-allNotifications
-
-);
-
-}
+  }
 
 }

@@ -1,6 +1,7 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable} from '@angular/core';
 // 1️⃣ Executes First.
-//
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs'
 // Injectable
 // Means Angular can create this service.
 //
@@ -24,48 +25,22 @@ import { WishlistModel } from '../models/wishlist.model';
 
 export class WishlistService {
 
-    // ==================================================
-    // EXECUTION FLOW
-    // ==================================================
-    //
-    // 1️⃣ Angular creates WishlistService.
-    //
-    // 2️⃣ wishlistItems signal is created.
-    //
-    // 3️⃣ Component calls getWishlist().
-    //
-    // 4️⃣ HTML displays Wishlist.
-    //
-    // 5️⃣ Customer adds item.
-    //
-    // 6️⃣ Signal updates.
-    //
-    // 7️⃣ UI refreshes automatically.
-    //
-    // ==================================================
+   
+private apiUrl = 'https://localhost:7278/api/Wishlist';
 
-    wishlistItems = signal<WishlistModel[]>([]);
-    // signal<WishlistModel[]>
-    //
-    // Means:
-    // Store multiple wishlist items.
-    //
-    // Initially Wishlist is empty.
-
-    constructor() {
-
+    constructor(private http: HttpClient) {
     }
     // Constructor executes automatically.
     // No dependency is required.
 
-    getWishlist(): WishlistModel[] {
+    getWishlist(): Observable<WishlistModel[]> {
 
         // (): WishlistModel[]
         //
         // Means:
         // Returns complete Wishlist.
 
-        return this.wishlistItems();
+        return this.http.get<WishlistModel[]>(this.apiUrl);
 
     }
 
@@ -73,85 +48,27 @@ export class WishlistService {
 
         newItem: WishlistModel
 
-    ): void {
+    ): Observable<WishlistModel> {
 
         // newItem: WishlistModel
         //
         // Means:
         // Receives one Wishlist object.
-
-        const currentWishlist =
-
-            [...this.wishlistItems()];
-
-        // Copy current Wishlist.
-
-        const alreadyExists =
-
-            currentWishlist.find(
-
-                item =>
-
-                item.menuId === newItem.menuId
-
-            );
-
+return this.http.post<WishlistModel>(this.apiUrl, newItem);
         // Check if same food already exists.
 
-        if (alreadyExists) {
-
-            return;
-
-        }
-
-        currentWishlist.push(
-
-            newItem
-
-        );
-
-        // Add new item.
-
-        this.wishlistItems.set(
-
-            currentWishlist
-
-        );
-
-        // Update Signal.
-
-        console.log("Wishlist Updated");
-
-        console.log(this.wishlistItems());
-
-    }
+    );
+}  
 
     removeFromWishlist(
 
-        selectedMenuId: number
+        selectedMenuId: number):Observable<any> {
 
-    ): void {
+   return this.http.delete(
+        `${this.apiUrl}/${selectedMenuId}`
+    );
 
-        // selectedMenuId: number
-        //
-        // Means:
-        // Remove selected food item.
-
-        this.wishlistItems.set(
-
-            this.wishlistItems().filter(
-
-                item =>
-
-                item.menuId !== selectedMenuId
-
-            )
-
-        );
-
-        console.log("Wishlist Item Removed");
-
-    }
+}
 
     clearWishlist(): void {
 

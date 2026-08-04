@@ -41,13 +41,38 @@ export class FavoritesComponent {
   // Get all favorite restaurants.
   loadFavorites(): void {
 
-    this.customerFavorites =
-      this.favoriteService.getFavorites();
+    this.favoriteService.getFavorites().subscribe({
+      next: (data: FavoriteModel[]) => {
+        this.customerFavorites = data;
+      }
+    });
 
-    console.log("Favorite Restaurants");
+      // Runs if API Fails.
+      error: (err: any) => {
 
-    console.log(this.customerFavorites);
+        console.log(err);
 
+      }
+
+    
   }
 
 }
+
+// Backend sends data
+
+// ↓
+
+// next runs
+
+// ↓
+
+// Store data into customerFavorites
+
+// ↓
+
+// Print customerFavorites
+
+
+
+// next: (data) => {
