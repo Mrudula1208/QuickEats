@@ -1,0 +1,36 @@
+<h1>Edit Restaurant</h1>
+
+@if(restaurant){
+
+<div>
+
+<input
+type="text"
+[(ngModel)]="restaurant.name">
+
+<input
+type="text"
+[(ngModel)]="restaurant.description">
+
+<input
+type="text"
+[(ngModel)]="restaurant.address">
+
+<input
+type="text"
+[(ngModel)]="restaurant.phoneNumber">
+
+<input
+type="text"
+[(ngModel)]="restaurant.imageUrl">
+
+<button
+(click)="updateRestaurant()">
+
+Update Restaurant
+
+</button>
+
+</div>
+
+}

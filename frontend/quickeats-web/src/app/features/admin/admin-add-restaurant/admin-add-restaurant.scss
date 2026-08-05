@@ -1,0 +1,19 @@
+h1{
+    margin-bottom:20px;
+}
+
+div{
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+    width:400px;
+}
+
+input{
+    padding:10px;
+}
+
+button{
+    padding:10px;
+    cursor:pointer;
+}

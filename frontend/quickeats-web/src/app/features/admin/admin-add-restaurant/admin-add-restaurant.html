@@ -1,0 +1,37 @@
+<h1>Add Restaurant</h1>
+
+<div>
+
+    <input
+        type="text"
+        placeholder="Restaurant Name"
+        [(ngModel)]="restaurant.name">
+
+    <input
+        type="text"
+        placeholder="Description"
+        [(ngModel)]="restaurant.description">
+
+    <input
+        type="text"
+        placeholder="Address"
+        [(ngModel)]="restaurant.address">
+
+    <input
+        type="text"
+        placeholder="Phone Number"
+        [(ngModel)]="restaurant.phoneNumber">
+
+    <input
+        type="text"
+        placeholder="Image Url"
+        [(ngModel)]="restaurant.imageUrl">
+
+    <button
+        (click)="saveRestaurant()">
+
+        Save Restaurant
+
+    </button>
+
+</div>

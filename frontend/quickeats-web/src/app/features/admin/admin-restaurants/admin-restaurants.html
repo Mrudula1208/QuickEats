@@ -1,0 +1,95 @@
+<h1>Restaurant Management</h1>
+
+<p>Manage all restaurants.</p>
+
+@if(restaurants.length===0){
+
+<div class="empty">
+
+    <h2>No Restaurants Found</h2>
+
+</div>
+
+}
+<button (click)="addRestaurant()">
+    Add Restaurant
+</button>
+@else{
+
+<table>
+
+    <thead>
+
+        <tr>
+
+            <th>Name</th>
+
+            <th>Address</th>
+
+            <th>Phone</th>
+
+            <th>Status</th>
+
+            <th>Action</th>
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+        @for(restaurant of restaurants; track restaurant.id){
+
+        <tr>
+
+            <td>{{restaurant.name}}</td>
+
+            <td>{{restaurant.address}}</td>
+
+            <td>{{restaurant.phoneNumber}}</td>
+
+            <td>
+
+                @if(restaurant.isActive){
+
+                Active
+
+                }
+
+                @else{
+
+                Inactive
+
+                }
+
+            </td>
+
+            <td>
+
+               <button
+
+(click)="editRestaurant(restaurant)">
+
+Edit
+
+</button>
+
+<button
+
+(click)="deleteRestaurant(restaurant.id)">
+
+Delete
+
+</button>
+
+            </td>
+
+        </tr>
+
+        }
+
+    </tbody>
+
+</table>
+
+}

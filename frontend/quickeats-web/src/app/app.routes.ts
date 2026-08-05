@@ -11,6 +11,8 @@ import { DeliveryTrackingComponent } from './features/customer/delivery-tracking
 import { authGuard } from './guards/auth.guard';
 import { LoginComponent } from './features/auth/login/login';
 import { RegisterComponent } from './features/auth/register/register';
+import { AdminRestaurants } from './features/admin/admin-restaurants/admin-restaurants';
+import { AdminEditRestaurant } from './features/admin/admin-edit-restaurant/admin-edit-restaurant';
 export const routes: Routes = [
 
 {
@@ -84,6 +86,14 @@ export const routes: Routes = [
     loadComponent: () =>
         import('./features/customer/profile/profile')
         .then(m => m.ProfileComponent)
-}
-
+},
+{
+  path: 'admin/restaurants',
+  component: AdminRestaurants,
+  canActivate: [authGuard]
+},{
+path:'admin/edit-restaurant/:id',
+component:AdminEditRestaurant,
+canActivate:[authGuard]
+},
 ];
