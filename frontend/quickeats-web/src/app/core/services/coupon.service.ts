@@ -1,193 +1,98 @@
-import { Injectable, signal } from '@angular/core';
-// 1️⃣ Executes First.
-//
-// Injectable
-// Means Angular creates this service.
-//
-// signal
-// Stores live Coupon data.
-// Whenever coupons change,
-// UI updates automatically.
+// Service Annotation.
+// Makes this file an Angular Service.
+import { Injectable } from '@angular/core';
 
+// Backend Caller.
+// Calls ASP.NET Core APIs.
+import { HttpClient } from '@angular/common/http';
+
+// Wait for Backend.
+// Receives API response later.
+import { Observable } from 'rxjs';
+
+// Coupon Structure.
+// Defines one Coupon object.
 import { CouponModel } from '../models/coupon.model';
-// 2️⃣ Import CouponModel.
-// Service stores Coupon objects.
 
 @Injectable({
 
-    providedIn: 'root'
-    // Angular creates only ONE object
-    // of this service.
+  // One Service Instance.
+  // Used everywhere.
+  providedIn: 'root'
 
 })
-
 export class CouponService {
 
-    // ==========================================
-    // EXECUTION FLOW
-    // ==========================================
+  // API URL Variable.
+  // Stores Backend Address.
+  private apiUrl = 'https://localhost:7278/api/Coupon';
+
+  constructor(
+
+    // private
+    // Used only inside Service.
     //
-    // 1️⃣ Angular creates CouponService.
+    // http
+    // HttpClient variable.
     //
-    // 2️⃣ coupons signal is created.
-    //
-    // 3️⃣ Component calls getCoupons().
-    //
-    // 4️⃣ Coupons are returned.
-    //
-    // 5️⃣ HTML displays coupons.
-    //
-    // 6️⃣ Customer selects one coupon.
-    //
-    // ==========================================
+    // HttpClient
+    // Calls Backend APIs.
+    private http: HttpClient
 
-    coupons = signal<CouponModel[]>([
+  ) { }
 
-        {
+  // ==========================================
+  // GET ALL COUPONS
+  // ==========================================
 
-            couponId: 1,
+  // getCoupons
+  // Gets all Coupons.
+  //
+  // ()
+  // No Input.
+  //
+  // :
+  // Return Type Starts.
+  //
+  // Observable<CouponModel[]>
+  // Wait and return all Coupons.
+  getCoupons(): Observable<CouponModel[]> {
 
-            couponCode: 'WELCOME50',
+    // Go to Backend.
+    // Get Coupons.
+    return this.http.get<CouponModel[]>(this.apiUrl);
 
-            description: 'Flat ₹50 OFF',
+  }
 
-            minimumOrderAmount: 299,
+  // ==========================================
+  // GET COUPON BY CODE
+  // ==========================================
 
-            discountAmount: 50,
+  // getCouponByCode
+  // Gets one Coupon.
+  //
+  // enteredCouponCode
+  // Coupon Code.
+  //
+  // :
+  // Return Type Starts.
+  //
+  // Observable<CouponModel>
+  // Wait and return Coupon.
+  getCouponByCode(
 
-            expiryDate: new Date('2026-12-31'),
+    enteredCouponCode: string
 
-            isActive: true
+  ): Observable<CouponModel> {
 
-        },
+    // Go to Backend.
+    // Search Coupon.
+    return this.http.get<CouponModel>(
 
-        {
+      `${this.apiUrl}/${enteredCouponCode}`
 
-            couponId: 2,
+    );
 
-            couponCode: 'SAVE100',
-
-            description: 'Flat ₹100 OFF',
-
-            minimumOrderAmount: 599,
-
-            discountAmount: 100,
-
-            expiryDate: new Date('2026-12-31'),
-
-            isActive: true
-
-        },
-
-        {
-
-            couponId: 3,
-
-            couponCode: 'FOOD20',
-
-            description: '20% OFF',
-
-            minimumOrderAmount: 799,
-
-            discountAmount: 150,
-
-            expiryDate: new Date('2026-12-31'),
-
-            isActive: true
-
-        }
-
-    ]);
-
-    // signal<CouponModel[]>
-    //
-    // Means:
-    // Store multiple coupons.
-    //
-    // Later these coupons
-    // will come from ASP.NET Backend.
-
-    constructor() {
-
-    }
-    // Constructor runs automatically.
-
-    getCoupons(): CouponModel[] {
-
-        // (): CouponModel[]
-        //
-        // Means:
-        // Return all coupons.
-
-        return this.coupons();
-
-    }
-
-    getCouponByCode(
-
-        enteredCouponCode: string
-
-    ): CouponModel | undefined {
-
-        // enteredCouponCode: string
-        //
-        // Customer enters
-        // coupon code.
-
-        return this.coupons().find(
-
-            coupon =>
-
-            coupon.couponCode === enteredCouponCode
-
-            &&
-
-            coupon.isActive
-
-        );
-
-    }
+  }
 
 }
-
-/*
-
-WHY DO WE WRITE THIS FILE?
-
-This service manages
-
-✔ Get Coupons
-
-✔ Search Coupon
-
-✔ Validate Coupon
-
-Flow
-
-Coupon Page
-
-↓
-
-Coupon Service
-
-↓
-
-Coupon Data
-
-↓
-
-HTML
-
-Later
-
-Backend API
-
-↓
-
-Coupon Service
-
-↓
-
-Coupon Page
-
-*/

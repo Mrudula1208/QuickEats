@@ -1,17 +1,22 @@
 import { Component } from '@angular/core';
-// Import Component because this file controls the Coupons page.
+// Component.
+// Controls Coupon Page.
 
 import { CommonModule } from '@angular/common';
-// Import CommonModule because HTML uses @if and @for.
+// CommonModule.
+// Used for @if and @for.
 
 import { Router } from '@angular/router';
-// Router is used to navigate back to Checkout page.
+// Router.
+// Opens another page.
 
 import { CouponService } from '../../../core/services/coupon.service';
-// CouponService contains all coupon logic.
+// CouponService.
+// Calls Coupon APIs.
 
 import { CouponModel } from '../../../core/models/coupon.model';
-// CouponModel defines one coupon structure.
+// CouponModel.
+// Defines one Coupon.
 
 @Component({
 
@@ -20,9 +25,7 @@ import { CouponModel } from '../../../core/models/coupon.model';
   standalone: true,
 
   imports: [
-
     CommonModule
-
   ],
 
   templateUrl: './coupons.html',
@@ -33,95 +36,115 @@ import { CouponModel } from '../../../core/models/coupon.model';
 
 export class CouponsComponent {
 
-  // =====================================
-  // EXECUTION FLOW
-  // =====================================
-  //
-  // 1. Angular creates CouponsComponent.
-  //
-  // 2. Constructor executes.
-  //
-  // 3. loadCoupons() executes.
-  //
-  // 4. CouponService returns all coupons.
-  //
-  // 5. Coupons are displayed in HTML.
-  //
-  // 6. Customer clicks Apply Coupon.
-  //
-  // 7. applyCoupon() executes.
-  //
-  // 8. Selected coupon is sent to Checkout.
-  //
-  // =====================================
-
+  // Store Coupons.
   coupons: CouponModel[] = [];
-  // CouponModel[]
-  // Means:
-  // Store multiple coupon objects.
 
   constructor(
 
+    // Coupon Service.
     private couponService: CouponService,
-    // Angular automatically injects CouponService.
 
+    // Router.
     private router: Router
-    // Router is used for page navigation.
 
   ) {
 
-    // Constructor runs automatically
-    // when page opens.
-
+    // Load Coupons.
     this.loadCoupons();
 
   }
 
+  // ==========================================
+  // LOAD COUPONS
+  // ==========================================
+
+  // loadCoupons
+  // Gets all Coupons.
+  //
+  // ()
+  // No Input.
+  //
+  // : void
+  // Returns Nothing.
   loadCoupons(): void {
 
-    // (): void
-    // Means:
-    // This method returns nothing.
-    // It only loads coupons.
+    this.couponService
+      .getCoupons()
+      .subscribe({
 
-    this.coupons =
+        //
+        // next
+        // Runs if API Success.
+        //
+        next: (data: CouponModel[]) => {
 
-      this.couponService.getCoupons();
+          //
+          // this
+          // Current Component.
+          //
+          // coupons
+          // Store Coupons.
+          //
+          // =
+          // Assign Value.
+          //
+          // data
+          // Backend Response.
+          //
+          this.coupons = data;
 
-    // Read all coupons
-    // from CouponService.
+          console.log(this.coupons);
 
-    console.log(this.coupons);
+        },
+
+        //
+        // error
+        // Runs if API Fails.
+        //
+        error: (err: any) => {
+
+          console.log(err);
+
+        }
+
+      });
 
   }
 
+  // ==========================================
+  // APPLY COUPON
+  // ==========================================
+
+  // applyCoupon
+  // Applies Coupon.
+  //
+  // selectedCoupon
+  // Selected Coupon.
+  //
+  // : void
+  // Returns Nothing.
   applyCoupon(
 
     selectedCoupon: CouponModel
 
   ): void {
 
-    // selectedCoupon: CouponModel
-    // Means:
-    // Receive one coupon object
-    // when customer clicks Apply.
+    //
+    // selectedCoupon
+    // Coupon selected by customer.
+    //
+    console.log(selectedCoupon);
 
-    console.log(
-
-      "Coupon Applied"
-
-    );
-
-    console.log(
-
-      selectedCoupon
-
-    );
-
-    // Later
-    // CheckoutService will receive
-    // this coupon.
-
+    //
+    // this
+    // Current Component.
+    //
+    // router
+    // Router Object.
+    //
+    // navigate()
+    // Open another page.
+    //
     this.router.navigate([
 
       '/checkout'
@@ -131,53 +154,3 @@ export class CouponsComponent {
   }
 
 }
-
-/*
-
-WHY DO WE WRITE THIS FILE?
-
-This component controls
-
-✔ Display Coupons
-
-✔ Apply Coupon
-
-✔ Navigate Back to Checkout
-
-Flow
-
-Coupons Page Opens
-
-↓
-
-Constructor
-
-↓
-
-loadCoupons()
-
-↓
-
-Coupon Service
-
-↓
-
-Coupons Loaded
-
-↓
-
-HTML
-
-↓
-
-Customer Clicks Apply
-
-↓
-
-applyCoupon()
-
-↓
-
-Checkout Page
-
-*/
