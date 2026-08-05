@@ -1,229 +1,152 @@
-import { Injectable, signal } from '@angular/core';
-// 1️⃣ Executes First.
-//
-// Injectable
-// Means Angular can create this service.
-//
-// signal
-// Stores live address data.
-// Whenever signal changes,
-// UI automatically refreshes.
+// Service Annotation.
+// Makes this file an Angular Service.
+import { Injectable } from '@angular/core';
 
+// Backend Caller.
+// Calls ASP.NET Core APIs.
+import { HttpClient } from '@angular/common/http';
+
+// Wait for Backend.
+// Receives API response later.
+import { Observable } from 'rxjs';
+
+// Address Structure.
+// Defines one Address object.
 import { SavedAddressModel } from '../models/saved-address.model';
-// 2️⃣ Import Address Model.
-// Service stores objects of this type.
 
 @Injectable({
 
-    providedIn: 'root'
-
-    // Angular creates only ONE object
-    // of this service.
-    // Every component shares the same object.
+  // One Service Instance.
+  // Used everywhere.
+  providedIn: 'root'
 
 })
-
 export class SavedAddressService {
 
-    // =====================================================
-    // EXECUTION FLOW
-    // =====================================================
+  // API URL Variable.
+  // Stores Backend Address.
+  private apiUrl = 'https://localhost:7278/api/SavedAddress';
+
+  constructor(
+
+    // private
+    // Used only inside Service.
     //
-    // 1️⃣ Angular creates SavedAddressService.
+    // http
+    // HttpClient variable.
     //
-    // 2️⃣ savedAddresses signal is created.
-    //
-    // 3️⃣ Component calls getAddresses().
-    //
-    // 4️⃣ HTML displays all addresses.
-    //
-    // 5️⃣ User adds new address.
-    //
-    // 6️⃣ Signal updates.
-    //
-    // 7️⃣ UI refreshes automatically.
-    //
-    // =====================================================
+    // HttpClient
+    // Calls Backend APIs.
+    private http: HttpClient
 
-    savedAddresses = signal<SavedAddressModel[]>([
+  ) { }
 
-        {
+  // ==========================================
+  // GET ALL ADDRESSES
+  // ==========================================
 
-            addressId: 1,
+  // getAddresses
+  // Gets all Addresses.
+  //
+  // ()
+  // No Input.
+  //
+  // :
+  // Return Type Starts.
+  //
+  // Observable<SavedAddressModel[]>
+  // Wait and return Addresses.
+  getAddresses(): Observable<SavedAddressModel[]> {
 
-            customerName: "Mrudula More",
+    // Go to Backend.
+    // Get Addresses.
+    return this.http.get<SavedAddressModel[]>(this.apiUrl);
 
-            phoneNumber: "9876543210",
+  }
 
-            houseNumber: "A-302",
+  // ==========================================
+  // ADD ADDRESS
+  // ==========================================
 
-            area: "Borivali West",
+  // addAddress
+  // Saves Address.
+  //
+  // newAddress
+  // New Address Object.
+  //
+  // Observable<SavedAddressModel>
+  // Wait and return saved Address.
+  addAddress(
 
-            landmark: "Near Metro Station",
+    newAddress: SavedAddressModel
 
-            city: "Mumbai",
+  ): Observable<SavedAddressModel> {
 
-            state: "Maharashtra",
+    // Go to Backend.
+    // Save Address.
+    return this.http.post<SavedAddressModel>(
+      this.apiUrl,
+      newAddress
+    );
 
-            pincode: "400092",
+  }
 
-            addressType: "Home",
+  // ==========================================
+  // DELETE ADDRESS
+  // ==========================================
 
-            isDefault: true
+  // deleteAddress
+  // Deletes Address.
+  //
+  // selectedAddressId
+  // Address Id.
+  //
+  // Observable<any>
+  // Wait for response.
+  deleteAddress(
 
-        }
+    selectedAddressId: number
 
-    ]);
+  ): Observable<any> {
 
-    // signal<SavedAddressModel[]>
-    //
-    // Means:
-    //
-    // signal stores live array.
-    //
-    // [] means multiple addresses.
+    // Go to Backend.
+    // Delete Address.
+    return this.http.delete(
 
-    constructor() {
+      `${this.apiUrl}/${selectedAddressId}`
 
-    }
+    );
 
-    getAddresses(): SavedAddressModel[] {
+  }
 
-        // (): SavedAddressModel[]
-        //
-        // Returns complete address list.
+  // ==========================================
+  // SET DEFAULT ADDRESS
+  // ==========================================
 
-        return this.savedAddresses();
+  // setDefaultAddress
+  // Updates Default Address.
+  //
+  // selectedAddressId
+  // Address Id.
+  //
+  // Observable<any>
+  // Wait for response.
+  setDefaultAddress(
 
-    }
+    selectedAddressId: number
 
-    addAddress(
+  ): Observable<any> {
 
-        newAddress: SavedAddressModel
+    // Go to Backend.
+    // Update Default Address.
+    return this.http.put(
 
-    ): void {
+      `${this.apiUrl}/default/${selectedAddressId}`,
 
-        // newAddress
-        // New address entered by customer.
+      {}
 
-        const currentAddresses =
+    );
 
-            [...this.savedAddresses()];
-
-        currentAddresses.push(
-
-            newAddress
-
-        );
-
-        this.savedAddresses.set(
-
-            currentAddresses
-
-        );
-
-        console.log("Address Added");
-
-        console.log(this.savedAddresses());
-
-    }
-
-    deleteAddress(
-
-        selectedAddressId: number
-
-    ): void {
-
-        this.savedAddresses.set(
-
-            this.savedAddresses().filter(
-
-                address =>
-
-                address.addressId !== selectedAddressId
-
-            )
-
-        );
-
-        console.log("Address Deleted");
-
-    }
-
-    setDefaultAddress(
-
-        selectedAddressId: number
-
-    ): void {
-
-        const currentAddresses =
-
-            [...this.savedAddresses()];
-
-        currentAddresses.forEach(address => {
-
-            address.isDefault =
-
-                address.addressId === selectedAddressId;
-
-        });
-
-        this.savedAddresses.set(
-
-            currentAddresses
-
-        );
-
-        console.log("Default Address Updated");
-
-    }
+  }
 
 }
-
-/*
-
-WHY DO WE WRITE THIS FILE?
-
-This service manages
-
-✔ Add Address
-
-✔ Delete Address
-
-✔ Default Address
-
-✔ Return All Addresses
-
-Flow
-
-Saved Address Component
-
-↓
-
-Saved Address Service
-
-↓
-
-Signal
-
-↓
-
-HTML
-
-Later
-
-Backend API
-
-↓
-
-Saved Address Service
-
-↓
-
-Component
-
-↓
-
-HTML
-
-*/
