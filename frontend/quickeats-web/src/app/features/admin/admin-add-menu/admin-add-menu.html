@@ -1,0 +1,33 @@
+<h1>Add Menu</h1>
+
+<input
+type="number"
+placeholder="Restaurant Id"
+[(ngModel)]="menu.restaurantId">
+
+<input
+type="text"
+placeholder="Food Name"
+[(ngModel)]="menu.name">
+
+<input
+type="text"
+placeholder="Description"
+[(ngModel)]="menu.description">
+
+<input
+type="number"
+placeholder="Price"
+[(ngModel)]="menu.price">
+
+<input
+type="text"
+placeholder="Image Url"
+[(ngModel)]="menu.imageUrl">
+
+<button
+(click)="saveMenu()">
+
+Save Menu
+
+</button>

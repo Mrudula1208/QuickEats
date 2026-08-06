@@ -48,5 +48,36 @@ export class MenuService {
 // Backend returns only the menu items of that restaurant.
 
   }
+// addMenu
+// Save Menu.
+addMenu(
 
+  menu: MenuItem
+
+): Observable<MenuItem> {
+
+  // Send Menu.
+  return this.http.post<MenuItem>(
+
+    this.apiUrl,
+
+    menu
+
+  );
+
+}deleteMenu(
+
+id:number
+
+):Observable<any>{
+
+// Go to Backend.
+// Delete Menu.
+return this.http.delete(
+
+`${this.apiUrl}/${id}`
+
+);
+
+}
 }

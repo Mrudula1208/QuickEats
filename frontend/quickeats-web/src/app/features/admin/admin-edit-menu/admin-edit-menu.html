@@ -1,0 +1,32 @@
+<h1>Edit Menu</h1>
+
+@if(menu){
+
+<input
+type="number"
+[(ngModel)]="menu.restaurantId">
+
+<input
+type="text"
+[(ngModel)]="menu.name">
+
+<input
+type="text"
+[(ngModel)]="menu.description">
+
+<input
+type="number"
+[(ngModel)]="menu.price">
+
+<input
+type="text"
+[(ngModel)]="menu.imageUrl">
+
+<button
+(click)="updateMenu()">
+
+Update Menu
+
+</button>
+
+}
