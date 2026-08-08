@@ -1,0 +1,141 @@
+<h1>Order Details</h1>
+
+<!--
+  @if
+
+  Checks whether the order exists.
+
+  order
+  Contains the selected Order object.
+-->
+
+@if (order) {
+
+  <div class="order-details">
+
+
+    <!--
+      {{ }}
+
+      Angular interpolation.
+
+      Takes a value from TypeScript
+      and displays it on the screen.
+    -->
+
+    <h2>
+      Order #{{ order.id }}
+    </h2>
+
+
+    <p>
+
+      <strong>Customer:</strong>
+
+      {{ order.customerName }}
+
+    </p>
+
+
+    <p>
+
+      <strong>Restaurant:</strong>
+
+      {{ order.restaurantName }}
+
+    </p>
+
+
+    <p>
+
+      <strong>Address:</strong>
+
+      {{ order.address }}
+
+    </p>
+
+
+    <p>
+
+      <strong>Phone:</strong>
+
+      {{ order.phone }}
+
+    </p>
+
+
+    <p>
+
+      <strong>Total:</strong>
+
+      ₹{{ order.total }}
+
+    </p>
+
+
+    <p>
+
+      <strong>Payment Method:</strong>
+
+      {{ order.paymentMethod }}
+
+    </p>
+
+
+    <p>
+
+      <strong>Status:</strong>
+
+      {{ order.status }}
+
+    </p>
+
+
+    <p>
+
+      <strong>Estimated Delivery:</strong>
+
+      {{ order.estimatedDeliveryTime }}
+
+    </p>
+
+
+    <p>
+
+      <strong>Date:</strong>
+
+      {{ order.date | date:'medium' }}
+
+    </p>
+
+
+    <h3>Items</h3>
+
+
+    <!--
+      @for
+
+      Repeats the HTML for every item
+      inside the order.items array.
+
+      item
+      Represents one item.
+
+      $index
+      Angular's automatic index number.
+    -->
+
+    @for (item of order.items; track $index) {
+
+      <p>
+
+        {{ item }}
+
+      </p>
+
+    }
+
+
+  </div>
+
+}
