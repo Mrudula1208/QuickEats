@@ -1,14 +1,14 @@
 import { Component } from '@angular/core';
-// Import Component because this file controls Notification Page.
+// Controls Notification Page.
 
 import { CommonModule } from '@angular/common';
-// Import CommonModule because HTML uses @if and @for.
+// Required for @for and @if.
 
 import { NotificationService } from '../../../core/services/notification.service';
-// Import NotificationService because all notification logic is written there.
+// Calls Notification APIs.
 
 import { NotificationModel } from '../../../core/models/notification.model';
-// Import NotificationModel because it defines one notification object.
+// Notification Structure.
 
 @Component({
   selector: 'app-notifications',
@@ -19,7 +19,6 @@ import { NotificationModel } from '../../../core/models/notification.model';
   templateUrl: './notifications.html',
   styleUrl: './notifications.scss'
 })
-
 export class NotificationsComponent {
 
   // Store all notifications.
@@ -27,32 +26,73 @@ export class NotificationsComponent {
 
   constructor(
 
-    // Angular automatically injects NotificationService.
+    // Notification Service.
     private notificationService: NotificationService
 
   ) {
 
-    // Load notifications immediately.
+    // Load Notifications.
     this.loadNotifications();
 
   }
 
-  // Load all notifications.
+  // Load Notifications.
   loadNotifications(): void {
-      this.notificationService.getNotifications().subscribe({
-        next:(data:NotificationModel[])=> {
+
+    this.notificationService
+      .getNotifications()
+      .subscribe({
+
+        // Success.
+        next: (data: NotificationModel[]) => {
+
           this.notifications = data;
+
           console.log(this.notifications);
+
+        },
+
+        // Error.
+        error: (err: any) => {
+
+          console.log(err);
+
         }
-    ,
-  error:(err:any)=> {
-    console.error( err);
-  
 
-  // Runs when customer opens notification.
+      });
 
-
-
-      }});
   }
+
+  // Mark Notification As Read.
+  markAsRead(
+
+    notificationId: number
+
+  ): void {
+
+    this.notificationService
+      .markAsRead(notificationId)
+      .subscribe({
+
+        // Success.
+        next: () => {
+
+          console.log("Notification Read");
+
+          // Reload Notifications.
+          this.loadNotifications();
+
+        },
+
+        // Error.
+        error: (err: any) => {
+
+          console.log(err);
+
+        }
+
+      });
+
+  }
+
 }

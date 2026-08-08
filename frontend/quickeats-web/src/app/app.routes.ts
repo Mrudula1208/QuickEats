@@ -86,7 +86,7 @@ export const routes: Routes = [
     loadComponent: () =>
         import('./features/customer/profile/profile')
         .then(m => m.ProfileComponent)
-
+},
         {
   path: 'admin/restaurants',
   component: AdminRestaurants,

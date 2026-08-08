@@ -1,95 +1,138 @@
-<h1>Restaurant Management</h1>
+<h1>Admin Orders</h1>
 
-<p>Manage all restaurants.</p>
+<!--
+  @if
+  Checks a condition.
 
-@if(restaurants.length===0){
+  orders.length
+  Means the number of orders in our array.
 
-<div class="empty">
+  === 0
+  Means exactly equal to zero.
 
-    <h2>No Restaurants Found</h2>
+  So this says:
 
-</div>
+  "If there are no orders, show No Orders Found."
+-->
+
+@if (orders.length === 0) {
+
+  <h2>No Orders Found</h2>
 
 }
-<button (click)="addRestaurant()">
-    Add Restaurant
-</button>
-@else{
 
-<table>
+@else {
 
-    <thead>
+  <!--
+    @for
+    Repeats this HTML for every order.
 
-        <tr>
+    order
+    = current order.
 
-            <th>Name</th>
+    of orders
+    = take each order from the orders array.
 
-            <th>Address</th>
+    track order.id
+    = Angular uses the unique order ID
+      to identify each row.
+  -->
 
-            <th>Phone</th>
+  @for (order of orders; track order.id) {
 
-            <th>Status</th>
+    <div class="order-card">
 
-            <th>Action</th>
+      <!--
+        {{ }}
+        Angular interpolation.
 
-        </tr>
+        It takes a value from TypeScript
+        and displays it in HTML.
+      -->
 
-    </thead>
+      <h2>
+        Order #{{ order.id }}
+      </h2>
 
-    <tbody>
 
-        @for(restaurant of restaurants; track restaurant.id){
+      <p>
+        <strong>Customer:</strong>
+        {{ order.customerName }}
+      </p>
 
-        <tr>
 
-            <td>{{restaurant.name}}</td>
+      <p>
+        <strong>Restaurant:</strong>
+        {{ order.restaurantName }}
+      </p>
 
-            <td>{{restaurant.address}}</td>
 
-            <td>{{restaurant.phoneNumber}}</td>
+      <p>
+        <strong>Address:</strong>
+        {{ order.address }}
+      </p>
 
-            <td>
 
-                @if(restaurant.isActive){
+      <p>
+        <strong>Phone:</strong>
+        {{ order.phone }}
+      </p>
 
-                Active
 
-                }
+      <p>
+        <strong>Total:</strong>
+        ₹{{ order.total }}
+      </p>
 
-                @else{
 
-                Inactive
+      <p>
+        <strong>Payment:</strong>
+        {{ order.paymentMethod }}
+      </p>
 
-                }
 
-            </td>
+      <p>
+        <strong>Status:</strong>
+        {{ order.status }}
+      </p>
 
-            <td>
 
-               <button
+      <p>
+        <strong>Estimated Delivery:</strong>
+        {{ order.estimatedDeliveryTime }}
+      </p>
 
-(click)="editRestaurant(restaurant)">
 
-Edit
+      <p>
+        <strong>Date:</strong>
+        {{ order.date | date:'medium' }}
+      </p>
 
-</button>
 
-<button
+      <!--
+        order.items
+        = food items inside this order.
 
-(click)="deleteRestaurant(restaurant.id)">
+        @for
+        = repeat for every item.
 
-Delete
+        $index
+        = Angular's automatic number
+          for the current item.
+      -->
 
-</button>
+      <h3>Items</h3>
 
-            </td>
+      @for (item of order.items; track $index) {
 
-        </tr>
+        <p>
+          {{ item }}
+        </p>
 
-        }
+      }
 
-    </tbody>
+    </div>
 
-</table>
+  }
 
 }

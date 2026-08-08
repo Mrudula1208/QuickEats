@@ -1,0 +1,282 @@
+<h1>Admin Orders</h1>
+
+<!--
+    @if
+
+    Checks a condition.
+
+    orders.length
+    Means number of orders in the array.
+
+    === 0
+    Means exactly equal to zero.
+
+    So:
+
+    If there are no orders,
+    show "No Orders Found".
+-->
+
+@if (orders.length === 0) {
+
+    <h2>
+        No Orders Found
+    </h2>
+
+}
+
+@else {
+
+    <!--
+        @for
+
+        Repeats HTML for every order.
+
+        orders
+        ↓
+        Order 1
+        Order 2
+        Order 3
+        etc.
+
+        order
+        Means the current order.
+
+        track order.id
+        Tells Angular to identify each order
+        using its unique id.
+    -->
+
+    @for (order of orders; track order.id) {
+
+        <div class="order-card">
+
+            <!-- Order ID -->
+
+            <h2>
+                Order #{{order.id}}
+            </h2>
+
+
+            <!-- Customer Name -->
+
+            <p>
+
+                <strong>
+                    Customer:
+                </strong>
+
+                {{order.customerName}}
+
+            </p>
+
+
+            <!-- Restaurant -->
+
+            <p>
+
+                <strong>
+                    Restaurant:
+                </strong>
+
+                {{order.restaurantName}}
+
+            </p>
+
+
+            <!-- Address -->
+
+            <p>
+
+                <strong>
+                    Address:
+                </strong>
+
+                {{order.address}}
+
+            </p>
+
+
+            <!-- Phone -->
+
+            <p>
+
+                <strong>
+                    Phone:
+                </strong>
+
+                {{order.phone}}
+
+            </p>
+
+
+            <!-- Total -->
+
+            <p>
+
+                <strong>
+                    Total:
+                </strong>
+
+                ₹{{order.total}}
+
+            </p>
+
+
+            <!-- Payment Method -->
+
+            <p>
+
+                <strong>
+                    Payment:
+                </strong>
+
+                {{order.paymentMethod}}
+
+            </p>
+
+
+            <!-- Order Status -->
+
+           <!--
+  Display current Order Status.
+-->
+
+<p>
+
+  <strong>Status:</strong>
+
+  {{ order.status }}
+
+</p>
+
+
+<!--
+  select
+
+  Creates a dropdown list.
+
+  [(ngModel)]
+
+  Two-way data binding.
+
+  It means:
+
+  HTML value
+       ↕
+  TypeScript value
+
+  selectedStatus
+
+  Stores the status selected
+  by the Admin.
+-->
+
+<select
+  [(ngModel)]="order.status"
+>
+
+  <option value="Pending">
+    Pending
+  </option>
+
+  <option value="Confirmed">
+    Confirmed
+  </option>
+
+  <option value="Preparing">
+    Preparing
+  </option>
+
+  <option value="Out for Delivery">
+    Out for Delivery
+  </option>
+
+  <option value="Delivered">
+    Delivered
+  </option>
+
+  <option value="Cancelled">
+    Cancelled
+  </option>
+
+</select>
+
+
+<!--
+  (click)
+
+  Angular event binding.
+
+  When Admin clicks this button,
+
+  updateStatus()
+
+  method runs in admin-order.ts.
+
+  order.id
+  sends the selected Order ID.
+-->
+
+<button
+  (click)="updateStatus(order.id, order.status)"
+>
+
+  Update Status
+
+</button>
+            <!-- Estimated Delivery -->
+
+            <p>
+
+                <strong>
+                    Estimated Delivery:
+                </strong>
+
+                {{order.estimatedDeliveryTime}}
+
+            </p>
+
+
+            <!-- Order Date -->
+
+            <p>
+
+                <strong>
+                    Date:
+                </strong>
+
+                {{order.date | date:'medium'}}
+
+            </p>
+
+
+            <!--
+                Items
+
+                order.items
+                Contains food items inside this order.
+
+                We can display them later
+                after checking the exact structure
+                of your items.
+            -->
+
+            <h3>
+                Items
+            </h3>
+
+
+            @for (item of order.items; track $index) {
+
+                <p>
+                    {{item}}
+                </p>
+
+            }
+
+        </div>
+
+    }
+
+}

@@ -49,7 +49,43 @@ export class MenuService {
 
   }
 // addMenu
-// Save Menu.
+// Save Menu.// Get One Menu.
+// Read Menu By Id.
+getMenuById(
+
+  id: number
+
+): Observable<MenuItem> {
+
+  // Go to Backend.
+  // Read One Menu.
+  return this.http.get<MenuItem>(
+
+    `${this.apiUrl}/${id}`
+
+  );
+
+}
+
+// Update Menu.
+// Save Updated Menu.
+updateMenu(
+
+  menu: MenuItem
+
+): Observable<MenuItem> {
+
+  // Go to Backend.
+  // Update Menu.
+  return this.http.put<MenuItem>(
+
+    `${this.apiUrl}/${menu.id}`,
+
+    menu
+
+  );
+
+}
 addMenu(
 
   menu: MenuItem

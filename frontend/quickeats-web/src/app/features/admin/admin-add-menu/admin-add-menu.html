@@ -1,33 +1,116 @@
-<h1>Add Menu</h1>
+<h1>Add New Menu Item</h1>
 
-<input
-type="number"
-placeholder="Restaurant Id"
-[(ngModel)]="menu.restaurantId">
+<form (ngSubmit)="saveMenu()">
 
-<input
-type="text"
-placeholder="Food Name"
-[(ngModel)]="menu.name">
+    <!--
+        Restaurant ID
 
-<input
-type="text"
-placeholder="Description"
-[(ngModel)]="menu.description">
+        Customer/Admin enters the Restaurant Id.
+        This tells Backend which restaurant
+        this food item belongs to.
+    -->
+    <label>
+        Restaurant ID
+    </label>
 
-<input
-type="number"
-placeholder="Price"
-[(ngModel)]="menu.price">
+    <input
+        type="number"
+        name="restaurantId"
+        [(ngModel)]="menu.restaurantId"
+        required
+    >
 
-<input
-type="text"
-placeholder="Image Url"
-[(ngModel)]="menu.imageUrl">
 
-<button
-(click)="saveMenu()">
+    <!--
+        Food Name
 
-Save Menu
+        [(ngModel)]
+        Means:
+        Whatever user types here is stored
+        inside menu.name.
+    -->
+    <label>
+        Food Name
+    </label>
 
-</button>
+    <input
+        type="text"
+        name="name"
+        [(ngModel)]="menu.name"
+        required
+    >
+
+
+    <!-- Food Description -->
+
+    <label>
+        Description
+    </label>
+
+    <textarea
+        name="description"
+        [(ngModel)]="menu.description"
+        required
+    ></textarea>
+
+
+    <!-- Food Price -->
+
+    <label>
+        Price
+    </label>
+
+    <input
+        type="number"
+        name="price"
+        [(ngModel)]="menu.price"
+        required
+    >
+
+
+    <!-- Food Image URL -->
+
+    <label>
+        Image URL
+    </label>
+
+    <input
+        type="text"
+        name="imageUrl"
+        [(ngModel)]="menu.imageUrl"
+    >
+
+
+    <!--
+        Availability
+
+        true  = Available
+        false = Not Available
+    -->
+
+    <label>
+        Available
+    </label>
+
+    <input
+        type="checkbox"
+        name="isAvailable"
+        [(ngModel)]="menu.isAvailable"
+    >
+
+
+    <!--
+        ngSubmit
+
+        When button is clicked,
+        Angular calls saveMenu().
+    -->
+
+    <button
+        type="submit">
+
+        Add Menu
+
+    </button>
+
+</form>
