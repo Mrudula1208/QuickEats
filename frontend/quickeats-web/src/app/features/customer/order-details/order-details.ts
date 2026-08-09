@@ -123,4 +123,37 @@ export class OrderDetailsComponent {
 
   }
 
+  // Check if order can be cancelled.
+  // Only "Pending" or "Confirmed" orders can be cancelled.
+  canCancel(): boolean {
+    if (!this.selectedOrder) return false;
+    return this.selectedOrder.status === 'Pending' ||
+           this.selectedOrder.status === 'Confirmed';
+  }
+
+  // Runs when customer clicks "Cancel Order" button.
+  cancelOrder(): void {
+    if (!this.selectedOrder) return;
+
+    // Ask for confirmation before cancelling.
+    const confirmed = confirm(
+      `Are you sure you want to cancel order #${this.selectedOrder.id}?`
+    );
+
+    if (!confirmed) return;
+
+    this.orderService.cancelOrder(this.selectedOrder.id).subscribe({
+      next: () => {
+        // Update the local status to reflect cancellation.
+        if (this.selectedOrder) {
+          this.selectedOrder.status = 'Cancelled';
+        }
+      },
+      error: (err) => {
+        console.log(err);
+        alert(err.error || 'Failed to cancel order.');
+      }
+    });
+  }
+
 }

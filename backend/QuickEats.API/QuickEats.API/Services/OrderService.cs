@@ -296,6 +296,45 @@ namespace QuickEats.API.Services
             await _notificationService.CreateAsync(notification);
         }
 
+        // Customer cancels their own order.
+        // Only allowed when status is "Pending" or "Confirmed".
+        public async Task CancelAsync(int id, int userId)
+        {
+            var order = await _orderRepository.GetByIdAsync(id);
+            if (order == null)
+            {
+                throw new NotFoundException($"Order with Id {id} not found");
+            }
+
+            // Only the order owner can cancel.
+            if (order.UserId != userId)
+            {
+                throw new UnauthorizedAccessException("You can only cancel your own orders.");
+            }
+
+            // Only Pending or Confirmed orders can be cancelled.
+            // Once Preparing, Out for Delivery, or Delivered, cancellation is not allowed.
+            if (order.Status != "Pending" && order.Status != "Confirmed")
+            {
+                throw new BadRequestException(
+                    $"Cannot cancel order with status \"{order.Status}\". Only Pending or Confirmed orders can be cancelled.");
+            }
+
+            order.Status = "Cancelled";
+            _orderRepository.Update(order);
+            await _orderRepository.SaveChangesAsync();
+
+            // Notify the customer about cancellation.
+            var notification = new CreateNotificationDto
+            {
+                UserId = order.UserId,
+                Title = "Order Cancelled",
+                Message = $"Your order #{order.Id} has been cancelled successfully."
+            };
+
+            await _notificationService.CreateAsync(notification);
+        }
+
 
 
 

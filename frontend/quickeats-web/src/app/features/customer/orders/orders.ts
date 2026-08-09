@@ -77,4 +77,31 @@ export class OrdersComponent {
 
   }
 
+  // Check if order can be cancelled.
+  canCancel(status: string): boolean {
+    return status === 'Pending' || status === 'Confirmed';
+  }
+
+  // Cancel an order after confirmation.
+  cancelOrder(orderId: number): void {
+
+    const confirmed = confirm(
+      `Are you sure you want to cancel order #${orderId}?`
+    );
+
+    if (!confirmed) return;
+
+    this.orderService.cancelOrder(orderId).subscribe({
+      next: () => {
+        // Reload orders to reflect updated status.
+        this.loadCustomerOrders();
+      },
+      error: (err) => {
+        console.log(err);
+        alert(err.error || 'Failed to cancel order.');
+      }
+    });
+
+  }
+
 }

@@ -65,4 +65,12 @@ export class OrderService {
 
   }
 
+  // Cancel an order (used by Customer).
+  // Only allowed when status is "Pending" or "Confirmed".
+  cancelOrder(id: number): Observable<any> {
+
+    return this.http.patch(`${this.apiUrl}/${id}/cancel`, {});
+
+  }
+
 }

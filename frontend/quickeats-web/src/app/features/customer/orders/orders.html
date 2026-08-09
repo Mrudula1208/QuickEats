@@ -46,6 +46,16 @@
 
             </button>
 
+            @if (canCancel(order.status)) {
+                <button
+                    class="cancel-btn"
+                    (click)="cancelOrder(order.id)">
+
+                    Cancel Order
+
+                </button>
+            }
+
         </div>
 
         }

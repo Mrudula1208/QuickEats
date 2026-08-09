@@ -135,6 +135,16 @@
              inside order-details.ts
         -->
 
+        @if (canCancel()) {
+            <button
+                class="cancel-btn"
+                (click)="cancelOrder()">
+
+                Cancel Order
+
+            </button>
+        }
+
     </div>
 
     }

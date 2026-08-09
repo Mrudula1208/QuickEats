@@ -104,6 +104,18 @@ namespace QuickEats.API.Controllers
             await _orderService.UpdateStatusAsync(id, dto);
             return Ok("Order status updated successfully.");
         }
+
+        // Customer cancels their own order.
+        [Authorize(Roles = "Customer")]
+        [HttpPatch("{id}/cancel")]
+        public async Task<IActionResult> Cancel(int id)
+        {
+            var userId = int.Parse(
+                User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            await _orderService.CancelAsync(id, userId);
+            return Ok("Order cancelled successfully.");
+        }
         [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
