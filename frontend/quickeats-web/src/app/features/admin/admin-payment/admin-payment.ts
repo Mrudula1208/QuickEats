@@ -83,60 +83,72 @@ export class AdminPayment {
 
 
   // Load all payments.
-  loadPayments(): void {
+  // Load all payments from Backend.
+loadPayments(): void {
 
-    // Call getPayments() from PaymentService.
-    //
-    // getPayments()
-    // Returns all payments.
-    //
-    // this
-    // Refers to the current AdminPayment component.
-    //
-    // paymentService
-    // Our injected PaymentService.
-    //
-    // =
-    // Stores the returned data.
-    this.payments =
-      this.paymentService.getPayments();
+  // STEP 1
+  // Call PaymentService.
+  //
+  // getPayments()
+  // Sends GET request to Backend.
+  this.paymentService
+    .getPayments()
 
+    // STEP 2
+    // subscribe()
+    // Waits for Backend response.
 
-    // Display payments in browser console
-    // so we can check the returned data.
-    console.log(this.payments);
+    .subscribe({
 
-  }
+      // Backend successfully returned payments.
+      next: (data: Payment[]) => {
+
+        // Store Backend data
+        // inside the Component variable.
+        this.payments = data;
+
+        console.log(
+          this.payments
+        );
+
+      },
+
+      // Backend/API request failed.
+      error: (err: any) => {
+
+        console.log(err);
+
+      }
+
+    });
+
+}
+// Update Payment Status.
 // Update Payment Status.
 updatePaymentStatus(
 
+  // ID of the payment we want to update.
+  //
   // paymentId
   // Variable name.
   //
   // : number
   // Means paymentId stores a number.
-  //
-  // This is the ID of the payment
-  // selected by the Admin.
   paymentId: number,
 
+  // New status we want to give the payment.
+  //
   // newStatus
   // Variable name.
   //
   // : string
   // Means newStatus stores text.
-  //
-  // Example:
-  // "Success"
-  // "Failed"
-  // "Refunded"
   newStatus: string
 
 ): void {
 
   // STEP 1
-  // Send the Payment ID
-  // and new status to PaymentService.
+  // Call the PaymentService.
   //
   // this
   // Refers to the current AdminPayment Component.
@@ -146,30 +158,93 @@ updatePaymentStatus(
   //
   // updatePaymentStatus()
   // Calls the Service method.
-  this.paymentService.updatePaymentStatus(
-
-    paymentId,
-
-    newStatus
-
-  );
-
-
-  // STEP 2
-  // Load the updated payment data again.
   //
-  // This keeps the Component data
-  // synchronized with the Service.
-  this.loadPayments();
+  // The Service sends the PUT request
+  // to the ASP.NET Core Backend.
 
+  this.paymentService
+    .updatePaymentStatus(
+      paymentId,
+      newStatus
+    )
 
-  console.log(
-    "Payment Status Updated"
-  );
+    // STEP 2
+    // subscribe()
+    // Waits for the Backend response.
+    //
+    // next
+    // Runs when the Backend successfully
+    // updates the payment.
 
-}
-deletepayment(paymentId: number): void {
-  this.paymentService.deletePayment(paymentId);
-  this.loadPayments();
-  console.log("Payment Deleted");
-}
+    .subscribe({
+
+      next: () => {
+
+        console.log(
+          "Payment Status Updated"
+        );
+
+        // STEP 3
+        // Load payments again.
+        //
+        // This gets the latest data
+        // from the Backend.
+
+        this.loadPayments();
+
+      },
+
+      // error
+      // Runs when the Backend request fails.
+
+      error: (err: any) => {
+
+        console.log(err);
+
+      }
+
+    });
+
+}// Delete Payment.
+deletePayment(
+
+  // ID of the payment we want to delete.
+  paymentId: number
+
+): void {
+
+  // STEP 1
+  // Call PaymentService.
+  //
+  // deletePayment()
+  // Sends DELETE request to ASP.NET Core.
+  this.paymentService
+    .deletePayment(paymentId)
+
+    // STEP 2
+    // Wait for Backend response.
+    .subscribe({
+
+      // Backend successfully deleted payment.
+      next: () => {
+
+        console.log(
+          "Payment Deleted Successfully"
+        );
+
+        // STEP 3
+        // Reload payments from Backend.
+        this.loadPayments();
+
+      },
+
+      // Backend/API error.
+      error: (err: any) => {
+
+        console.log(err);
+
+      }
+
+    });
+
+}}

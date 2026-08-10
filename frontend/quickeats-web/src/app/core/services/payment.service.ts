@@ -1,107 +1,180 @@
-import { Injectable } from "@angular/core";
-import { Payment } from "../models/payment.model";
+import { Injectable } from '@angular/core';
+// Injectable
+// Tells Angular that this file is a Service
+// and Angular can create this Service automatically.
+
+import { HttpClient } from '@angular/common/http';
+// HttpClient
+// Used to send HTTP requests to the ASP.NET Core Backend.
+//
+// We use:
+// GET    → read data
+// POST   → create data
+// PUT    → update data
+// DELETE → delete data
+
+import { Observable } from 'rxjs';
+// Observable
+// Represents data that will come from the Backend later.
+//
+// API calls take time,
+// so the result does not come immediately.
+
+import { Payment } from '../models/payment.model';
+// Payment
+// Defines the structure of one Payment object.
+
+
 @Injectable({
-    providedIn:'root'
+
+  // providedIn
+  // Tells Angular where this Service should be available.
+
+  // 'root'
+  // Makes one shared instance of PaymentService
+  // available throughout the application.
+
+  providedIn: 'root'
+
 })
-export class PaymentService{
-    private payments:Payment[]=[];
-    savePayment(payment:Payment):void{
- console.log("Saving Payment...");
-  console.log(payment);
 
-  this.payments.push(payment);
 
-  console.log(this.payments);    }
-    getPayments():Payment[]{
-        return this.payments;
-    }// Update the status of one payment.
-updatePaymentStatus(
+export class PaymentService {
 
-  // paymentId
+
+  // Backend API URL.
+  //
+  // private
+  // Means this variable is used only
+  // inside PaymentService.
+  //
+  // apiUrl
   // Variable name.
   //
-  // : number
-  // Means paymentId stores a number.
-  paymentId: number,
+  // =
+  // Assigns the Backend URL to the variable.
 
-  // newStatus
-  // Variable name.
-  //
-  // : string
-  // Means newStatus stores text.
-  //
-  // Example:
-  // "Success"
-  // "Failed"
-  // "Refunded"
-  newStatus: string
+  private apiUrl =
+    'https://localhost:7278/api/Payment';
 
-): void {
 
-  // STEP 1
-  // Find the payment whose ID
-  // matches paymentId.
-  //
-  // find()
-  // Searches the payments array.
-  //
-  // payment
-  // Represents one payment
-  // during the search.
-  const selectedPayment =
-    this.payments.find(
+  constructor(
 
-      payment =>
-        payment.id === paymentId
+    // private
+    // Creates a private variable named http.
 
+    // http
+    // Variable name.
+
+    // :
+    // Separates variable name and type.
+
+    // HttpClient
+    // Type of the injected object.
+
+    private http: HttpClient
+
+  ) { }
+
+
+  // Get all payments from Backend.
+  getPayments(): Observable<Payment[]> {
+
+    // this
+    // Refers to the current PaymentService.
+
+    // http
+    // Our HttpClient object.
+
+    // get()
+    // Sends an HTTP GET request.
+
+    // <Payment[]>
+    // Tells TypeScript:
+    // "Backend should return an array of Payment objects."
+
+    // this.apiUrl
+    // Sends the request to:
+    // https://localhost:7278/api/Payment
+
+    return this.http.get<Payment[]>(
+      this.apiUrl
     );
-
-
-  // STEP 2
-  // Check whether the payment was found.
-  //
-  // if
-  // Checks a condition.
-  //
-  // selectedPayment
-  // Means the payment exists.
-  if (selectedPayment) {
-
-    // STEP 3
-    // Change the payment status.
-    //
-    // selectedPayment
-    // The payment we found.
-    //
-    // .
-    // Accesses a property.
-    //
-    // status
-    // Property we want to change.
-    //
-    // =
-    // Assigns the new value.
-    selectedPayment.status =
-      newStatus;
 
   }
 
 
-  console.log(
-    "Payment Status Updated"
-  );
+  // Update Payment Status.
+  updatePaymentStatus(
 
-}
-deletePayment (paymentId: number): void {
+    // ID of the payment we want to update.
+    paymentId: number,
 
-  // STEP 1
-  this.payments=this.payments.filter(
+    // New status of the payment.
+    newStatus: string
 
-    payment =>
-      payment.id !== paymentId      );
+  ): Observable<any> {
 
-    console.log(
-      "Payment Deleted"
-    );  
-}
+    // Create the object that Backend expects.
+    //
+    // status
+    // Must match the property expected
+    // by UpdatePaymentStatusDto.
+
+    const data = {
+
+      PaymentStatus: newStatus
+
+    };
+
+
+    // Send PUT request to Backend.
+    //
+    // `${}`
+    // Template literal.
+    //
+    // Allows us to insert paymentId
+    // directly into the URL.
+    //
+    // Example:
+    // paymentId = 5
+    //
+    // URL becomes:
+    // /api/Payment/5
+
+    return this.http.put(
+
+      `${this.apiUrl}/${paymentId}`,
+
+      data
+
+    );
+
+  }
+
+
+  // Delete Payment.
+  deletePayment(
+
+    // ID of payment to delete.
+    paymentId: number
+
+  ): Observable<any> {
+
+    // Send DELETE request to Backend.
+    //
+    // Example:
+    // paymentId = 5
+    //
+    // Backend URL:
+    // /api/Payment/5
+
+    return this.http.delete(
+
+      `${this.apiUrl}/${paymentId}`
+
+    );
+
+  }
+
 }
