@@ -13,6 +13,7 @@ import { LoginComponent } from './features/auth/login/login';
 import { RegisterComponent } from './features/auth/register/register';
 import { AdminRestaurants } from './features/admin/admin-restaurants/admin-restaurants';
 import { AdminEditRestaurant } from './features/admin/admin-edit-restaurant/admin-edit-restaurant';
+import { AdminOrderDetails } from './features/admin/admin-order-details/admin-order-details';
 export const routes: Routes = [
 
 {
@@ -95,5 +96,8 @@ export const routes: Routes = [
 path:'admin/edit-restaurant/:id',
 component:AdminEditRestaurant,
 canActivate:[authGuard]
-},
+},{
+  path: 'admin/order-details/:id',
+  component: AdminOrderDetails
+}
 ];

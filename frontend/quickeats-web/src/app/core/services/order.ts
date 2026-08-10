@@ -105,5 +105,16 @@ updateOrderStatus(
   console.log("Order Status Updated");
 
 }
+deleteOrder(orderId: number): void {
 
+  // Create a copy of the current orders.
+  const currentOrders = [...this.customerOrders()];
+
+  // Filter out the order to be deleted.
+  const updatedOrders = currentOrders.filter(
+    order => order.id !== orderId
+  );
+  this.customerOrders.set(updatedOrders);
+  console.log("order deleted successfully");
+}
 }

@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import {Router} from '@angular/router';
 // Controls the Admin Orders Page.
 
 import { CommonModule } from '@angular/common';import { FormsModule } from '@angular/forms';
@@ -46,7 +47,8 @@ export class AdminOrders {
     //
     // Angular automatically creates
     // the OrderService object and gives it here.
-    private orderService: OrderService
+    private orderService: OrderService,
+    private router: Router
 
   ) {
 
@@ -108,5 +110,28 @@ updateStatus(
   this.loadOrders();
 
 }
+viewOrder(orderId: number): void {
 
+  // Navigate to the order details page.
+  this.router.navigate(['/admin/order-details', orderId]);
+}
+// Delete selected order.
+deleteOrder(
+
+  // orderId
+  // ID of the order we want to delete.
+  orderId: number
+
+): void {
+
+  // Send the Order ID to OrderService.
+  this.orderService.deleteOrder(
+    orderId
+  );
+
+  // Reload the order list
+  // after deletion.
+  this.loadOrders();
+
+}
 }

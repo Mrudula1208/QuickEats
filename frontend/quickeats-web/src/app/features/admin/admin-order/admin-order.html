@@ -136,145 +136,125 @@
             </p>
 
 
-            <!-- Order Status -->
-
-           <!--
-  Display current Order Status.
--->
+     <!-- Order Status -->
 
 <p>
 
-  <strong>Status:</strong>
+    <!--
+        strong
+        Makes the label bold.
 
-  {{ order.status }}
+        {{ order.status }}
+        Displays the current order status.
+    -->
+
+    <strong>
+        Status:
+    </strong>
+
+    {{ order.status }}
 
 </p>
 
 
 <!--
-  select
+    View Details Button.
 
-  Creates a dropdown list.
+    (click)
+    Runs a TypeScript method when clicked.
 
-  [(ngModel)]
+    order.id
+    Sends the selected order's ID.
+-->
 
-  Two-way data binding.
+<button
+    (click)="viewOrder(order.id)"
+>
+    View Details
+</button>
 
-  It means:
 
-  HTML value
-       ↕
-  TypeScript value
+<!--
+    select
+    Creates a dropdown list.
 
-  selectedStatus
+    [(ngModel)]
+    Two-way binding.
 
-  Stores the status selected
-  by the Admin.
+    It connects the dropdown value
+    with order.status.
+
+    So when Admin changes the dropdown,
+    order.status changes automatically.
 -->
 
 <select
-  [(ngModel)]="order.status"
+    [(ngModel)]="order.status"
 >
 
-  <option value="Pending">
-    Pending
-  </option>
+    <!--
+        option
+        Creates one option inside the dropdown.
 
-  <option value="Confirmed">
-    Confirmed
-  </option>
+        value
+        Is the actual value sent/stored.
+    -->
 
-  <option value="Preparing">
-    Preparing
-  </option>
+    <option value="Pending">
+        Pending
+    </option>
 
-  <option value="Out for Delivery">
-    Out for Delivery
-  </option>
+    <option value="Confirmed">
+        Confirmed
+    </option>
 
-  <option value="Delivered">
-    Delivered
-  </option>
+    <option value="Preparing">
+        Preparing
+    </option>
 
-  <option value="Cancelled">
-    Cancelled
-  </option>
+    <option value="Out for Delivery">
+        Out for Delivery
+    </option>
+
+    <option value="Delivered">
+        Delivered
+    </option>
+
+    <option value="Cancelled">
+        Cancelled
+    </option>
 
 </select>
 
 
 <!--
-  (click)
+    Update Status Button.
 
-  Angular event binding.
+    order.id
+    Sends the selected order ID.
 
-  When Admin clicks this button,
-
-  updateStatus()
-
-  method runs in admin-order.ts.
-
-  order.id
-  sends the selected Order ID.
+    order.status
+    Sends the newly selected status.
 -->
 
 <button
-  (click)="updateStatus(order.id, order.status)"
+    (click)="updateStatus(order.id, order.status)"
 >
-
-  Update Status
-
+    Update Status
 </button>
-            <!-- Estimated Delivery -->
+<!--
+    Delete Order Button.
 
-            <p>
+    order.id
+    Sends the ID of the order
+    that the Admin wants to delete.
+-->
 
-                <strong>
-                    Estimated Delivery:
-                </strong>
-
-                {{order.estimatedDeliveryTime}}
-
-            </p>
-
-
-            <!-- Order Date -->
-
-            <p>
-
-                <strong>
-                    Date:
-                </strong>
-
-                {{order.date | date:'medium'}}
-
-            </p>
-
-
-            <!--
-                Items
-
-                order.items
-                Contains food items inside this order.
-
-                We can display them later
-                after checking the exact structure
-                of your items.
-            -->
-
-            <h3>
-                Items
-            </h3>
-
-
-            @for (item of order.items; track $index) {
-
-                <p>
-                    {{item}}
-                </p>
-
-            }
-
+<button
+    (click)="deleteOrder(order.id)"
+>
+    Delete
+</button>
         </div>
 
     }
