@@ -168,4 +168,8 @@ updatePaymentStatus(
   );
 
 }
+deletepayment(paymentId: number): void {
+  this.paymentService.deletePayment(paymentId);
+  this.loadPayments();
+  console.log("Payment Deleted");
 }

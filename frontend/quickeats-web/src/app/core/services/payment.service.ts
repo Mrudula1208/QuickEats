@@ -92,4 +92,16 @@ updatePaymentStatus(
   );
 
 }
+deletePayment (paymentId: number): void {
+
+  // STEP 1
+  this.payments=this.payments.filter(
+
+    payment =>
+      payment.id !== paymentId      );
+
+    console.log(
+      "Payment Deleted"
+    );  
+}
 }
