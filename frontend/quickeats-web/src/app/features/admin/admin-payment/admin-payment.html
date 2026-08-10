@@ -1,0 +1,210 @@
+<h1>
+  Admin Payments
+</h1>
+
+
+<!--
+  @if
+
+  Checks whether the payments array
+  contains zero payments.
+
+  payments.length
+  Gives the number of payments.
+
+  ===
+  Means strictly equal to.
+
+  0
+  Means there are no payments.
+-->
+
+@if (payments.length === 0) {
+
+  <h2>
+    No Payments Found
+  </h2>
+
+}
+
+
+@else {
+
+  <!--
+    @for
+
+    Repeats this HTML for every payment.
+
+    payment
+    Represents the current payment.
+
+    payments
+    Is our complete Payment[] array.
+
+    track payment.id
+    Gives Angular a unique ID
+    for each payment.
+  -->
+
+  @for (payment of payments; track payment.id) {
+
+    <div class="payment-card">
+
+
+      <!-- Payment ID -->
+
+      <h2>
+
+        Payment #{{ payment.id }}
+
+      </h2>
+
+
+      <!-- Order ID -->
+
+      <p>
+
+        <strong>
+          Order:
+        </strong>
+
+        {{ payment.orderId }}
+
+      </p>
+
+
+      <!-- Amount -->
+
+      <p>
+
+        <strong>
+          Amount:
+        </strong>
+
+        ₹{{ payment.amount }}
+
+      </p>
+
+
+      <!-- Payment Method -->
+
+      <p>
+
+        <strong>
+          Method:
+        </strong>
+
+        {{ payment.method }}
+
+      </p>
+
+
+      <!-- Payment Status -->
+
+      <p>
+
+        <strong>
+          Status:
+        </strong>
+
+        {{ payment.status }}
+
+      </p>
+<!--
+  Display current payment status.
+-->
+
+<p>
+
+  <strong>
+    Status:
+  </strong>
+
+  {{ payment.status }}
+
+</p>
+
+
+<!--
+  select
+  Creates a dropdown.
+
+  [(ngModel)]
+  Two-way binding.
+
+  It connects the dropdown
+  with payment.status.
+-->
+
+<select
+  [(ngModel)]="payment.status"
+>
+
+  <!--
+    option
+    Creates one dropdown option.
+
+    value
+    Is the actual value stored.
+  -->
+
+  <option value="Pending">
+    Pending
+  </option>
+
+  <option value="Success">
+    Success
+  </option>
+
+  <option value="Failed">
+    Failed
+  </option>
+
+  <option value="Refunded">
+    Refunded
+  </option>
+
+</select>
+
+
+<!--
+  (click)
+  Runs updatePaymentStatus()
+  when Admin clicks the button.
+
+  payment.id
+  Sends the selected Payment ID.
+
+  payment.status
+  Sends the newly selected status.
+-->
+
+<button
+  (click)="updatePaymentStatus(
+    payment.id,
+    payment.status
+  )"
+>
+
+  Update Status
+
+</button>
+
+      <!-- Payment Date -->
+
+      <p>
+
+        <strong>
+          Date:
+        </strong>
+
+        {{ payment.date | date:'medium' }}
+
+      </p>
+
+
+    </div>
+
+  }
+
+}

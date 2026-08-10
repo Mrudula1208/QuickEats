@@ -14,6 +14,7 @@ import { RegisterComponent } from './features/auth/register/register';
 import { AdminRestaurants } from './features/admin/admin-restaurants/admin-restaurants';
 import { AdminEditRestaurant } from './features/admin/admin-edit-restaurant/admin-edit-restaurant';
 import { AdminOrderDetails } from './features/admin/admin-order-details/admin-order-details';
+import { AdminPaymentDetailsComponent } from './features/admin/admin-payment-details/admin-payment-details';
 export const routes: Routes = [
 
 {
@@ -99,5 +100,12 @@ canActivate:[authGuard]
 },{
   path: 'admin/order-details/:id',
   component: AdminOrderDetails
-}
+},
+{ path: 'admin/payment-details/:id',
+
+  // component
+  // Opens AdminPaymentDetailsComponent
+  // when this URL is visited.
+  component: AdminPaymentDetailsComponent
+
 ];

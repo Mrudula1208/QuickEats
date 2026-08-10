@@ -1,0 +1,91 @@
+<h1>
+  Payment Details
+</h1>
+
+
+<!--
+  @if
+
+  Checks whether payment exists.
+
+  payment
+  Contains the selected Payment object.
+-->
+
+@if (payment) {
+
+  <div class="payment-details">
+
+
+    <!--
+      {{ }}
+
+      Angular interpolation.
+
+      Takes a value from TypeScript
+      and displays it in HTML.
+    -->
+
+    <h2>
+      Payment #{{ payment.id }}
+    </h2>
+
+
+    <p>
+
+      <strong>
+        Order ID:
+      </strong>
+
+      {{ payment.orderId }}
+
+    </p>
+
+
+    <p>
+
+      <strong>
+        Amount:
+      </strong>
+
+      ₹{{ payment.amount }}
+
+    </p>
+
+
+    <p>
+
+      <strong>
+        Payment Method:
+      </strong>
+
+      {{ payment.method }}
+
+    </p>
+
+
+    <p>
+
+      <strong>
+        Status:
+      </strong>
+
+      {{ payment.status }}
+
+    </p>
+
+
+    <p>
+
+      <strong>
+        Date:
+      </strong>
+
+      {{ payment.date | date:'medium' }}
+
+    </p>
+
+
+  </div>
+
+}
