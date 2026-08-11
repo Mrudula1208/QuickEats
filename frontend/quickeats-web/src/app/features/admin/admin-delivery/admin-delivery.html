@@ -143,5 +143,19 @@
     Delivered
   </option>
 
-</select>
+</select><!--
+  Delete Delivery Button.
+
+  (click)
+  Runs deleteDelivery() when clicked.
+
+  delivery.id
+  Sends the selected Delivery ID.
+-->
+
+<button
+  (click)="deleteDelivery(delivery.id)"
+>
+  Delete
+</button>
 }

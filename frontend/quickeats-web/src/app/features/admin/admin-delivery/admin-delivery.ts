@@ -10,7 +10,7 @@ import { DeliveryService } from '../../../core/services/delivery.service';
 // DeliveryService
 // Used to call Delivery APIs.
 
-import { OrderDeliveryResponse } from '../../../core/models/order-delivery-response.model';
+import { OrderDeliveryResponse } from '../../../core/models/delivery.model';
 // OrderDeliveryResponse
 // Defines the structure of delivery data coming from Backend.
 
@@ -168,6 +168,54 @@ updateDeliveryStatus(
 
         // STEP 3
         // Load latest delivery data
+        // from Backend.
+
+        this.loadDeliveries();
+
+      },
+
+      // Backend/API error.
+
+      error: (err: any) => {
+
+        console.log(err);
+
+      }
+
+    });
+
+}// Delete Delivery.
+deleteDelivery(
+
+  // ID of the delivery we want to delete.
+  deliveryId: number
+
+): void {
+
+  // STEP 1
+  // Call DeliveryService.
+  //
+  // deleteDelivery()
+  // Sends DELETE request to Backend.
+
+  this.deliveryService
+    .deleteDelivery(deliveryId)
+
+    // STEP 2
+    // Wait for Backend response.
+
+    .subscribe({
+
+      // Backend successfully deleted delivery.
+
+      next: () => {
+
+        console.log(
+          "Delivery Deleted Successfully"
+        );
+
+        // STEP 3
+        // Load the latest delivery list
         // from Backend.
 
         this.loadDeliveries();

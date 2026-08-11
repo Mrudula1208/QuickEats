@@ -1,15 +1,30 @@
-export interface ReviewModel{
+export interface Review {
 
-    reviewId:number;
+  // Unique ID of this review.
+  id: number;
 
-    customerName:string;
+  // ID of the customer who wrote the review.
+  customerId: number;
 
-    restaurantName:string;
+  // Name of the customer.
+  customerName: string;
 
-    rating:number;
+  // ID of the restaurant being reviewed.
+  restaurantId: number;
 
-    reviewMessage:string;
+  // Name of the restaurant.
+  restaurantName: string;
 
-    reviewDate:Date;
+  // Rating given by the customer.
+  //
+  // Example:
+  // 1, 2, 3, 4, or 5
+  rating: number;
+
+  // Text written by the customer.
+  comment: string;
+
+  // Date when the review was created.
+  date: Date;
 
 }

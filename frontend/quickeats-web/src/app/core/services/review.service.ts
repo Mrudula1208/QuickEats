@@ -1,28 +1,89 @@
-import { Injectable, signal } from '@angular/core';
-// Import Injectable because this is an Angular Service.
-// Import signal because reviews can change dynamically.
+import { Injectable } from '@angular/core';
+// Injectable
+// Tells Angular this is a Service
+// that Angular can create automatically.
 
-import { ReviewModel } from '../models/review.model';
-// Import Review Model.
-import {Observable} from 'rxjs';
-import {HttpClient} from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
+// HttpClient
+// Used to send HTTP requests to ASP.NET Core.
+
+import { Observable } from 'rxjs';
+// Observable
+// Represents the response that comes later
+// from the Backend.
+
+import { Review } from '../models/review.model';
+// Review
+// Defines the structure of one Review.
+
+
 @Injectable({
+  // providedIn
+  // Tells Angular where the Service is available.
 
-providedIn:'root'
-// Angular creates only one ReviewService.
+  // 'root'
+  // Creates one shared instance
+  // of ReviewService.
 
+  providedIn: 'root'
 })
+
+
 export class ReviewService {
-    private apiUrl = 'http://localhost:8080/reviews';
-    constructor(private http: HttpClient) { }
 
-    getReviews (): Observable<ReviewModel[]> {
-        return this.http.get<ReviewModel[]>(this.apiUrl);
-}
+  // Backend Review API URL.
+  //
+  // private
+  // Means this variable is used only
+  // inside this Service.
 
-addReviews(review :ReviewModel): Observable<ReviewModel> {{
-    // "Go to this URL, send this object, save it, and return the saved object."
-    return this.http.post<ReviewModel>(this.apiUrl, review);
-}
-}
+  private apiUrl =
+    'https://localhost:7278/api/Review';
+
+
+  constructor(
+
+    // http
+    // Variable name.
+
+    // HttpClient
+    // Type of the variable.
+
+    private http: HttpClient
+
+  ) { }
+
+
+  // Get all Reviews.
+  getReviews(): Observable<Review[]> {
+
+    // GET
+    // Reads Reviews from Backend.
+
+    return this.http.get<Review[]>(
+      this.apiUrl
+    );
+
+  }
+
+
+  // Delete one Review.
+  deleteReview(
+
+    // ID of Review to delete.
+    reviewId: number
+
+  ): Observable<any> {
+
+    // DELETE
+    // Removes Review from Backend.
+
+    return this.http.delete(
+
+      `${this.apiUrl}/${reviewId}`
+
+    );
+
+  }
+
 }

@@ -1,0 +1,147 @@
+<h1>
+  Admin Reviews
+</h1>
+
+
+<!--
+  @if
+
+  Checks whether there are no reviews.
+
+  reviews.length
+  Gives the number of reviews.
+
+  ===
+  Means strictly equal to.
+
+  0
+  Means there are no reviews.
+-->
+
+@if (reviews.length === 0) {
+
+  <h2>
+    No Reviews Found
+  </h2>
+
+}
+
+
+@else {
+
+
+  <!--
+    @for
+
+    Repeats the HTML for every review.
+
+    review
+    Represents the current review.
+
+    reviews
+    Is the complete reviews array.
+
+    track review.id
+    Gives Angular a unique ID
+    for every review.
+  -->
+
+  @for (
+    review of reviews;
+    track review.id
+  ) {
+
+
+    <div class="review-card">
+
+
+      <!-- Review ID -->
+
+      <h2>
+
+        Review #{{ review.id }}
+
+      </h2>
+
+
+      <!-- Customer -->
+
+      <p>
+
+        <strong>
+          Customer:
+        </strong>
+
+        {{ review.customerName }}
+
+      </p>
+
+
+      <!-- Restaurant -->
+
+      <p>
+
+        <strong>
+          Restaurant:
+        </strong>
+
+        {{ review.restaurantName }}
+
+      </p>
+
+
+      <!-- Rating -->
+
+      <p>
+
+        <strong>
+          Rating:
+        </strong>
+
+        {{ review.rating }} / 5
+
+      </p>
+
+
+      <!-- Comment -->
+
+      <p>
+
+        <strong>
+          Comment:
+        </strong>
+
+        {{ review.comment }}
+
+      </p>
+
+
+      <!-- Date -->
+
+      <p>
+
+        <strong>
+          Date:
+        </strong>
+
+        {{ review.date | date:'medium' }}
+
+      </p>
+
+
+      <!-- Delete -->
+
+      <button
+        (click)="deleteReview(review.id)"
+      >
+
+        Delete
+
+      </button>
+
+
+    </div>
+
+  }
+
+}
