@@ -1,0 +1,147 @@
+<h1>
+  Admin Delivery Management
+</h1>
+
+
+<!--
+  @if
+
+  Checks whether there are no deliveries.
+
+  deliveries.length
+  Gives the number of deliveries.
+
+  ===
+  Means strictly equal to.
+
+  0
+  Means no deliveries exist.
+-->
+
+@if (deliveries.length === 0) {
+
+  <h2>
+    No Deliveries Found
+  </h2>
+
+}
+
+
+@else {
+
+  <!--
+    @for
+
+    Repeats the HTML for every delivery.
+
+    delivery
+    Represents the current delivery.
+
+    deliveries
+    Is the complete deliveries array.
+
+    track delivery.id
+    Gives Angular a unique ID
+    for every delivery.
+  -->
+
+  @for (
+    delivery of deliveries;
+    track delivery.id
+  ) {
+
+    <div class="delivery-card">
+
+
+      <!-- Delivery ID -->
+
+      <h2>
+
+        Delivery #{{ delivery.id }}
+
+      </h2>
+
+
+      <!-- Order ID -->
+
+      <p>
+
+        <strong>
+          Order ID:
+        </strong>
+
+        {{ delivery.orderId }}
+
+      </p>
+
+
+      <!-- Delivery Partner ID -->
+
+      <p>
+
+        <strong>
+          Delivery Partner:
+        </strong>
+
+        {{ delivery.deliveryPartnerId }}
+
+      </p>
+
+
+      <!-- Delivery Status -->
+
+      <p>
+
+        <strong>
+          Status:
+        </strong>
+
+        {{ delivery.deliveryStatus }}
+
+      </p>
+
+
+      <!-- Assigned Date -->
+
+      <p>
+
+        <strong>
+          Assigned At:
+        </strong>
+
+        {{ delivery.assignedAt | date:'medium' }}
+
+      </p>
+
+
+    </div>
+
+  }
+<!-- Delivery Status Dropdown -->
+
+<select
+  [value]="delivery.deliveryStatus"
+  (change)="updateDeliveryStatus(
+    delivery.id,
+    $any($event.target).value
+  )"
+>
+
+  <option value="Assigned">
+    Assigned
+  </option>
+
+  <option value="Picked Up">
+    Picked Up
+  </option>
+
+  <option value="Out For Delivery">
+    Out For Delivery
+  </option>
+
+  <option value="Delivered">
+    Delivered
+  </option>
+
+</select>
+}
