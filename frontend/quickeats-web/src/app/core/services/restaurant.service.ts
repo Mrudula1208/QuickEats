@@ -60,7 +60,9 @@ private apiUrl = 'https://localhost:7278/api/Restaurant';
 
 }
 
-
-    
+// Toggle restaurant active/inactive status.
+toggleStatus(id: number): Observable<any> {
+  return this.http.patch(`${this.apiUrl}/${id}/toggle-status`, {});
+}
   }
 

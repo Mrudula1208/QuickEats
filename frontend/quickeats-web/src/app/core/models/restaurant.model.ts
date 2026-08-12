@@ -21,6 +21,15 @@ export interface Restaurant {
   // Restaurant Active Status
   isActive: boolean;
 
+  // Opening Time (HH:mm format)
+  openingTime: string;
+
+  // Closing Time (HH:mm format)
+  closingTime: string;
+
+  // Computed on server based on current time
+  isOpenNow: boolean;
+
   // Created Date
   createdAt: string;
 

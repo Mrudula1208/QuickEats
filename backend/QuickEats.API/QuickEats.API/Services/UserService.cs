@@ -95,7 +95,7 @@ namespace QuickEats.API.Services
             }
 
             user.ProfileImageUrl = imageUrl;
-            _userRepository.Update(user);
+            await _userRepository.UpdateAsync(user);
             await _userRepository.SaveChangesAsync();
         }
     }

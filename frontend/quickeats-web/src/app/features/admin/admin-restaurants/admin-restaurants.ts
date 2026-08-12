@@ -27,6 +27,18 @@ export class AdminRestaurants {
       }
     });
   }
+
+// Toggle restaurant active status.
+toggleStatus(id: number): void {
+  this.restaurantService.toggleStatus(id).subscribe({
+    next: () => {
+      this.loadRestaurants();
+    },
+    error: (err: any) => {
+      console.error(err);
+    }
+  });
+}
 deleteRestaurant(
   id: number
 ): void {

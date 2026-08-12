@@ -12,5 +12,6 @@ namespace QuickEats.API.Services.Interfaces
         Task CreateAsync(CreateRestaurantDto dto, int ownerId); 
         Task UpdateAsync(int id, UpdateRestaurantDto dto);
         Task DeleteAsync(int id);
+        Task ToggleActiveStatusAsync(int id);
     }
 }

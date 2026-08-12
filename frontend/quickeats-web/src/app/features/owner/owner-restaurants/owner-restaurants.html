@@ -39,6 +39,18 @@
 
                 <p>📞 {{ restaurant.phoneNumber }}</p>
 
+                <p>🕐 {{ restaurant.openingTime }} - {{ restaurant.closingTime }}</p>
+
+                <p>
+                    @if (restaurant.isOpenNow) {
+                        <span class="status-open">🟢 Open Now</span>
+                    } @else {
+                        <span class="status-closed">🔴 Closed</span>
+                    }
+                    ·
+                    {{ restaurant.isActive ? 'Active' : 'Inactive' }}
+                </p>
+
                 <div class="actions">
 
                     <button routerLink="/owner/restaurants/{{ restaurant.id }}/edit">
@@ -47,6 +59,10 @@
 
                     <button routerLink="/owner/menu/{{ restaurant.id }}">
                         Manage Menu
+                    </button>
+
+                    <button (click)="toggleStatus(restaurant.id)">
+                        {{ restaurant.isActive ? 'Deactivate' : 'Activate' }}
                     </button>
 
                     <button

@@ -18,14 +18,23 @@
             <p class="description">{{ restaurant.description }}</p>
             <p class="detail">📍 {{ restaurant.address }}</p>
             <p class="detail">📞 {{ restaurant.phoneNumber }}</p>
+            <p class="detail">🕐 {{ restaurant.openingTime }} - {{ restaurant.closingTime }}</p>
             <p class="status-detail">
-              Status: 
+              @if (restaurant.isOpenNow) {
+                <span class="status-open">🟢 Open Now</span>
+              } @else {
+                <span class="status-closed">🔴 Closed</span>
+              }
+              ·
               <span [class.active]="restaurant.isActive" [class.inactive]="!restaurant.isActive">
                 {{ restaurant.isActive ? 'Active' : 'Inactive' }}
               </span>
             </p>
             <div class="card-actions">
               <button (click)="editRestaurant(restaurant)" class="btn-edit">Edit</button>
+              <button (click)="toggleStatus(restaurant.id)" class="btn-toggle">
+                {{ restaurant.isActive ? 'Deactivate' : 'Activate' }}
+              </button>
               <button (click)="deleteRestaurant(restaurant.id)" class="btn-delete">Delete</button>
             </div>
           </div>

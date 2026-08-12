@@ -49,6 +49,12 @@ export class AdminAddRestaurant {
 
     isActive: true,
 
+    openingTime: '09:00',
+
+    closingTime: '22:00',
+
+    isOpenNow: true,
+
     createdAt: ''
 
   };

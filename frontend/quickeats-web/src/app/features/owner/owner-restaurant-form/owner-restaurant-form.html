@@ -103,6 +103,26 @@
         <img [src]="imagePreview" class="image-preview" alt="New Preview">
     }
 
+    <!-- Opening Hours -->
+    <div class="hours-row">
+        <div class="time-group">
+            <label>Opening Time</label>
+            <input
+                type="time"
+                name="openingTime"
+                [(ngModel)]="restaurant.openingTime"
+                required>
+        </div>
+        <div class="time-group">
+            <label>Closing Time</label>
+            <input
+                type="time"
+                name="closingTime"
+                [(ngModel)]="restaurant.closingTime"
+                required>
+        </div>
+    </div>
+
     <button
         class="save-btn"
         type="submit"

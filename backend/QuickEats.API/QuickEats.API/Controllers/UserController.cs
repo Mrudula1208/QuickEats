@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QuickEats.API.DTos.Auth;
+using QuickEats.API.DTos.User;
 using QuickEats.API.Repositories.Interfaces;
 using QuickEats.API.Services.Interfaces;
 using System.Security.Claims;

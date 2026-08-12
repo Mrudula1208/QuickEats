@@ -26,5 +26,10 @@ namespace QuickEats.API.DTos.Restaurant
         // Restaurant Image URL
         [StringLength(500, ErrorMessage = "Image URL cannot exceed 500 characters")]
         public string ImageUrl { get; set; } = string.Empty;
+
+        // Opening hours in "HH:mm" format (24-hour).
+        public string OpeningTime { get; set; } = "09:00";
+
+        public string ClosingTime { get; set; } = "22:00";
     }
 }

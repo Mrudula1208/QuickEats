@@ -19,11 +19,13 @@
 
     <p>📞 {{ restaurant.phoneNumber }}</p>
 
-    @if(restaurant.isActive){
+    <p>🕐 {{ restaurant.openingTime }} - {{ restaurant.closingTime }}</p>
+
+    @if(restaurant.isOpenNow){
 
         <span class="status open">
 
-            🟢 Open
+            🟢 Open Now
 
         </span>
 
@@ -42,6 +44,12 @@
 </div>
 
 <div class="menu-toolbar">
+
+    @if (!restaurant.isOpenNow) {
+        <div class="closed-banner">
+            <p>🔴 This restaurant is currently closed. Ordering is disabled.</p>
+        </div>
+    }
 
     <!-- Search Menu -->
 
@@ -226,6 +234,7 @@
 
             <button
                 class="add-btn"
+                [disabled]="!restaurant.isOpenNow"
                 (click)="addToCart(menu)">
 
                 Add To Cart
@@ -234,6 +243,7 @@
 
             <button
                 class="wishlist-btn"
+                [disabled]="!restaurant.isOpenNow"
                 (click)="addToWishlist(menu)">
 
                 Add To Wishlist

@@ -68,4 +68,16 @@ export class OwnerRestaurantsComponent {
 
   }
 
+  // Toggle restaurant active status.
+  toggleStatus(id: number): void {
+    this.restaurantService.toggleStatus(id).subscribe({
+      next: () => {
+        this.loadRestaurants();
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    });
+  }
+
 }

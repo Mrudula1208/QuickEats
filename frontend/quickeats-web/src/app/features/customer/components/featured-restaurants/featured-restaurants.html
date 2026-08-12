@@ -34,7 +34,7 @@
                 [alt]="restaurant.name">
 
             <!-- Restaurant Status -->
-            @if (restaurant.isActive) {
+            @if (restaurant.isOpenNow) {
                 <span class="discount-badge">
                     🟢 Open
                 </span>
@@ -80,6 +80,10 @@
 
             <p>
                 📞 {{ restaurant.phoneNumber }}
+            </p>
+
+            <p>
+                🕐 {{ restaurant.openingTime }} - {{ restaurant.closingTime }}
             </p>
 
         </div>

@@ -12,7 +12,6 @@ namespace QuickEats.API.Services
 {
     public class RestaurantService : IRestaurantService
     {
-        //Create a private variable named _restaurantRepository that will store a Restaurant Repository object, and once it gets a value, it cannot be changed."
         private readonly IRestaurantRepository _restaurantRepository;
         private readonly IReviewService _reviewService;
 
@@ -22,73 +21,64 @@ namespace QuickEats.API.Services
             _reviewService = reviewService;
         }
 
-        // Converts a stored image value (filename or full path) into a full /uploads/ URL.
         private static string GetImageUrl(string imageUrl)
         {
             if (string.IsNullOrWhiteSpace(imageUrl))
                 return string.Empty;
-
-            // Already a full path
             if (imageUrl.StartsWith("/uploads/"))
                 return imageUrl;
-
-            // Legacy filename only -> prepend /uploads/restaurants/
             return $"/uploads/restaurants/{imageUrl}";
+        }
+
+        // Check if current time falls within opening and closing hours.
+        private static bool ComputeIsOpenNow(string openingTime, string closingTime, bool isActive)
+        {
+            if (!isActive)
+                return false;
+
+            if (TimeOnly.TryParse(openingTime, out var open) &&
+                TimeOnly.TryParse(closingTime, out var close))
+            {
+                var now = TimeOnly.FromDateTime(DateTime.Now);
+
+                // Normal hours: e.g. 09:00 to 22:00
+                if (open < close)
+                {
+                    return now >= open && now <= close;
+                }
+                // Overnight hours: e.g. 22:00 to 06:00
+                else
+                {
+                    return now >= open || now <= close;
+                }
+            }
+
+            // If times are invalid, fall back to just checking IsActive.
+            return isActive;
         }
 
         public async Task<IEnumerable<RestaurantResponseDto>> GetAllAsync()
         {
-            // Ask Repository to fetch data from database
             var restaurants = await _restaurantRepository.GetAllAsync();
-
-            // Create an empty list of Response DTOs. We don't return Entity directly.
             var response = new List<RestaurantResponseDto>();
-
-            // Convert every Restaurant Entity into RestaurantResponseDto.
 
             foreach (var restaurant in restaurants)
             {
                 var rating = await _reviewService.GetAverageRatingAsync(restaurant.Id);
-
-                response.Add(new RestaurantResponseDto
-                {
-                    Id = restaurant.Id,
-                    Name = restaurant.Name,
-                    Description = restaurant.Description,
-                    Address = restaurant.Address,
-                    PhoneNumber = restaurant.PhoneNumber,
-                    ImageUrl = GetImageUrl(restaurant.ImageUrl),
-                    IsActive = restaurant.IsActive,
-                    CreatedAt = restaurant.CreatedAt,
-                    Rating = rating ?? 0
-                });
+                response.Add(MapToDto(restaurant, rating));
             }
             return response;
-
         }
 
         public async Task<PagedResult<RestaurantResponseDto>> GetPagedAsync(int page, int pageSize, string? sortBy, bool sortDesc)
         {
             var pagedResult = await _restaurantRepository.GetPagedAsync(page, pageSize, sortBy, sortDesc);
-
             var response = new List<RestaurantResponseDto>();
 
             foreach (var restaurant in pagedResult.Items)
             {
                 var rating = await _reviewService.GetAverageRatingAsync(restaurant.Id);
-
-                response.Add(new RestaurantResponseDto
-                {
-                    Id = restaurant.Id,
-                    Name = restaurant.Name,
-                    Description = restaurant.Description,
-                    Address = restaurant.Address,
-                    PhoneNumber = restaurant.PhoneNumber,
-                    ImageUrl = GetImageUrl(restaurant.ImageUrl),
-                    IsActive = restaurant.IsActive,
-                    CreatedAt = restaurant.CreatedAt,
-                    Rating = rating ?? 0
-                });
+                response.Add(MapToDto(restaurant, rating));
             }
 
             return new PagedResult<RestaurantResponseDto>
@@ -100,75 +90,36 @@ namespace QuickEats.API.Services
             };
         }
 
-
         public async Task<RestaurantResponseDto?> GetByIdAsync(int id)
         {
             var restaurant = await _restaurantRepository.GetByIdAsync(id);
-            // Ask Repository to find restaurant.
             if (restaurant == null)
             {
                 return null;
             }
 
             var rating = await _reviewService.GetAverageRatingAsync(id);
-
-            //Convert Entity into DTO.
-            return new RestaurantResponseDto
-            {
-                Id = restaurant.Id,
-                Name = restaurant.Name,
-                Description = restaurant.Description,
-                Address = restaurant.Address,
-                PhoneNumber = restaurant.PhoneNumber,
-                ImageUrl = restaurant.ImageUrl,
-                IsActive = restaurant.IsActive,
-                CreatedAt = restaurant.CreatedAt,
-                Rating = rating ?? 0
-            };
+            return MapToDto(restaurant, rating);
         }
 
-        // Get all restaurants owned by one Owner.
         public async Task<IEnumerable<RestaurantResponseDto>> GetByOwnerIdAsync(int ownerId)
         {
             var restaurants = await _restaurantRepository.GetByOwnerIdAsync(ownerId);
-
             var response = new List<RestaurantResponseDto>();
 
             foreach (var restaurant in restaurants)
             {
-                response.Add(new RestaurantResponseDto
-                {
-                    Id = restaurant.Id,
-                    Name = restaurant.Name,
-                    Description = restaurant.Description,
-                    Address = restaurant.Address,
-                    PhoneNumber = restaurant.PhoneNumber,
-                    ImageUrl = GetImageUrl(restaurant.ImageUrl),
-                    IsActive = restaurant.IsActive,
-                    CreatedAt = restaurant.CreatedAt,
-                });
+                response.Add(MapToDto(restaurant, null));
             }
             return response;
         }
 
-
-
-
-        //Create Restaurant 
         public async Task CreateAsync(CreateRestaurantDto dto, int ownerId)
-
-
         {
             if (string.IsNullOrWhiteSpace(dto.Name))
-            {
                 throw new BadRequestException("Restaurant name is required");
-            }
-
-
-            if (string.IsNullOrWhiteSpace(dto.Address)){
+            if (string.IsNullOrWhiteSpace(dto.Address))
                 throw new BadRequestException("Restaurant address is required");
-            }
-
 
             var restaurant = new Restaurant
             {
@@ -179,6 +130,8 @@ namespace QuickEats.API.Services
                 OwnerId = ownerId,
                 ImageUrl = dto.ImageUrl,
                 IsActive = true,
+                OpeningTime = dto.OpeningTime,
+                ClosingTime = dto.ClosingTime,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -186,43 +139,65 @@ namespace QuickEats.API.Services
             await _restaurantRepository.SaveChangesAsync();
         }
 
-
-
-        public async Task UpdateAsync(int id, UpdateRestaurantDto dto) {
+        public async Task UpdateAsync(int id, UpdateRestaurantDto dto)
+        {
             var restaurant = await _restaurantRepository.GetByIdAsync(id);
             if (restaurant == null)
-            {
                 throw new NotFoundException("Restaurant not found");
-            }
-            //Copy updated Name from DTO to Entity.
+
             restaurant.Name = dto.Name;
             restaurant.Description = dto.Description;
             restaurant.Address = dto.Address;
             restaurant.PhoneNumber = dto.PhoneNumber;
             restaurant.ImageUrl = dto.ImageUrl;
+            restaurant.OpeningTime = dto.OpeningTime;
+            restaurant.ClosingTime = dto.ClosingTime;
+
             _restaurantRepository.Update(restaurant);
             await _restaurantRepository.SaveChangesAsync();
-
-
-
-
-
-
         }
-
 
         public async Task DeleteAsync(int id)
         {
             var restaurant = await _restaurantRepository.GetByIdAsync(id);
             if (restaurant == null)
-            {
                 throw new NotFoundException("Restaurant not found");
-            }
-            _restaurantRepository.Delete(restaurant);  
+            _restaurantRepository.Delete(restaurant);
             await _restaurantRepository.SaveChangesAsync();
-
         }
 
+        public async Task ToggleActiveStatusAsync(int id)
+        {
+            var restaurant = await _restaurantRepository.GetByIdAsync(id);
+            if (restaurant == null)
+                throw new NotFoundException("Restaurant not found");
+
+            restaurant.IsActive = !restaurant.IsActive;
+            _restaurantRepository.Update(restaurant);
+            await _restaurantRepository.SaveChangesAsync();
+        }
+
+        // Maps a Restaurant entity to RestaurantResponseDto.
+        private static RestaurantResponseDto MapToDto(Restaurant restaurant, double? rating)
+        {
+            return new RestaurantResponseDto
+            {
+                Id = restaurant.Id,
+                Name = restaurant.Name,
+                Description = restaurant.Description,
+                Address = restaurant.Address,
+                PhoneNumber = restaurant.PhoneNumber,
+                ImageUrl = GetImageUrl(restaurant.ImageUrl),
+                IsActive = restaurant.IsActive,
+                OpeningTime = restaurant.OpeningTime,
+                ClosingTime = restaurant.ClosingTime,
+                IsOpenNow = ComputeIsOpenNow(
+                    restaurant.OpeningTime,
+                    restaurant.ClosingTime,
+                    restaurant.IsActive),
+                CreatedAt = restaurant.CreatedAt,
+                Rating = rating ?? 0
+            };
+        }
     }
-    
 }

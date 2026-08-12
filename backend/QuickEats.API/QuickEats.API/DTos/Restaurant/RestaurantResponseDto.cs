@@ -16,9 +16,14 @@
 
         public bool IsActive { get; set; }
 
-        public DateTime CreatedAt { get; set; }
+        public string OpeningTime { get; set; } = string.Empty;
 
-        // New properties for UI
+        public string ClosingTime { get; set; } = string.Empty;
+
+        // Computed: true if current time is between opening and closing.
+        public bool IsOpenNow { get; set; }
+
+        public DateTime CreatedAt { get; set; }
 
         public double Rating { get; set; }
 
