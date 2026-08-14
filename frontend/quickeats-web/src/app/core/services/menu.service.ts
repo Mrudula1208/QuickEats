@@ -86,6 +86,25 @@ updateMenu(
   );
 
 }
+// Update Menu using a DTO.
+// This matches UpdateMenuDto in C#.
+updateMenuData(
+
+  id: number,
+
+  dto: any
+
+): Observable<MenuItem> {
+
+  return this.http.put<MenuItem>(
+
+    `${this.apiUrl}/${id}`,
+
+    dto
+
+  );
+
+}
 addMenu(
 
   menu: MenuItem

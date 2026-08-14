@@ -3,35 +3,21 @@
 
 <div class="restaurant-banner">
 
-   
-
     <img
         [src]="'assets/images/restaurants/' + restaurant.imageUrl"
         [alt]="restaurant.name">
 
-   
 </div>
-
-
 
 <div class="restaurant-details">
 
-  
-
     <h1>{{ restaurant.name }}</h1>
-
-   
 
     <p>{{ restaurant.description }}</p>
 
-
     <p>📍 {{ restaurant.address }}</p>
 
-   
-
     <p>📞 {{ restaurant.phoneNumber }}</p>
-
-    
 
     @if(restaurant.isActive){
 
@@ -40,8 +26,6 @@
             🟢 Open
 
         </span>
-
-       
 
     }
 
@@ -53,14 +37,63 @@
 
         </span>
 
-      
-
     }
 
 </div>
 
+<div class="menu-toolbar">
 
+    <!-- Search Menu -->
 
+    <input
+        class="search-box"
+        type="text"
+        placeholder="Search menu items..."
+        [(ngModel)]="searchText"
+        (ngModelChange)="applyFilters()">
+
+    <!-- Veg Only Toggle -->
+
+    <label class="veg-toggle">
+
+        <input
+            type="checkbox"
+            [(ngModel)]="vegOnly"
+            (ngModelChange)="applyFilters()">
+
+        Veg Only
+
+    </label>
+
+    <!-- Category Filter -->
+
+    <div class="category-chips">
+
+        <button
+            class="chip"
+            [class.active]="selectedCategory === 'All'"
+            (click)="selectCategory('All')">
+
+            All
+
+        </button>
+
+        @for(category of categories; track category){
+
+            <button
+                class="chip"
+                [class.active]="selectedCategory === category"
+                (click)="selectCategory(category)">
+
+                {{ category }}
+
+            </button>
+
+        }
+
+    </div>
+
+</div>
 
 <div class="menu-title">
 
@@ -68,33 +101,76 @@
 
 </div>
 
-
-
 <div class="menu-grid">
 
-    
-    @for(menu of menus; track menu.id){
-
-  
+    @for(menu of filteredMenus; track menu.id){
 
     <div class="menu-card">
 
         <!-- Menu Image -->
-        <img
-            [src]="'assets/images/menu/' + menu.imageUrl"
-            [alt]="menu.name">
 
-      
+        <div class="menu-image">
+
+            <img
+                [src]="'assets/images/menu/' + menu.imageUrl"
+                [alt]="menu.name">
+
+            <!-- Veg / Non-Veg Badge -->
+
+            <span class="veg-badge"
+                [class.nonveg]="!menu.isVeg">
+
+                @if(menu.isVeg){V}@else{NV}
+
+            </span>
+
+            <!-- Bestseller Badge -->
+
+            @if(menu.isBestseller){
+
+                <span class="bestseller-badge">
+
+                    🔥 Bestseller
+
+                </span>
+
+            }
+
+            <!-- Discount Badge -->
+
+            @if(menu.discountPercent > 0){
+
+                <span class="discount-badge">
+
+                    {{ menu.discountPercent }}% OFF
+
+                </span>
+
+            }
+
+        </div>
 
         <h3>{{ menu.name }}</h3>
 
-       
         <p>{{ menu.description }}</p>
 
-       
-        <h4>₹{{ menu.price }}</h4>
+        <p class="category-tag">{{ menu.category }}</p>
 
-       
+        <div class="price-row">
+
+            <h4>₹{{ getSalePrice(menu) }}</h4>
+
+            @if(menu.discountPercent > 0){
+
+                <span class="old-price">
+
+                    ₹{{ menu.price }}
+
+                </span>
+
+            }
+
+        </div>
 
         @if(menu.isAvailable){
 
@@ -104,7 +180,33 @@
 
             </span>
 
-           
+            <div class="quantity-row">
+
+                <button
+                    (click)="decreaseQuantity(menu.id)">
+
+                    -
+
+                </button>
+
+                <span>{{ getQuantity(menu.id) }}</span>
+
+                <button
+                    (click)="increaseQuantity(menu.id)">
+
+                    +
+
+                </button>
+
+            </div>
+
+            <button
+                class="add-btn"
+                (click)="addToCart(menu)">
+
+                Add To Cart
+
+            </button>
 
         }
 
@@ -112,20 +214,11 @@
 
             <span class="unavailable">
 
-                ❌ Not Available
+                ❌ Out of Stock
 
             </span>
 
-
         }
-
-        <button
-            (click)="addToCart(menu)">
-
-            Add To Cart
-
-        </button>
-
 
     </div>
 
@@ -133,12 +226,22 @@
 
 </div>
 
+@if(filteredMenus.length === 0){
+
+    <div class="no-results">
+
+        <h3>No Menu Items Found</h3>
+
+        <p>Try a different search or filter.</p>
+
+    </div>
+
+}
+
 }
 
 @else {
 
 <h2>Loading Restaurant...</h2>
 
-
 }
-```

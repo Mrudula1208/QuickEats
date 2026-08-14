@@ -99,6 +99,71 @@
     >
 
 
+    <!-- Food Category -->
+
+    <label>
+        Category
+    </label>
+
+    <select
+        name="category"
+        [(ngModel)]="menu.category"
+    >
+
+        <option value="Starters">Starters</option>
+        <option value="Main Course">Main Course</option>
+        <option value="Biryani">Biryani</option>
+        <option value="Pizza">Pizza</option>
+        <option value="Burgers">Burgers</option>
+        <option value="Desserts">Desserts</option>
+        <option value="Beverages">Beverages</option>
+
+    </select>
+
+
+    <!-- Veg / Non-Veg -->
+
+    <label>
+        Veg / Non-Veg
+    </label>
+
+    <select
+        name="isVeg"
+        [(ngModel)]="menu.isVeg"
+    >
+
+        <option [ngValue]="true">Veg</option>
+        <option [ngValue]="false">Non-Veg</option>
+
+    </select>
+
+
+    <!-- Bestseller -->
+
+    <label>
+        Bestseller
+    </label>
+
+    <input
+        type="checkbox"
+        name="isBestseller"
+        [(ngModel)]="menu.isBestseller"
+    >
+
+
+    <!-- Discount Percent -->
+
+    <label>
+        Discount Percent
+    </label>
+
+    <input
+        type="number"
+        name="discountPercent"
+        [(ngModel)]="menu.discountPercent"
+    >
+
+
     <!--
         ngSubmit
 

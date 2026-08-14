@@ -4,7 +4,8 @@
 
 <input
 type="number"
-[(ngModel)]="menu.restaurantId">
+[(ngModel)]="menu.restaurantId"
+disabled>
 
 <input
 type="text"
@@ -21,6 +22,39 @@ type="number"
 <input
 type="text"
 [(ngModel)]="menu.imageUrl">
+
+<select
+[(ngModel)]="menu.category">
+
+<option value="Starters">Starters</option>
+<option value="Main Course">Main Course</option>
+<option value="Biryani">Biryani</option>
+<option value="Pizza">Pizza</option>
+<option value="Burgers">Burgers</option>
+<option value="Desserts">Desserts</option>
+<option value="Beverages">Beverages</option>
+
+</select>
+
+<select
+[(ngModel)]="menu.isVeg">
+
+<option [ngValue]="true">Veg</option>
+<option [ngValue]="false">Non-Veg</option>
+
+</select>
+
+<input
+type="checkbox"
+[(ngModel)]="menu.isAvailable">
+
+<input
+type="checkbox"
+[(ngModel)]="menu.isBestseller">
+
+<input
+type="number"
+[(ngModel)]="menu.discountPercent">
 
 <button
 (click)="updateMenu()">

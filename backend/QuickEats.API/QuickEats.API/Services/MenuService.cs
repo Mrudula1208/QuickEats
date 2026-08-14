@@ -1,4 +1,4 @@
-﻿using QuickEats.API.DTos.Menu;
+using QuickEats.API.DTos.Menu;
 using QuickEats.API.Models;
 using QuickEats.API.Repositories.Interfaces;
 using QuickEats.API.Services.Interfaces;
@@ -30,8 +30,11 @@ namespace QuickEats.API.Services
                     Description = menuItem.Description,
                     Price = menuItem.Price,
                     ImageUrl = menuItem.ImageUrl,
-                    IsAvailable = menuItem.IsAvailable
-                });
+                    IsAvailable = menuItem.IsAvailable,
+                    Category = menuItem.Category,
+                    IsVeg = menuItem.IsVeg,
+                    IsBestseller = menuItem.IsBestseller,
+                    DiscountPercent = menuItem.DiscountPercent});
         }
             return response;
         
@@ -52,8 +55,11 @@ namespace QuickEats.API.Services
                 Description = menuItem.Description,
                 Price = menuItem.Price,
                 ImageUrl = menuItem.ImageUrl,
-                IsAvailable = menuItem.IsAvailable
-            };
+                IsAvailable = menuItem.IsAvailable,
+                    Category = menuItem.Category,
+                    IsVeg = menuItem.IsVeg,
+                    IsBestseller = menuItem.IsBestseller,
+                    DiscountPercent = menuItem.DiscountPercent};
             return response;
         }
 
@@ -71,8 +77,11 @@ namespace QuickEats.API.Services
                     Description = menuItem.Description,
                     Price = menuItem.Price,
                     ImageUrl = menuItem.ImageUrl,
-                    IsAvailable = menuItem.IsAvailable
-                });
+                    IsAvailable = menuItem.IsAvailable,
+                    Category = menuItem.Category,
+                    IsVeg = menuItem.IsVeg,
+                    IsBestseller = menuItem.IsBestseller,
+                    DiscountPercent = menuItem.DiscountPercent});
             }
             return response;
         }
@@ -88,7 +97,11 @@ namespace QuickEats.API.Services
                 Description = dto.Description,
                 Price = dto.Price,
                 ImageUrl = dto.ImageUrl,
-                IsAvailable = dto.IsAvailable
+                IsAvailable = dto.IsAvailable,
+                Category = dto.Category,
+                IsVeg = dto.IsVeg,
+                IsBestseller = dto.IsBestseller,
+                DiscountPercent = dto.DiscountPercent
 
             };
             //ask repo to add the new menu item
@@ -111,6 +124,10 @@ namespace QuickEats.API.Services
             menuItem.Price = dto.Price;
             menuItem.ImageUrl = dto.ImageUrl;
             menuItem.IsAvailable = dto.IsAvailable;
+            menuItem.Category = dto.Category;
+            menuItem.IsVeg = dto.IsVeg;
+            menuItem.IsBestseller = dto.IsBestseller;
+            menuItem.DiscountPercent = dto.DiscountPercent;
 
             _menuRepository.Update(menuItem);
             await _menuRepository.SaveChangesAsync();

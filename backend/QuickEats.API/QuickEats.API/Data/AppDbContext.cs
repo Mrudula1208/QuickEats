@@ -34,6 +34,10 @@ namespace QuickEats.API.Data
                 .Property(m => m.Price)
                 .HasPrecision(18, 2);
 
+            modelBuilder.Entity<MenuItem>()
+                .Property(m => m.DiscountPercent)
+                .HasPrecision(5, 2);
+
             modelBuilder.Entity<Order>()
                 .Property(o => o.TotalAmount)
                 .HasPrecision(18, 2);

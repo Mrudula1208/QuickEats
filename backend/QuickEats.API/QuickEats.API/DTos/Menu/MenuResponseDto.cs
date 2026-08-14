@@ -10,6 +10,11 @@ namespace QuickEats.API.DTos.Menu
         public string Description { get; set; } = string.Empty;
         public decimal Price { get; set; }
         public string ImageUrl { get; set; } = string.Empty;
-        public bool IsAvailable { get; set; } 
+        public bool IsAvailable { get; set; }
+
+        public string Category { get; set; } = string.Empty;
+        public bool IsVeg { get; set; }
+        public bool IsBestseller { get; set; }
+        public decimal DiscountPercent { get; set; }
     }
 }

@@ -76,8 +76,25 @@ export class AdminEditMenu {
 
   updateMenu(): void {
 
+    // Send only the editable fields.
+    // Property names must match
+    // UpdateMenuDto in C#.
+    const dto = {
+
+      Name: this.menu.name,
+      Description: this.menu.description,
+      Price: this.menu.price,
+      ImageUrl: this.menu.imageUrl,
+      IsAvailable: this.menu.isAvailable,
+      Category: this.menu.category,
+      IsVeg: this.menu.isVeg,
+      IsBestseller: this.menu.isBestseller,
+      DiscountPercent: this.menu.discountPercent
+
+    };
+
     this.menuService
-      .updateMenu(this.menu)
+      .updateMenuData(this.menu.id, dto)
       .subscribe({
 
         next: () => {

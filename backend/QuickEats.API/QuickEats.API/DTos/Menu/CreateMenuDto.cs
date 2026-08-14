@@ -1,7 +1,4 @@
-﻿using QuickEats.API.Models;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace QuickEats.API.DTos.Menu
+﻿namespace QuickEats.API.DTos.Menu
 {
     public class CreateMenuDto
         //Used to receive new menu item data from the frontend.
@@ -16,5 +13,10 @@ namespace QuickEats.API.DTos.Menu
         public string ImageUrl { get; set; } = string.Empty;
 
         public bool IsAvailable { get; set; } = true;
+
+        public string Category { get; set; } = "Main Course";
+        public bool IsVeg { get; set; } = true;
+        public bool IsBestseller { get; set; } = false;
+        public decimal DiscountPercent { get; set; } = 0;
     }
 }

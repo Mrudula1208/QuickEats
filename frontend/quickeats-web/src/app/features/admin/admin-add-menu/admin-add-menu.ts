@@ -48,7 +48,15 @@ export class AdminAddMenu {
 
     imageUrl: '',
 
-    isAvailable: true
+    isAvailable: true,
+
+    category: 'Main Course',
+
+    isVeg: true,
+
+    isBestseller: false,
+
+    discountPercent: 0
 
   };
 

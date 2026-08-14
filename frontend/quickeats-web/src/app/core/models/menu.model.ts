@@ -28,4 +28,18 @@ export interface MenuItem {
   // Available or Not
   isAvailable: boolean;
 
+  // Food Category
+  // Example: "Starters", "Main Course", "Desserts"
+  category: string;
+
+  // true = Veg, false = Non-Veg
+  isVeg: boolean;
+
+  // true = Bestseller item
+  isBestseller: boolean;
+
+  // Discount percentage
+  // Example: 10 means 10% off
+  discountPercent: number;
+
 }

@@ -23,7 +23,17 @@ Add Menu
 
 <th>Name</th>
 
+<th>Category</th>
+
+<th>Type</th>
+
 <th>Price</th>
+
+<th>Discount</th>
+
+<th>Bestseller</th>
+
+<th>Status</th>
 
 <th>Restaurant</th>
 
@@ -41,7 +51,53 @@ Add Menu
 
 <td>{{menu.name}}</td>
 
-<td>{{menu.price}}</td>
+<td>{{menu.category}}</td>
+
+<td>
+
+@if(menu.isVeg){
+Veg
+}
+@else{
+Non-Veg
+}
+
+</td>
+
+<td>₹{{menu.price}}</td>
+
+<td>
+
+@if(menu.discountPercent > 0){
+{{menu.discountPercent}}%
+}
+@else{
+-
+}
+
+</td>
+
+<td>
+
+@if(menu.isBestseller){
+✅
+}
+@else{
+-
+}
+
+</td>
+
+<td>
+
+@if(menu.isAvailable){
+Available
+}
+@else{
+Out of Stock
+}
+
+</td>
 
 <td>{{menu.restaurantId}}</td>
 
@@ -65,7 +121,7 @@ Delete
 </td>
 
 </tr>
-o
+
 }
 
 </tbody>
