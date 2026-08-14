@@ -59,7 +59,7 @@
         Payment Method:
       </strong>
 
-      {{ payment.method }}
+      {{ payment.paymentMethod }}
 
     </p>
 
@@ -70,7 +70,7 @@
         Status:
       </strong>
 
-      {{ payment.status }}
+      {{ payment.paymentStatus }}
 
     </p>
 
@@ -81,7 +81,7 @@
         Date:
       </strong>
 
-      {{ payment.date | date:'medium' }}
+      {{ payment.paidAt | date:'medium' }}
 
     </p>
 

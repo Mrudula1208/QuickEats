@@ -10,8 +10,8 @@ import { FormsModule } from '@angular/forms';
 import { ReviewService } from '../../../core/services/review.service';
 // Import ReviewService because all review logic is written there.
 
-import { ReviewModel } from '../../../core/models/review.model';
-// Import ReviewModel because it defines one review object.
+import { Review } from '../../../core/models/review.model';
+// Import Review because it defines one review object.
 
 @Component({
   selector: 'app-reviews',
@@ -27,12 +27,16 @@ import { ReviewModel } from '../../../core/models/review.model';
 export class ReviewsComponent {
 
   // Store all customer reviews.
-  customerReviews: ReviewModel[] = [];
+  customerReviews: Review[] = [];
 
   // Store new review entered by customer.
-  newReview: ReviewModel = {
+  newReview: Review = {
 
-    reviewId: 0,
+    id: 0,
+
+    customerId: 1,
+
+    restaurantId: 1,
 
     customerName: '',
 
@@ -40,9 +44,9 @@ export class ReviewsComponent {
 
     rating: 5,
 
-    reviewMessage: '',
+    comment: '',
 
-    reviewDate: new Date()
+    createdAt: new Date()
 
   };
 
@@ -67,7 +71,7 @@ export class ReviewsComponent {
 
         // next
         // Runs if API Success.
-        next: (data:ReviewModel[]) => {
+        next: (data: Review[]) => {
 
           // data
           // Reviews from Backend.
@@ -79,7 +83,7 @@ export class ReviewsComponent {
 
         // error
         // Runs if API Fails.
-        error: (err:any) => {
+        error: (err: any) => {
 
           console.log(err);
 
@@ -91,16 +95,10 @@ export class ReviewsComponent {
   // Runs when customer clicks Submit Review.
    submitReview(): void {
 
-    // Generate Review Id.
-    this.newReview.reviewId = Date.now();
-
-    // Store Current Date.
-    this.newReview.reviewDate = new Date();
-
     // Go to Backend.
     // Save Review.
     this.reviewService
-      .addReviews(this.newReview)
+      .addReview(this.newReview)
       .subscribe({
 
         // next
@@ -113,7 +111,11 @@ export class ReviewsComponent {
           // Clear Form.
           this.newReview = {
 
-            reviewId: 0,
+            id: 0,
+
+            customerId: 1,
+
+            restaurantId: 1,
 
             customerName: '',
 
@@ -121,9 +123,9 @@ export class ReviewsComponent {
 
             rating: 5,
 
-            reviewMessage: '',
+            comment: '',
 
-            reviewDate: new Date()
+            createdAt: new Date()
 
           };
 
@@ -133,7 +135,7 @@ export class ReviewsComponent {
 
         // error
         // Runs if API Fails.
-        error: (err:any) => {
+        error: (err: any) => {
 
           console.log(err);
 

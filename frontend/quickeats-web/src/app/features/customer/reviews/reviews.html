@@ -25,7 +25,7 @@
         <textarea
             rows="4"
             placeholder="Write your review"
-            [(ngModel)]="newReview.reviewMessage">
+            [(ngModel)]="newReview.comment">
         </textarea>
 
         <button
@@ -39,7 +39,7 @@
 
     <div class="review-list">
 
-        @for(review of customerReviews; track review.reviewId){
+        @for(review of customerReviews; track review.id){
 
         <div class="review-card">
 
@@ -49,11 +49,11 @@
 
             <p>⭐ {{review.rating}} / 5</p>
 
-            <p>{{review.reviewMessage}}</p>
+            <p>{{review.comment}}</p>
 
             <small>
 
-                {{review.reviewDate | date:'mediumDate'}}
+                {{review.createdAt | date:'mediumDate'}}
 
             </small>
 

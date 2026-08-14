@@ -104,6 +104,30 @@ export class PaymentService {
   }
 
 
+  // Create a new payment.
+  addPayment(
+    orderId: number,
+    paymentMethod: string
+  ): Observable<any> {
+
+    // Object sent to Backend.
+    // Property names must match
+    // CreatePaymentDto in C#.
+    const data = {
+      OrderId: orderId,
+      PaymentMethod: paymentMethod
+    };
+
+    // POST
+    // Creates a new payment on Backend.
+    return this.http.post(
+      this.apiUrl,
+      data
+    );
+
+  }
+
+
   // Update Payment Status.
   updatePaymentStatus(
 

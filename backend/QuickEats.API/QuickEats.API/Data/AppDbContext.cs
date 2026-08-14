@@ -26,6 +26,7 @@ namespace QuickEats.API.Data
         public DbSet<RestaurantRating> RestaurantRatings { get; set; }
 
         public DbSet<OrderDelivery> OrderDeliveries { get; set; }
+        public DbSet<Reviews> Reviews { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

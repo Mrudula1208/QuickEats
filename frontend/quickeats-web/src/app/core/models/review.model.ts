@@ -6,11 +6,11 @@ export interface Review {
   // ID of the customer who wrote the review.
   customerId: number;
 
-  // Name of the customer.
-  customerName: string;
-
   // ID of the restaurant being reviewed.
   restaurantId: number;
+
+  // Name of the customer.
+  customerName: string;
 
   // Name of the restaurant.
   restaurantName: string;
@@ -25,6 +25,6 @@ export interface Review {
   comment: string;
 
   // Date when the review was created.
-  date: Date;
+  createdAt: Date;
 
 }

@@ -6,6 +6,8 @@ import { Component } from '@angular/core';
 // will use Angular features such as @if and @for.
 import { CommonModule } from '@angular/common';
 
+import { FormsModule } from '@angular/forms';
+
 // Import PaymentService because
 // PaymentService contains the payment data.
 import { PaymentService } from '../../../core/services/payment.service';
@@ -29,7 +31,8 @@ import { Payment } from '../../../core/models/payment.model';
   // imports
   // Lists modules required by this component.
   imports: [
-    CommonModule
+    CommonModule,
+    FormsModule
   ],
 
   // Connect this TypeScript file

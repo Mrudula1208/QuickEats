@@ -24,6 +24,7 @@ namespace QuickEats.API.Services
                 response.Add(new RestaurantRatingResponseDto
                 {
                     Id = rating.Id,
+                    RestaurantId = rating.RestaurantId,
                     UserId = rating.UserId,
                     Rating = rating.Rating,
                     Review = rating.Review,
@@ -45,6 +46,7 @@ namespace QuickEats.API.Services
             var response = new RestaurantRatingResponseDto
             {
                 Id = rating.Id,
+                RestaurantId = rating.RestaurantId,
                 UserId = rating.UserId,
                 Rating = rating.Rating,
                 Review = rating.Review,
@@ -78,19 +80,20 @@ namespace QuickEats.API.Services
         }
 
 
-       
 
 
-        public async Task AddAsync(CreateRestaurantRatingDto dto)
+
+        public async Task AddAsync(CreateRestaurantRatingDto dto, int userId)
         {
             var rating = new RestaurantRating
             {
                 RestaurantId = dto.RestaurantId,
-                UserId = dto.UserId,
+                UserId = userId,
                 Rating = dto.Rating,
                 Review = dto.Review,
                 CreatedAt = DateTime.UtcNow
             };
+
             await _restaurantRatingRepository.AddAsync(rating);
             await _restaurantRatingRepository.SaveChangesAsync();
         }

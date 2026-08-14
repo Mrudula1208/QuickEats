@@ -12,11 +12,11 @@
 
         <div class="delivery-header">
 
-            <h2>Delivery Partner</h2>
+            <h2>Delivery Information</h2>
 
             <span class="status">
 
-                {{currentDelivery.status}}
+                {{currentDelivery.deliveryStatus}}
 
             </span>
 
@@ -26,11 +26,11 @@
 
             <div class="detail-item">
 
-                <h4>Partner Name</h4>
+                <h4>Order ID</h4>
 
                 <p>
 
-                    {{currentDelivery.partnerName}}
+                    {{currentDelivery.orderId}}
 
                 </p>
 
@@ -38,11 +38,11 @@
 
             <div class="detail-item">
 
-                <h4>Phone Number</h4>
+                <h4>Delivery Partner ID</h4>
 
                 <p>
 
-                    {{currentDelivery.partnerPhone}}
+                    {{currentDelivery.deliveryPartnerId}}
 
                 </p>
 
@@ -50,23 +50,11 @@
 
             <div class="detail-item">
 
-                <h4>Bike Number</h4>
+                <h4>Assigned At</h4>
 
                 <p>
 
-                    {{currentDelivery.bikeNumber}}
-
-                </p>
-
-            </div>
-
-            <div class="detail-item">
-
-                <h4>Estimated Delivery</h4>
-
-                <p>
-
-                    {{currentDelivery.estimatedTime}}
+                    {{currentDelivery.assignedAt | date:'medium'}}
 
                 </p>
 

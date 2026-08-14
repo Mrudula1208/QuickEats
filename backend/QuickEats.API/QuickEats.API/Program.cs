@@ -78,11 +78,16 @@ namespace QuickEats.API
             builder.Services.AddScoped<IRestaurantRatingService, RestaurantRatingService>();
             builder.Services.AddScoped<IOrderDeliveryRepository, OrderDeliveryRepository>();
             builder.Services.AddScoped<IOrderDeliveryService, OrderDeliveryService>();
+            builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
 
+            builder.Services.AddScoped<
+            IDashboardService,
+            DashboardService>();
             builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
             builder.Services.AddScoped<IJwtService, JwtService>();
 
-
+            builder.Services.AddScoped< IReviewRepository,ReviewRepository>();
+            builder.Services.AddScoped< IReviewService,  ReviewService>();
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
                 var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
@@ -100,9 +105,18 @@ namespace QuickEats.API
             });
             builder.Services.AddAuthorization();
            
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngular",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:4200")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
             var app = builder.Build();
-
+            app.UseCors("AllowAngular");
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {

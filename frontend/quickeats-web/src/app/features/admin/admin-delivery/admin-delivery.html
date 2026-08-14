@@ -113,49 +113,45 @@
 
       </p>
 
+      <!-- Delivery Status Dropdown -->
+
+      <select
+        [value]="delivery.deliveryStatus"
+        (change)="updateDeliveryStatus(
+          delivery.id,
+          $any($event.target).value
+        )"
+      >
+
+        <option value="Assigned">
+          Assigned
+        </option>
+
+        <option value="Picked Up">
+          Picked Up
+        </option>
+
+        <option value="Out For Delivery">
+          Out For Delivery
+        </option>
+
+        <option value="Delivered">
+          Delivered
+        </option>
+
+      </select>
+
+      <!--
+        Delete Delivery Button.
+      -->
+
+      <button
+        (click)="deleteDelivery(delivery.id)"
+      >
+        Delete
+      </button>
 
     </div>
 
   }
-<!-- Delivery Status Dropdown -->
-
-<select
-  [value]="delivery.deliveryStatus"
-  (change)="updateDeliveryStatus(
-    delivery.id,
-    $any($event.target).value
-  )"
->
-
-  <option value="Assigned">
-    Assigned
-  </option>
-
-  <option value="Picked Up">
-    Picked Up
-  </option>
-
-  <option value="Out For Delivery">
-    Out For Delivery
-  </option>
-
-  <option value="Delivered">
-    Delivered
-  </option>
-
-</select><!--
-  Delete Delivery Button.
-
-  (click)
-  Runs deleteDelivery() when clicked.
-
-  delivery.id
-  Sends the selected Delivery ID.
--->
-
-<button
-  (click)="deleteDelivery(delivery.id)"
->
-  Delete
-</button>
 }

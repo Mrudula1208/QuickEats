@@ -86,4 +86,23 @@ export class ReviewService {
 
   }
 
+
+  // Add a new Review.
+  addReview(review: Review): Observable<any> {
+
+    // Create the DTO the Backend expects.
+    //
+    // Property names must match
+    // CreateReviewDto in C#.
+
+    const dto = {
+      CustomerId: review.customerId,
+      RestaurantId: review.restaurantId,
+      Rating: review.rating,
+      Comment: review.comment
+    };
+
+    return this.http.post(this.apiUrl, dto);
+  }
+
 }

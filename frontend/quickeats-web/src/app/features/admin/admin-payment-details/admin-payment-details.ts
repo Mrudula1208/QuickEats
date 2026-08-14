@@ -114,33 +114,39 @@ export class AdminPaymentDetails {
     // Get all payments from PaymentService.
     //
     // getPayments()
-    // Returns Payment[].
+    // Returns Observable<Payment[]>.
+    // The API takes time, so we subscribe()
+    // and wait for the response.
 
-    const payments =
-      this.paymentService.getPayments();
+    this.paymentService
+      .getPayments()
+      .subscribe({
 
+        // STEP 3
+        // API Success.
+        // Find the payment whose ID
+        // matches the ID from the URL.
+        //
+        // find()
+        // Searches the array and returns
+        // the matching payment.
 
-    // STEP 3
-    // Find the payment whose ID
-    // matches the ID from the URL.
-    //
-    // find()
-    // Searches the array and returns
-    // the matching payment.
-    //
-    // payment
-    // Represents one payment during the search.
-    //
-    // ===
-    // Strictly compares both values.
+        next: (payments) => {
 
-    this.payment =
-      payments.find(
+          this.payment =
+            payments.find(
+              payment =>
+                payment.id === id
+            )!;
 
-        payment =>
-          payment.id === id
+        },
 
-      )!;
+        // API Failed.
+        error: (err: any) => {
+          console.log(err);
+        }
+
+      });
 
   }
 

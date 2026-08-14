@@ -17,21 +17,17 @@
         public bool IsActive { get; set; }
 
         public DateTime CreatedAt { get; set; }
+
+        // New properties for UI
+
+        public double Rating { get; set; }
+
+        public string DeliveryTime { get; set; } = string.Empty;
+
+        public decimal PriceForTwo { get; set; }
+
+        public string Discount { get; set; } = string.Empty;
+
+        public bool FreeDelivery { get; set; }
     }
 }
-//RestaurantService->GetAllAsync()
-//RestaurantService->GetByIdAsync()
-//RestaurantController->GET APIs
-
-
-//Interview Question
-
-//Why use DTOs instead of Entity?
-
-//Answer:
-
-//Security
-//Hide database structure
-//Validation
-//Clean architecture
-//Independent API contract 

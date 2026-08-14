@@ -94,7 +94,7 @@
           Method:
         </strong>
 
-        {{ payment.method }}
+        {{ payment.paymentMethod }}
 
       </p>
 
@@ -107,7 +107,7 @@
           Status:
         </strong>
 
-        {{ payment.status }}
+        {{ payment.paymentStatus }}
 
       </p>
 <!--
@@ -120,7 +120,7 @@
     Status:
   </strong>
 
-  {{ payment.status }}
+  {{ payment.paymentStatus }}
 
 </p>
 
@@ -133,11 +133,11 @@
   Two-way binding.
 
   It connects the dropdown
-  with payment.status.
+  with payment.paymentStatus.
 -->
 
 <select
-  [(ngModel)]="payment.status"
+  [(ngModel)]="payment.paymentStatus"
 >
 
   <!--
@@ -175,14 +175,14 @@
   payment.id
   Sends the selected Payment ID.
 
-  payment.status
+  payment.paymentStatus
   Sends the newly selected status.
 -->
 
 <button
   (click)="updatePaymentStatus(
     payment.id,
-    payment.status
+    payment.paymentStatus
   )"
 >
 
@@ -198,30 +198,18 @@
           Date:
         </strong>
 
-        {{ payment.date | date:'medium' }}
+        {{ payment.paidAt | date:'medium' }}
 
       </p>
+
+      <button
+        (click)="deletePayment(payment.id)"
+      >
+        Delete
+      </button>
 
 
     </div>
 
-  }<!--
-  Delete Payment Button.
-
-  (click)
-  Runs deletePayment()
-  when Admin clicks the button.
-
-  payment.id
-  Sends the ID of the selected payment.
--->
-
-<button
-  (click)="deletePayment(payment.id)"
->
-
-  Delete
-
-</button>
-
+  }
 }

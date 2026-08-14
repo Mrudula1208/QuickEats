@@ -10,7 +10,6 @@ import { CartService } from '../../../core/services/cart.service';
 
 // Import Cart Item model.
 import { CartItem } from '../../../core/models/cart-item.model';
-import { RouterLink } from '@angular/router';
 
 @Component({
 
@@ -18,7 +17,7 @@ import { RouterLink } from '@angular/router';
 
   standalone: true,
 
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
 
   templateUrl: './cart.html',
 

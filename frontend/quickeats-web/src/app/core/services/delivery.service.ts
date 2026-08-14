@@ -57,6 +57,12 @@ export class DeliveryService {
   }
 
 
+  // Get delivery by order ID.
+  getDeliveryByOrderId(orderId: number): Observable<Delivery> {
+    return this.http.get<Delivery>(`${this.apiUrl}/order/${orderId}`);
+  }
+
+
   // Update delivery status.
   updateDeliveryStatus(
 

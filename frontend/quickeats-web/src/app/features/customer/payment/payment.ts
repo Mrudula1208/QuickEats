@@ -13,23 +13,14 @@ import { Router } from '@angular/router';
 // Checkout data service.
 import { CheckoutDataService } from '../../../core/services/checkout-data.service';
 
-// Order model.
-import { OrderModel } from '../../../core/models/order.model';
-
 // Order service.
 import { OrderService } from '../../../core/services/order';
-
-// Payment model.
-import { Payment } from '../../../core/models/payment.model';
 
 // Payment service.
 import { PaymentService } from '../../../core/services/payment.service';
 
 // Cart service.
 import { CartService } from '../../../core/services/cart.service';
-import { Delivery } from '../../../core/models/delivery.model';
-
-import { DeliveryService } from '../../../core/services/delivery.service';
 
 @Component({
   selector: 'app-payment',
@@ -65,8 +56,7 @@ export class PaymentComponent {
     private paymentService: PaymentService,
 
     // Used for page navigation.
-    private router: Router,
-    private deliveryService: DeliveryService,
+    private router: Router
 
   ) {
 
@@ -78,154 +68,106 @@ export class PaymentComponent {
   // Runs when user clicks "Pay Now".
   payNow(): void {
 
-    // Create one unique id.
-    // We use the same id for both
-    // Order and Payment.
-    const orderId = Date.now();
+    // Take the restaurant id from the first cart item.
+    const restaurantId =
+      this.checkoutData.cartItems[0].menu.restaurantId;
 
-    // Create Order object.
- const order: OrderModel = {
+    // Build the order items the Backend expects.
+    // Property names must match CreateOrderDto
+    // and OrderItemDto in C#.
+    const items =
+      this.checkoutData.cartItems.map(item => ({
+        MenuItemId: item.menu.id,
+        Quantity: item.quantity
+      }));
 
-  id: orderId,
+    // Create the Order on the Backend.
+    this.orderService
+      .createOrder({
+        RestaurantId: restaurantId,
+        Items: items
+      })
+      .subscribe({
 
-  customerName: "Mrudula More",
+        // Order created successfully.
+        next: () => {
 
-  restaurantName: "Quick Eats",
+          // Create the Payment on the Backend.
+          // We need the order id from the URL,
+          // so we load the user's latest order.
+          this.placePayment();
 
-  address: this.checkoutData.address,
+        },
 
-  phone: this.checkoutData.phone,
+        // Order creation failed.
+        error: (err) => {
 
-  items: this.checkoutData.cartItems,
+          console.log(err);
 
-  total: this.checkoutData.total,
+        }
 
-  paymentMethod: this.paymentMethod,
+      });
 
-  status: "Preparing",
-
-  estimatedDeliveryTime: "30 Minutes",
-
-  date: new Date()
-
-};
-
-    // Save order into OrderService.
-    this.orderService.placeOrder(order);
-
-    // Create Payment object.
-    const payment: Payment = {
-
-      // Payment Id.
-      id: orderId,
-
-      // Connected Order Id.
-      orderId: orderId,
-
-      // Total amount paid.
-      amount: order.total,
-
-      // Selected payment method.
-      method: this.paymentMethod,
-
-      // Payment status.
-      status: 'Paid',
-
-      // Payment date.
-      date: new Date()
-
-    };
-
-    // Save payment into PaymentService.
-  // Save payment.
-this.paymentService.savePayment(payment);
-
-// Create Delivery object.
-const delivery: Delivery = {
-
-  id: orderId,
-
-  orderId: orderId,
-
-  partnerName: "Rahul Sharma",
-
-  partnerPhone: "9876543210",
-
-  bikeNumber: "MH12AB1234",
-
-  estimatedTime: "30 Minutes",
-
-  status: "Preparing"
-
-};
-
-// Save Delivery.
-this.deliveryService.updateDelivery(delivery);
-
-// ===== DEBUG =====
-console.log("Delivery Saved");
-console.log(delivery);
-
-console.log("All Deliveries");
-console.log(this.deliveryService.getDelivery());
-// Empty cart.
-this.cartService.clearCart();
-
-// Success message.
-alert("✅ Payment Successful");
-
-// Navigate.
-this.router.navigate(['/payments']);
   }
+
+  // Create the Payment for the order.
+  placePayment(): void {
+
+    // The Backend stores the order for us.
+    // To keep this simple, we look up the most
+    // recent order of the current user.
+    const userId = Number(localStorage.getItem('userId') || 1);
+
+    this.orderService
+      .getUserOrders(userId)
+      .subscribe({
+
+        next: (orders) => {
+
+          // Take the latest order.
+          const latestOrder =
+            orders[orders.length - 1];
+
+          this.paymentService
+            .addPayment(
+              latestOrder.id,
+              this.paymentMethod
+            )
+            .subscribe({
+
+              // Payment saved.
+              next: () => {
+
+                // Empty cart.
+                this.cartService.clearCart();
+
+                // Success message.
+                alert("✅ Payment Successful");
+
+                // Navigate.
+                this.router.navigate(['/orders']);
+
+              },
+
+              // Payment failed.
+              error: (err) => {
+
+                console.log(err);
+
+              }
+
+            });
+
+        },
+
+        error: (err) => {
+
+          console.log(err);
+
+        }
+
+      });
+
+  }
+
 }
-/*
-
-WHY DO WE WRITE THIS FILE?
-
-This component performs the complete
-payment process.
-
-Flow
-
-Cart
-   ↓
-
-Checkout
-   ↓
-
-CheckoutDataService
-   ↓
-
-Payment (THIS FILE)
-   ↓
-
-Create Order Object
-   ↓
-
-Save Order
-   ↓
-
-Create Payment Object
-   ↓
-
-Save Payment
-   ↓
-
-Clear Cart
-   ↓
-
-Payment History
-
-This component:
-
-1. Reads Checkout data.
-2. Displays total amount.
-3. Lets user select payment method.
-4. Creates an Order object.
-5. Saves the Order.
-6. Creates a Payment object.
-7. Saves the Payment.
-8. Clears the shopping cart.
-9. Opens Payment History.
-
-*/

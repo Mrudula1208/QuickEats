@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QuickEats.API.DTos.RestaurantRating;
 using QuickEats.API.Services.Interfaces;
+using System.Security.Claims;
 
 namespace QuickEats.API.Controllers
 {
@@ -47,9 +48,13 @@ return Ok(rating);
 
         [Authorize(Roles = "Customer")]
         [HttpPost]
-        public async Task <IActionResult> Create(CreateRestaurantRatingDto dto)
+        public async Task<IActionResult> Create(CreateRestaurantRatingDto dto)
         {
-            await _restaurantRatingService.AddAsync(dto);
+            var userId = int.Parse(
+                User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            await _restaurantRatingService.AddAsync(dto, userId);
+
             return Ok("Restaurant Rating created successfully.");
         }
         [Authorize(Roles = "Customer")]

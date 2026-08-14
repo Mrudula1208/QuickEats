@@ -21,7 +21,10 @@ namespace QuickEats.API.Controllers
         public async Task<IActionResult> Register(RegisterRequestDto request)
         {
             await _userService.RegisterAsync(request);
-            return Ok("User Registered successfully");
+            return Ok(new
+            {
+                message = "User Registered Successfully"
+            });
         }
         [HttpPost("Login")]
         public async Task<IActionResult> Login(LoginRequestDto request)

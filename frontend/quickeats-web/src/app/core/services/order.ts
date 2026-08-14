@@ -1,13 +1,43 @@
 import { Injectable, signal } from '@angular/core';
 import { OrderModel } from '../models/order.model';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class OrderService {
 
+  // Backend Order API URL.
+  private apiUrl = 'https://localhost:7278/api/Order';
+
+  constructor(private http: HttpClient) { }
+
   // Store all customer orders.
   customerOrders = signal<OrderModel[]>([]);
+
+  // Create a new order on the Backend.
+  createOrder(dto: any): Observable<any> {
+
+    // POST
+    // Sends the order to ASP.NET Core.
+    return this.http.post(this.apiUrl, dto);
+
+  }
+
+  // Get all orders of one customer.
+  getUserOrders(userId: number): Observable<OrderModel[]> {
+
+    return this.http.get<OrderModel[]>(`${this.apiUrl}/user/${userId}`);
+
+  }
+
+  // Get one order by id.
+  getOrderById(id: number): Observable<OrderModel> {
+
+    return this.http.get<OrderModel>(`${this.apiUrl}/${id}`);
+
+  }
 
   // Save newly placed order.
   placeOrder(newOrder: OrderModel): void {

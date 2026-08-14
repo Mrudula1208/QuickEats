@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
 // 2️⃣ Executes Second.
 // Import CommonModule because HTML uses Angular features like @if and @for.
 
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 // 3️⃣ Executes Third.
 // Router helps move the user to another page.
 
@@ -70,9 +70,13 @@ export class DeliveryTrackingComponent {
     // 7️⃣ Angular automatically injects DeliveryService.
     // We never create it using new DeliveryService().
 
-    private router: Router
+    private router: Router,
     // 8️⃣ Angular injects Router.
     // Router helps move between pages.
+
+    private route: ActivatedRoute
+    // 8️⃣ Angular injects ActivatedRoute.
+    // ActivatedRoute helps read URL parameters.
 
   ) {
 
@@ -84,26 +88,21 @@ export class DeliveryTrackingComponent {
   }
 
   loadCurrentDelivery(): void {
-  // 🔟 Executes when constructor calls this method.
-  //
-  // (): void
-  // Means:
-  // This method returns nothing.
-  // It only performs work.
+    const orderId = Number(this.route.snapshot.paramMap.get('orderId'));
+    if (!orderId) {
+      console.error("No orderId parameter in URL");
+      return;
+    }
 
-    this.currentDelivery =
-      this.deliveryService.getDelivery();
-
-    // 1️⃣1️⃣ Executes Next.
-    //
-    // Read latest delivery
-    // from DeliveryService.
-
-    console.log("Current Delivery");
-
-    console.log(this.currentDelivery);
-    // Print delivery information
-    // in browser console.
+    this.deliveryService.getDeliveryByOrderId(orderId).subscribe({
+      next: (data) => {
+        this.currentDelivery = data;
+        console.log("Loaded current delivery:", this.currentDelivery);
+      },
+      error: (err) => {
+        console.error("Failed to load delivery info", err);
+      }
+    });
 
   }
 

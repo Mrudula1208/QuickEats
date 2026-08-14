@@ -15,9 +15,15 @@ payments :Payment[]=[];
   constructor (
     private paymentService:PaymentService
   ){
-    this.payments=this.paymentService.getPayments();
-      console.log("Payment History");
-  console.log(this.payments);
+    this.paymentService.getPayments().subscribe({
+      next: (data) => {
+        this.payments = data;
+        console.log("Payment History", this.payments);
+      },
+      error: (err) => {
+        console.error(err);
+      }
+    });
 
 }
 }
