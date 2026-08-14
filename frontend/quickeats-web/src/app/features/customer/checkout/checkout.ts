@@ -13,6 +13,9 @@ import { Router } from '@angular/router';
 import { CheckoutService } from '../../../core/services/checkout.service';
 // CheckoutService stores checkout information.
 
+import { CheckoutDataService } from '../../../core/services/checkout-data.service';
+// CheckoutDataService passes simple data to the Payment page.
+
 import { CartService } from '../../../core/services/cart.service';
 // CartService gives all cart items and total amount.
 
@@ -40,6 +43,7 @@ customerCartItems = signal<CartItem[]>([]);
 constructor(
   private cartService: CartService,
   private checkoutService: CheckoutService,
+  private checkoutData: CheckoutDataService,
   private router: Router
 ) {
 
@@ -127,6 +131,21 @@ constructor(
     // Save checkout information.
     this.checkoutService
       .saveCheckoutDetails(this.customerCheckout);
+
+    // Pass simple data to the Payment page.
+    this.checkoutData.address =
+      this.customerCheckout.deliveryAddress +
+      (this.customerCheckout.landmark ?
+        ", " + this.customerCheckout.landmark : "");
+
+    this.checkoutData.phone =
+      this.customerCheckout.phoneNumber;
+
+    this.checkoutData.cartItems =
+      this.cartService.cartItems();
+
+    this.checkoutData.total =
+      this.customerCheckout.grandTotal;
 
     // Open Payment Page.
     this.router.navigate(['/payment']);

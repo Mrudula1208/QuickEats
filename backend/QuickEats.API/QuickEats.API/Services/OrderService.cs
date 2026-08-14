@@ -26,6 +26,11 @@ namespace QuickEats.API.Services
                 {
                     Id = order.Id,
                     UserId = order.UserId,
+                    RestaurantId = order.RestaurantId,
+                    RestaurantName = order.Restaurant?.Name ?? "",
+                    DeliveryAddress = order.DeliveryAddress,
+                    PhoneNumber = order.PhoneNumber,
+                    PaymentMethod = order.PaymentMethod,
                     TotalAmount = order.TotalAmount,
                     Status = order.Status,
                     CreatedAt = order.CreatedAt,
@@ -34,6 +39,9 @@ namespace QuickEats.API.Services
                     {
                         MenuItemId = item.MenuItemId,
                         Quantity = item.Quantity,
+                        Name = item.MenuItem?.Name ?? "",
+                        UnitPrice = item.UnitPrice,
+                        TotalPrice = item.TotalPrice
                     }).ToList()
 
                 });
@@ -53,13 +61,21 @@ namespace QuickEats.API.Services
             {
                 Id = order.Id,
                 UserId = order.UserId,
+                RestaurantId = order.RestaurantId,
+                RestaurantName = order.Restaurant?.Name ?? "",
+                DeliveryAddress = order.DeliveryAddress,
+                PhoneNumber = order.PhoneNumber,
+                PaymentMethod = order.PaymentMethod,
                 TotalAmount = order.TotalAmount,
                 Status = order.Status,
                 CreatedAt = order.CreatedAt,
 
                 Items = order.OrderItems.Select(item => new OrderItemDto{
                     MenuItemId = item.MenuItemId,
-                    Quantity = item.Quantity
+                    Quantity = item.Quantity,
+                    Name = item.MenuItem?.Name ?? "",
+                    UnitPrice = item.UnitPrice,
+                    TotalPrice = item.TotalPrice
                 }).ToList()
             };
 
@@ -78,6 +94,11 @@ namespace QuickEats.API.Services
                 {
                     Id = order.Id,
                     UserId = order.UserId,
+                    RestaurantId = order.RestaurantId,
+                    RestaurantName = order.Restaurant?.Name ?? "",
+                    DeliveryAddress = order.DeliveryAddress,
+                    PhoneNumber = order.PhoneNumber,
+                    PaymentMethod = order.PaymentMethod,
                     TotalAmount = order.TotalAmount,
                     Status = order.Status,
                     CreatedAt = order.CreatedAt,
@@ -85,7 +106,10 @@ namespace QuickEats.API.Services
                     Items = order.OrderItems.Select(item => new OrderItemDto
                     {
                         MenuItemId = item.MenuItemId,
-                        Quantity = item.Quantity
+                        Quantity = item.Quantity,
+                        Name = item.MenuItem?.Name ?? "",
+                        UnitPrice = item.UnitPrice,
+                        TotalPrice = item.TotalPrice
                     }).ToList()
                 });
             }
@@ -99,11 +123,15 @@ namespace QuickEats.API.Services
 
 
 
-        public async Task CreateAsync(CreateOrderDto dto,int userId)
+        public async Task<int> CreateAsync(CreateOrderDto dto,int userId)
         {
             var order = new Order
             {
                 UserId = userId,
+                RestaurantId = dto.RestaurantId,
+                DeliveryAddress = dto.DeliveryAddress,
+                PhoneNumber = dto.PhoneNumber,
+                PaymentMethod = dto.PaymentMethod,
                 Status = "Pending",
                 CreatedAt = DateTime.UtcNow
             };
@@ -121,7 +149,16 @@ namespace QuickEats.API.Services
                         $"Menu Item {item.MenuItemId} not found.");
                 }
 
+                // Apply the menu discount if any.
+                decimal discountPercent = menuItem.DiscountPercent;
+
                 decimal unitPrice = menuItem.Price;
+
+                if (discountPercent > 0)
+                {
+                    unitPrice = unitPrice *
+                        (1 - discountPercent / 100);
+                }
 
                 decimal totalPrice =
                     unitPrice * item.Quantity;
@@ -144,6 +181,8 @@ namespace QuickEats.API.Services
             await _orderRepository.AddAsync(order);
             await _orderRepository.SaveChangesAsync();
 
+            // Return the new order id.
+            return order.Id;
         }
 
 

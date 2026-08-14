@@ -82,20 +82,28 @@ export class PaymentComponent {
       }));
 
     // Create the Order on the Backend.
+    // The Backend returns the new order id.
     this.orderService
       .createOrder({
+
         RestaurantId: restaurantId,
+
+        DeliveryAddress: this.checkoutData.address,
+
+        PhoneNumber: this.checkoutData.phone,
+
+        PaymentMethod: this.paymentMethod,
+
         Items: items
+
       })
       .subscribe({
 
         // Order created successfully.
-        next: () => {
+        next: (orderId: number) => {
 
           // Create the Payment on the Backend.
-          // We need the order id from the URL,
-          // so we load the user's latest order.
-          this.placePayment();
+          this.placePayment(orderId);
 
         },
 
@@ -111,55 +119,27 @@ export class PaymentComponent {
   }
 
   // Create the Payment for the order.
-  placePayment(): void {
+  placePayment(orderId: number): void {
 
-    // The Backend stores the order for us.
-    // To keep this simple, we look up the most
-    // recent order of the current user.
-    const userId = Number(localStorage.getItem('userId') || 1);
-
-    this.orderService
-      .getUserOrders(userId)
+    this.paymentService
+      .addPayment(orderId, this.paymentMethod)
       .subscribe({
 
-        next: (orders) => {
+        // Payment saved.
+        next: () => {
 
-          // Take the latest order.
-          const latestOrder =
-            orders[orders.length - 1];
+          // Empty cart.
+          this.cartService.clearCart();
 
-          this.paymentService
-            .addPayment(
-              latestOrder.id,
-              this.paymentMethod
-            )
-            .subscribe({
+          // Success message.
+          alert("✅ Payment Successful");
 
-              // Payment saved.
-              next: () => {
-
-                // Empty cart.
-                this.cartService.clearCart();
-
-                // Success message.
-                alert("✅ Payment Successful");
-
-                // Navigate.
-                this.router.navigate(['/orders']);
-
-              },
-
-              // Payment failed.
-              error: (err) => {
-
-                console.log(err);
-
-              }
-
-            });
+          // Navigate.
+          this.router.navigate(['/orders']);
 
         },
 
+        // Payment failed.
         error: (err) => {
 
           console.log(err);

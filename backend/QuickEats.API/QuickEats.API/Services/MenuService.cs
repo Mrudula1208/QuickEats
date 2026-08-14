@@ -26,6 +26,7 @@ namespace QuickEats.API.Services
                 response.Add(new MenuResponseDto
                 {
                     Id = menuItem.Id,
+                    RestaurantId = menuItem.RestaurantId,
                     Name = menuItem.Name,
                     Description = menuItem.Description,
                     Price = menuItem.Price,
@@ -51,6 +52,7 @@ namespace QuickEats.API.Services
             var response= new MenuResponseDto
             {
                 Id = menuItem.Id,
+                RestaurantId = menuItem.RestaurantId,
                 Name = menuItem.Name,
                 Description = menuItem.Description,
                 Price = menuItem.Price,
@@ -73,6 +75,7 @@ namespace QuickEats.API.Services
                 response.Add(new MenuResponseDto
                 {
                     Id = menuItem.Id,
+                    RestaurantId = menuItem.RestaurantId,
                     Name = menuItem.Name,
                     Description = menuItem.Description,
                     Price = menuItem.Price,
@@ -147,3 +150,4 @@ namespace QuickEats.API.Services
 
     }
 }
+

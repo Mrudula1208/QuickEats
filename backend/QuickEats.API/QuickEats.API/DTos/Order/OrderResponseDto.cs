@@ -4,6 +4,11 @@
     {
         public int Id { get; set; }
         public int UserId { get; set; }
+        public int RestaurantId { get; set; }
+        public string RestaurantName { get; set; } = string.Empty;
+        public string DeliveryAddress { get; set; } = string.Empty;
+        public string PhoneNumber { get; set; } = string.Empty;
+        public string PaymentMethod { get; set; } = string.Empty;
         public decimal TotalAmount { get; set; }
         public string Status { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }

@@ -57,9 +57,10 @@ namespace QuickEats.API.Controllers
             var userId = int.Parse(
                 User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
-            await _orderService.CreateAsync(dto, userId);
+            // Create the order and get its new id.
+            int orderId = await _orderService.CreateAsync(dto, userId);
 
-            return Ok("Order created successfully.");
+            return Ok(orderId);
         }
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]

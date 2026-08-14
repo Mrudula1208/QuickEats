@@ -6,6 +6,7 @@ namespace QuickEats.API.DTos.Menu
     {
         //Used to send menu item data from the backend to the frontend.
         public int Id { get; set; }
+        public int RestaurantId { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public decimal Price { get; set; }
