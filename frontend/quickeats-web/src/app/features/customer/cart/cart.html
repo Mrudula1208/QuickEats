@@ -15,6 +15,12 @@
     }
     @else{
 
+        <h2 class="restaurant-name">
+
+            🏪 {{ restaurantName }}
+
+        </h2>
+
         @for(item of cartItems(); track item.menu.id){
 
         <div class="cart-card">
@@ -29,7 +35,18 @@
 
                 <p>{{ item.menu.description }}</p>
 
-                <h4>₹{{ item.menu.price }}</h4>
+                @if(item.menu.discountPercent > 0){
+
+                    <h4>₹{{ item.menu.price * (1 - item.menu.discountPercent / 100) }}</h4>
+
+                    <span class="old-price">₹{{ item.menu.price }}</span>
+
+                }
+                @else{
+
+                    <h4>₹{{ item.menu.price }}</h4>
+
+                }
 
             </div>
 
@@ -65,17 +82,112 @@
 
         }
 
+        <!-- Coupon Section -->
+
+        <div class="coupon-box">
+
+            <input
+                type="text"
+                placeholder="Enter Coupon Code (SAVE10, FLAT50)"
+                [(ngModel)]="couponInput">
+
+            <button
+                (click)="applyCoupon()">
+
+                Apply
+
+            </button>
+
+            @if(couponMessage){
+
+                <p class="coupon-message">{{ couponMessage }}</p>
+
+            }
+
+        </div>
+
+        <!-- Bill Summary -->
+
+        <div class="bill-summary">
+
+            <div class="bill-row">
+
+                <span>Food Total</span>
+
+                <span>₹{{ getFoodTotal() }}</span>
+
+            </div>
+
+            <div class="bill-row">
+
+                <span>GST (5%)</span>
+
+                <span>₹{{ getGstAmount() }}</span>
+
+            </div>
+
+            <div class="bill-row">
+
+                <span>Platform Fee</span>
+
+                <span>₹{{ getPlatformFee() }}</span>
+
+            </div>
+
+            <div class="bill-row">
+
+                <span>Delivery Fee</span>
+
+                <span>
+
+                    @if(getDeliveryFee() === 0){
+                        FREE
+                    }
+                    @else{
+                        ₹{{ getDeliveryFee() }}
+                    }
+
+                </span>
+
+            </div>
+
+            @if(getCouponDiscount() > 0){
+
+                <div class="bill-row discount">
+
+                    <span>Coupon Discount</span>
+
+                    <span>- ₹{{ getCouponDiscount() }}</span>
+
+                </div>
+
+            }
+
+            <hr>
+
+            <div class="bill-row total">
+
+                <span>Grand Total</span>
+
+                <span>₹{{ getGrandTotal() }}</span>
+
+            </div>
+
+        </div>
+
         <div class="cart-total">
 
-            <h2>
+            <button
+                class="empty-cart-btn"
+                (click)="emptyCart()">
 
-                Total :
+                Empty Cart
 
-                ₹{{ getTotalPrice() }}
+            </button>
 
-            </h2>
-
-            <button>
+            <button
+                class="checkout-btn"
+                (click)="goToCheckout()">
 
                 Proceed To Checkout
 

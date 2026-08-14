@@ -27,7 +27,6 @@ namespace QuickEats.API.Controllers
             var restaurants = await _restaurantService.GetAllAsync();
             return Ok(restaurants);
         }
-        [Authorize(Roles = "Admin,Owner")]
         [HttpGet("{id}")]
 
         public async Task<IActionResult> GetById(int id)

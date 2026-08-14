@@ -86,17 +86,21 @@ constructor(
   // Calculate complete bill.
   calculateBill(): void {
 
-    // Total food amount.
+    // Food total after menu discounts.
     this.customerCheckout.subTotal =
-      this.cartService.getTotalPrice();
+      this.cartService.getFoodTotal();
 
     // GST = 5%
     this.customerCheckout.gstAmount =
-      this.customerCheckout.subTotal * 0.05;
+      this.cartService.getGstAmount();
+
+    // Platform fee.
+    this.customerCheckout.platformFee =
+      this.cartService.getPlatformFee();
 
     // Free delivery above ₹500.
     this.customerCheckout.deliveryCharge =
-      this.customerCheckout.subTotal >= 500 ? 0 : 40;
+      this.cartService.getDeliveryFee();
 
     // Reward points.
     this.customerCheckout.rewardPoints =
