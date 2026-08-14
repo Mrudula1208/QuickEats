@@ -23,6 +23,13 @@ namespace QuickEats.API.Repositories
             return await _context.Restaurants.FirstOrDefaultAsync(r => r.Id == id);
         }
 
+        public async Task<IEnumerable<Restaurant>> GetByOwnerIdAsync(int ownerId)
+        {
+            return await _context.Restaurants
+                .Where(r => r.OwnerId == ownerId)
+                .ToListAsync();
+        }
+
         public async Task  AddAsync(Restaurant restaurant)
         {
             await _context.Restaurants.AddAsync(restaurant);

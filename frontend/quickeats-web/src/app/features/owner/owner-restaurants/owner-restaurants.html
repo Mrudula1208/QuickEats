@@ -1,0 +1,70 @@
+<app-owner-nav></app-owner-nav>
+
+<div class="owner-page">
+
+    <h1>My Restaurants</h1>
+
+    <button
+        class="add-btn"
+        routerLink="/owner/restaurants/new">
+
+        + Add Restaurant
+
+    </button>
+
+    @if(restaurants.length === 0){
+
+        <div class="empty">
+
+            <h2>No Restaurants Yet</h2>
+
+            <p>Add your first restaurant to start taking orders.</p>
+
+        </div>
+
+    }
+    @else{
+
+        <div class="restaurant-grid">
+
+            @for(restaurant of restaurants; track restaurant.id){
+
+            <div class="restaurant-card">
+
+                <h2>{{ restaurant.name }}</h2>
+
+                <p>{{ restaurant.description }}</p>
+
+                <p>📍 {{ restaurant.address }}</p>
+
+                <p>📞 {{ restaurant.phoneNumber }}</p>
+
+                <div class="actions">
+
+                    <button routerLink="/owner/restaurants/{{ restaurant.id }}/edit">
+                        Edit
+                    </button>
+
+                    <button routerLink="/owner/menu/{{ restaurant.id }}">
+                        Manage Menu
+                    </button>
+
+                    <button
+                        class="delete-btn"
+                        (click)="deleteRestaurant(restaurant.id)">
+
+                        Delete
+
+                    </button>
+
+                </div>
+
+            </div>
+
+            }
+
+        </div>
+
+    }
+
+</div>

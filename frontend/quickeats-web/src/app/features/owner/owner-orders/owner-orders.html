@@ -1,0 +1,102 @@
+<app-owner-nav></app-owner-nav>
+
+<div class="owner-page">
+
+    <h1>Orders</h1>
+
+    @if(orders.length === 0){
+
+        <div class="empty">
+
+            <h2>No Orders Yet</h2>
+
+            <p>Orders from your restaurants will appear here.</p>
+
+        </div>
+
+    }
+    @else{
+
+        <div class="order-list">
+
+            @for(order of orders; track order.id){
+
+            <div class="order-card">
+
+                <div class="order-head">
+
+                    <h2>Order #{{ order.id }}</h2>
+
+                    <span class="status">{{ order.status }}</span>
+
+                </div>
+
+                <p>
+                    Restaurant: <strong>{{ order.restaurantName }}</strong>
+                </p>
+
+                <p>
+                    Customer: {{ order.customerName }} •
+                    {{ order.phoneNumber }}
+                </p>
+
+                <p>
+                    Delivery to: {{ order.deliveryAddress }}
+                </p>
+
+                <p>
+                    Payment: {{ order.paymentMethod }} •
+                    ₹{{ order.totalAmount }}
+                </p>
+
+                <div class="items">
+
+                    @for(item of order.items; track item.menuItemId){
+
+                        <p>
+                            {{ item.name }}
+                            × {{ item.quantity }}
+                            — ₹{{ item.totalPrice }}
+                        </p>
+
+                    }
+
+                </div>
+
+                <div class="status-row">
+
+                    <label>Update Status</label>
+
+                    <select
+                        [(ngModel)]="order.status"
+                        name="status-{{ order.id }}">
+
+                        <option value="Pending">Pending</option>
+
+                        <option value="Confirmed">Confirmed</option>
+
+                        <option value="Preparing">Preparing</option>
+
+                        <option value="Out for Delivery">Out for Delivery</option>
+
+                        <option value="Delivered">Delivered</option>
+
+                        <option value="Cancelled">Cancelled</option>
+
+                    </select>
+
+                    <button (click)="updateStatus(order)">
+                        Update
+                    </button>
+
+                </div>
+
+            </div>
+
+            }
+
+        </div>
+
+    }
+
+</div>

@@ -18,6 +18,11 @@ private apiUrl = 'https://localhost:7278/api/Restaurant';
   getRestaurantById(id: number): Observable<Restaurant> {
     return this.http.get<Restaurant>(`${this.apiUrl}/${id}`);
   }
+
+  // Owner: get my own restaurants.
+  getMyRestaurants(): Observable<Restaurant[]> {
+    return this.http.get<Restaurant[]>(`${this.apiUrl}/mine`);
+  }
   addRestaurant(
 
   restaurant: Restaurant

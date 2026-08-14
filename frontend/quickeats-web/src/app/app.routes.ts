@@ -8,7 +8,14 @@ import { OrderDetailsComponent } from './features/customer/order-details/order-d
 import { PaymentComponent } from './features/customer/payment/payment';
 import { PaymentHistoryComponent } from './features/customer/payment-history/payment-history';
 import { DeliveryTrackingComponent } from './features/customer/delivery-tracking/delivery-tracking';
+import { OwnerDashboardComponent } from './features/owner/owner-dashboard/owner-dashboard';
+import { OwnerRestaurantsComponent } from './features/owner/owner-restaurants/owner-restaurants';
+import { OwnerRestaurantFormComponent } from './features/owner/owner-restaurant-form/owner-restaurant-form';
+import { OwnerMenuComponent } from './features/owner/owner-menu/owner-menu';
+import { OwnerMenuItemFormComponent } from './features/owner/owner-menu-item-form/owner-menu-item-form';
+import { OwnerOrdersComponent } from './features/owner/owner-orders/owner-orders';
 import { authGuard } from './guards/auth.guard';
+import { ownerGuard } from './guards/owner.guard';
 import { LoginComponent } from './features/auth/login/login';
 import { RegisterComponent } from './features/auth/register/register';
 import { AdminRestaurants } from './features/admin/admin-restaurants/admin-restaurants';
@@ -107,5 +114,45 @@ canActivate:[authGuard]
   // Opens AdminPaymentDetails
   // when this URL is visited.
   component: AdminPaymentDetails
+},
+{
+  path: 'owner',
+  component: OwnerDashboardComponent,
+  canActivate: [ownerGuard]
+},
+{
+  path: 'owner/restaurants',
+  component: OwnerRestaurantsComponent,
+  canActivate: [ownerGuard]
+},
+{
+  path: 'owner/restaurants/new',
+  component: OwnerRestaurantFormComponent,
+  canActivate: [ownerGuard]
+},
+{
+  path: 'owner/restaurants/:id/edit',
+  component: OwnerRestaurantFormComponent,
+  canActivate: [ownerGuard]
+},
+{
+  path: 'owner/menu/:id',
+  component: OwnerMenuComponent,
+  canActivate: [ownerGuard]
+},
+{
+  path: 'owner/menu/:restaurantId/new',
+  component: OwnerMenuItemFormComponent,
+  canActivate: [ownerGuard]
+},
+{
+  path: 'owner/menu/:restaurantId/:itemId/edit',
+  component: OwnerMenuItemFormComponent,
+  canActivate: [ownerGuard]
+},
+{
+  path: 'owner/orders',
+  component: OwnerOrdersComponent,
+  canActivate: [ownerGuard]
 }
 ];

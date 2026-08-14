@@ -126,6 +126,44 @@ namespace QuickEats.API.Services
 
 
 
+        public async Task<IEnumerable<OrderResponseDto>> GetByOwnerIdAsync(int ownerId)
+        {
+            var orders = await _orderRepository.GetByOwnerIdAsync(ownerId);
+            var response = new List<OrderResponseDto>();
+
+            foreach (var order in orders)
+            {
+                response.Add(new OrderResponseDto
+                {
+                    Id = order.Id,
+                    UserId = order.UserId,
+                    CustomerName = order.User?.Name ?? "",
+                    RestaurantId = order.RestaurantId,
+                    RestaurantName = order.Restaurant?.Name ?? "",
+                    DeliveryAddress = order.DeliveryAddress,
+                    PhoneNumber = order.PhoneNumber,
+                    PaymentMethod = order.PaymentMethod,
+                    TotalAmount = order.TotalAmount,
+                    Status = order.Status,
+                    CreatedAt = order.CreatedAt,
+
+                    Items = order.OrderItems.Select(item => new OrderItemDto
+                    {
+                        MenuItemId = item.MenuItemId,
+                        Quantity = item.Quantity,
+                        Name = item.MenuItem?.Name ?? "",
+                        UnitPrice = item.UnitPrice,
+                        TotalPrice = item.TotalPrice
+                    }).ToList()
+                });
+            }
+
+            return response;
+        }
+
+
+
+
         public async Task<int> CreateAsync(CreateOrderDto dto,int userId)
         {
             var order = new Order

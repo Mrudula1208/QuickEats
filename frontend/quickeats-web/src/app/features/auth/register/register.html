@@ -53,6 +53,22 @@ type="text"
 [(ngModel)]="user.phoneNumber"
 name="phoneNumber">
 
+<label>Register As</label>
+
+<select
+    [(ngModel)]="user.role"
+    name="role">
+
+    <option value="Customer">
+        Customer
+    </option>
+
+    <option value="Owner">
+        Restaurant Owner
+    </option>
+
+</select>
+
 
 
 <button

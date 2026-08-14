@@ -49,6 +49,18 @@ namespace QuickEats.API.Repositories
         .ToListAsync();
 }
 
+      // Orders for all restaurants owned by one Owner.
+      public async Task<List<Order>> GetByOwnerIdAsync(int ownerId)
+{
+    return await _context.Orders
+        .Where(o => o.Restaurant.OwnerId == ownerId)
+        .Include(o => o.User)
+        .Include(o => o.Restaurant)
+        .Include(o => o.OrderItems)
+        .ThenInclude(oi => oi.MenuItem)
+        .ToListAsync();
+}
+
 
         public async Task AddAsync(Order order)
         {

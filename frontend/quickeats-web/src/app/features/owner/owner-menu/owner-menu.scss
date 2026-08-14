@@ -1,0 +1,87 @@
+.owner-page{
+    max-width:1100px;
+    margin:0 auto;
+    padding:40px 20px;
+}
+
+.owner-page h1{
+    font-size:36px;
+    color:#222;
+    margin-bottom:20px;
+}
+
+.add-btn{
+    background:linear-gradient(135deg,#ff7a18,#ff5f00);
+    color:#fff;
+    border:none;
+    padding:12px 24px;
+    border-radius:30px;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+    margin-bottom:30px;
+}
+
+.empty{
+    text-align:center;
+    padding:60px 20px;
+    color:#999;
+}
+
+.menu-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:20px;
+}
+
+.menu-card{
+    background:#fff;
+    border-radius:16px;
+    box-shadow:0 4px 15px rgba(0,0,0,.08);
+    padding:25px;
+}
+
+.menu-card h2{
+    color:#222;
+    margin-bottom:8px;
+}
+
+.menu-card p{
+    color:#666;
+    margin:6px 0;
+}
+
+.price{
+    font-size:20px;
+    font-weight:800;
+    color:#ff5f00;
+}
+
+.discount{
+    background:#ffe0b2;
+    color:#e65100;
+    font-size:12px;
+    padding:3px 8px;
+    border-radius:10px;
+    margin-left:8px;
+}
+
+.actions{
+    display:flex;
+    gap:10px;
+    margin-top:15px;
+}
+
+.actions button{
+    background:#ff7a18;
+    color:#fff;
+    border:none;
+    padding:9px 16px;
+    border-radius:20px;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.actions .delete-btn{
+    background:#d32f2f;
+}

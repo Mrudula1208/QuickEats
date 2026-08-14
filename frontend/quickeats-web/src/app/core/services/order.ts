@@ -44,6 +44,13 @@ export class OrderService {
 
   }
 
+  // Get orders for the Owner's own restaurants.
+  getOwnerOrders(): Observable<OrderModel[]> {
+
+    return this.http.get<OrderModel[]>(`${this.apiUrl}/owner`);
+
+  }
+
   // Update the status of one order (used by Admin / Owner).
   updateOrderStatusApi(id: number, status: string): Observable<any> {
 

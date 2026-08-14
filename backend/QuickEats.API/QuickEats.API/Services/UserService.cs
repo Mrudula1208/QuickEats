@@ -76,6 +76,7 @@ namespace QuickEats.API.Services
             // Return Login Response.
             return new LoginResponseDto
             {
+                Id = user.Id,
                 Token = token,
                 Name = user.Name,
                 Email = user.Email,

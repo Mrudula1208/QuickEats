@@ -11,6 +11,8 @@ namespace QuickEats.API.Repositories.Interfaces
 
         Task<Restaurant?> GetByIdAsync(int id);
 
+        Task<IEnumerable<Restaurant>> GetByOwnerIdAsync(int ownerId);
+
         Task AddAsync(Restaurant restaurant);
 
         void Update(Restaurant restaurant);

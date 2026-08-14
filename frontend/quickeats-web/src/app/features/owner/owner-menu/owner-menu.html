@@ -1,0 +1,83 @@
+<app-owner-nav></app-owner-nav>
+
+<div class="owner-page">
+
+    <h1>Menu Items</h1>
+
+    <button
+        class="add-btn"
+        routerLink="/owner/menu/{{ restaurantId }}/new">
+
+        + Add Menu Item
+
+    </button>
+
+    @if(menuItems.length === 0){
+
+        <div class="empty">
+
+            <h2>No Menu Items</h2>
+
+            <p>Add your first menu item.</p>
+
+        </div>
+
+    }
+    @else{
+
+        <div class="menu-grid">
+
+            @for(item of menuItems; track item.id){
+
+            <div class="menu-card">
+
+                <h2>{{ item.name }}</h2>
+
+                <p>{{ item.description }}</p>
+
+                <p class="price">
+                    ₹{{ item.price }}
+
+                    @if(item.discountPercent > 0){
+                        <span class="discount">
+                            {{ item.discountPercent }}% OFF
+                        </span>
+                    }
+
+                </p>
+
+                <p>
+                    {{ item.category }} •
+                    @if(item.isVeg){
+                        Veg
+                    }
+                    @else{
+                        Non-Veg
+                    }
+                </p>
+
+                <div class="actions">
+
+                    <button routerLink="/owner/menu/{{ restaurantId }}/{{ item.id }}/edit">
+                        Edit
+                    </button>
+
+                    <button
+                        class="delete-btn"
+                        (click)="deleteItem(item.id)">
+
+                        Delete
+
+                    </button>
+
+                </div>
+
+            </div>
+
+            }
+
+        </div>
+
+    }
+
+</div>

@@ -1,0 +1,104 @@
+<app-owner-nav></app-owner-nav>
+
+<div class="owner-page form-page">
+
+    <h1>
+
+        @if(isEdit){
+            Edit Menu Item
+        }
+        @else{
+            Add Menu Item
+        }
+
+    </h1>
+
+    <label>Item Name</label>
+
+    <input
+        type="text"
+        placeholder="Enter Name"
+        [(ngModel)]="item.name">
+
+    <label>Description</label>
+
+    <textarea
+        placeholder="Describe this item"
+        [(ngModel)]="item.description"></textarea>
+
+    <label>Price (₹)</label>
+
+    <input
+        type="number"
+        [(ngModel)]="item.price">
+
+    <label>Image URL</label>
+
+    <input
+        type="text"
+        placeholder="assets/images/menu/..."
+        [(ngModel)]="item.imageUrl">
+
+    <label>Category</label>
+
+    <select [(ngModel)]="item.category">
+
+        <option value="Starters">Starters</option>
+
+        <option value="Main Course">Main Course</option>
+
+        <option value="Beverages">Beverages</option>
+
+        <option value="Desserts">Desserts</option>
+
+    </select>
+
+    <label>Discount %</label>
+
+    <input
+        type="number"
+        [(ngModel)]="item.discountPercent">
+
+    <div class="switch-row">
+
+        <label>
+
+            <input
+                type="checkbox"
+                [(ngModel)]="item.isVeg">
+
+            Veg
+
+        </label>
+
+        <label>
+
+            <input
+                type="checkbox"
+                [(ngModel)]="item.isBestseller">
+
+            Bestseller
+
+        </label>
+
+        <label>
+
+            <input
+                type="checkbox"
+                [(ngModel)]="item.isAvailable">
+
+            Available
+
+        </label>
+
+    </div>
+
+    <button
+        class="save-btn"
+        (click)="saveItem()">
+
+        Save Item
+
+    </button>
+
+</div>

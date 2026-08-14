@@ -73,6 +73,30 @@ namespace QuickEats.API.Services
             };
         }
 
+        // Get all restaurants owned by one Owner.
+        public async Task<IEnumerable<RestaurantResponseDto>> GetByOwnerIdAsync(int ownerId)
+        {
+            var restaurants = await _restaurantRepository.GetByOwnerIdAsync(ownerId);
+
+            var response = new List<RestaurantResponseDto>();
+
+            foreach (var restaurant in restaurants)
+            {
+                response.Add(new RestaurantResponseDto
+                {
+                    Id = restaurant.Id,
+                    Name = restaurant.Name,
+                    Description = restaurant.Description,
+                    Address = restaurant.Address,
+                    PhoneNumber = restaurant.PhoneNumber,
+                    ImageUrl = restaurant.ImageUrl,
+                    IsActive = restaurant.IsActive,
+                    CreatedAt = restaurant.CreatedAt,
+                });
+            }
+            return response;
+        }
+
 
 
 

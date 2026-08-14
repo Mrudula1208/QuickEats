@@ -1,0 +1,45 @@
+<app-owner-nav></app-owner-nav>
+
+<div class="owner-page">
+
+    <h1>Dashboard</h1>
+
+    <p>Welcome back, {{ ownerName }}</p>
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+
+            <h2>{{ restaurantCount }}</h2>
+
+            <p>My Restaurants</p>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h2>{{ orderCount }}</h2>
+
+            <p>Total Orders</p>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h2>₹{{ revenue }}</h2>
+
+            <p>Total Revenue</p>
+
+        </div>
+
+    </div>
+
+    <div class="quick-links">
+
+        <a routerLink="/owner/restaurants">Manage Restaurants</a>
+
+        <a routerLink="/owner/orders">View Orders</a>
+
+    </div>
+
+</div>

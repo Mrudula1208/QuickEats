@@ -63,6 +63,7 @@ export class LoginComponent {
 
     // Save user data
     localStorage.setItem('token', response.token);
+    localStorage.setItem('userId', String(response.id));
     localStorage.setItem('name', response.name);
     localStorage.setItem('email', response.email);
     localStorage.setItem('role', response.role);
