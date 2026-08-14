@@ -81,31 +81,29 @@ export class OrderDetailsComponent {
     // Number() converts string into integer.
     // Example:
     // URL:
-    // /order-details/105
+    // /orders/105
     // selectedOrderId = 105
 
-    const customerOrders =
-      this.orderService.getAllOrders();
+    // Ask the Backend for that one order.
+    this.orderService
+      .getOrderById(selectedOrderId)
+      .subscribe({
 
-    // Get all orders stored inside OrderService.
-    // We need the complete list before finding one order.
+        next: (data) => {
 
-    this.selectedOrder =
-      customerOrders.find(
+          this.selectedOrder = data;
 
-(order: OrderModel) => order.id === selectedOrderId
-      );
+          console.log(this.selectedOrder);
 
-    // find() searches the array.
-    // It returns only ONE matching object.
-    // We compare every order's orderId
-    // with selectedOrderId.
-    // When both become equal,
-    // that order is stored inside selectedOrder.
+        },
 
-    console.log(this.selectedOrder);
-    // Print selected order in browser console.
-    // Useful for debugging.
+        error: (err) => {
+
+          console.log(err);
+
+        }
+
+      });
 
   }
 
@@ -115,11 +113,13 @@ export class OrderDetailsComponent {
 
     this.router.navigate([
 
-      '/delivery-tracking'
+      '/delivery',
+      this.selectedOrder?.id
 
     ]);
 
-    // Navigate to Delivery Tracking page.
+    // Navigate to Delivery Tracking page
+    // with the order id in the URL.
 
   }
 

@@ -5,17 +5,17 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 // Import Order model.
+import { OrderModel } from '../../../core/models/order.model';
+
 // Import Order Service.
 import { OrderService } from '../../../core/services/order';
-import { OrderModel } from '../../../core/models/order.model';
+
 import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-order-history',
   standalone: true,
-  imports: [CommonModule,RouterLink
-    
-  ],
+  imports: [CommonModule, RouterLink],
   templateUrl: './order-history.html',
   styleUrl: './order-history.scss'
 })
@@ -31,33 +31,41 @@ export class OrderHistoryComponent {
 
   ) {
 
-    // Load all orders.
-    this.orders = this.orderService.getAllOrders();
+    // Load all orders from the Backend.
+    this.loadOrders();
+
+  }
+
+  // Fetch orders of the logged in customer.
+  loadOrders(): void {
+
+    // The Backend stores the user id.
+    // We saved it in localStorage during login.
+    const userId = Number(localStorage.getItem('userId') || 1);
+
+    this.orderService
+      .getUserOrders(userId)
+      .subscribe({
+
+        next: (data) => {
+
+          // Show the newest order first.
+          this.orders = data.sort(
+            (a, b) =>
+              new Date(b.createdAt).getTime() -
+              new Date(a.createdAt).getTime()
+          );
+
+        },
+
+        error: (err) => {
+
+          console.log(err);
+
+        }
+
+      });
 
   }
 
 }
-
-/*
-WHY DO WE WRITE THIS FILE?
-
-This component displays every order
-placed by the customer.
-
-Flow
-
-Restaurant
- ↓
-Cart
- ↓
-Checkout
- ↓
-OrderService
- ↓
-Order History (THIS FILE)
-
-This component:
-1. Gets all saved orders.
-2. Stores them in 'orders'.
-3. Sends them to HTML for display.
-*/

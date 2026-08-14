@@ -40,13 +40,30 @@ export class OrdersComponent {
 
   }
 
-  // Get all orders from OrderService.
+  // Get all orders from the Backend.
   loadCustomerOrders(): void {
 
-    this.customerOrders =
-      this.orderService.getAllOrders();
+    const userId = Number(localStorage.getItem('userId') || 1);
 
-    console.log(this.customerOrders);
+    this.orderService
+      .getUserOrders(userId)
+      .subscribe({
+
+        next: (data) => {
+
+          this.customerOrders = data;
+
+          console.log(this.customerOrders);
+
+        },
+
+        error: (err) => {
+
+          console.log(err);
+
+        }
+
+      });
 
   }
 

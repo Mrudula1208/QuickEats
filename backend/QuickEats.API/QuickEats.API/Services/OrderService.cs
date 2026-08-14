@@ -26,6 +26,7 @@ namespace QuickEats.API.Services
                 {
                     Id = order.Id,
                     UserId = order.UserId,
+                    CustomerName = order.User?.Name ?? "",
                     RestaurantId = order.RestaurantId,
                     RestaurantName = order.Restaurant?.Name ?? "",
                     DeliveryAddress = order.DeliveryAddress,
@@ -59,9 +60,10 @@ namespace QuickEats.API.Services
             }
             var response = new OrderResponseDto
             {
-                Id = order.Id,
-                UserId = order.UserId,
-                RestaurantId = order.RestaurantId,
+                    Id = order.Id,
+                    UserId = order.UserId,
+                    CustomerName = order.User?.Name ?? "",
+                    RestaurantId = order.RestaurantId,
                 RestaurantName = order.Restaurant?.Name ?? "",
                 DeliveryAddress = order.DeliveryAddress,
                 PhoneNumber = order.PhoneNumber,
@@ -94,6 +96,7 @@ namespace QuickEats.API.Services
                 {
                     Id = order.Id,
                     UserId = order.UserId,
+                    CustomerName = order.User?.Name ?? "",
                     RestaurantId = order.RestaurantId,
                     RestaurantName = order.Restaurant?.Name ?? "",
                     DeliveryAddress = order.DeliveryAddress,

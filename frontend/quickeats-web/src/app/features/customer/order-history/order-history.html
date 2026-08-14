@@ -34,23 +34,29 @@
 
                 <span class="status">
 
-                    Delivered
+                    {{ order.status }}
 
                 </span>
 
             </div>
 
+            <h2 class="restaurant-name">
+
+                {{ order.restaurantName }}
+
+            </h2>
+
             <hr>
 
             <p>
 
-                📅 {{order.date | date:'mediumDate'}}
+                📅 {{ order.createdAt | date:'mediumDate' }}
 
             </p>
 
             <h2>
 
-                ₹{{order.total}}
+                ₹{{ order.totalAmount }}
 
             </h2>
 

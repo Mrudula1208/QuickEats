@@ -19,6 +19,7 @@ namespace QuickEats.API.Repositories
         public async Task<IEnumerable<Order>> GetAllAsync()
         {
             return await _context.Orders
+                .Include(o => o.User)
                 .Include(o => o.Restaurant)
                 .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.MenuItem)
@@ -30,6 +31,7 @@ namespace QuickEats.API.Repositories
         public async Task<Order?> GetByIdAsync(int id)
         {
             return await _context.Orders
+                .Include(o => o.User)
                 .Include(o => o.Restaurant)
                 .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.MenuItem)
@@ -40,6 +42,7 @@ namespace QuickEats.API.Repositories
 {
     return await _context.Orders
         .Where(o => o.UserId == userId)
+        .Include(o => o.User)
         .Include(o => o.Restaurant)
         .Include(o => o.OrderItems)
         .ThenInclude(oi => oi.MenuItem)

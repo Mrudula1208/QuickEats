@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { OrderModel } from '../models/order.model';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -13,15 +13,13 @@ export class OrderService {
 
   constructor(private http: HttpClient) { }
 
-  // Store all customer orders.
-  customerOrders = signal<OrderModel[]>([]);
-
   // Create a new order on the Backend.
-  createOrder(dto: any): Observable<any> {
+  // The Backend returns the new order id.
+  createOrder(dto: any): Observable<number> {
 
     // POST
     // Sends the order to ASP.NET Core.
-    return this.http.post(this.apiUrl, dto);
+    return this.http.post<number>(this.apiUrl, dto);
 
   }
 
@@ -39,112 +37,25 @@ export class OrderService {
 
   }
 
-  // Save newly placed order.
-  placeOrder(newOrder: OrderModel): void {
+  // Get all orders (used by Admin / Owner).
+  getAllOrdersApi(): Observable<OrderModel[]> {
 
-    const currentOrders = [...this.customerOrders()];
-
-    currentOrders.push(newOrder);
-
-    this.customerOrders.set(currentOrders);
-
-    console.log("Order Placed Successfully");
-
-    console.log(this.customerOrders());
+    return this.http.get<OrderModel[]>(this.apiUrl);
 
   }
 
-  // Return all customer orders.
-  getAllOrders(): OrderModel[] {
+  // Update the status of one order (used by Admin / Owner).
+  updateOrderStatusApi(id: number, status: string): Observable<any> {
 
-    return this.customerOrders();
-
-  }// Update the status of one order.
-updateOrderStatus(
-
-  selectedOrderId: number,
-
-  newStatus: string
-
-): void {
-
-  // selectedOrderId: number
-  // Receives the ID of the order
-  // that the Admin wants to update.
-  //
-  // Example:
-  // selectedOrderId = 101
-
-  // newStatus: string
-  // Receives the new status.
-  //
-  // Example:
-  // "Preparing"
-  // "Out for Delivery"
-  // "Delivered"
-
-  // Create a copy of the current orders.
-  //
-  // this.customerOrders()
-  // Gets the current array from the signal.
-  //
-  // [...]
-  // Creates a new array.
-  const currentOrders =
-    [...this.customerOrders()];
-
-
-  // Find the selected order.
-  //
-  // find()
-  // Searches the array.
-  //
-  // order => order.id === selectedOrderId
-  // Means:
-  // Find the order whose ID
-  // is equal to the selected ID.
-
-  const selectedOrder =
-    currentOrders.find(
-
-      order =>
-        order.id === selectedOrderId
-
-    );
-
-
-  // Check whether the order exists.
-
-  if (selectedOrder) {
-
-    // Change the status of that order.
-
-    selectedOrder.status =
-      newStatus;
+    return this.http.put(`${this.apiUrl}/${id}`, { status: status });
 
   }
 
+  // Delete one order (used by Admin).
+  deleteOrderApi(id: number): Observable<any> {
 
-  // Update the signal.
+    return this.http.delete(`${this.apiUrl}/${id}`);
 
-  this.customerOrders.set(
-    currentOrders
-  );
+  }
 
-
-  console.log("Order Status Updated");
-
-}
-deleteOrder(orderId: number): void {
-
-  // Create a copy of the current orders.
-  const currentOrders = [...this.customerOrders()];
-
-  // Filter out the order to be deleted.
-  const updatedOrders = currentOrders.filter(
-    order => order.id !== orderId
-  );
-  this.customerOrders.set(updatedOrders);
-  console.log("order deleted successfully");
-}
 }

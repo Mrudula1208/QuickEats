@@ -50,7 +50,7 @@
 
       <strong>Address:</strong>
 
-      {{ order.address }}
+      {{ order.deliveryAddress }}
 
     </p>
 
@@ -59,7 +59,7 @@
 
       <strong>Phone:</strong>
 
-      {{ order.phone }}
+      {{ order.phoneNumber }}
 
     </p>
 
@@ -68,7 +68,7 @@
 
       <strong>Total:</strong>
 
-      ₹{{ order.total }}
+      ₹{{ order.totalAmount }}
 
     </p>
 
@@ -93,18 +93,9 @@
 
     <p>
 
-      <strong>Estimated Delivery:</strong>
-
-      {{ order.estimatedDeliveryTime }}
-
-    </p>
-
-
-    <p>
-
       <strong>Date:</strong>
 
-      {{ order.date | date:'medium' }}
+      {{ order.createdAt | date:'medium' }}
 
     </p>
 
@@ -129,7 +120,8 @@
 
       <p>
 
-        {{ item }}
+        {{ item.name }} × {{ item.quantity }}
+        — ₹{{ item.totalPrice }}
 
       </p>
 

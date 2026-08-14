@@ -28,9 +28,9 @@
 
             <p>Order #{{order.id}}</p>
 
-            <p>{{order.date}}</p>
+            <p>{{order.createdAt | date}}</p>
 
-            <p>₹{{order.total}}</p>
+            <p>₹{{order.totalAmount}}</p>
 
             <span class="status">
 

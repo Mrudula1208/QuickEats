@@ -21,6 +21,34 @@
 
         <hr>
 
+        <!-- Order Items -->
+
+        <h2>Ordered Items</h2>
+
+        <div class="order-items">
+
+            @for(item of selectedOrder.items; track item.menuItemId){
+
+            <div class="item-row">
+
+                <span>
+
+                    {{ item.name }}
+
+                    <small> × {{ item.quantity }}</small>
+
+                </span>
+
+                <span>₹{{ item.totalPrice }}</span>
+
+            </div>
+
+            }
+
+        </div>
+
+        <hr>
+
         <div class="order-information">
 
             <div class="information-row">
@@ -42,7 +70,7 @@
 
                 <span>
 
-                    ₹{{ selectedOrder.total }}
+                    ₹{{ selectedOrder.totalAmount }}
 
                 </span>
 
@@ -55,12 +83,24 @@
 
                 <span>
 
-                    {{ selectedOrder.address }}
+                    {{ selectedOrder.deliveryAddress }}
 
                 </span>
 
             </div>
             <!-- Displays delivery location. -->
+
+            <div class="information-row">
+
+                <span>Phone Number</span>
+
+                <span>
+
+                    {{ selectedOrder.phoneNumber }}
+
+                </span>
+
+            </div>
 
             <div class="information-row">
 
@@ -79,19 +119,6 @@
                  Out For Delivery
                  Delivered
             -->
-
-            <div class="information-row">
-
-                <span>Estimated Delivery</span>
-
-                <span>
-
-                    {{ selectedOrder.estimatedDeliveryTime }}
-
-                </span>
-
-            </div>
-            <!-- Shows estimated delivery time. -->
 
         </div>
 

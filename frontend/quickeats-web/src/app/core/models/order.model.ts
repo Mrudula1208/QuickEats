@@ -1,25 +1,42 @@
+// One item inside an order.
+export interface OrderItemModel {
+
+  menuItemId: number;
+
+  quantity: number;
+
+  name: string;
+
+  unitPrice: number;
+
+  totalPrice: number;
+
+}
+
 export interface OrderModel {
 
   id: number;
 
+  userId: number;
+
   customerName: string;
+
+  restaurantId: number;
 
   restaurantName: string;
 
-  address: string;
+  deliveryAddress: string;
 
-  phone: string;
-
-  items: any[];
-
-  total: number;
+  phoneNumber: string;
 
   paymentMethod: string;
 
+  totalAmount: number;
+
   status: string;
 
-  estimatedDeliveryTime: string;
+  createdAt: Date;
 
-  date: Date;
+  items: OrderItemModel[];
 
 }

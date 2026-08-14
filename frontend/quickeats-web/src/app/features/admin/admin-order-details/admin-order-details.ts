@@ -109,32 +109,24 @@ export class AdminOrderDetails {
         this.route.snapshot.paramMap.get('id')
       );
 
+    // Load the order from the Backend.
+    this.orderService
+      .getOrderById(id)
+      .subscribe({
 
-    // Get all orders from OrderService.
-    //
-    // getAllOrders()
-    // Returns OrderModel[].
+        next: (data) => {
 
-    const orders =
-      this.orderService.getAllOrders();
+          this.order = data;
 
+        },
 
-    // Find the order whose ID
-    // matches the ID from the URL.
-    //
-    // find()
-    // Searches the array for one matching order.
-    //
-    // order
-    // Represents one order while searching.
+        error: (err) => {
 
-    this.order =
-      orders.find(
+          console.log(err);
 
-        order =>
-          order.id === id
+        }
 
-      )!;
+      });
 
   }
 

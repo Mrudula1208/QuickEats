@@ -61,29 +61,35 @@ export class AdminOrders {
   }
 
 
- // Load all orders.
-// Load all orders.
+ // Load all orders from the Backend.
 loadOrders(): void {
 
-  // Call OrderService.
-  //
-  // getAllOrders()
-  // Gives us all orders directly.
-  //
-  // It returns:
-  // OrderModel[]
-  //
-  // It does NOT return an Observable,
-  // so we do NOT use subscribe().
-  const data: OrderModel[] =
-    this.orderService.getAllOrders();
+  // The Backend returns an Observable,
+  // so we use subscribe().
+  this.orderService
+    .getAllOrdersApi()
+    .subscribe({
 
-  // Store all orders inside the orders array.
-  this.orders = data;
+      next: (data) => {
 
-  console.log(this.orders);
+        // Store all orders inside the orders array.
+        this.orders = data;
 
-}// Update selected order status.
+        console.log(this.orders);
+
+      },
+
+      error: (err) => {
+
+        console.log(err);
+
+      }
+
+    });
+
+}
+
+// Update selected order status on the Backend.
 updateStatus(
 
   orderId: number,
@@ -98,16 +104,24 @@ updateStatus(
   // status
   // New status selected from dropdown.
 
-  this.orderService.updateOrderStatus(
+  this.orderService
+    .updateOrderStatusApi(orderId, status)
+    .subscribe({
 
-    orderId,
+      next: () => {
 
-    status
+        // Reload orders after updating.
+        this.loadOrders();
 
-  );
+      },
 
-  // Reload orders after updating.
-  this.loadOrders();
+      error: (err) => {
+
+        console.log(err);
+
+      }
+
+    });
 
 }
 viewOrder(orderId: number): void {
@@ -115,7 +129,7 @@ viewOrder(orderId: number): void {
   // Navigate to the order details page.
   this.router.navigate(['/admin/order-details', orderId]);
 }
-// Delete selected order.
+// Delete selected order from the Backend.
 deleteOrder(
 
   // orderId
@@ -125,13 +139,25 @@ deleteOrder(
 ): void {
 
   // Send the Order ID to OrderService.
-  this.orderService.deleteOrder(
-    orderId
-  );
+  this.orderService
+    .deleteOrderApi(orderId)
+    .subscribe({
 
-  // Reload the order list
-  // after deletion.
-  this.loadOrders();
+      next: () => {
+
+        // Reload the order list
+        // after deletion.
+        this.loadOrders();
+
+      },
+
+      error: (err) => {
+
+        console.log(err);
+
+      }
+
+    });
 
 }
 }
