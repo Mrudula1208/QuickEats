@@ -1,0 +1,98 @@
+<app-delivery-partner-nav></app-delivery-partner-nav>
+
+<div class="dp-page">
+
+    <h1>My Deliveries</h1>
+
+    @if(deliveries.length === 0){
+
+        <div class="empty">
+
+            <h2>No Deliveries Assigned</h2>
+
+            <p>Deliveries assigned to you will appear here.</p>
+
+        </div>
+
+    }
+    @else{
+
+        <div class="delivery-list">
+
+            @for(delivery of deliveries; track delivery.id){
+
+            <div class="delivery-card">
+
+                <div class="delivery-head">
+
+                    <h2>Delivery #{{ delivery.id }}</h2>
+
+                    <span class="status">{{ delivery.deliveryStatus }}</span>
+
+                </div>
+
+                <p>
+                    Order #{{ delivery.orderId }} •
+                    {{ delivery.restaurantName }}
+                </p>
+
+                <p>
+                    Customer: {{ delivery.customerName }} •
+                    {{ delivery.phoneNumber }}
+                </p>
+
+                <p>
+                    Deliver to: {{ delivery.deliveryAddress }}
+                </p>
+
+                <p>
+                    Order Total: ₹{{ delivery.totalAmount }}
+                </p>
+
+                <div class="items">
+
+                    @for(item of delivery.items; track item.menuItemId){
+
+                        <p>
+                            {{ item.name }}
+                            × {{ item.quantity }}
+                            — ₹{{ item.totalPrice }}
+                        </p>
+
+                    }
+
+                </div>
+
+                <div class="status-row">
+
+                    <label>Update Status</label>
+
+                    <select
+                        [(ngModel)]="delivery.deliveryStatus"
+                        name="delivery-status-{{ delivery.id }}">
+
+                        <option value="Assigned">Assigned</option>
+
+                        <option value="Picked Up">Picked Up</option>
+
+                        <option value="On The Way">On The Way</option>
+
+                        <option value="Delivered">Delivered</option>
+
+                    </select>
+
+                    <button (click)="updateStatus(delivery)">
+                        Update
+                    </button>
+
+                </div>
+
+            </div>
+
+            }
+
+        </div>
+
+    }
+
+</div>

@@ -17,6 +17,7 @@ import { OwnerOrdersComponent } from './features/owner/owner-orders/owner-orders
 import { authGuard } from './guards/auth.guard';
 import { adminGuard } from './guards/admin.guard';
 import { ownerGuard } from './guards/owner.guard';
+import { deliveryPartnerGuard } from './guards/delivery-partner.guard';
 import { LoginComponent } from './features/auth/login/login';
 import { RegisterComponent } from './features/auth/register/register';
 import { AdminRestaurants } from './features/admin/admin-restaurants/admin-restaurants';
@@ -32,6 +33,7 @@ import { AdminOrders } from './features/admin/admin-order/admin-order';
 import { AdminPayment } from './features/admin/admin-payment/admin-payment';
 import { AdminDelivery } from './features/admin/admin-delivery/admin-delivery';
 import { AdminReviews } from './features/admin/admin-reviews/admin-reviews';
+import { DeliveryPartnerComponent } from './features/delivery-partner/delivery-partner';
 export const routes: Routes = [
 
 {
@@ -202,5 +204,10 @@ path:'admin/edit-restaurant/:id',
   path: 'owner/orders',
   component: OwnerOrdersComponent,
   canActivate: [ownerGuard]
+},
+{
+  path: 'delivery-partner',
+  component: DeliveryPartnerComponent,
+  canActivate: [deliveryPartnerGuard]
 }
 ];

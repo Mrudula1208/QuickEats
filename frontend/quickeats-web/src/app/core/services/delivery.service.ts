@@ -56,6 +56,18 @@ export class DeliveryService {
 
   }
 
+  // Get deliveries assigned to the logged in Delivery Partner.
+  getPartnerDeliveries(): Observable<Delivery[]> {
+
+    // GET
+    // Reads only my deliveries from Backend.
+
+    return this.http.get<Delivery[]>(
+      `${this.apiUrl}/partner`
+    );
+
+  }
+
 
   // Get delivery by order ID.
   getDeliveryByOrderId(orderId: number): Observable<Delivery> {

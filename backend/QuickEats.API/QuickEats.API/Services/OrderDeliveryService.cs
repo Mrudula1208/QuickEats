@@ -1,4 +1,5 @@
-﻿using QuickEats.API.DTos.OrderDelivery;
+﻿using QuickEats.API.DTos.Order;
+using QuickEats.API.DTos.OrderDelivery;
 using QuickEats.API.Models;
 using QuickEats.API.Repositories.Interfaces;
 using QuickEats.API.Services.Interfaces;
@@ -22,14 +23,7 @@ namespace QuickEats.API.Services
 
             foreach (var delivery in deliveries)
             {
-                response.Add(new OrderDeliveryResponseDto
-                {
-                    Id = delivery.Id,
-                    OrderId = delivery.OrderId,
-                    DeliveryPartnerId = delivery.DeliveryPartnerId,
-                    DeliveryStatus = delivery.DeliveryStatus,
-                    AssignedAt = delivery.AssignedAt,
-                });
+                response.Add(ToResponseDto(delivery));
             }
             return response;
             
@@ -45,14 +39,7 @@ namespace QuickEats.API.Services
             {
                 return null;
             }
-            return new OrderDeliveryResponseDto
-            {
-                Id = delivery.Id,
-                OrderId = delivery.OrderId,
-                DeliveryPartnerId = delivery.DeliveryPartnerId,
-                DeliveryStatus = delivery.DeliveryStatus,
-                AssignedAt = delivery.AssignedAt,
-            };
+            return ToResponseDto(delivery);
 
 
         }
@@ -64,14 +51,21 @@ namespace QuickEats.API.Services
             {
                 return null;
             }
-            return new OrderDeliveryResponseDto
+            return ToResponseDto(delivery);
+        }
+
+        // All deliveries assigned to one Delivery Partner.
+        public async Task<IEnumerable<OrderDeliveryResponseDto>> GetByPartnerIdAsync(int partnerId)
+        {
+            var deliveries = await _orderDeliveryRepository.GetByPartnerIdAsync(partnerId);
+
+            var response = new List<OrderDeliveryResponseDto>();
+
+            foreach (var delivery in deliveries)
             {
-                Id = delivery.Id,
-                OrderId = delivery.OrderId,
-                DeliveryPartnerId = delivery.DeliveryPartnerId,
-                DeliveryStatus = delivery.DeliveryStatus,
-                AssignedAt = delivery.AssignedAt,
-            };
+                response.Add(ToResponseDto(delivery));
+            }
+            return response;
         }
 
 
@@ -112,6 +106,36 @@ namespace QuickEats.API.Services
             }
             _orderDeliveryRepository.Delete(delivery);
             await _orderDeliveryRepository.SaveChangesAsync();
+        }
+
+        // Convert a delivery to the response DTO.
+        private OrderDeliveryResponseDto ToResponseDto(OrderDelivery delivery)
+        {
+            return new OrderDeliveryResponseDto
+            {
+                Id = delivery.Id,
+                OrderId = delivery.OrderId,
+                DeliveryPartnerId = delivery.DeliveryPartnerId,
+                DeliveryStatus = delivery.DeliveryStatus,
+                AssignedAt = delivery.AssignedAt,
+
+                RestaurantName = delivery.Order?.Restaurant?.Name ?? "",
+                CustomerName = delivery.Order?.User?.Name ?? "",
+                DeliveryAddress = delivery.Order?.DeliveryAddress ?? "",
+                PhoneNumber = delivery.Order?.PhoneNumber ?? "",
+                TotalAmount = delivery.Order?.TotalAmount ?? 0,
+                OrderStatus = delivery.Order?.Status ?? "",
+
+                Items = (delivery.Order?.OrderItems ?? new List<OrderItem>())
+                    .Select(item => new OrderItemDto
+                    {
+                        MenuItemId = item.MenuItemId,
+                        Quantity = item.Quantity,
+                        Name = item.MenuItem?.Name ?? "",
+                        UnitPrice = item.UnitPrice,
+                        TotalPrice = item.TotalPrice
+                    }).ToList()
+            };
         }
 
 

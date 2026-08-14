@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QuickEats.API.DTos.OrderDelivery;
 using QuickEats.API.Services.Interfaces;
+using System.Security.Claims;
 
 namespace QuickEats.API.Controllers
 {
@@ -26,6 +27,19 @@ namespace QuickEats.API.Controllers
             var deliveries = await _orderDeliveryService.GetAllAsync();
             return Ok(deliveries);
         }
+
+        // A Delivery Partner sees only their own deliveries.
+        [Authorize(Roles = "DeliveryPartner")]
+        [HttpGet("partner")]
+        public async Task<IActionResult> GetPartnerDeliveries()
+        {
+            var partnerId = int.Parse(
+                User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            var deliveries = await _orderDeliveryService.GetByPartnerIdAsync(partnerId);
+            return Ok(deliveries);
+        }
+
         [HttpGet("{id}")]
 
         public async Task<IActionResult> GetById(int id)

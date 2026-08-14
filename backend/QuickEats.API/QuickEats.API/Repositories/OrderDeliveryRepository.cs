@@ -15,20 +15,43 @@ namespace QuickEats.API.Repositories
 
         }
 
+        // Always load the full Order along with its details.
+        private IQueryable<OrderDelivery> QueryWithOrder()
+        {
+            return _context.OrderDeliveries
+                .Include(d => d.Order)
+                    .ThenInclude(o => o.User)
+                .Include(d => d.Order)
+                    .ThenInclude(o => o.Restaurant)
+                .Include(d => d.Order)
+                    .ThenInclude(o => o.OrderItems)
+                        .ThenInclude(oi => oi.MenuItem);
+        }
+
         public async Task <IEnumerable<OrderDelivery>> GetAllAsync()
         {
-            return await _context.OrderDeliveries.ToListAsync();
+            return await QueryWithOrder().ToListAsync();
 
         }
 
         public async Task <OrderDelivery> GetByIdAsync(int id)
         {
-            return await _context.OrderDeliveries.FirstOrDefaultAsync(o => o.Id == id);
+            return await QueryWithOrder()
+                .FirstOrDefaultAsync(o => o.Id == id);
 
         }
         public async Task <OrderDelivery> GetByOrderIdAsync(int orderId)
         {
-            return await _context.OrderDeliveries.FirstOrDefaultAsync(o=>o.OrderId==orderId);
+            return await QueryWithOrder()
+                .FirstOrDefaultAsync(o=>o.OrderId==orderId);
+        }
+
+        // Deliveries assigned to one Delivery Partner.
+        public async Task<List<OrderDelivery>> GetByPartnerIdAsync(int partnerId)
+        {
+            return await QueryWithOrder()
+                .Where(d => d.DeliveryPartnerId == partnerId)
+                .ToListAsync();
         }
 
         public async Task AddAsync(OrderDelivery orderDelivery)

@@ -7,6 +7,7 @@ namespace QuickEats.API.Repositories.Interfaces
         Task<IEnumerable<OrderDelivery>> GetAllAsync();
         Task<OrderDelivery> GetByIdAsync(int id);
         Task<OrderDelivery>GetByOrderIdAsync(int  orderId);
+        Task<List<OrderDelivery>> GetByPartnerIdAsync(int partnerId);
         Task AddAsync(OrderDelivery orderDelivery);
         void Update (OrderDelivery orderDelivery);
         void Delete (OrderDelivery orderDelivery);
