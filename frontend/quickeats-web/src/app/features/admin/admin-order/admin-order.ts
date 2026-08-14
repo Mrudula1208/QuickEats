@@ -11,6 +11,9 @@ import { OrderService } from '../../../core/services/order';
 import { OrderModel } from '../../../core/models/order.model';
 // Defines the structure of one Order.
 
+import { AdminNavComponent } from '../../../shared/admin-nav/admin-nav';
+// Top navigation bar for the Admin Panel.
+
 @Component({
 
   selector: 'app-admin-orders',
@@ -18,7 +21,7 @@ import { OrderModel } from '../../../core/models/order.model';
   standalone: true,
 
   imports: [
-    CommonModule,FormsModule
+    CommonModule,FormsModule,AdminNavComponent
   ],
 
   templateUrl: './admin-order.html',

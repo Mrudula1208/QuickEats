@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using QuickEats.API.Services.Interfaces;
 
 namespace QuickEats.API.Controllers
 {
+    // Only Admin can see the dashboard statistics.
+    [Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
 

@@ -18,6 +18,8 @@ namespace QuickEats.API.Controllers
             _orderDeliveryService = orderDeliveryService;
 
         }
+        // Only Admin can see all deliveries.
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -60,7 +62,8 @@ namespace QuickEats.API.Controllers
            await _orderDeliveryService.UpdateStatusAsync(id, dto);
             return Ok("Delivery updated successfully.");
         }
-         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             await _orderDeliveryService.DeleteAsync(id);

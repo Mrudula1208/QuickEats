@@ -14,6 +14,9 @@ import { Review } from '../../../core/models/review.model';
 // Review
 // Defines the structure of one review.
 
+import { AdminNavComponent } from '../../../shared/admin-nav/admin-nav';
+// Top navigation bar for the Admin Panel.
+
 
 @Component({
 
@@ -28,7 +31,8 @@ import { Review } from '../../../core/models/review.model';
   // imports
   // Modules required by this Component.
   imports: [
-    CommonModule
+    CommonModule,
+    AdminNavComponent
   ],
 
   // Connects TypeScript with HTML.

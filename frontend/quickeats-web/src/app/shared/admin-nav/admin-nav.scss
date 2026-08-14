@@ -1,0 +1,59 @@
+.admin-nav{
+    display:flex;
+    align-items:center;
+    gap:20px;
+    background:#2c3e50;
+    padding:15px 40px;
+    color:#fff;
+}
+
+.brand{
+    font-size:22px;
+    font-weight:800;
+}
+
+.links{
+    display:flex;
+    gap:12px;
+    flex:1;
+    flex-wrap:wrap;
+}
+
+.links a{
+    color:#dfe6e9;
+    text-decoration:none;
+    font-weight:600;
+    padding:8px 14px;
+    border-radius:20px;
+    transition:.3s;
+}
+
+.links a:hover,
+.links a.active{
+    background:rgba(255,255,255,.18);
+    color:#fff;
+}
+
+.logout-btn{
+    background:#fff;
+    color:#2c3e50;
+    border:none;
+    padding:8px 18px;
+    border-radius:20px;
+    font-weight:700;
+    cursor:pointer;
+}
+
+@media(max-width:768px){
+
+    .admin-nav{
+        flex-direction:column;
+        padding:15px;
+        gap:10px;
+    }
+
+    .links{
+        justify-content:center;
+    }
+
+}

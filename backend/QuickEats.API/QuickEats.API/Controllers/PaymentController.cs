@@ -18,6 +18,8 @@ namespace QuickEats.API.Controllers
             _paymentService = paymentService;
         }
 
+        // Only Admin can see all payments of all users.
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {

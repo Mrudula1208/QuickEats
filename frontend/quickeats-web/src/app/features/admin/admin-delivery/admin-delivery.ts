@@ -14,6 +14,9 @@ import { OrderDeliveryResponse } from '../../../core/models/delivery.model';
 // OrderDeliveryResponse
 // Defines the structure of delivery data coming from Backend.
 
+import { AdminNavComponent } from '../../../shared/admin-nav/admin-nav';
+// Top navigation bar for the Admin Panel.
+
 
 @Component({
 
@@ -26,7 +29,8 @@ import { OrderDeliveryResponse } from '../../../core/models/delivery.model';
   // Means this Component works independently.
 
   imports: [
-    CommonModule
+    CommonModule,
+    AdminNavComponent
   ],
   // imports
   // Lists modules required by this Component.

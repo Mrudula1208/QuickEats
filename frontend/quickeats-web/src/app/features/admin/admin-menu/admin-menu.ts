@@ -13,6 +13,9 @@ import { MenuItem } from '../../../core/models/menu.model';
 import { Router } from '@angular/router';
 // Used for page navigation.
 
+import { AdminNavComponent } from '../../../shared/admin-nav/admin-nav';
+// Top navigation bar for the Admin Panel.
+
 @Component({
 
   selector: 'app-admin-menu',
@@ -20,7 +23,8 @@ import { Router } from '@angular/router';
   standalone: true,
 
   imports: [
-    CommonModule
+    CommonModule,
+    AdminNavComponent
   ],
 
   templateUrl: './admin-menu.html',

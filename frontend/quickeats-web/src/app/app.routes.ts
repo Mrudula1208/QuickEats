@@ -15,6 +15,7 @@ import { OwnerMenuComponent } from './features/owner/owner-menu/owner-menu';
 import { OwnerMenuItemFormComponent } from './features/owner/owner-menu-item-form/owner-menu-item-form';
 import { OwnerOrdersComponent } from './features/owner/owner-orders/owner-orders';
 import { authGuard } from './guards/auth.guard';
+import { adminGuard } from './guards/admin.guard';
 import { ownerGuard } from './guards/owner.guard';
 import { LoginComponent } from './features/auth/login/login';
 import { RegisterComponent } from './features/auth/register/register';
@@ -22,6 +23,15 @@ import { AdminRestaurants } from './features/admin/admin-restaurants/admin-resta
 import { AdminEditRestaurant } from './features/admin/admin-edit-restaurant/admin-edit-restaurant';
 import { AdminOrderDetails } from './features/admin/admin-order-details/admin-order-details';
 import { AdminPaymentDetails } from './features/admin/admin-payment-details/admin-payment-details';
+import { AdminDashboard } from './features/admin/admin-dashboard/admin-dashboard';
+import { AdminAddRestaurant } from './features/admin/admin-add-restaurant/admin-add-restaurant';
+import { AdminMenu } from './features/admin/admin-menu/admin-menu';
+import { AdminAddMenu } from './features/admin/admin-add-menu/admin-add-menu';
+import { AdminEditMenu } from './features/admin/admin-edit-menu/admin-edit-menu';
+import { AdminOrders } from './features/admin/admin-order/admin-order';
+import { AdminPayment } from './features/admin/admin-payment/admin-payment';
+import { AdminDelivery } from './features/admin/admin-delivery/admin-delivery';
+import { AdminReviews } from './features/admin/admin-reviews/admin-reviews';
 export const routes: Routes = [
 
 {
@@ -97,23 +107,61 @@ export const routes: Routes = [
         .then(m => m.ProfileComponent)
 },
         {
+  path: 'admin/dashboard',
+  component: AdminDashboard,
+  canActivate: [adminGuard]
+},{
   path: 'admin/restaurants',
   component: AdminRestaurants,
-  canActivate: [authGuard]
+  canActivate: [adminGuard]
+},{
+  path: 'admin/add-restaurant',
+  component: AdminAddRestaurant,
+  canActivate: [adminGuard]
 },{
 path:'admin/edit-restaurant/:id',
-component:AdminEditRestaurant,
-canActivate:[authGuard]
+ component:AdminEditRestaurant,
+ canActivate:[adminGuard]
+},{
+  path: 'admin/menu',
+  component: AdminMenu,
+  canActivate: [adminGuard]
+},{
+  path: 'admin/add-menu',
+  component: AdminAddMenu,
+  canActivate: [adminGuard]
+},{
+  path: 'admin/edit-menu/:id',
+  component: AdminEditMenu,
+  canActivate: [adminGuard]
+},{
+  path: 'admin/order',
+  component: AdminOrders,
+  canActivate: [adminGuard]
 },{
   path: 'admin/order-details/:id',
-  component: AdminOrderDetails
+  component: AdminOrderDetails,
+  canActivate: [adminGuard]
 },
 { path: 'admin/payment-details/:id',
 
   // component
   // Opens AdminPaymentDetails
   // when this URL is visited.
-  component: AdminPaymentDetails
+  component: AdminPaymentDetails,
+  canActivate: [adminGuard]
+},{
+  path: 'admin/payment',
+  component: AdminPayment,
+  canActivate: [adminGuard]
+},{
+  path: 'admin/delivery',
+  component: AdminDelivery,
+  canActivate: [adminGuard]
+},{
+  path: 'admin/reviews',
+  component: AdminReviews,
+  canActivate: [adminGuard]
 },
 {
   path: 'owner',

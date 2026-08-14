@@ -16,6 +16,9 @@ import { PaymentService } from '../../../core/services/payment.service';
 // the structure of one payment object.
 import { Payment } from '../../../core/models/payment.model';
 
+import { AdminNavComponent } from '../../../shared/admin-nav/admin-nav';
+// Top navigation bar for the Admin Panel.
+
 
 @Component({
 
@@ -32,7 +35,8 @@ import { Payment } from '../../../core/models/payment.model';
   // Lists modules required by this component.
   imports: [
     CommonModule,
-    FormsModule
+    FormsModule,
+    AdminNavComponent
   ],
 
   // Connect this TypeScript file

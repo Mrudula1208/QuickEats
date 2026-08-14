@@ -3,9 +3,10 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { RestaurantService } from '../../../core/services/restaurant.service';
 import { Restaurant } from '../../../core/models/restaurant.model';
+import { AdminNavComponent } from '../../../shared/admin-nav/admin-nav';
 @Component({
   selector: 'app-admin-restaurants',
-  imports: [CommonModule],
+  imports: [CommonModule, AdminNavComponent],
   templateUrl: './admin-restaurants.html',
   styleUrl: './admin-restaurants.scss',
 })

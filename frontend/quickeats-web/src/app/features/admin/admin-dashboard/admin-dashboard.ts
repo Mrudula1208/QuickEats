@@ -10,13 +10,17 @@ import { DashboardService } from '../../../core/services/dashboard.service';
 import { DashboardModel } from '../../../core/models/dashboard.model';
 // Dashboard Structure.
 
+import { AdminNavComponent } from '../../../shared/admin-nav/admin-nav';
+// Top navigation bar for the Admin Panel.
+
 @Component({
   selector: 'app-admin-dashboard',
 
   standalone: true,
 
   imports: [
-    CommonModule
+    CommonModule,
+    AdminNavComponent
   ],
 
   templateUrl: './admin-dashboard.html',
