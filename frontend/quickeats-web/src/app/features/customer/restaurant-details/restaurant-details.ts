@@ -23,6 +23,9 @@ import { MenuService } from '../../../core/services/menu.service';
 import { CartService } from '../../../core/services/cart.service';
 // Used to add food into cart.
 
+import { WishlistService } from '../../../core/services/wishlist.service';
+// Used to save food items into the Wishlist.
+
 @Component({
   selector: 'app-restaurant-details',
   standalone: true,
@@ -69,6 +72,8 @@ export class RestaurantDetailsComponent {
     private menuService: MenuService,
 
     private cartService: CartService,
+
+    private wishlistService: WishlistService,
 
     private router: Router
 
@@ -244,6 +249,38 @@ export class RestaurantDetailsComponent {
 
     // Open Cart Page.
     this.router.navigate(['/cart']);
+
+  }
+
+  // Runs when Add To Wishlist button is clicked.
+  addToWishlist(menu: MenuItem): void {
+
+    this.wishlistService.addToWishlist({
+      wishlistId: 0,
+      menuId: menu.id,
+      restaurantId: menu.restaurantId,
+      restaurantName: this.restaurant?.name || '',
+      foodName: menu.name,
+      imageUrl: menu.imageUrl,
+      price: menu.price,
+      category: menu.category
+    }).subscribe({
+
+      // API Success.
+      next: () => {
+
+        console.log("Item added to wishlist");
+
+      },
+
+      // API Failed.
+      error: (err) => {
+
+        console.log(err);
+
+      }
+
+    });
 
   }
 

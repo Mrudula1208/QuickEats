@@ -4,6 +4,9 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 // CommonModule is required because HTML uses @for and @if.
 
+import { Router } from '@angular/router';
+// Router is used to open the Restaurant Details page.
+
 import { FavoriteService } from '../../../core/services/favorite.service';
 // FavoriteService stores all favorite restaurants.
 
@@ -28,7 +31,10 @@ export class FavoritesComponent {
   constructor(
 
     // Angular automatically creates FavoriteService.
-    private favoriteService: FavoriteService
+    private favoriteService: FavoriteService,
+
+    // Router is used to open another page.
+    private router: Router
 
   ) {
 
@@ -44,17 +50,30 @@ export class FavoritesComponent {
     this.favoriteService.getFavorites().subscribe({
       next: (data: FavoriteModel[]) => {
         this.customerFavorites = data;
-      }
-    });
-
+      },
       // Runs if API Fails.
       error: (err: any) => {
 
         console.log(err);
 
       }
+    });
 
-    
+  }
+
+  // Open the Restaurant Details page.
+  openRestaurant(
+    selectedRestaurantId: number
+  ): void {
+
+    this.router.navigate([
+
+      '/restaurant',
+
+      selectedRestaurantId
+
+    ]);
+
   }
 
 }

@@ -34,6 +34,11 @@ import { AdminPayment } from './features/admin/admin-payment/admin-payment';
 import { AdminDelivery } from './features/admin/admin-delivery/admin-delivery';
 import { AdminReviews } from './features/admin/admin-reviews/admin-reviews';
 import { DeliveryPartnerComponent } from './features/delivery-partner/delivery-partner';
+import { WishlistComponent } from './features/customer/wishlist/wishlist';
+import { FavoritesComponent } from './features/customer/favorites/favorites';
+import { CouponsComponent } from './features/customer/coupons/coupons';
+import { NotificationsComponent } from './features/customer/notifications/notifications';
+import { SavedAddressComponent } from './features/customer/saved-address/saved-address';
 export const routes: Routes = [
 
 {
@@ -107,6 +112,31 @@ export const routes: Routes = [
     loadComponent: () =>
         import('./features/customer/profile/profile')
         .then(m => m.ProfileComponent)
+},
+{
+    path: 'wishlist',
+    component: WishlistComponent,
+    canActivate: [authGuard]
+},
+{
+    path: 'favorites',
+    component: FavoritesComponent,
+    canActivate: [authGuard]
+},
+{
+    path: 'coupons',
+    component: CouponsComponent,
+    canActivate: [authGuard]
+},
+{
+    path: 'notifications',
+    component: NotificationsComponent,
+    canActivate: [authGuard]
+},
+{
+    path: 'saved-address',
+    component: SavedAddressComponent,
+    canActivate: [authGuard]
 },
         {
   path: 'admin/dashboard',

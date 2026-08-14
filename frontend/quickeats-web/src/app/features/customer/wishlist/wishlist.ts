@@ -145,7 +145,7 @@ removeWishlistItem(
 
     this.router.navigate([
 
-      '/restaurant-details',
+      '/restaurant',
 
       selectedRestaurantId
 

@@ -106,18 +106,31 @@ export class CartComponent {
   // Apply the coupon code.
   applyCoupon(): void {
 
-    const valid = this.cartService.applyCoupon(this.couponInput);
+    this.cartService
+      .applyCoupon(this.couponInput)
+      .subscribe({
+        next: (valid) => {
 
-    if (valid) {
+          if (valid) {
 
-      this.couponMessage = 'Coupon applied!';
+            this.couponMessage = 'Coupon applied!';
 
-    }
-    else {
+          }
+          else {
 
-      this.couponMessage = 'Invalid coupon code.';
+            this.couponMessage = 'Invalid, expired or not eligible coupon.';
 
-    }
+          }
+
+        },
+        error: (err) => {
+
+          console.log(err);
+
+          this.couponMessage = 'Coupon not available.';
+
+        }
+      });
 
   }
 

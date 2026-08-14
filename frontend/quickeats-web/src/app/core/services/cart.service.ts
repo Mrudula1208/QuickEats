@@ -1,6 +1,10 @@
 import { Injectable, signal } from '@angular/core';
 import { CartItem } from '../models/cart-item.model';
 import { MenuItem } from '../models/menu.model';
+import { CouponService } from './coupon.service';
+import { CouponModel } from '../models/coupon.model';
+import { Observable, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -13,13 +17,12 @@ export class CartService {
   // Applied coupon code.
   couponCode = signal<string>('');
 
-  // Coupon codes and their discounts.
-  // code -> discount (percent or amount)
-  private coupons: { [code: string]: string } = {
-    SAVE10: '10%',
-    SAVE20: '20%',
-    FLAT50: '50'
-  };
+  // Applied coupon details.
+  appliedCoupon = signal<CouponModel | null>(null);
+
+  constructor(
+    private couponService: CouponService
+  ) { }
 
   // Add food into cart.
   addToCart(menu: MenuItem): void {
@@ -119,6 +122,8 @@ export class CartService {
 
     this.couponCode.set('');
 
+    this.appliedCoupon.set(null);
+
   }
 
   // =============================================
@@ -183,21 +188,11 @@ export class CartService {
   // Coupon discount.
   getCouponDiscount(): number {
 
-    const code = this.couponCode();
+    const coupon = this.appliedCoupon();
 
-    const value = this.coupons[code];
+    if (!coupon) return 0;
 
-    if (!value) return 0;
-
-    if (value.endsWith('%')) {
-
-      const percent = Number(value.replace('%', ''));
-
-      return (this.getFoodTotal() * percent) / 100;
-
-    }
-
-    return Number(value);
+    return coupon.discountAmount;
 
   }
 
@@ -217,20 +212,41 @@ export class CartService {
   }
 
   // Apply a coupon code.
+  // Checks the coupon with the Backend.
   // Returns true if the coupon is valid.
-  applyCoupon(code: string): boolean {
+  applyCoupon(code: string): Observable<boolean> {
 
-    const value = this.coupons[code.trim().toUpperCase()];
+    return this.couponService
+      .getCouponByCode(code)
+      .pipe(
+        map((coupon) => {
 
-    if (value) {
+          const now = new Date();
 
-      this.couponCode.set(code.trim().toUpperCase());
+          const expired = new Date(coupon.expiryDate) < now;
 
-      return true;
+          const belowMinimum =
+            this.getFoodTotal() < coupon.minimumOrderAmount;
 
-    }
+          if (!coupon.isActive || expired || belowMinimum) {
 
-    return false;
+            return false;
+
+          }
+
+          this.couponCode.set(coupon.couponCode);
+
+          this.appliedCoupon.set(coupon);
+
+          return true;
+
+        }),
+        catchError(() => {
+
+          return of(false);
+
+        })
+      );
 
   }
 
@@ -238,6 +254,8 @@ export class CartService {
   removeCoupon(): void {
 
     this.couponCode.set('');
+
+    this.appliedCoupon.set(null);
 
   }
 
