@@ -65,6 +65,22 @@ export class CouponService {
   }
 
   // ==========================================
+  // CREATE COUPON
+  // ==========================================
+
+  createCoupon(coupon: any): Observable<CouponModel> {
+    return this.http.post<CouponModel>(this.apiUrl, coupon);
+  }
+
+  // ==========================================
+  // DELETE COUPON
+  // ==========================================
+
+  deleteCoupon(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`);
+  }
+
+  // ==========================================
   // GET COUPON BY CODE
   // ==========================================
 

@@ -246,6 +246,164 @@
 
 }
 
+<div class="reviews-section">
+
+    <div class="reviews-header">
+
+        <h2>Reviews &amp; Ratings</h2>
+
+        <div class="average-rating">
+
+            <span class="big-star">⭐</span>
+
+            <span class="rating-value">
+
+                {{ averageRating | number:'1.1-1' }}
+
+            </span>
+
+            <div class="rating-stars">
+
+                @for(star of stars; track star){
+
+                    <span
+                        class="star"
+                        [class.filled]="isStarFilled(star, averageRating)">
+
+                        ★
+
+                    </span>
+
+                }
+
+            </div>
+
+            <span class="rating-count">
+
+                ({{ reviewCount }} Reviews)
+
+            </span>
+
+        </div>
+
+    </div>
+
+    @if(isLoggedIn){
+
+        <div class="review-form">
+
+            <h3>Write a Review</h3>
+
+            <div class="star-selector">
+
+                @for(star of stars; track star){
+
+                    <button
+                        type="button"
+                        class="star-btn"
+                        [class.active]="star <= newRating"
+                        (click)="setRating(star)">
+
+                        ★
+
+                    </button>
+
+                }
+
+                <span>{{ newRating }} / 5</span>
+
+            </div>
+
+            <textarea
+                rows="4"
+                placeholder="Share your experience..."
+                [(ngModel)]="newComment">
+            </textarea>
+
+            <button
+                class="submit-review-btn"
+                (click)="submitReview()">
+
+                Submit Review
+
+            </button>
+
+        </div>
+
+    }
+
+    @else {
+
+        <p class="login-hint">
+
+            <a routerLink="/login">Log in</a>
+
+            to write a review.
+
+        </p>
+
+    }
+
+    @if(reviews.length === 0){
+
+        <div class="no-reviews">
+
+            <h3>No Reviews Yet</h3>
+
+            <p>Be the first one to review this restaurant.</p>
+
+        </div>
+
+    }
+
+    @else {
+
+        <div class="review-list">
+
+            @for(review of reviews; track review.id){
+
+                <div class="review-card">
+
+                    <div class="review-top">
+
+                        <h4>{{ review.customerName }}</h4>
+
+                        <div class="rating-stars">
+
+                            @for(star of stars; track star){
+
+                                <span
+                                    class="star"
+                                    [class.filled]="isStarFilled(star, review.rating)">
+
+                                    ★
+
+                                </span>
+
+                            }
+
+                        </div>
+
+                    </div>
+
+                    <p>{{ review.comment }}</p>
+
+                    <small>
+
+                        {{ review.createdAt | date:'mediumDate' }}
+
+                    </small>
+
+                </div>
+
+            }
+
+        </div>
+
+    }
+
+</div>
+
 }
 
 @else {

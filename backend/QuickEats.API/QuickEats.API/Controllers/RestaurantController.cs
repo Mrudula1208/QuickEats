@@ -52,7 +52,7 @@ namespace QuickEats.API.Controllers
             return Ok(restaurants);
         }
 
-        [Authorize(Roles = "Owner")]
+        [Authorize(Roles = "Admin,Owner")]
         [HttpPost]
         public async Task<IActionResult> Create(CreateRestaurantDto dto)
         {

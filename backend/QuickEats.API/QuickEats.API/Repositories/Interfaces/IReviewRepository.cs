@@ -30,6 +30,23 @@ namespace QuickEats.API.Repositories.Interfaces
         Task<Reviews?> GetByIdAsync(int id);
 
 
+        // Get all Reviews of one Restaurant.
+
+        Task<IEnumerable<Reviews>> GetByRestaurantIdAsync(
+            int restaurantId
+        );
+
+
+        // Get average Rating of one Restaurant.
+        //
+        // Returns null when the Restaurant
+        // has no Reviews yet.
+
+        Task<double?> GetAverageRatingAsync(
+            int restaurantId
+        );
+
+
         // Add a new Review to database.
 
         Task AddAsync(Reviews review);

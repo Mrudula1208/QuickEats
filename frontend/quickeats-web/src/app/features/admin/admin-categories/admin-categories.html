@@ -1,0 +1,45 @@
+<app-admin-nav></app-admin-nav>
+
+<h1>Menu Categories</h1>
+
+@if(categories.length===0){
+
+<h2>No Categories Found</h2>
+
+}
+
+@else{
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Category</th>
+
+<th>Menu Items</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+@for(category of categories; track category.name){
+
+<tr>
+
+<td>{{category.name}}</td>
+
+<td>{{category.count}}</td>
+
+</tr>
+
+}
+
+</tbody>
+
+</table>
+
+}

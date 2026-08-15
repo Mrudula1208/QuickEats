@@ -1,12 +1,16 @@
 import { Component } from '@angular/core';
 // Import Component because this is an Angular Component.
 
+import { CommonModule } from '@angular/common';
+// Import CommonModule because HTML uses the date pipe.
+
 import { FormsModule } from '@angular/forms';
 // Required for ngModel (search box and veg toggle).
 
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 // ActivatedRoute reads restaurant id from URL.
 // Router opens another page.
+// RouterLink makes routerLink work in HTML.
 
 import { Restaurant } from '../../../core/models/restaurant.model';
 // Restaurant model stores restaurant details.
@@ -26,10 +30,19 @@ import { CartService } from '../../../core/services/cart.service';
 import { WishlistService } from '../../../core/services/wishlist.service';
 // Used to save food items into the Wishlist.
 
+import { ReviewService } from '../../../core/services/review.service';
+// Used to call Review APIs.
+
+import { Review } from '../../../core/models/review.model';
+// Review model stores one review.
+
+import { AuthService } from '../../../core/services/auth.service';
+// Used to check whether the Customer is logged in.
+
 @Component({
   selector: 'app-restaurant-details',
   standalone: true,
-  imports: [FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './restaurant-details.html',
   styleUrl: './restaurant-details.scss'
 })
@@ -62,6 +75,27 @@ export class RestaurantDetailsComponent {
   // List of available categories.
   categories: string[] = [];
 
+  // Store all Reviews of this Restaurant.
+  reviews: Review[] = [];
+
+  // Average Rating of this Restaurant.
+  averageRating = 0;
+
+  // Number of Reviews of this Restaurant.
+  reviewCount = 0;
+
+  // true = Customer is logged in.
+  isLoggedIn = false;
+
+  // Rating selected in the Add Review form.
+  newRating = 5;
+
+  // Comment typed in the Add Review form.
+  newComment = '';
+
+  // Star values used to draw rating stars.
+  stars = [1, 2, 3, 4, 5];
+
   // Angular injects all required services.
   constructor(
 
@@ -75,9 +109,16 @@ export class RestaurantDetailsComponent {
 
     private wishlistService: WishlistService,
 
+    private reviewService: ReviewService,
+
+    private authService: AuthService,
+
     private router: Router
 
   ) {
+
+    // Check whether Customer is logged in.
+    this.isLoggedIn = this.authService.isLoggedIn();
 
     // Read restaurant id from URL.
     const restaurantId =
@@ -128,6 +169,134 @@ export class RestaurantDetailsComponent {
                 array.indexOf(value) === index);
 
           console.log(this.menus);
+
+        },
+
+        // API Failed.
+        error: (err) => {
+
+          console.log(err);
+
+        }
+
+      });
+
+    // Load Reviews of this Restaurant.
+    this.loadReviews(restaurantId);
+
+    // Load average Rating of this Restaurant.
+    this.loadAverageRating(restaurantId);
+
+  }
+
+  // Load all Reviews of one Restaurant.
+  loadReviews(restaurantId: number): void {
+
+    this.reviewService
+      .getReviewsByRestaurant(restaurantId)
+      .subscribe({
+
+        // API Success.
+        next: (data: Review[]) => {
+
+          this.reviews = data;
+
+          this.reviewCount = data.length;
+
+          console.log(this.reviews);
+
+        },
+
+        // API Failed.
+        error: (err) => {
+
+          console.log(err);
+
+        }
+
+      });
+
+  }
+
+  // Load average Rating of one Restaurant.
+  loadAverageRating(restaurantId: number): void {
+
+    this.reviewService
+      .getAverageRating(restaurantId)
+      .subscribe({
+
+        // API Success.
+        next: (data: number) => {
+
+          this.averageRating = data;
+
+        },
+
+        // API Failed.
+        error: (err) => {
+
+          console.log(err);
+
+        }
+
+      });
+
+  }
+
+  // true = this star should be filled.
+  isStarFilled(star: number, rating: number): boolean {
+
+    return star <= Math.round(rating);
+
+  }
+
+  // Select the Rating in the Add Review form.
+  setRating(rating: number): void {
+
+    this.newRating = rating;
+
+  }
+
+  // Runs when the Customer clicks Submit Review.
+  submitReview(): void {
+
+    const restaurantId =
+      Number(this.route.snapshot.paramMap.get('id'));
+
+    const review: Review = {
+
+      id: 0,
+
+      customerId: 0,
+
+      restaurantId: restaurantId,
+
+      customerName: '',
+
+      restaurantName: '',
+
+      rating: this.newRating,
+
+      comment: this.newComment,
+
+      createdAt: new Date()
+
+    };
+
+    this.reviewService
+      .addReview(review)
+      .subscribe({
+
+        // API Success.
+        next: () => {
+
+          // Clear the form.
+          this.newRating = 5;
+          this.newComment = '';
+
+          // Reload Reviews and average Rating.
+          this.loadReviews(restaurantId);
+          this.loadAverageRating(restaurantId);
 
         },
 

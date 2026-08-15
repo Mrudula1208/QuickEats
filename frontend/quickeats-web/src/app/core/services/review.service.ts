@@ -67,6 +67,37 @@ export class ReviewService {
   }
 
 
+  // Get all Reviews of one Restaurant.
+  getReviewsByRestaurant(
+    restaurantId: number
+  ): Observable<Review[]> {
+
+    // GET
+    // Reads Reviews of one Restaurant.
+
+    return this.http.get<Review[]>(
+      `${this.apiUrl}/restaurant/${restaurantId}`
+    );
+
+  }
+
+
+  // Get average Rating of one Restaurant.
+  getAverageRating(
+    restaurantId: number
+  ): Observable<number> {
+
+    // GET
+    // Reads average Rating
+    // of one Restaurant.
+
+    return this.http.get<number>(
+      `${this.apiUrl}/restaurant/${restaurantId}/average`
+    );
+
+  }
+
+
   // Delete one Review.
   deleteReview(
 

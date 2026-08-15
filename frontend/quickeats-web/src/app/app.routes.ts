@@ -33,6 +33,10 @@ import { AdminOrders } from './features/admin/admin-order/admin-order';
 import { AdminPayment } from './features/admin/admin-payment/admin-payment';
 import { AdminDelivery } from './features/admin/admin-delivery/admin-delivery';
 import { AdminReviews } from './features/admin/admin-reviews/admin-reviews';
+import { AdminUsers } from './features/admin/admin-users/admin-users';
+import { AdminOwners } from './features/admin/admin-owners/admin-owners';
+import { AdminCategories } from './features/admin/admin-categories/admin-categories';
+import { AdminCoupons } from './features/admin/admin-coupons/admin-coupons';
 import { DeliveryPartnerComponent } from './features/delivery-partner/delivery-partner';
 import { WishlistComponent } from './features/customer/wishlist/wishlist';
 import { FavoritesComponent } from './features/customer/favorites/favorites';
@@ -141,6 +145,22 @@ export const routes: Routes = [
         {
   path: 'admin/dashboard',
   component: AdminDashboard,
+  canActivate: [adminGuard]
+},{
+  path: 'admin/users',
+  component: AdminUsers,
+  canActivate: [adminGuard]
+},{
+  path: 'admin/owners',
+  component: AdminOwners,
+  canActivate: [adminGuard]
+},{
+  path: 'admin/categories',
+  component: AdminCategories,
+  canActivate: [adminGuard]
+},{
+  path: 'admin/coupons',
+  component: AdminCoupons,
   canActivate: [adminGuard]
 },{
   path: 'admin/restaurants',

@@ -42,6 +42,18 @@ namespace QuickEats.API.Services
         }
 
 
+        public async Task<IEnumerable<string>> GetCategoriesAsync()
+        {
+            var menuItems = await _menuRepository.GetAllAsync();
+
+            return menuItems
+                .Select(m => m.Category)
+                .Where(c => !string.IsNullOrWhiteSpace(c))
+                .Distinct()
+                .OrderBy(c => c)
+                .ToList();
+        }
+
         public async Task<MenuResponseDto?> GetByIdAsync(int id)
         {
             var menuItem = await _menuRepository.GetByIdAsync(id);

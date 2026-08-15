@@ -1,0 +1,106 @@
+<app-admin-nav></app-admin-nav>
+
+<h1>Coupon Management</h1>
+
+<h2>Add New Coupon</h2>
+
+<div class="coupon-form">
+
+    <label>Coupon Code</label>
+    <input type="text" [(ngModel)]="couponCode" placeholder="e.g. SAVE50" />
+
+    <label>Description</label>
+    <input type="text" [(ngModel)]="description" placeholder="Coupon description" />
+
+    <label>Minimum Order Amount</label>
+    <input type="number" [(ngModel)]="minimumOrderAmount" />
+
+    <label>Discount Amount</label>
+    <input type="number" [(ngModel)]="discountAmount" />
+
+    <label>Expiry Date</label>
+    <input type="date" [(ngModel)]="expiryDate" />
+
+    <label>
+        <input type="checkbox" [(ngModel)]="isActive" />
+        Active
+    </label>
+
+    <button (click)="createCoupon()">Create Coupon</button>
+
+</div>
+
+@if(coupons.length===0){
+
+<h2>No Coupons Found</h2>
+
+}
+
+@else{
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Code</th>
+
+<th>Description</th>
+
+<th>Min Order</th>
+
+<th>Discount</th>
+
+<th>Expiry</th>
+
+<th>Status</th>
+
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+@for(coupon of coupons; track coupon.couponId){
+
+<tr>
+
+<td>{{coupon.couponCode}}</td>
+
+<td>{{coupon.description}}</td>
+
+<td>₹{{coupon.minimumOrderAmount}}</td>
+
+<td>₹{{coupon.discountAmount}}</td>
+
+<td>{{coupon.expiryDate | date:'mediumDate'}}</td>
+
+<td>
+
+@if(coupon.isActive){
+Active
+}
+@else{
+Expired
+}
+
+</td>
+
+<td>
+
+<button (click)="deleteCoupon(coupon.couponId)">Delete</button>
+
+</td>
+
+</tr>
+
+}
+
+</tbody>
+
+</table>
+
+}

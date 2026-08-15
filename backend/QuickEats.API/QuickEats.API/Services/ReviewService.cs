@@ -80,6 +80,12 @@ namespace QuickEats.API.Services
                         RestaurantId =
                             review.RestaurantId,
 
+                        CustomerName =
+                            review.Customer.Name,
+
+                        RestaurantName =
+                            review.Restaurant.Name,
+
                         Rating =
                             review.Rating,
 
@@ -139,6 +145,12 @@ namespace QuickEats.API.Services
                 RestaurantId =
                     review.RestaurantId,
 
+                CustomerName =
+                    review.Customer.Name,
+
+                RestaurantName =
+                    review.Restaurant.Name,
+
                 Rating =
                     review.Rating,
 
@@ -151,9 +163,90 @@ namespace QuickEats.API.Services
         }
 
 
+        // Get all Reviews of one Restaurant.
+
+        public async Task<IEnumerable<ReviewResponseDto>>
+            GetByRestaurantIdAsync(int restaurantId)
+        {
+            // STEP 1
+            // Get Reviews from database.
+
+            var reviews =
+                await _reviewRepository
+                    .GetByRestaurantIdAsync(restaurantId);
+
+
+            // STEP 2
+            // Create an empty list
+            // for Response DTOs.
+
+            var response =
+                new List<ReviewResponseDto>();
+
+
+            // STEP 3
+            // Go through every Review.
+
+            foreach (var review in reviews)
+            {
+                // STEP 4
+                // Convert Review model
+                // into ReviewResponseDto.
+
+                response.Add(
+                    new ReviewResponseDto
+                    {
+                        Id = review.Id,
+
+                        CustomerId =
+                            review.CustomerId,
+
+                        RestaurantId =
+                            review.RestaurantId,
+
+                        CustomerName =
+                            review.Customer.Name,
+
+                        RestaurantName =
+                            review.Restaurant.Name,
+
+                        Rating =
+                            review.Rating,
+
+                        Comment =
+                            review.Comment,
+
+                        CreatedAt =
+                            review.CreatedAt
+                    }
+                );
+            }
+
+
+            // STEP 5
+            // Return all converted Reviews.
+
+            return response;
+        }
+
+
+        // Get average Rating of one Restaurant.
+
+        public async Task<double?>
+            GetAverageRatingAsync(int restaurantId)
+        {
+            // Ask Repository to calculate
+            // the average Rating.
+
+            return await _reviewRepository
+                .GetAverageRatingAsync(restaurantId);
+        }
+
+
         // Create a new Review.
 
         public async Task CreateAsync(
+            int customerId,
             CreateReviewDto dto
         )
         {
@@ -165,7 +258,7 @@ namespace QuickEats.API.Services
                 new Reviews
                 {
                     CustomerId =
-                        dto.CustomerId,
+                        customerId,
 
                     RestaurantId =
                         dto.RestaurantId,

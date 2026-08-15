@@ -6,6 +6,7 @@ namespace QuickEats.API.Services.Interfaces
     public interface IMenuService
     {
         Task<IEnumerable<MenuResponseDto>> GetAllAsync();
+        Task<IEnumerable<string>> GetCategoriesAsync();
         Task<MenuResponseDto?> GetByIdAsync(int id);
         Task<IEnumerable<MenuResponseDto>> GetByRestaurantIdAsync(int restaurantId);
         Task CreateAsync(CreateMenuDto dto);

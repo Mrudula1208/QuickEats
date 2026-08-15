@@ -1,0 +1,91 @@
+h1{
+
+    margin-bottom:10px;
+
+}
+
+h2{
+
+    margin-top:20px;
+
+}
+
+.coupon-form{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:10px;
+
+    max-width:400px;
+
+    margin-bottom:30px;
+
+}
+
+.coupon-form label{
+
+    font-weight:bold;
+
+}
+
+.coupon-form input{
+
+    padding:8px;
+
+    border:1px solid #ddd;
+
+    border-radius:4px;
+
+}
+
+.coupon-form button{
+
+    padding:10px;
+
+    background:#1976d2;
+
+    color:white;
+
+    border:none;
+
+    border-radius:4px;
+
+    cursor:pointer;
+
+}
+
+table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+th{
+
+    background:#1976d2;
+
+    color:white;
+
+    padding:12px;
+
+}
+
+td{
+
+    border:1px solid #ddd;
+
+    padding:10px;
+
+}
+
+td button{
+
+    padding:6px 12px;
+
+    cursor:pointer;
+
+}

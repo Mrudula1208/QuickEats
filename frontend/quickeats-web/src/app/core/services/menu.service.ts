@@ -36,6 +36,10 @@ export class MenuService {
 
   }
 
+  getCategories(): Observable<string[]> {
+    return this.http.get<string[]>(`${this.apiUrl}/categories`);
+  }
+
   getMenuByRestaurantId(restaurantId: number): Observable<MenuItem[]> {
 // We create this method because every restaurant has different menu items.
 // restaurantId tells the Backend which restaurant's menu we need.

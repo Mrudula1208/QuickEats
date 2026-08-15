@@ -39,6 +39,13 @@ namespace QuickEats.API.Controllers
             }
             return Ok(menuItems);
         }
+        [HttpGet("categories")]
+        public async Task<IActionResult> GetCategories()
+        {
+            var categories = await _menuService.GetCategoriesAsync();
+            return Ok(categories);
+        }
+
         [HttpGet("restaurant/{restaurantId}")]
         public async Task <IActionResult> GetByRestaurantId(int restaurantId)
         {

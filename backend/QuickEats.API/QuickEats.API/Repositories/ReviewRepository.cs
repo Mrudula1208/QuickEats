@@ -45,11 +45,18 @@ namespace QuickEats.API.Repositories
             // Reviews
             // Represents the Review table.
 
+            // Include()
+            // Also loads the Customer name
+            // and Restaurant name
+            // with every Review.
+
             // ToListAsync()
             // Executes the database query
             // and returns all records as a list.
 
             return await _context.Reviews
+                .Include(review => review.Customer)
+                .Include(review => review.Restaurant)
                 .ToListAsync();
         }
 
@@ -67,9 +74,56 @@ namespace QuickEats.API.Repositories
             // it returns null.
 
             return await _context.Reviews
+                .Include(review => review.Customer)
+                .Include(review => review.Restaurant)
                 .FirstOrDefaultAsync(
                     review => review.Id == id
                 );
+        }
+
+
+        // Get all reviews of one Restaurant.
+
+        public async Task<IEnumerable<Reviews>> GetByRestaurantIdAsync(
+            int restaurantId
+        )
+        {
+            // Where()
+            // Keeps only Reviews
+            // that belong to the given Restaurant.
+
+            return await _context.Reviews
+                .Include(review => review.Customer)
+                .Include(review => review.Restaurant)
+                .Where(review => review.RestaurantId == restaurantId)
+                .ToListAsync();
+        }
+
+
+        // Get average Rating of one Restaurant.
+
+        public async Task<double?> GetAverageRatingAsync(
+            int restaurantId
+        )
+        {
+            // AnyAsync()
+            // Checks whether the Restaurant
+            // has at least one Review.
+
+            if (!await _context.Reviews
+                .AnyAsync(review => review.RestaurantId == restaurantId))
+            {
+                // No Reviews yet.
+
+                return null;
+            }
+
+            // AverageAsync()
+            // Calculates the average of all Ratings.
+
+            return await _context.Reviews
+                .Where(review => review.RestaurantId == restaurantId)
+                .AverageAsync(review => review.Rating);
         }
 
 

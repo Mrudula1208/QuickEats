@@ -40,5 +40,15 @@ namespace QuickEats.API.Models
         // Date and time when the review was created.
 
         public DateTime CreatedAt { get; set; }
+
+
+        // The customer who wrote the review.
+
+        public User Customer { get; set; } = null!;
+
+
+        // The restaurant that was reviewed.
+
+        public Restaurant Restaurant { get; set; } = null!;
     }
 }

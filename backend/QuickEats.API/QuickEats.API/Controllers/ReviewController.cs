@@ -11,6 +11,10 @@ using QuickEats.API.DTos.Review;
 using QuickEats.API.Services.Interfaces;
 // Import IReviewService.
 
+using System.Security.Claims;
+// ClaimTypes.NameIdentifier
+// Used to read the logged in Customer ID.
+
 
 namespace QuickEats.API.Controllers
 {
@@ -104,6 +108,57 @@ namespace QuickEats.API.Controllers
         }
 
 
+        // GET: /api/Review/restaurant/5
+        //
+        // Get all Reviews of one Restaurant.
+
+        [HttpGet("restaurant/{restaurantId}")]
+        public async Task<IActionResult> GetByRestaurantId(
+            int restaurantId
+        )
+        {
+            // Ask Service for Reviews
+            // of the given Restaurant.
+
+            var reviews =
+                await _reviewService
+                    .GetByRestaurantIdAsync(restaurantId);
+
+
+            // HTTP 200
+            // Return Reviews.
+
+            return Ok(reviews);
+        }
+
+
+        // GET: /api/Review/restaurant/5/average
+        //
+        // Get average Rating of one Restaurant.
+
+        [HttpGet("restaurant/{restaurantId}/average")]
+        public async Task<IActionResult> GetAverageRating(
+            int restaurantId
+        )
+        {
+            // Ask Service for average Rating
+            // of the given Restaurant.
+
+            var average =
+                await _reviewService
+                    .GetAverageRatingAsync(restaurantId);
+
+
+            // HTTP 200
+            // Return average Rating.
+            //
+            // When no Reviews exist,
+            // average will be null.
+
+            return Ok(average);
+        }
+
+
         // POST: /api/Review
         //
         // Create a new Review.
@@ -116,10 +171,19 @@ namespace QuickEats.API.Controllers
             CreateReviewDto dto
         )
         {
+            // Read the logged in Customer ID
+            // from the JWT token.
+
+            var customerId = int.Parse(
+                User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
             // Send DTO to Service.
+            //
+            // CustomerId always comes from the token.
+            // It is never trusted from the request.
 
             await _reviewService
-                .CreateAsync(dto);
+                .CreateAsync(customerId, dto);
 
 
             // HTTP 200

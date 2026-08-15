@@ -27,6 +27,11 @@ namespace QuickEats.API.Data
 
         public DbSet<OrderDelivery> OrderDeliveries { get; set; }
         public DbSet<Reviews> Reviews { get; set; }
+        public DbSet<WishlistItem> WishlistItems { get; set; }
+        public DbSet<Coupon> Coupons { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
+        public DbSet<SavedAddress> SavedAddresses { get; set; }
+        public DbSet<Favorite> Favorites { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -60,6 +65,14 @@ namespace QuickEats.API.Data
                 .WithMany()
                 .HasForeignKey(r => r.OwnerId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Coupon>()
+                .Property(c => c.MinimumOrderAmount)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Coupon>()
+                .Property(c => c.DiscountAmount)
+                .HasPrecision(18, 2);
 
             base.OnModelCreating(modelBuilder);
         }
