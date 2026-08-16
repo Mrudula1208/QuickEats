@@ -15,6 +15,20 @@ namespace QuickEats.API.Services
             _menuRepository = menuRepository;
         }
 
+        // Converts a stored image value (filename or full path) into a full /uploads/ URL.
+        private static string GetImageUrl(string imageUrl)
+        {
+            if (string.IsNullOrWhiteSpace(imageUrl))
+                return string.Empty;
+
+            // Already a full path
+            if (imageUrl.StartsWith("/uploads/"))
+                return imageUrl;
+
+            // Legacy filename only -> prepend /uploads/menu/
+            return $"/uploads/menu/{imageUrl}";
+        }
+
         public async Task<IEnumerable<MenuResponseDto>> GetAllAsync()
         {
             var menuItems = await _menuRepository.GetAllAsync();
@@ -32,7 +46,7 @@ namespace QuickEats.API.Services
                     Name = menuItem.Name,
                     Description = menuItem.Description,
                     Price = menuItem.Price,
-                    ImageUrl = menuItem.ImageUrl,
+                    ImageUrl = GetImageUrl(menuItem.ImageUrl),
                     IsAvailable = menuItem.IsAvailable,
                     Category = menuItem.Category,
                     IsVeg = menuItem.IsVeg,
@@ -58,7 +72,7 @@ namespace QuickEats.API.Services
                     Name = menuItem.Name,
                     Description = menuItem.Description,
                     Price = menuItem.Price,
-                    ImageUrl = menuItem.ImageUrl,
+                    ImageUrl = GetImageUrl(menuItem.ImageUrl),
                     IsAvailable = menuItem.IsAvailable,
                     Category = menuItem.Category,
                     IsVeg = menuItem.IsVeg,
@@ -126,7 +140,7 @@ namespace QuickEats.API.Services
                     Name = menuItem.Name,
                     Description = menuItem.Description,
                     Price = menuItem.Price,
-                    ImageUrl = menuItem.ImageUrl,
+                    ImageUrl = GetImageUrl(menuItem.ImageUrl),
                     IsAvailable = menuItem.IsAvailable,
                     Category = menuItem.Category,
                     IsVeg = menuItem.IsVeg,

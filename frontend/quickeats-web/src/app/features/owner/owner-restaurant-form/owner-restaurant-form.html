@@ -87,21 +87,33 @@
         </div>
     }
 
-    <label>Image URL</label>
+    <!-- Image Upload -->
+    <label>Restaurant Image</label>
+
+    @if (restaurant.imageUrl && !imagePreview) {
+        <img [src]="restaurant.imageUrl" class="image-preview" alt="Current">
+    }
 
     <input
-        type="text"
-        placeholder="assets/images/restaurants/..."
-        name="imageUrl"
-        [(ngModel)]="restaurant.imageUrl"
-        maxlength="500">
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        (change)="onFileSelected($event)">
+
+    @if (imagePreview) {
+        <img [src]="imagePreview" class="image-preview" alt="New Preview">
+    }
 
     <button
         class="save-btn"
         type="submit"
-        [disabled]="restaurantForm.invalid">
+        [disabled]="restaurantForm.invalid || isUploading">
 
-        Save Restaurant
+        @if (isUploading) {
+            Uploading...
+        }
+        @else {
+            Save Restaurant
+        }
 
     </button>
 

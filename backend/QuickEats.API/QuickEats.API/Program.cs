@@ -132,6 +132,9 @@ builder.Services.AddCors(options =>
 
             app.UseMiddleware<ExceptionMiddleware>();
 
+            // Serve uploaded images from wwwroot/uploads
+            app.UseStaticFiles();
+
             app.UseCors("AllowAngular");
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

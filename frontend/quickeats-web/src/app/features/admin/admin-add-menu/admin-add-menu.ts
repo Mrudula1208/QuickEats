@@ -13,6 +13,9 @@ import { Router } from '@angular/router';
 import { MenuService } from '../../../core/services/menu.service';
 // Calls Menu APIs.
 
+import { ImageService } from '../../../core/services/image.service';
+// Handles image upload.
+
 import { MenuItem } from '../../../core/models/menu.model';
 // Menu Structure.
 
@@ -60,24 +63,71 @@ export class AdminAddMenu {
 
   };
 
+  // File selected for upload.
+  selectedFile: File | null = null;
+
+  // Preview URL for selected image.
+  imagePreview: string = '';
+
+  // Is file currently uploading.
+  isUploading = false;
+
   constructor(
 
     // Menu API.
     private menuService: MenuService,
+
+    // Image upload API.
+    private imageService: ImageService,
 
     // Navigation.
     private router: Router
 
   ) { }
 
+  // When user selects a file.
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.selectedFile = input.files[0];
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagePreview = reader.result as string;
+      };
+      reader.readAsDataURL(this.selectedFile);
+    }
+  }
+
   // Save Menu.
   saveMenu(): void {
 
+    // If a file is selected, upload it first.
+    if (this.selectedFile) {
+      this.isUploading = true;
+
+      this.imageService.uploadImage(this.selectedFile, 'menu').subscribe({
+        next: (response) => {
+          this.menu.imageUrl = response.imageUrl;
+          this.isUploading = false;
+          this.createMenu();
+        },
+        error: (err) => {
+          console.log(err);
+          this.isUploading = false;
+        }
+      });
+    } else {
+      this.createMenu();
+    }
+
+  }
+
+  private createMenu(): void {
     this.menuService
       .addMenu(this.menu)
       .subscribe({
 
-        // Success.
         next: () => {
 
           console.log("Menu Added");
@@ -90,7 +140,6 @@ export class AdminAddMenu {
 
         },
 
-        // Error.
         error: (err: any) => {
 
           console.log(err);
@@ -98,7 +147,6 @@ export class AdminAddMenu {
         }
 
       });
-
   }
 
 }

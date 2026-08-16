@@ -73,6 +73,7 @@ export class LoginComponent {
     localStorage.setItem('name', response.name);
     localStorage.setItem('email', response.email);
     localStorage.setItem('role', response.role);
+    localStorage.setItem('profileImageUrl', response.profileImageUrl || '');
 
     this.toastr.success('Login Successful', 'Welcome Back');
 

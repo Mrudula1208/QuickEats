@@ -56,11 +56,21 @@ max="999999"
     </div>
 }
 
+<!-- Image Upload -->
+<label>Menu Item Image</label>
+
+@if (menu.imageUrl && !imagePreview) {
+    <img [src]="menu.imageUrl" class="image-preview" alt="Current">
+}
+
 <input
-type="text"
-name="imageUrl"
-[(ngModel)]="menu.imageUrl"
-maxlength="500">
+type="file"
+accept="image/jpeg,image/png,image/webp"
+(change)="onFileSelected($event)">
+
+@if (imagePreview) {
+    <img [src]="imagePreview" class="image-preview" alt="New Preview">
+}
 
 <select
 name="category"
@@ -106,9 +116,14 @@ max="100">
 
 <button
 type="submit"
-[disabled]="menuForm.invalid">
+[disabled]="menuForm.invalid || isUploading">
 
-Update Menu
+@if (isUploading) {
+    Uploading...
+}
+@else {
+    Update Menu
+}
 
 </button>
 

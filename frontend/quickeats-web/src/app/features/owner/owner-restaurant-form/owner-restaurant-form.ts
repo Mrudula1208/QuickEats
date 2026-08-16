@@ -20,6 +20,9 @@ import { OwnerNavComponent } from '../../../shared/owner-nav/owner-nav';
 import { RestaurantService } from '../../../core/services/restaurant.service';
 // Saves the restaurant.
 
+import { ImageService } from '../../../core/services/image.service';
+// Handles image upload.
+
 import { Restaurant } from '../../../core/models/restaurant.model';
 // Structure of one restaurant.
 
@@ -47,10 +50,20 @@ export class OwnerRestaurantFormComponent {
     createdAt: ''
   };
 
+  // File selected for upload.
+  selectedFile: File | null = null;
+
+  // Preview URL for selected image.
+  imagePreview: string = '';
+
+  // Is file currently uploading.
+  isUploading = false;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private restaurantService: RestaurantService
+    private restaurantService: RestaurantService,
+    private imageService: ImageService
   ) {
 
     // Check the URL to decide Add or Edit.
@@ -77,9 +90,45 @@ export class OwnerRestaurantFormComponent {
 
   }
 
+  // When user selects a file.
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.selectedFile = input.files[0];
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagePreview = reader.result as string;
+      };
+      reader.readAsDataURL(this.selectedFile);
+    }
+  }
+
   // Save the restaurant (Add or Edit).
   saveRestaurant(): void {
 
+    // If a file is selected, upload it first.
+    if (this.selectedFile) {
+      this.isUploading = true;
+
+      this.imageService.uploadImage(this.selectedFile, 'restaurants').subscribe({
+        next: (response) => {
+          this.restaurant.imageUrl = response.imageUrl;
+          this.isUploading = false;
+          this.submitRestaurant();
+        },
+        error: (err) => {
+          console.log(err);
+          this.isUploading = false;
+        }
+      });
+    } else {
+      this.submitRestaurant();
+    }
+
+  }
+
+  private submitRestaurant(): void {
     if (this.isEdit) {
 
       // Update existing restaurant.
@@ -110,7 +159,6 @@ export class OwnerRestaurantFormComponent {
         });
 
     }
-
   }
 
 }

@@ -22,6 +22,20 @@ namespace QuickEats.API.Services
             _reviewService = reviewService;
         }
 
+        // Converts a stored image value (filename or full path) into a full /uploads/ URL.
+        private static string GetImageUrl(string imageUrl)
+        {
+            if (string.IsNullOrWhiteSpace(imageUrl))
+                return string.Empty;
+
+            // Already a full path
+            if (imageUrl.StartsWith("/uploads/"))
+                return imageUrl;
+
+            // Legacy filename only -> prepend /uploads/restaurants/
+            return $"/uploads/restaurants/{imageUrl}";
+        }
+
         public async Task<IEnumerable<RestaurantResponseDto>> GetAllAsync()
         {
             // Ask Repository to fetch data from database
@@ -43,7 +57,7 @@ namespace QuickEats.API.Services
                     Description = restaurant.Description,
                     Address = restaurant.Address,
                     PhoneNumber = restaurant.PhoneNumber,
-                    ImageUrl = restaurant.ImageUrl,
+                    ImageUrl = GetImageUrl(restaurant.ImageUrl),
                     IsActive = restaurant.IsActive,
                     CreatedAt = restaurant.CreatedAt,
                     Rating = rating ?? 0
@@ -70,7 +84,7 @@ namespace QuickEats.API.Services
                     Description = restaurant.Description,
                     Address = restaurant.Address,
                     PhoneNumber = restaurant.PhoneNumber,
-                    ImageUrl = restaurant.ImageUrl,
+                    ImageUrl = GetImageUrl(restaurant.ImageUrl),
                     IsActive = restaurant.IsActive,
                     CreatedAt = restaurant.CreatedAt,
                     Rating = rating ?? 0
@@ -129,7 +143,7 @@ namespace QuickEats.API.Services
                     Description = restaurant.Description,
                     Address = restaurant.Address,
                     PhoneNumber = restaurant.PhoneNumber,
-                    ImageUrl = restaurant.ImageUrl,
+                    ImageUrl = GetImageUrl(restaurant.ImageUrl),
                     IsActive = restaurant.IsActive,
                     CreatedAt = restaurant.CreatedAt,
                 });

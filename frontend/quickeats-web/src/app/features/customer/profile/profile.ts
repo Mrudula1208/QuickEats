@@ -1,19 +1,22 @@
 import { Component } from '@angular/core';
-// 1️⃣ Executes First.
+// 1 Executes First.
 // Import Component because every Angular page starts with @Component.
 
 import { CommonModule } from '@angular/common';
-// 2️⃣ Import CommonModule because HTML uses Angular directives.
+// 2 Import CommonModule because HTML uses Angular directives.
 
 import { FormsModule } from '@angular/forms';
-// 3️⃣ Import FormsModule because Edit Profile uses ngModel.
+// 3 Import FormsModule because Edit Profile uses ngModel.
 
 import { ProfileService } from '../../../core/services/profile.service';
-// 4️⃣ Import ProfileService.
+// 4 Import ProfileService.
 // Service manages customer profile.
 
+import { ImageService } from '../../../core/services/image.service';
+// Handles image upload.
+
 import { ProfileModel } from '../../../core/models/profile.model';
-// 5️⃣ Import ProfileModel.
+// 5 Import ProfileModel.
 // Defines structure of customer profile.
 
 import { ToastrService } from 'ngx-toastr';
@@ -40,45 +43,26 @@ import { ToastrService } from 'ngx-toastr';
 
 export class ProfileComponent {
 
-  // ====================================================
-  // EXECUTION FLOW
-  // ====================================================
-  //
-  // 1️⃣ Angular creates ProfileComponent.
-  //
-  // 2️⃣ Constructor executes.
-  //
-  // 3️⃣ Profile loads from ProfileService.
-  //
-  // 4️⃣ HTML receives profile.
-  //
-  // 5️⃣ User edits details.
-  //
-  // 6️⃣ Save button updates profile.
-  //
-  // ====================================================
-
-  // profile: ProfileModel
-  //
-  // Stores customer profile.
-
   profile: ProfileModel;
+
+  // File selected for upload.
+  selectedFile: File | null = null;
+
+  // Preview URL for new image.
+  imagePreview: string = '';
+
+  // Is file currently uploading.
+  isUploading = false;
 
   constructor(
 
     private profileService: ProfileService,
 
+    private imageService: ImageService,
+
     private toastr: ToastrService
 
-    // private
-    // Only this component can use service.
-    //
-    // Angular automatically injects
-    // ProfileService.
-
   ) {
-
-    // Load customer profile.
 
     this.profile =
 
@@ -86,53 +70,47 @@ export class ProfileComponent {
 
   }
 
+  // When user selects a file.
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.selectedFile = input.files[0];
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagePreview = reader.result as string;
+      };
+      reader.readAsDataURL(this.selectedFile);
+    }
+  }
+
   saveProfile(): void {
 
-    // (): void
-    //
-    // Returns nothing.
-    // Only performs work.
+    // If a file is selected, upload it first.
+    if (this.selectedFile) {
+      this.isUploading = true;
 
-    this.profileService.updateProfile(
-
-      this.profile
-
-    );
-
-    this.toastr.success('Profile Updated Successfully');
+      this.imageService.uploadImage(this.selectedFile, 'profile').subscribe({
+        next: (response) => {
+          this.profile.profileImage = response.imageUrl;
+          this.isUploading = false;
+          this.updateProfile();
+        },
+        error: (err) => {
+          console.log(err);
+          this.isUploading = false;
+          this.toastr.error('Failed to upload image');
+        }
+      });
+    } else {
+      this.updateProfile();
+    }
 
   }
 
+  private updateProfile(): void {
+    this.profileService.updateProfile(this.profile);
+    this.toastr.success('Profile Updated Successfully');
+  }
+
 }
-
-/*
-
-WHY DO WE WRITE THIS FILE?
-
-This component controls Profile Page.
-
-Flow
-
-Profile Service
-
-↓
-
-Profile Component
-
-↓
-
-HTML
-
-↓
-
-Customer Updates Profile
-
-↓
-
-Profile Service
-
-↓
-
-Signal Updated
-
-*/

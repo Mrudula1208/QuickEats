@@ -65,6 +65,22 @@ required
     </div>
 }
 
+<!-- Image Upload -->
+<label>Restaurant Image</label>
+
+@if (restaurant.imageUrl && !imagePreview) {
+    <img [src]="restaurant.imageUrl" class="image-preview" alt="Current">
+}
+
+<input
+type="file"
+accept="image/jpeg,image/png,image/webp"
+(change)="onFileSelected($event)">
+
+@if (imagePreview) {
+    <img [src]="imagePreview" class="image-preview" alt="New Preview">
+}
+
 <input
 type="text"
 name="imageUrl"
@@ -73,9 +89,14 @@ maxlength="500">
 
 <button
 type="submit"
-[disabled]="restaurantForm.invalid">
+[disabled]="restaurantForm.invalid || isUploading">
 
-Update Restaurant
+@if (isUploading) {
+    Uploading...
+}
+@else {
+    Update Restaurant
+}
 
 </button>
 

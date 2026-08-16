@@ -12,7 +12,7 @@
     <div class="restaurants-grid">
       @for (restaurant of restaurants; track restaurant.id) {
         <div class="restaurant-card">
-          <img [src]="'assets/images/restaurants/' + restaurant.imageUrl" [alt]="restaurant.name" class="restaurant-image">
+          <img [src]="restaurant.imageUrl" [alt]="restaurant.name" class="restaurant-image">
           <div class="restaurant-info">
             <h2>{{ restaurant.name }}</h2>
             <p class="description">{{ restaurant.description }}</p>

@@ -14,6 +14,20 @@
 
             alt="Profile">
 
+        <!-- Image Upload -->
+        <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            (change)="onFileSelected($event)">
+
+        @if (imagePreview) {
+            <img [src]="imagePreview" class="upload-preview" alt="New Preview">
+        }
+
+        @if (isUploading) {
+            <p class="upload-status">Uploading image...</p>
+        }
+
         <div class="form-group">
 
             <label>
@@ -146,7 +160,12 @@
 
             (click)="saveProfile()">
 
-            Save Profile
+            @if (isUploading) {
+                Uploading...
+            }
+            @else {
+                Save Profile
+            }
 
         </button>
 

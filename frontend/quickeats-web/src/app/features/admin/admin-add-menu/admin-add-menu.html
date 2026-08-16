@@ -2,13 +2,6 @@
 
 <form #menuForm="ngForm" (ngSubmit)="saveMenu()">
 
-    <!--
-        Restaurant ID
-
-        Customer/Admin enters the Restaurant Id.
-        This tells Backend which restaurant
-        this food item belongs to.
-    -->
     <label>
         Restaurant ID
     </label>
@@ -33,15 +26,6 @@
         </div>
     }
 
-
-    <!--
-        Food Name
-
-        [(ngModel)]
-        Means:
-        Whatever user types here is stored
-        inside menu.name.
-    -->
     <label>
         Food Name
     </label>
@@ -67,9 +51,6 @@
         </div>
     }
 
-
-    <!-- Food Description -->
-
     <label>
         Description
     </label>
@@ -79,9 +60,6 @@
         [(ngModel)]="menu.description"
         maxlength="1000"
     ></textarea>
-
-
-    <!-- Food Price -->
 
     <label>
         Price
@@ -108,27 +86,17 @@
         </div>
     }
 
-
-    <!-- Food Image URL -->
-
-    <label>
-        Image URL
-    </label>
+    <!-- Image Upload -->
+    <label>Menu Item Image</label>
 
     <input
-        type="text"
-        name="imageUrl"
-        [(ngModel)]="menu.imageUrl"
-        maxlength="500"
-    >
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        (change)="onFileSelected($event)">
 
-
-    <!--
-        Availability
-
-        true  = Available
-        false = Not Available
-    -->
+    @if (imagePreview) {
+        <img [src]="imagePreview" class="image-preview" alt="Preview">
+    }
 
     <label>
         Available
@@ -139,9 +107,6 @@
         name="isAvailable"
         [(ngModel)]="menu.isAvailable"
     >
-
-
-    <!-- Food Category -->
 
     <label>
         Category
@@ -164,9 +129,6 @@
 
     </select>
 
-
-    <!-- Veg / Non-Veg -->
-
     <label>
         Veg / Non-Veg
     </label>
@@ -181,9 +143,6 @@
 
     </select>
 
-
-    <!-- Bestseller -->
-
     <label>
         Bestseller
     </label>
@@ -193,9 +152,6 @@
         name="isBestseller"
         [(ngModel)]="menu.isBestseller"
     >
-
-
-    <!-- Discount Percent -->
 
     <label>
         Discount Percent
@@ -209,19 +165,16 @@
         max="100"
     >
 
-
-    <!--
-        ngSubmit
-
-        When button is clicked,
-        Angular calls saveMenu().
-    -->
-
     <button
         type="submit"
-        [disabled]="menuForm.invalid">
+        [disabled]="menuForm.invalid || isUploading">
 
-        Add Menu
+        @if (isUploading) {
+            Uploading...
+        }
+        @else {
+            Add Menu
+        }
 
     </button>
 

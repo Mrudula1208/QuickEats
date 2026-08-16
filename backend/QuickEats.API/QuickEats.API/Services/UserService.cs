@@ -38,7 +38,7 @@ namespace QuickEats.API.Services
                 PhoneNumber = request.PhoneNumber,
                 PasswordHash = PasswordHasher.Hash(request.Password),
                 Role=request.Role
-                
+
             };
             await _userRepository.AddAsync(user);
             await _userRepository.SaveChangesAsync();
@@ -81,39 +81,22 @@ namespace QuickEats.API.Services
                 Token = token,
                 Name = user.Name,
                 Email = user.Email,
-                Role = user.Role
+                Role = user.Role,
+                ProfileImageUrl = user.ProfileImageUrl
             };
         }
 
+        public async Task UpdateProfileImageUrlAsync(int userId, string imageUrl)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+            {
+                throw new NotFoundException("User not found");
+            }
 
-
-
-
-
-
-
-
+            user.ProfileImageUrl = imageUrl;
+            _userRepository.Update(user);
+            await _userRepository.SaveChangesAsync();
+        }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//UserService needs Repository.
-//ASP.NET gives Repository.
-//UserService stores it in _repository.

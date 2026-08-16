@@ -116,6 +116,7 @@ private apiUrl = 'https://localhost:7278/api/Auth';
     localStorage.removeItem('name');
     localStorage.removeItem('email');
     localStorage.removeItem('role');
+    localStorage.removeItem('profileImageUrl');
 
   }
 

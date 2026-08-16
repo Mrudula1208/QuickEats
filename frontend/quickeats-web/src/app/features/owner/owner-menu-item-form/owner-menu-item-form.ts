@@ -20,6 +20,9 @@ import { OwnerNavComponent } from '../../../shared/owner-nav/owner-nav';
 import { MenuService } from '../../../core/services/menu.service';
 // Saves menu items.
 
+import { ImageService } from '../../../core/services/image.service';
+// Handles image upload.
+
 import { MenuItem } from '../../../core/models/menu.model';
 // Structure of one menu item.
 
@@ -53,10 +56,20 @@ export class OwnerMenuItemFormComponent {
     discountPercent: 0
   };
 
+  // File selected for upload.
+  selectedFile: File | null = null;
+
+  // Preview URL for selected image.
+  imagePreview: string = '';
+
+  // Is file currently uploading.
+  isUploading = false;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private menuService: MenuService
+    private menuService: MenuService,
+    private imageService: ImageService
   ) {
 
     // Read the restaurant id and the menu item id from the URL.
@@ -87,9 +100,45 @@ export class OwnerMenuItemFormComponent {
 
   }
 
+  // When user selects a file.
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.selectedFile = input.files[0];
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagePreview = reader.result as string;
+      };
+      reader.readAsDataURL(this.selectedFile);
+    }
+  }
+
   // Save the menu item (Add or Edit).
   saveItem(): void {
 
+    // If a file is selected, upload it first.
+    if (this.selectedFile) {
+      this.isUploading = true;
+
+      this.imageService.uploadImage(this.selectedFile, 'menu').subscribe({
+        next: (response) => {
+          this.item.imageUrl = response.imageUrl;
+          this.isUploading = false;
+          this.submitItem();
+        },
+        error: (err) => {
+          console.log(err);
+          this.isUploading = false;
+        }
+      });
+    } else {
+      this.submitItem();
+    }
+
+  }
+
+  private submitItem(): void {
     if (this.isEdit) {
 
       // Build the DTO that matches UpdateMenuDto in C#.
@@ -135,7 +184,6 @@ export class OwnerMenuItemFormComponent {
         });
 
     }
-
   }
 
 }
