@@ -21,12 +21,15 @@ namespace QuickEats.API.Controllers
             _restaurantService = restaurantService;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAllAsync()
         {
             var restaurants = await _restaurantService.GetAllAsync();
             return Ok(restaurants);
         }
+
+        [AllowAnonymous]
         [HttpGet("{id}")]
 
         public async Task<IActionResult> GetById(int id)

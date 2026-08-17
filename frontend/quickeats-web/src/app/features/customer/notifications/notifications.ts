@@ -1,14 +1,7 @@
 import { Component } from '@angular/core';
-// Controls Notification Page.
-
 import { CommonModule } from '@angular/common';
-// Required for @for and @if.
-
 import { NotificationService } from '../../../core/services/notification.service';
-// Calls Notification APIs.
-
 import { NotificationModel } from '../../../core/models/notification.model';
-// Notification Structure.
 
 @Component({
   selector: 'app-notifications',
@@ -21,78 +14,84 @@ import { NotificationModel } from '../../../core/models/notification.model';
 })
 export class NotificationsComponent {
 
-  // Store all notifications.
   notifications: NotificationModel[] = [];
+  unreadCount: number = 0;
 
   constructor(
-
-    // Notification Service.
     private notificationService: NotificationService
-
   ) {
-
-    // Load Notifications.
     this.loadNotifications();
-
+    this.loadUnreadCount();
   }
 
-  // Load Notifications.
   loadNotifications(): void {
-
-    this.notificationService
-      .getNotifications()
-      .subscribe({
-
-        // Success.
-        next: (data: NotificationModel[]) => {
-
-          this.notifications = data;
-
-          console.log(this.notifications);
-
-        },
-
-        // Error.
-        error: (err: any) => {
-
-          console.log(err);
-
-        }
-
-      });
-
+    this.notificationService.getNotifications().subscribe({
+      next: (data: NotificationModel[]) => {
+        this.notifications = data;
+      },
+      error: (err: any) => {
+        console.log(err);
+      }
+    });
   }
 
-  // Mark Notification As Read.
-  markAsRead(
+  loadUnreadCount(): void {
+    this.notificationService.getUnreadCount().subscribe({
+      next: (count: number) => {
+        this.unreadCount = count;
+      },
+      error: (err: any) => {
+        console.log(err);
+      }
+    });
+  }
 
-    notificationId: number
+  markAsRead(notificationId: number): void {
+    this.notificationService.markAsRead(notificationId).subscribe({
+      next: () => {
+        this.loadNotifications();
+        this.loadUnreadCount();
+      },
+      error: (err: any) => {
+        console.log(err);
+      }
+    });
+  }
 
-  ): void {
+  markAllAsRead(): void {
+    this.notificationService.markAllAsRead().subscribe({
+      next: () => {
+        this.loadNotifications();
+        this.loadUnreadCount();
+      },
+      error: (err: any) => {
+        console.log(err);
+      }
+    });
+  }
 
-    this.notificationService
-      .markAsRead(notificationId)
-      .subscribe({
+  deleteNotification(notificationId: number): void {
+    this.notificationService.deleteNotification(notificationId).subscribe({
+      next: () => {
+        this.loadNotifications();
+        this.loadUnreadCount();
+      },
+      error: (err: any) => {
+        console.log(err);
+      }
+    });
+  }
 
-        // Success.
-        next: () => {
-
-          console.log("Notification Read");
-
-          // Reload Notifications.
-          this.loadNotifications();
-
-        },
-
-        // Error.
-        error: (err: any) => {
-
-          console.log(err);
-
-        }
-
-      });
-
+  clearAll(): void {
+    this.notificationService.clearAll().subscribe({
+      next: () => {
+        this.notifications = [];
+        this.unreadCount = 0;
+      },
+      error: (err: any) => {
+        console.log(err);
+      }
+    });
   }
 
 }

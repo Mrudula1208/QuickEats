@@ -23,4 +23,7 @@ export interface Restaurant {
 
   // Created Date
   createdAt: string;
+
+  // Average Rating
+  rating?: number;
 }

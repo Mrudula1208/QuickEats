@@ -1,69 +1,99 @@
-// Import Component decorator and signal.
 import { Component, signal } from '@angular/core';
-
-// Import Featured Restaurants Component.
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { FeaturedRestaurantsComponent } from '../components/featured-restaurants/featured-restaurants';
-
-// Import Restaurant Model.
 import { Restaurant } from '../../../core/models/restaurant.model';
-
-// Import Restaurant Service.
 import { RestaurantService } from '../../../core/services/restaurant.service';
 
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [
+    CommonModule,
+    FormsModule,
     FeaturedRestaurantsComponent
   ],
   templateUrl: './home.html',
   styleUrl: './home.scss'
 })
-
 export class Home {
 
-  // Stores all restaurants as a reactive signal.
-  //
-  // Initially this list is empty.
   restaurants = signal<Restaurant[]>([]);
+  filteredRestaurants = signal<Restaurant[]>([]);
 
-  // Dependency Injection.
-  //
-  // Angular automatically creates
-  // RestaurantService object.
+  searchText = '';
+  showOpenOnly = false;
+  showClosedOnly = false;
+  minRating = 0;
+
   constructor(
-
     private restaurantService: RestaurantService
-
   ) {
     this.loadRestaurants();
   }
-    loadRestaurants(): void {
 
-    // Call Restaurant API.
+  loadRestaurants(): void {
     this.restaurantService.getRestaurants().subscribe({
-
-      // API Success
       next: (data) => {
-
-        // Store API data
-        // inside restaurants signal.
         this.restaurants.set(data);
-
-        console.log("Restaurants Loaded Successfully");
-        console.log(this.restaurants());
+        this.applyFilters();
       },
-
-      // API Failed
       error: (err) => {
-
-        console.log("Failed to Load Restaurants");
         console.log(err);
-
       }
-
     });
+  }
 
+  applyFilters(): void {
+    let result = this.restaurants();
+
+    if (this.searchText) {
+      const search = this.searchText.toLowerCase();
+      result = result.filter(r =>
+        r.name.toLowerCase().includes(search) ||
+        r.address.toLowerCase().includes(search) ||
+        r.description.toLowerCase().includes(search)
+      );
+    }
+
+    if (this.showOpenOnly) {
+      result = result.filter(r => r.isActive);
+    }
+
+    if (this.showClosedOnly) {
+      result = result.filter(r => !r.isActive);
+    }
+
+    if (this.minRating > 0) {
+      result = result.filter(r => (r.rating ?? 0) >= this.minRating);
+    }
+
+    this.filteredRestaurants.set(result);
+  }
+
+  onSearch(): void {
+    this.applyFilters();
+  }
+
+  toggleOpen(): void {
+    this.showOpenOnly = !this.showOpenOnly;
+    if (this.showOpenOnly) {
+      this.showClosedOnly = false;
+    }
+    this.applyFilters();
+  }
+
+  toggleClosed(): void {
+    this.showClosedOnly = !this.showClosedOnly;
+    if (this.showClosedOnly) {
+      this.showOpenOnly = false;
+    }
+    this.applyFilters();
+  }
+
+  setMinRating(rating: number): void {
+    this.minRating = this.minRating === rating ? 0 : rating;
+    this.applyFilters();
   }
 
 }

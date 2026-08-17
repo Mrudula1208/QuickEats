@@ -1,4 +1,5 @@
-﻿using QuickEats.API.DTos.Order;
+﻿using QuickEats.API.DTos.Notification;
+using QuickEats.API.DTos.Order;
 using QuickEats.API.Models;
 using QuickEats.API.Repositories.Interfaces;
 using QuickEats.API.Services.Interfaces;
@@ -9,10 +10,12 @@ namespace QuickEats.API.Services
     {
         private readonly IOrderRepository _orderRepository;
         private readonly IMenuRepository _menuRepository;
-        public OrderService(IOrderRepository orderRepository, IMenuRepository menuRepository)
+        private readonly INotificationService _notificationService;
+        public OrderService(IOrderRepository orderRepository, IMenuRepository menuRepository, INotificationService notificationService)
         {
             _orderRepository = orderRepository;
             _menuRepository = menuRepository;
+            _notificationService = notificationService;
         }
 
         public async Task<IEnumerable<OrderResponseDto>> GetAllAsync()
@@ -240,7 +243,14 @@ namespace QuickEats.API.Services
             _orderRepository.Update(order);
             await _orderRepository.SaveChangesAsync();
 
+            var notification = new CreateNotificationDto
+            {
+                UserId = order.UserId,
+                Title = "Order Status Updated",
+                Message = $"Your order #{order.Id} status has been updated to {dto.Status}."
+            };
 
+            await _notificationService.CreateAsync(notification);
         }
 
 

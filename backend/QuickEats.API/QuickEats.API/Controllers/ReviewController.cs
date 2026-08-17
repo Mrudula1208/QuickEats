@@ -56,6 +56,7 @@ namespace QuickEats.API.Controllers
         //
         // Get all Reviews.
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -77,6 +78,7 @@ namespace QuickEats.API.Controllers
         //
         // Get one Review.
 
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(
             int id
@@ -112,6 +114,7 @@ namespace QuickEats.API.Controllers
         //
         // Get all Reviews of one Restaurant.
 
+        [AllowAnonymous]
         [HttpGet("restaurant/{restaurantId}")]
         public async Task<IActionResult> GetByRestaurantId(
             int restaurantId
@@ -136,6 +139,7 @@ namespace QuickEats.API.Controllers
         //
         // Get average Rating of one Restaurant.
 
+        [AllowAnonymous]
         [HttpGet("restaurant/{restaurantId}/average")]
         public async Task<IActionResult> GetAverageRating(
             int restaurantId

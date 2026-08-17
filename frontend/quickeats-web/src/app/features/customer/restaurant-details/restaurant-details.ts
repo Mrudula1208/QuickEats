@@ -68,6 +68,10 @@ export class RestaurantDetailsComponent {
   // true = show only veg items.
   vegOnly = false;
 
+  // Price range filter.
+  minPrice = 0;
+  maxPrice = 10000;
+
   // Store quantity of every menu item.
   // Key = menu id, Value = quantity.
   quantities: { [id: number]: number } = {};
@@ -311,7 +315,7 @@ export class RestaurantDetailsComponent {
 
   }
 
-  // Filter menus by search text, category and veg only.
+  // Filter menus by search text, category, veg and price.
   applyFilters(): void {
 
     let result = this.menus;
@@ -342,6 +346,11 @@ export class RestaurantDetailsComponent {
       result = result.filter(m => m.isVeg);
 
     }
+
+    // Filter by price range.
+    result = result.filter(m =>
+      m.price >= this.minPrice && m.price <= this.maxPrice
+    );
 
     this.filteredMenus = result;
 

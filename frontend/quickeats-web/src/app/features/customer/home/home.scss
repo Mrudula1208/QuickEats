@@ -235,3 +235,99 @@ box-shadow:0 15px 30px rgba(255,122,24,.35);}
   font-weight:600;
 
 }
+
+/* ==========================
+   FILTER BAR
+========================== */
+
+.filter-bar{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+  flex-wrap:wrap;
+
+  gap:15px;
+
+  padding:20px 8%;
+
+  background:#fff;
+
+  box-shadow:0 4px 15px rgba(0,0,0,.05);
+
+}
+
+.filter-group{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:10px;
+
+  flex-wrap:wrap;
+
+}
+
+.filter-label{
+
+  font-size:16px;
+
+  font-weight:700;
+
+  color:#333;
+
+}
+
+.filter-chip{
+
+  padding:10px 20px;
+
+  border:2px solid #eee;
+
+  border-radius:30px;
+
+  background:#fff;
+
+  color:#555;
+
+  font-size:14px;
+
+  font-weight:600;
+
+  cursor:pointer;
+
+  transition:.3s;
+
+}
+
+.filter-chip:hover{
+
+  border-color:#ff5f00;
+
+  color:#ff5f00;
+
+}
+
+.filter-chip.active{
+
+  background:linear-gradient(135deg,#ff7a18,#ff5f00);
+
+  color:#fff;
+
+  border-color:#ff5f00;
+
+}
+
+.result-count{
+
+  font-size:16px;
+
+  color:#888;
+
+  font-weight:600;
+
+}

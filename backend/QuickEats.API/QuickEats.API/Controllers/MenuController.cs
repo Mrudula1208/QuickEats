@@ -22,6 +22,7 @@ namespace QuickEats.API.Controllers
             _restaurantService = restaurantService;
         }
 
+        [AllowAnonymous]
         [HttpGet]
 
         public async Task<IActionResult> GetAll()
@@ -29,6 +30,8 @@ namespace QuickEats.API.Controllers
             var menuItems=await _menuService.GetAllAsync();
             return Ok(menuItems);
         }
+
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task <IActionResult>GetByID(int id)
         {
@@ -39,6 +42,8 @@ namespace QuickEats.API.Controllers
             }
             return Ok(menuItems);
         }
+
+        [AllowAnonymous]
         [HttpGet("categories")]
         public async Task<IActionResult> GetCategories()
         {
@@ -46,6 +51,7 @@ namespace QuickEats.API.Controllers
             return Ok(categories);
         }
 
+        [AllowAnonymous]
         [HttpGet("restaurant/{restaurantId}")]
         public async Task <IActionResult> GetByRestaurantId(int restaurantId)
         {

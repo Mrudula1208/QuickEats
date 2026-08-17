@@ -197,8 +197,46 @@
 }
 
 /* ================================
+   Rating Badge
+=========================== */
+
+.rating-badge{
+    display:inline-block;
+    background:#fff8e1;
+    color:#f57c00;
+    padding:6px 14px;
+    border-radius:20px;
+    font-size:15px;
+    font-weight:700;
+}
+
+/* ================================
+   Closed Badge Override
+=========================== */
+
+.closed-badge{
+    background:#d32f2f;
+}
+
+/* ================================
+   No Results
+=========================== */
+
+.no-results{
+    text-align:center;
+    padding:60px 20px;
+    color:#999;
+}
+
+.no-results h3{
+    font-size:24px;
+    color:#666;
+    margin-bottom:10px;
+}
+
+/* ================================
    Responsive
-================================ */
+=========================== */
 
 @media(max-width:768px){
 

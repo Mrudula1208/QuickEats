@@ -12,12 +12,12 @@ namespace QuickEats.API.Services
     {
         //Create a private variable named _restaurantRepository that will store a Restaurant Repository object, and once it gets a value, it cannot be changed."
         private readonly IRestaurantRepository _restaurantRepository;
+        private readonly IReviewService _reviewService;
 
-
-        // ASP.NET,please give me an object that implements IRestaurantRepository. I'll store it in _restaurantRepository.
-        public RestaurantService(IRestaurantRepository restaurantRepository)
+        public RestaurantService(IRestaurantRepository restaurantRepository, IReviewService reviewService)
         {
             _restaurantRepository = restaurantRepository;
+            _reviewService = reviewService;
         }
 
         public async Task<IEnumerable<RestaurantResponseDto>> GetAllAsync()
@@ -32,6 +32,8 @@ namespace QuickEats.API.Services
 
             foreach (var restaurant in restaurants)
             {
+                var rating = await _reviewService.GetAverageRatingAsync(restaurant.Id);
+
                 response.Add(new RestaurantResponseDto
                 {
                     Id = restaurant.Id,
@@ -42,6 +44,7 @@ namespace QuickEats.API.Services
                     ImageUrl = restaurant.ImageUrl,
                     IsActive = restaurant.IsActive,
                     CreatedAt = restaurant.CreatedAt,
+                    Rating = rating ?? 0
                 });
             }
             return response;
@@ -57,6 +60,9 @@ namespace QuickEats.API.Services
             {
                 return null;
             }
+
+            var rating = await _reviewService.GetAverageRatingAsync(id);
+
             //Convert Entity into DTO.
             return new RestaurantResponseDto
             {
@@ -68,8 +74,7 @@ namespace QuickEats.API.Services
                 ImageUrl = restaurant.ImageUrl,
                 IsActive = restaurant.IsActive,
                 CreatedAt = restaurant.CreatedAt,
-
-
+                Rating = rating ?? 0
             };
         }
 
