@@ -12,6 +12,8 @@ namespace QuickEats.API.Controllers
     {
         private readonly IUserService _userService;
 
+        private static readonly string[] AllowedRoles = { "Customer", "Owner" };
+
         public AuthController(IUserService userService)
         {
             _userService = userService;
@@ -20,13 +22,18 @@ namespace QuickEats.API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterRequestDto request)
         {
+            if (!AllowedRoles.Contains(request.Role))
+            {
+                request.Role = "Customer";
+            }
+
             await _userService.RegisterAsync(request);
             return Ok(new
             {
                 message = "User Registered Successfully"
             });
         }
-        [HttpPost("Login")]
+        [HttpPost("login")]
         public async Task<IActionResult> Login(LoginRequestDto request)
         {
             // Ask Service to Login User.

@@ -111,11 +111,11 @@ private apiUrl = 'https://localhost:7278/api/Auth';
 
   logout(): void {
 
-    localStorage.removeItem(
-
-      'token'
-
-    );
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('name');
+    localStorage.removeItem('email');
+    localStorage.removeItem('role');
 
   }
 

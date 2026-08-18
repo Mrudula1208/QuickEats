@@ -10,6 +10,8 @@ import { Router } from '@angular/router';
 // 3️⃣ Executes Third.
 // Router is used to open another page.
 
+import { ToastrService } from 'ngx-toastr';
+
 // Component Configuration
 @Component({
 
@@ -79,7 +81,9 @@ export class CustomerDashboardComponent {
 
   constructor(
 
-    private router: Router
+    private router: Router,
+
+    private toastr: ToastrService
 
     // private
     // Means only this class can use Router.
@@ -153,11 +157,15 @@ export class CustomerDashboardComponent {
 
   logout(): void {
 
-    alert("Logout Successfully");
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('name');
+    localStorage.removeItem('email');
+    localStorage.removeItem('role');
 
-    this.router.navigate([
-      '/'
-    ]);
+    this.toastr.success('Logged out successfully');
+
+    this.router.navigate(['/']);
 
   }
 

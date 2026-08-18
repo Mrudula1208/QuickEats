@@ -56,6 +56,47 @@ namespace QuickEats.API.Services
 
         }
 
+        public async Task<PagedResult<OrderResponseDto>> GetPagedAsync(int page, int pageSize, string? sortBy, bool sortDesc)
+        {
+            var pagedResult = await _orderRepository.GetPagedAsync(page, pageSize, sortBy, sortDesc);
+
+            var response = new List<OrderResponseDto>();
+
+            foreach (var order in pagedResult.Items)
+            {
+                response.Add(new OrderResponseDto
+                {
+                    Id = order.Id,
+                    UserId = order.UserId,
+                    CustomerName = order.User?.Name ?? "",
+                    RestaurantId = order.RestaurantId,
+                    RestaurantName = order.Restaurant?.Name ?? "",
+                    DeliveryAddress = order.DeliveryAddress,
+                    PhoneNumber = order.PhoneNumber,
+                    PaymentMethod = order.PaymentMethod,
+                    TotalAmount = order.TotalAmount,
+                    Status = order.Status,
+                    CreatedAt = order.CreatedAt,
+                    Items = order.OrderItems.Select(item => new OrderItemDto
+                    {
+                        MenuItemId = item.MenuItemId,
+                        Quantity = item.Quantity,
+                        Name = item.MenuItem?.Name ?? "",
+                        UnitPrice = item.UnitPrice,
+                        TotalPrice = item.TotalPrice
+                    }).ToList()
+                });
+            }
+
+            return new PagedResult<OrderResponseDto>
+            {
+                Items = response,
+                TotalCount = pagedResult.TotalCount,
+                Page = pagedResult.Page,
+                PageSize = pagedResult.PageSize
+            };
+        }
+
         public async Task <OrderResponseDto>GetByIdAsync(int id)
         {
             var order= await _orderRepository.GetByIdAsync(id);

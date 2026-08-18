@@ -22,6 +22,9 @@ import { PaymentService } from '../../../core/services/payment.service';
 // Cart service.
 import { CartService } from '../../../core/services/cart.service';
 
+// Toast notifications.
+import { ToastrService } from 'ngx-toastr';
+
 @Component({
   selector: 'app-payment',
   standalone: true,
@@ -56,7 +59,10 @@ export class PaymentComponent {
     private paymentService: PaymentService,
 
     // Used for page navigation.
-    private router: Router
+    private router: Router,
+
+    // Toast notifications.
+    private toastr: ToastrService
 
   ) {
 
@@ -132,7 +138,7 @@ export class PaymentComponent {
           this.cartService.clearCart();
 
           // Success message.
-          alert("✅ Payment Successful");
+          this.toastr.success('Payment Successful');
 
           // Navigate.
           this.router.navigate(['/orders']);

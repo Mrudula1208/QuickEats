@@ -16,6 +16,8 @@ import { ProfileModel } from '../../../core/models/profile.model';
 // 5️⃣ Import ProfileModel.
 // Defines structure of customer profile.
 
+import { ToastrService } from 'ngx-toastr';
+
 @Component({
 
   selector: 'app-profile',
@@ -64,7 +66,9 @@ export class ProfileComponent {
 
   constructor(
 
-    private profileService: ProfileService
+    private profileService: ProfileService,
+
+    private toastr: ToastrService
 
     // private
     // Only this component can use service.
@@ -95,7 +99,7 @@ export class ProfileComponent {
 
     );
 
-    alert("Profile Updated Successfully");
+    this.toastr.success('Profile Updated Successfully');
 
   }
 

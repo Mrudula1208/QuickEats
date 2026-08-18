@@ -13,6 +13,8 @@ import { ReviewService } from '../../../core/services/review.service';
 import { Review } from '../../../core/models/review.model';
 // Import Review because it defines one review object.
 
+import { ToastrService } from 'ngx-toastr';
+
 @Component({
   selector: 'app-reviews',
   standalone: true,
@@ -53,7 +55,10 @@ export class ReviewsComponent {
   constructor(
 
     // Angular automatically creates ReviewService.
-    private reviewService: ReviewService
+    private reviewService: ReviewService,
+
+    // Toast notifications.
+    private toastr: ToastrService
 
   ) {
 
@@ -129,7 +134,7 @@ export class ReviewsComponent {
 
           };
 
-          alert("Review Added");
+          this.toastr.success('Review Added');
 
         },
 

@@ -40,10 +40,6 @@ namespace QuickEats.API.Services
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
-
-            {
-
         }
-    }
     }
 }

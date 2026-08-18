@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting.Server;
-
-namespace QuickEats.API.DTos.Auth
+﻿namespace QuickEats.API.DTos.Auth
 {
     public class RegisterRequestDto
     {
