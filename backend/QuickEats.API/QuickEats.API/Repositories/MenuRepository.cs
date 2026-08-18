@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using QuickEats.API.Common;
 using QuickEats.API.Data;
 using QuickEats.API.Models;
 using QuickEats.API.Repositories.Interfaces;
@@ -16,6 +17,32 @@ namespace QuickEats.API.Repositories
         public async Task<IEnumerable<MenuItem>> GetAllAsync()
         {
             return await _context.MenuItems.ToListAsync();
+        }
+
+        public async Task<PagedResult<MenuItem>> GetPagedAsync(int page, int pageSize, string? sortBy, bool sortDesc)
+        {
+            var query = _context.MenuItems.AsQueryable();
+
+            query = sortBy?.ToLower() switch
+            {
+                "name" => sortDesc ? query.OrderByDescending(m => m.Name) : query.OrderBy(m => m.Name),
+                "price" => sortDesc ? query.OrderByDescending(m => m.Price) : query.OrderBy(m => m.Price),
+                "category" => sortDesc ? query.OrderByDescending(m => m.Category) : query.OrderBy(m => m.Category),
+                "isavailable" => sortDesc ? query.OrderByDescending(m => m.IsAvailable) : query.OrderBy(m => m.IsAvailable),
+                "restaurantid" => sortDesc ? query.OrderByDescending(m => m.RestaurantId) : query.OrderBy(m => m.RestaurantId),
+                _ => query.OrderByDescending(m => m.Id)
+            };
+
+            var totalCount = await query.CountAsync();
+            var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            return new PagedResult<MenuItem>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize
+            };
         }
 
         public async Task<MenuItem?> GetByIdAsync(int id)

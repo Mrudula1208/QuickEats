@@ -1,4 +1,5 @@
 using QuickEats.API.DTos.Coupon;
+using QuickEats.API.Exceptions;
 using QuickEats.API.Models;
 using QuickEats.API.Repositories.Interfaces;
 using QuickEats.API.Services.Interfaces;
@@ -96,7 +97,7 @@ namespace QuickEats.API.Services
 
             if (coupon == null)
             {
-                throw new Exception($"Coupon with Id {id} not found.");
+                throw new NotFoundException($"Coupon with Id {id} not found.");
             }
 
             _couponRepository.Delete(coupon);

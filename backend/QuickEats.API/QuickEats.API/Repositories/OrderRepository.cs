@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
+using QuickEats.API.Common;
 using QuickEats.API.Data;
 using QuickEats.API.Models;
 using QuickEats.API.Repositories.Interfaces;
@@ -25,6 +26,38 @@ namespace QuickEats.API.Repositories
                 .ThenInclude(oi => oi.MenuItem)
                 .ToListAsync();
 
+        }
+
+        public async Task<PagedResult<Order>> GetPagedAsync(int page, int pageSize, string? sortBy, bool sortDesc)
+        {
+            var query = _context.Orders
+                .Include(o => o.User)
+                .Include(o => o.Restaurant)
+                .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.MenuItem)
+                .AsQueryable();
+
+            query = sortBy?.ToLower() switch
+            {
+                "id" => sortDesc ? query.OrderByDescending(o => o.Id) : query.OrderBy(o => o.Id),
+                "totalamount" => sortDesc ? query.OrderByDescending(o => o.TotalAmount) : query.OrderBy(o => o.TotalAmount),
+                "status" => sortDesc ? query.OrderByDescending(o => o.Status) : query.OrderBy(o => o.Status),
+                "createdat" => sortDesc ? query.OrderByDescending(o => o.CreatedAt) : query.OrderBy(o => o.CreatedAt),
+                "restaurantname" => sortDesc ? query.OrderByDescending(o => o.Restaurant!.Name) : query.OrderBy(o => o.Restaurant!.Name),
+                "customername" => sortDesc ? query.OrderByDescending(o => o.User!.Name) : query.OrderBy(o => o.User!.Name),
+                _ => query.OrderByDescending(o => o.CreatedAt)
+            };
+
+            var totalCount = await query.CountAsync();
+            var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            return new PagedResult<Order>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize
+            };
         }
 
 

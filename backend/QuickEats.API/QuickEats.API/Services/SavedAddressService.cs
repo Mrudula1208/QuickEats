@@ -1,4 +1,5 @@
 using QuickEats.API.DTos.SavedAddress;
+using QuickEats.API.Exceptions;
 using QuickEats.API.Models;
 using QuickEats.API.Repositories.Interfaces;
 using QuickEats.API.Services.Interfaces;
@@ -99,14 +100,14 @@ namespace QuickEats.API.Services
 
             if (address == null)
             {
-                throw new Exception($"Address with Id {addressId} not found.");
+                throw new NotFoundException($"Address with Id {addressId} not found.");
             }
 
             // A User can only delete their own Address.
 
             if (address.UserId != userId)
             {
-                throw new Exception("You cannot delete another user's address.");
+                throw new ForbiddenException("You cannot delete another user's address.");
             }
 
             _addressRepository.Delete(address);
@@ -139,7 +140,7 @@ namespace QuickEats.API.Services
 
             if (selected == null)
             {
-                throw new Exception($"Address with Id {addressId} not found.");
+                throw new NotFoundException($"Address with Id {addressId} not found.");
             }
 
             // Remove Default from every Address,

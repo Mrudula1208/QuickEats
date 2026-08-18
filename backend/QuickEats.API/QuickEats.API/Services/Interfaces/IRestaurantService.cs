@@ -1,10 +1,12 @@
-﻿using QuickEats.API.DTos.Restaurant;
+﻿using QuickEats.API.Common;
+using QuickEats.API.DTos.Restaurant;
 
 namespace QuickEats.API.Services.Interfaces
 {
     public interface IRestaurantService
     {
         Task<IEnumerable<RestaurantResponseDto>> GetAllAsync();
+        Task<PagedResult<RestaurantResponseDto>> GetPagedAsync(int page, int pageSize, string? sortBy, bool sortDesc);
         Task<RestaurantResponseDto?> GetByIdAsync(int id);
         Task<IEnumerable<RestaurantResponseDto>> GetByOwnerIdAsync(int ownerId);
         Task CreateAsync(CreateRestaurantDto dto, int ownerId); 

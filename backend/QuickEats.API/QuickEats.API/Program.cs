@@ -6,6 +6,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using QuickEats.API.Configuration;
 using QuickEats.API.Data;
+using QuickEats.API.Logging;
+using QuickEats.API.Middleware;
 using QuickEats.API.Repositories;
 using QuickEats.API.Repositories.Interfaces;
 using QuickEats.API.Services;
@@ -98,6 +100,7 @@ namespace QuickEats.API
             builder.Services.AddScoped<ISavedAddressService, SavedAddressService>();
             builder.Services.AddScoped<IFavoriteRepository, FavoriteRepository>();
             builder.Services.AddScoped<IFavoriteService, FavoriteService>();
+            builder.Services.AddScoped<ILoggerService, LoggerService>();
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
                 var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
@@ -126,6 +129,9 @@ builder.Services.AddCors(options =>
         });
 });
             var app = builder.Build();
+
+            app.UseMiddleware<ExceptionMiddleware>();
+
             app.UseCors("AllowAngular");
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

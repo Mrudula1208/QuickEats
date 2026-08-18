@@ -1,5 +1,6 @@
 ﻿using QuickEats.API.DTos.Order;
 using QuickEats.API.DTos.OrderDelivery;
+using QuickEats.API.Exceptions;
 using QuickEats.API.Models;
 using QuickEats.API.Repositories.Interfaces;
 using QuickEats.API.Services.Interfaces;
@@ -89,7 +90,7 @@ namespace QuickEats.API.Services
             var delivery = await _orderDeliveryRepository.GetByIdAsync(id);
             if (delivery == null)
             {
-                throw new Exception($"Delivery with Id {id} not found.");
+                throw new NotFoundException($"Delivery with Id {id} not found.");
 
             }
             delivery.DeliveryStatus = dto.DeliveryStatus;
@@ -101,7 +102,7 @@ namespace QuickEats.API.Services
             var delivery = await _orderDeliveryRepository.GetByIdAsync(id);
             if (delivery == null)
             {
-                throw new Exception($"Delivery with Id {id} not found.");
+                throw new NotFoundException($"Delivery with Id {id} not found.");
 
             }
             _orderDeliveryRepository.Delete(delivery);

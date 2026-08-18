@@ -1,4 +1,5 @@
 using QuickEats.API.DTos.Notification;
+using QuickEats.API.Exceptions;
 using QuickEats.API.Models;
 using QuickEats.API.Repositories.Interfaces;
 using QuickEats.API.Services.Interfaces;
@@ -63,12 +64,12 @@ namespace QuickEats.API.Services
 
             if (notification == null)
             {
-                throw new Exception($"Notification with Id {notificationId} not found.");
+                throw new NotFoundException($"Notification with Id {notificationId} not found.");
             }
 
             if (notification.UserId != userId)
             {
-                throw new Exception("You cannot read another user's notification.");
+                throw new ForbiddenException("You cannot read another user's notification.");
             }
 
             notification.IsRead = true;
@@ -99,12 +100,12 @@ namespace QuickEats.API.Services
 
             if (notification == null)
             {
-                throw new Exception($"Notification with Id {notificationId} not found.");
+                throw new NotFoundException($"Notification with Id {notificationId} not found.");
             }
 
             if (notification.UserId != userId)
             {
-                throw new Exception("You cannot delete another user's notification.");
+                throw new ForbiddenException("You cannot delete another user's notification.");
             }
 
             _notificationRepository.Delete(notification);

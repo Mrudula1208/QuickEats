@@ -2,6 +2,7 @@
 // Import Review DTOs.
 // Used to transfer Review data.
 
+using QuickEats.API.Exceptions;
 using QuickEats.API.Models;
 // Import Review model.
 // This represents the database object.
@@ -310,7 +311,7 @@ namespace QuickEats.API.Services
             {
                 // Review was not found.
 
-                throw new Exception(
+                throw new NotFoundException(
                     $"Review with Id {id} not found."
                 );
             }

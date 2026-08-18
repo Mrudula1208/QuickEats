@@ -1,4 +1,5 @@
 using QuickEats.API.DTos.Wishlist;
+using QuickEats.API.Exceptions;
 using QuickEats.API.Models;
 using QuickEats.API.Repositories.Interfaces;
 using QuickEats.API.Services.Interfaces;
@@ -66,7 +67,7 @@ namespace QuickEats.API.Services
 
             if (menu == null)
             {
-                throw new Exception($"Menu item with Id {dto.MenuId} not found.");
+                throw new NotFoundException($"Menu item with Id {dto.MenuId} not found.");
             }
 
             // Avoid adding the same item twice.
@@ -100,7 +101,7 @@ namespace QuickEats.API.Services
 
             if (item == null)
             {
-                throw new Exception($"Wishlist item for menu {menuId} not found.");
+                throw new NotFoundException($"Wishlist item for menu {menuId} not found.");
             }
 
             _wishlistRepository.Delete(item);

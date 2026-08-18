@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using QuickEats.API.Common;
 using QuickEats.API.Data;
 using QuickEats.API.Models;
 using QuickEats.API.Repositories.Interfaces;
@@ -16,6 +17,31 @@ namespace QuickEats.API.Repositories
         public async Task<IEnumerable<Restaurant>> GetAllAsync()
         {
             return await _context.Restaurants.ToListAsync();
+        }
+
+        public async Task<PagedResult<Restaurant>> GetPagedAsync(int page, int pageSize, string? sortBy, bool sortDesc)
+        {
+            var query = _context.Restaurants.AsQueryable();
+
+            query = sortBy?.ToLower() switch
+            {
+                "name" => sortDesc ? query.OrderByDescending(r => r.Name) : query.OrderBy(r => r.Name),
+                "address" => sortDesc ? query.OrderByDescending(r => r.Address) : query.OrderBy(r => r.Address),
+                "createdat" => sortDesc ? query.OrderByDescending(r => r.CreatedAt) : query.OrderBy(r => r.CreatedAt),
+                "isactive" => sortDesc ? query.OrderByDescending(r => r.IsActive) : query.OrderBy(r => r.IsActive),
+                _ => query.OrderByDescending(r => r.CreatedAt)
+            };
+
+            var totalCount = await query.CountAsync();
+            var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            return new PagedResult<Restaurant>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize
+            };
         }
 
         public async Task<Restaurant?>GetByIdAsync(int id)

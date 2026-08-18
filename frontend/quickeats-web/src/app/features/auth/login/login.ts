@@ -16,6 +16,9 @@ import { Login } from '../../../core/models/login.model';
 // Auth Service.
 import { AuthService } from '../../../core/services/auth.service';
 
+// Toast notifications.
+import { ToastrService } from 'ngx-toastr';
+
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -44,7 +47,10 @@ export class LoginComponent {
     private authService: AuthService,
 
     // Used to move to another page.
-    private router: Router
+    private router: Router,
+
+    // Toast notifications.
+    private toastr: ToastrService
 
   ) { }
 
@@ -68,14 +74,15 @@ export class LoginComponent {
     localStorage.setItem('email', response.email);
     localStorage.setItem('role', response.role);
 
-    alert("Login Successful");
+    this.toastr.success('Login Successful', 'Welcome Back');
 
     this.router.navigate(['/']);
   },
 
   error: (err) => {
+
+    // Error handled by error interceptor.
     console.log(err);
-    alert("Invalid Email or Password");
   }
 });
 

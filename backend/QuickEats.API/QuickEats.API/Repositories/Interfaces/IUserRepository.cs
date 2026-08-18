@@ -1,4 +1,5 @@
-﻿using QuickEats.API.Models;
+﻿using QuickEats.API.Common;
+using QuickEats.API.Models;
 
 namespace QuickEats.API.Repositories.Interfaces
 {
@@ -6,6 +7,7 @@ namespace QuickEats.API.Repositories.Interfaces
     {
 
         Task<List<User>> GetAllAsync();
+        Task<PagedResult<User>> GetPagedAsync(int page, int pageSize, string? sortBy, bool sortDesc);
         Task<User?> GetByEmailAsync(string email);
         Task AddAsync(User user);
         Task<User?> GetByIdAsync(int id);

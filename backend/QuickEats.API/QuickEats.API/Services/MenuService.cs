@@ -1,4 +1,6 @@
+using QuickEats.API.Common;
 using QuickEats.API.DTos.Menu;
+using QuickEats.API.Exceptions;
 using QuickEats.API.Models;
 using QuickEats.API.Repositories.Interfaces;
 using QuickEats.API.Services.Interfaces;
@@ -39,6 +41,39 @@ namespace QuickEats.API.Services
         }
             return response;
         
+        }
+
+        public async Task<PagedResult<MenuResponseDto>> GetPagedAsync(int page, int pageSize, string? sortBy, bool sortDesc)
+        {
+            var pagedResult = await _menuRepository.GetPagedAsync(page, pageSize, sortBy, sortDesc);
+
+            var response = new List<MenuResponseDto>();
+
+            foreach (var menuItem in pagedResult.Items)
+            {
+                response.Add(new MenuResponseDto
+                {
+                    Id = menuItem.Id,
+                    RestaurantId = menuItem.RestaurantId,
+                    Name = menuItem.Name,
+                    Description = menuItem.Description,
+                    Price = menuItem.Price,
+                    ImageUrl = menuItem.ImageUrl,
+                    IsAvailable = menuItem.IsAvailable,
+                    Category = menuItem.Category,
+                    IsVeg = menuItem.IsVeg,
+                    IsBestseller = menuItem.IsBestseller,
+                    DiscountPercent = menuItem.DiscountPercent
+                });
+            }
+
+            return new PagedResult<MenuResponseDto>
+            {
+                Items = response,
+                TotalCount = pagedResult.TotalCount,
+                Page = pagedResult.Page,
+                PageSize = pagedResult.PageSize
+            };
         }
 
 
@@ -131,7 +166,7 @@ namespace QuickEats.API.Services
 
             if(menuItem==null)
             {
-                throw new Exception($"Menu item with id {id} not found.");
+                throw new NotFoundException($"Menu item with id {id} not found.");
             }
 
             menuItem.Name = dto.Name;
@@ -152,7 +187,7 @@ namespace QuickEats.API.Services
             var menuItem = await _menuRepository.GetByIdAsync(id);
             if (menuItem == null)
             {
-                throw new Exception($"Menu item with id {id} not found.");
+                throw new NotFoundException($"Menu item with id {id} not found.");
 
             }
                 _menuRepository.Delete(menuItem);

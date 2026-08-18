@@ -1,5 +1,7 @@
-﻿using QuickEats.API.DTos.Notification;
+﻿using QuickEats.API.Common;
+using QuickEats.API.DTos.Notification;
 using QuickEats.API.DTos.Order;
+using QuickEats.API.Exceptions;
 using QuickEats.API.Models;
 using QuickEats.API.Repositories.Interfaces;
 using QuickEats.API.Services.Interfaces;
@@ -189,7 +191,7 @@ namespace QuickEats.API.Services
 
                 if (menuItem == null)
                 {
-                    throw new Exception(
+                    throw new NotFoundException(
                         $"Menu Item {item.MenuItemId} not found.");
                 }
 
@@ -235,7 +237,7 @@ namespace QuickEats.API.Services
             var order = await _orderRepository.GetByIdAsync(id);
             if (order == null)
             {
-                throw new Exception($"Order with Id {id} not found");
+                throw new NotFoundException($"Order with Id {id} not found");
 
             }
 
@@ -263,7 +265,7 @@ namespace QuickEats.API.Services
 
             if(order == null)
             {
-                throw new Exception($"order with id {id}not found ");
+                throw new NotFoundException($"order with id {id} not found");
             }
             _orderRepository.Delete(order);
           await _orderRepository.SaveChangesAsync();

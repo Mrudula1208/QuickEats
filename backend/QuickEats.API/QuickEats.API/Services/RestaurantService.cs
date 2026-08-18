@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using QuickEats.API.Common;
 using QuickEats.API.DTos.Restaurant;
+using QuickEats.API.Exceptions;
 using QuickEats.API.Models;
 using QuickEats.API.Repositories;
 using QuickEats.API.Repositories.Interfaces;
@@ -49,6 +51,39 @@ namespace QuickEats.API.Services
             }
             return response;
 
+        }
+
+        public async Task<PagedResult<RestaurantResponseDto>> GetPagedAsync(int page, int pageSize, string? sortBy, bool sortDesc)
+        {
+            var pagedResult = await _restaurantRepository.GetPagedAsync(page, pageSize, sortBy, sortDesc);
+
+            var response = new List<RestaurantResponseDto>();
+
+            foreach (var restaurant in pagedResult.Items)
+            {
+                var rating = await _reviewService.GetAverageRatingAsync(restaurant.Id);
+
+                response.Add(new RestaurantResponseDto
+                {
+                    Id = restaurant.Id,
+                    Name = restaurant.Name,
+                    Description = restaurant.Description,
+                    Address = restaurant.Address,
+                    PhoneNumber = restaurant.PhoneNumber,
+                    ImageUrl = restaurant.ImageUrl,
+                    IsActive = restaurant.IsActive,
+                    CreatedAt = restaurant.CreatedAt,
+                    Rating = rating ?? 0
+                });
+            }
+
+            return new PagedResult<RestaurantResponseDto>
+            {
+                Items = response,
+                TotalCount = pagedResult.TotalCount,
+                Page = pagedResult.Page,
+                PageSize = pagedResult.PageSize
+            };
         }
 
 
@@ -112,12 +147,12 @@ namespace QuickEats.API.Services
         {
             if (string.IsNullOrWhiteSpace(dto.Name))
             {
-                throw new Exception("Restaurant name is required");
+                throw new BadRequestException("Restaurant name is required");
             }
 
 
             if (string.IsNullOrWhiteSpace(dto.Address)){
-                throw new Exception("Restaurant address is required");
+                throw new BadRequestException("Restaurant address is required");
             }
 
 
@@ -143,7 +178,7 @@ namespace QuickEats.API.Services
             var restaurant = await _restaurantRepository.GetByIdAsync(id);
             if (restaurant == null)
             {
-                throw new Exception("Restaurant not found");
+                throw new NotFoundException("Restaurant not found");
             }
             //Copy updated Name from DTO to Entity.
             restaurant.Name = dto.Name;
@@ -167,7 +202,7 @@ namespace QuickEats.API.Services
             var restaurant = await _restaurantRepository.GetByIdAsync(id);
             if (restaurant == null)
             {
-                throw new Exception("Restaurant not found");
+                throw new NotFoundException("Restaurant not found");
             }
             _restaurantRepository.Delete(restaurant);  
             await _restaurantRepository.SaveChangesAsync();

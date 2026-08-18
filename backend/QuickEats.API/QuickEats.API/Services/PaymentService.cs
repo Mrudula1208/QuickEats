@@ -1,4 +1,5 @@
 ﻿using QuickEats.API.DTos.Payment;
+using QuickEats.API.Exceptions;
 using QuickEats.API.Models;
 using QuickEats.API.Repositories.Interfaces;
 using QuickEats.API.Services.Interfaces;
@@ -95,7 +96,7 @@ namespace QuickEats.API.Services
 
             if (order == null)
             {
-                throw new Exception($"Order with Id {dto.OrderId} not found.");
+                throw new NotFoundException($"Order with Id {dto.OrderId} not found.");
             }
 
             var payment = new Payment
@@ -123,7 +124,7 @@ namespace QuickEats.API.Services
 
             if (payment == null)
             {
-                throw new Exception($"Payment with Id {id} not found.");
+                throw new NotFoundException($"Payment with Id {id} not found.");
             }
 
             payment.PaymentStatus = dto.PaymentStatus;
@@ -140,7 +141,7 @@ namespace QuickEats.API.Services
 
             if (payment == null)
             {
-                throw new Exception($"Payment with Id {id} not found.");
+                throw new NotFoundException($"Payment with Id {id} not found.");
             }
 
             _paymentRepository.Delete(payment);

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using QuickEats.API.Common;
 using QuickEats.API.DTos.Restaurant;
 using QuickEats.API.Models;
 
@@ -8,6 +9,8 @@ namespace QuickEats.API.Repositories.Interfaces
     {
 
         Task<IEnumerable<Restaurant>> GetAllAsync();
+
+        Task<PagedResult<Restaurant>> GetPagedAsync(int page, int pageSize, string? sortBy, bool sortDesc);
 
         Task<Restaurant?> GetByIdAsync(int id);
 

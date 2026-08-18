@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { Register } from '../../../core/models/register.model';
 import { FormsModule } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -27,7 +28,8 @@ export class RegisterComponent {
 };
   constructor (
     private authService :AuthService,
-    private router :Router
+    private router :Router,
+    private toastr: ToastrService
   ){}
 
 register(): void {
@@ -39,12 +41,13 @@ register(): void {
   this.authService.register(this.user)
   .subscribe({
     next: () => {
-      alert("Registration Successful");
+      this.toastr.success('Registration Successful', 'Welcome');
       this.router.navigate(['/login']);
     },
     error: (err) => {
+
+      // Error handled by error interceptor.
       console.log(err);
-      alert("Registration Failed");
     }
   });
 

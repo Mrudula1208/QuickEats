@@ -1,5 +1,6 @@
 ﻿using QuickEats.API.DTos.Payment;
 using QuickEats.API.DTos.RestaurantRating;
+using QuickEats.API.Exceptions;
 using QuickEats.API.Models;
 using QuickEats.API.Repositories;
 using QuickEats.API.Repositories.Interfaces;
@@ -104,7 +105,7 @@ namespace QuickEats.API.Services
             var rating = await _restaurantRatingRepository.GetByIdAsync(id);
             if (rating == null)
             {
-                throw new Exception($"Restaurant Rating with Id {id} not found.");
+                throw new NotFoundException($"Restaurant Rating with Id {id} not found.");
 
             }
             _restaurantRatingRepository.Delete(rating);

@@ -1,4 +1,5 @@
 using QuickEats.API.DTos.Favorite;
+using QuickEats.API.Exceptions;
 using QuickEats.API.Models;
 using QuickEats.API.Repositories.Interfaces;
 using QuickEats.API.Services.Interfaces;
@@ -60,7 +61,7 @@ namespace QuickEats.API.Services
 
             if (restaurant == null)
             {
-                throw new Exception($"Restaurant with Id {dto.RestaurantId} not found.");
+                throw new NotFoundException($"Restaurant with Id {dto.RestaurantId} not found.");
             }
 
             // Avoid adding the same Restaurant twice.

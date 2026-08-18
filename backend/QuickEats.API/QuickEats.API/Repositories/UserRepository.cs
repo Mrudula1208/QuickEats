@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using QuickEats.API.Common;
 using QuickEats.API.Data;
 using QuickEats.API.Models;
 using QuickEats.API.Repositories.Interfaces;
@@ -16,6 +17,31 @@ namespace QuickEats.API.Repositories
         public async Task<List<User>> GetAllAsync()
         {
             return await _context.Users.ToListAsync();
+        }
+
+        public async Task<PagedResult<User>> GetPagedAsync(int page, int pageSize, string? sortBy, bool sortDesc)
+        {
+            var query = _context.Users.AsQueryable();
+
+            query = sortBy?.ToLower() switch
+            {
+                "name" => sortDesc ? query.OrderByDescending(u => u.Name) : query.OrderBy(u => u.Name),
+                "email" => sortDesc ? query.OrderByDescending(u => u.Email) : query.OrderBy(u => u.Email),
+                "role" => sortDesc ? query.OrderByDescending(u => u.Role) : query.OrderBy(u => u.Role),
+                "createdat" => sortDesc ? query.OrderByDescending(u => u.CreatedAt) : query.OrderBy(u => u.CreatedAt),
+                _ => query.OrderByDescending(u => u.CreatedAt)
+            };
+
+            var totalCount = await query.CountAsync();
+            var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            return new PagedResult<User>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize
+            };
         }
 
         public async Task<User?> GetByEmailAsync(string email)

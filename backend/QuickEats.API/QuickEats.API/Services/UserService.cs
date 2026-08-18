@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using QuickEats.API.DTos.Auth;
+using QuickEats.API.Exceptions;
 
 using QuickEats.API.Helpers;
 using QuickEats.API.Models;
@@ -26,7 +27,7 @@ namespace QuickEats.API.Services
 
             if(existinguser != null)
             {
-                throw new Exception("user already exits");
+                throw new BadRequestException("User already exists");
             }
 
             Console.WriteLine(request.Role);
