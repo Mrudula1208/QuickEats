@@ -1,37 +1,85 @@
 <h1>Add Restaurant</h1>
 
-<div>
+<form #restaurantForm="ngForm" (ngSubmit)="saveRestaurant()">
 
     <input
         type="text"
         placeholder="Restaurant Name"
-        [(ngModel)]="restaurant.name">
+        name="name"
+        [(ngModel)]="restaurant.name"
+        required
+        minlength="2"
+        maxlength="200"
+        #name="ngModel">
+
+    @if (name.invalid && name.touched) {
+        <div class="error">
+            @if (name.errors?.['required']) {
+                Restaurant name is required
+            }
+            @else if (name.errors?.['minlength']) {
+                Name must be at least 2 characters
+            }
+        </div>
+    }
 
     <input
         type="text"
         placeholder="Description"
-        [(ngModel)]="restaurant.description">
+        name="description"
+        [(ngModel)]="restaurant.description"
+        maxlength="1000">
 
     <input
         type="text"
         placeholder="Address"
-        [(ngModel)]="restaurant.address">
+        name="address"
+        [(ngModel)]="restaurant.address"
+        required
+        minlength="5"
+        maxlength="500"
+        #address="ngModel">
+
+    @if (address.invalid && address.touched) {
+        <div class="error">
+            @if (address.errors?.['required']) {
+                Address is required
+            }
+            @else if (address.errors?.['minlength']) {
+                Address must be at least 5 characters
+            }
+        </div>
+    }
 
     <input
-        type="text"
+        type="tel"
         placeholder="Phone Number"
-        [(ngModel)]="restaurant.phoneNumber">
+        name="phoneNumber"
+        [(ngModel)]="restaurant.phoneNumber"
+        required
+        #phone="ngModel">
+
+    @if (phone.invalid && phone.touched) {
+        <div class="error">
+            @if (phone.errors?.['required']) {
+                Phone number is required
+            }
+        </div>
+    }
 
     <input
         type="text"
         placeholder="Image Url"
-        [(ngModel)]="restaurant.imageUrl">
+        name="imageUrl"
+        [(ngModel)]="restaurant.imageUrl"
+        maxlength="500">
 
     <button
-        (click)="saveRestaurant()">
+        type="submit"
+        [disabled]="restaurantForm.invalid">
 
         Save Restaurant
 
     </button>
 
-</div>
+</form>

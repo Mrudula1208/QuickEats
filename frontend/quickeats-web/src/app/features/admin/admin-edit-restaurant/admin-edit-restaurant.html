@@ -2,35 +2,83 @@
 
 @if(restaurant){
 
-<div>
+<form #restaurantForm="ngForm" (ngSubmit)="updateRestaurant()">
 
 <input
 type="text"
-[(ngModel)]="restaurant.name">
+name="name"
+[(ngModel)]="restaurant.name"
+required
+minlength="2"
+maxlength="200"
+#name="ngModel">
+
+@if (name.invalid && name.touched) {
+    <div class="error">
+        @if (name.errors?.['required']) {
+            Restaurant name is required
+        }
+        @else if (name.errors?.['minlength']) {
+            Name must be at least 2 characters
+        }
+    </div>
+}
 
 <input
 type="text"
-[(ngModel)]="restaurant.description">
+name="description"
+[(ngModel)]="restaurant.description"
+maxlength="1000">
 
 <input
 type="text"
-[(ngModel)]="restaurant.address">
+name="address"
+[(ngModel)]="restaurant.address"
+required
+minlength="5"
+maxlength="500"
+#address="ngModel">
+
+@if (address.invalid && address.touched) {
+    <div class="error">
+        @if (address.errors?.['required']) {
+            Address is required
+        }
+        @else if (address.errors?.['minlength']) {
+            Address must be at least 5 characters
+        }
+    </div>
+}
+
+<input
+type="tel"
+name="phoneNumber"
+[(ngModel)]="restaurant.phoneNumber"
+required
+#phone="ngModel">
+
+@if (phone.invalid && phone.touched) {
+    <div class="error">
+        @if (phone.errors?.['required']) {
+            Phone number is required
+        }
+    </div>
+}
 
 <input
 type="text"
-[(ngModel)]="restaurant.phoneNumber">
-
-<input
-type="text"
-[(ngModel)]="restaurant.imageUrl">
+name="imageUrl"
+[(ngModel)]="restaurant.imageUrl"
+maxlength="500">
 
 <button
-(click)="updateRestaurant()">
+type="submit"
+[disabled]="restaurantForm.invalid">
 
 Update Restaurant
 
 </button>
 
-</div>
+</form>
 
 }

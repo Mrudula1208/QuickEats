@@ -2,29 +2,71 @@
 
 @if(menu){
 
+<form #menuForm="ngForm" (ngSubmit)="updateMenu()">
+
 <input
 type="number"
+name="restaurantId"
 [(ngModel)]="menu.restaurantId"
 disabled>
 
 <input
 type="text"
-[(ngModel)]="menu.name">
+name="name"
+[(ngModel)]="menu.name"
+required
+minlength="2"
+maxlength="200"
+#name="ngModel">
+
+@if (name.invalid && name.touched) {
+    <div class="error">
+        @if (name.errors?.['required']) {
+            Item name is required
+        }
+        @else if (name.errors?.['minlength']) {
+            Name must be at least 2 characters
+        }
+    </div>
+}
 
 <input
 type="text"
-[(ngModel)]="menu.description">
+name="description"
+[(ngModel)]="menu.description"
+maxlength="1000">
 
 <input
 type="number"
-[(ngModel)]="menu.price">
+name="price"
+[(ngModel)]="menu.price"
+required
+min="0.01"
+max="999999"
+#price="ngModel">
+
+@if (price.invalid && price.touched) {
+    <div class="error">
+        @if (price.errors?.['required']) {
+            Price is required
+        }
+        @else if (price.errors?.['min']) {
+            Price must be at least 0.01
+        }
+    </div>
+}
 
 <input
 type="text"
-[(ngModel)]="menu.imageUrl">
+name="imageUrl"
+[(ngModel)]="menu.imageUrl"
+maxlength="500">
 
 <select
-[(ngModel)]="menu.category">
+name="category"
+[(ngModel)]="menu.category"
+required
+#category="ngModel">
 
 <option value="Starters">Starters</option>
 <option value="Main Course">Main Course</option>
@@ -37,6 +79,7 @@ type="text"
 </select>
 
 <select
+name="isVeg"
 [(ngModel)]="menu.isVeg">
 
 <option [ngValue]="true">Veg</option>
@@ -46,21 +89,29 @@ type="text"
 
 <input
 type="checkbox"
+name="isAvailable"
 [(ngModel)]="menu.isAvailable">
 
 <input
 type="checkbox"
+name="isBestseller"
 [(ngModel)]="menu.isBestseller">
 
 <input
 type="number"
-[(ngModel)]="menu.discountPercent">
+name="discountPercent"
+[(ngModel)]="menu.discountPercent"
+min="0"
+max="100">
 
 <button
-(click)="updateMenu()">
+type="submit"
+[disabled]="menuForm.invalid">
 
 Update Menu
 
 </button>
+
+</form>
 
 }
