@@ -20,9 +20,30 @@ export class CartService {
   // Applied coupon details.
   appliedCoupon = signal<CouponModel | null>(null);
 
+  // Delivery charge from the restaurant (default 40).
+  deliveryCharge = signal<number>(40);
+
+  // Free delivery threshold per restaurant.
+  freeDeliveryThreshold = signal<number>(500);
+
+  // Minimum order amount per restaurant.
+  minimumOrder = signal<number>(0);
+
   constructor(
     private couponService: CouponService
   ) { }
+
+  // Set restaurant delivery settings.
+  setDeliverySettings(charge: number, freeThreshold: number, minOrder: number): void {
+    this.deliveryCharge.set(charge);
+    this.freeDeliveryThreshold.set(freeThreshold);
+    this.minimumOrder.set(minOrder);
+  }
+
+  // Check if cart meets minimum order.
+  isBelowMinimumOrder(): boolean {
+    return this.getFoodTotal() < this.minimumOrder() && this.minimumOrder() > 0;
+  }
 
   // Add food into cart.
   addToCart(menu: MenuItem): void {
@@ -178,10 +199,10 @@ export class CartService {
 
   }
 
-  // Free delivery above ₹500, otherwise ₹40.
+  // Delivery fee: free if food total >= threshold, otherwise restaurant's charge.
   getDeliveryFee(): number {
 
-    return this.getFoodTotal() >= 500 ? 0 : 40;
+    return this.getFoodTotal() >= this.freeDeliveryThreshold() ? 0 : this.deliveryCharge();
 
   }
 

@@ -67,6 +67,14 @@ namespace QuickEats.API.Data
                 .HasForeignKey(r => r.OwnerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Restaurant>()
+                .Property(r => r.DeliveryCharge)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Restaurant>()
+                .Property(r => r.MinimumOrder)
+                .HasPrecision(18, 2);
+
             modelBuilder.Entity<Coupon>()
                 .Property(c => c.MinimumOrderAmount)
                 .HasPrecision(18, 2);

@@ -55,7 +55,11 @@ export class AdminAddRestaurant {
 
     isOpenNow: true,
 
-    createdAt: ''
+    createdAt: '',
+
+    deliveryCharge: 40,
+
+    minimumOrder: 0
 
   };
 

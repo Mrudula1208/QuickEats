@@ -17,8 +17,7 @@ import { CheckoutDataService } from '../../../core/services/checkout-data.servic
 // CheckoutDataService passes simple data to the Payment page.
 
 import { CartService } from '../../../core/services/cart.service';
-// CartService gives all cart items and total amount.
-
+import { RestaurantService } from '../../../core/services/restaurant.service';
 import { CheckoutModel } from '../../../core/models/checkout.model';
 import { signal } from '@angular/core';
 import { CartItem } from '../../../core/models/cart-item.model';
@@ -46,8 +45,12 @@ export class CheckoutComponent {
   // Per-field error messages.
   errors: { [key: string]: string } = {};
 
+  // Minimum order message.
+  minOrderMessage = '';
+
   constructor(
-    private cartService: CartService,
+    public cartService: CartService,
+    private restaurantService: RestaurantService,
     private checkoutService: CheckoutService,
     private checkoutData: CheckoutDataService,
     private router: Router
@@ -55,8 +58,30 @@ export class CheckoutComponent {
 
     this.customerCartItems = this.cartService.cartItems;
 
+    this.loadRestaurantSettings();
+
     this.calculateBill();
 
+  }
+
+  // Load restaurant delivery settings from first cart item.
+  loadRestaurantSettings(): void {
+    const firstItem = this.customerCartItems()[0];
+    if (!firstItem) return;
+
+    this.restaurantService
+      .getRestaurantById(firstItem.menu.restaurantId)
+      .subscribe({
+        next: (data) => {
+          this.cartService.setDeliverySettings(
+            data.deliveryCharge,
+            500,
+            data.minimumOrder
+          );
+          this.calculateBill();
+        },
+        error: (err) => console.log(err)
+      });
   }
 
   // Create Checkout object.
@@ -104,6 +129,12 @@ export class CheckoutComponent {
 
     // Clear old errors.
     this.errors = {};
+
+    // Minimum order check.
+    if (this.cartService.isBelowMinimumOrder()) {
+      this.errors['minimumOrder'] =
+        `Minimum order is ₹${this.cartService.minimumOrder()}.`;
+    }
 
     // Delivery Address
     if (!this.customerCheckout.deliveryAddress.trim()) {

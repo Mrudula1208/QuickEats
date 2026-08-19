@@ -132,6 +132,8 @@ namespace QuickEats.API.Services
                 IsActive = true,
                 OpeningTime = dto.OpeningTime,
                 ClosingTime = dto.ClosingTime,
+                DeliveryCharge = dto.DeliveryCharge,
+                MinimumOrder = dto.MinimumOrder,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -152,6 +154,8 @@ namespace QuickEats.API.Services
             restaurant.ImageUrl = dto.ImageUrl;
             restaurant.OpeningTime = dto.OpeningTime;
             restaurant.ClosingTime = dto.ClosingTime;
+            restaurant.DeliveryCharge = dto.DeliveryCharge;
+            restaurant.MinimumOrder = dto.MinimumOrder;
 
             _restaurantRepository.Update(restaurant);
             await _restaurantRepository.SaveChangesAsync();
@@ -196,7 +200,9 @@ namespace QuickEats.API.Services
                     restaurant.ClosingTime,
                     restaurant.IsActive),
                 CreatedAt = restaurant.CreatedAt,
-                Rating = rating ?? 0
+                Rating = rating ?? 0,
+                DeliveryCharge = restaurant.DeliveryCharge,
+                MinimumOrder = restaurant.MinimumOrder
             };
         }
     }

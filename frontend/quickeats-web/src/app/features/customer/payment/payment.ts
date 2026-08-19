@@ -122,7 +122,9 @@ export class PaymentComponent {
 
         PaymentMethod: this.paymentMethod,
 
-        Items: items
+        Items: items,
+
+        TotalAmount: this.amount
 
       })
       .subscribe({

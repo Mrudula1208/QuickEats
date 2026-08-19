@@ -162,13 +162,23 @@
 
                 </div>
 
-                @if(customerCheckout.discountAmount > 0){
+            @if(customerCheckout.discountAmount > 0){
 
-                <div class="bill-row discount">
+            <div class="bill-row discount">
 
                     <span>Coupon Discount</span>
 
                     <span>- ₹{{ customerCheckout.discountAmount }}</span>
+
+                </div>
+
+                }
+
+                @if(submitted && errors['minimumOrder']){
+
+                <div class="min-order-error">
+
+                    {{ errors['minimumOrder'] }}
 
                 </div>
 
@@ -199,6 +209,8 @@
             <button
 
                 class="place-order-btn"
+
+                [disabled]="cartService.isBelowMinimumOrder()"
 
                 (click)="placeOrder()">
 

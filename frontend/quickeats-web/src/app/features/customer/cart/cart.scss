@@ -235,6 +235,17 @@
     transform:translateY(-2px);
 }
 
+.min-order-msg{
+    width:100%;
+    text-align:center;
+    padding:10px;
+    margin-bottom:10px;
+    background:#fff3e0;
+    color:#e65100;
+    border-radius:8px;
+    font-weight:600;
+}
+
 .cart-total .checkout-btn{
     padding:16px 40px;
     border:none;

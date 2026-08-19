@@ -19,6 +19,12 @@
         public string OpeningTime { get; set; } = "09:00";
         public string ClosingTime { get; set; } = "22:00";
 
+        // Delivery fee charged per order (0 = free delivery).
+        public decimal DeliveryCharge { get; set; } = 40;
+
+        // Minimum order amount required to place an order.
+        public decimal MinimumOrder { get; set; } = 0;
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

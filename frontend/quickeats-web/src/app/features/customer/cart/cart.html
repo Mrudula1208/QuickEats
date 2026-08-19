@@ -205,6 +205,12 @@
 
         <div class="cart-total">
 
+            @if(isBelowMinimumOrder()){
+                <p class="min-order-msg">
+                    Minimum order is ₹{{ minimumOrder }}. Add ₹{{ (minimumOrder - getFoodTotal()).toFixed(2) }} more.
+                </p>
+            }
+
             <button
                 class="empty-cart-btn"
                 (click)="emptyCart()">
@@ -215,6 +221,7 @@
 
             <button
                 class="checkout-btn"
+                [disabled]="isBelowMinimumOrder()"
                 (click)="goToCheckout()">
 
                 Proceed To Checkout

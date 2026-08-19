@@ -123,6 +123,24 @@
         </div>
     </div>
 
+    <label>Delivery Charge (₹)</label>
+
+    <input
+        type="number"
+        name="deliveryCharge"
+        [(ngModel)]="restaurant.deliveryCharge"
+        min="0"
+        max="1000">
+
+    <label>Minimum Order (₹)</label>
+
+    <input
+        type="number"
+        name="minimumOrder"
+        [(ngModel)]="restaurant.minimumOrder"
+        min="0"
+        max="10000">
+
     <button
         class="save-btn"
         type="submit"

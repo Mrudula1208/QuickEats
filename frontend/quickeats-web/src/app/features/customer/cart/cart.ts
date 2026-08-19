@@ -40,6 +40,10 @@ export class CartComponent {
   // Restaurant name of the current order.
   restaurantName = '';
 
+  // Restaurant delivery settings.
+  deliveryCharge = 0;
+  minimumOrder = 0;
+
   // Coupon code typed by the customer.
   couponInput = '';
 
@@ -72,6 +76,15 @@ export class CartComponent {
         next: (data) => {
 
           this.restaurantName = data.name;
+          this.deliveryCharge = data.deliveryCharge;
+          this.minimumOrder = data.minimumOrder;
+
+          // Pass delivery settings to CartService.
+          this.cartService.setDeliverySettings(
+            data.deliveryCharge,
+            500,
+            data.minimumOrder
+          );
 
         },
 
@@ -158,6 +171,7 @@ export class CartComponent {
   getDeliveryFee(): number { return this.cartService.getDeliveryFee(); }
   getCouponDiscount(): number { return this.cartService.getCouponDiscount(); }
   getGrandTotal(): number { return this.cartService.getGrandTotal(); }
+  isBelowMinimumOrder(): boolean { return this.cartService.isBelowMinimumOrder(); }
 
   // Open the Checkout page.
   goToCheckout(): void {

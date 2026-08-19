@@ -35,4 +35,10 @@ export interface Restaurant {
 
   // Average Rating
   rating?: number;
+
+  // Delivery fee per order (0 = free delivery).
+  deliveryCharge: number;
+
+  // Minimum order amount required.
+  minimumOrder: number;
 }

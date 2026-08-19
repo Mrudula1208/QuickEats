@@ -26,5 +26,13 @@ namespace QuickEats.API.DTos.Restaurant
         public string OpeningTime { get; set; } = "09:00";
 
         public string ClosingTime { get; set; } = "22:00";
+
+        // Delivery fee per order (0 = free delivery).
+        [Range(0, 1000, ErrorMessage = "Delivery charge must be between 0 and 1000")]
+        public decimal DeliveryCharge { get; set; } = 40;
+
+        // Minimum order amount required to place an order.
+        [Range(0, 10000, ErrorMessage = "Minimum order must be between 0 and 10000")]
+        public decimal MinimumOrder { get; set; } = 0;
     }
 }

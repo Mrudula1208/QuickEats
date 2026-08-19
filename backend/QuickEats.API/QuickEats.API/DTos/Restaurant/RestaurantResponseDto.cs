@@ -27,12 +27,10 @@
 
         public double Rating { get; set; }
 
-        public string DeliveryTime { get; set; } = string.Empty;
+        // Delivery fee per order.
+        public decimal DeliveryCharge { get; set; }
 
-        public decimal PriceForTwo { get; set; }
-
-        public string Discount { get; set; } = string.Empty;
-
-        public bool FreeDelivery { get; set; }
+        // Minimum order amount.
+        public decimal MinimumOrder { get; set; }
     }
 }

@@ -264,7 +264,7 @@ namespace QuickEats.API.Services
 
                 order.OrderItems.Add(orderItem);
             }
-            order.TotalAmount = totalAmount;
+            order.TotalAmount = dto.TotalAmount > 0 ? dto.TotalAmount : totalAmount;
             await _orderRepository.AddAsync(order);
             await _orderRepository.SaveChangesAsync();
 
