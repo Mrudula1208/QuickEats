@@ -38,20 +38,27 @@ import { CartItem } from '../../../core/models/cart-item.model';
 export class CheckoutComponent {
 
   // Get all food items added into the cart.
-customerCartItems = signal<CartItem[]>([]);
+  customerCartItems = signal<CartItem[]>([]);
 
-constructor(
-  private cartService: CartService,
-  private checkoutService: CheckoutService,
-  private checkoutData: CheckoutDataService,
-  private router: Router
-) {
+  // Track if user clicked Place Order.
+  submitted = false;
 
-  this.customerCartItems = this.cartService.cartItems;
+  // Per-field error messages.
+  errors: { [key: string]: string } = {};
 
-  this.calculateBill();
+  constructor(
+    private cartService: CartService,
+    private checkoutService: CheckoutService,
+    private checkoutData: CheckoutDataService,
+    private router: Router
+  ) {
 
-}
+    this.customerCartItems = this.cartService.cartItems;
+
+    this.calculateBill();
+
+  }
+
   // Create Checkout object.
   // Default values are shown when page opens.
   customerCheckout: CheckoutModel = {
@@ -86,6 +93,48 @@ constructor(
 
   // Angular automatically injects required services.
 
+  // ==========================================
+  // VALIDATE FORM
+  // ==========================================
+
+  // validateForm
+  // Checks delivery address and phone number.
+  // Returns true if all fields are valid.
+  validateForm(): boolean {
+
+    // Clear old errors.
+    this.errors = {};
+
+    // Delivery Address
+    if (!this.customerCheckout.deliveryAddress.trim()) {
+
+      this.errors['deliveryAddress'] = 'Delivery address is required.';
+
+    } else if (this.customerCheckout.deliveryAddress.trim().length < 5) {
+
+      this.errors['deliveryAddress'] = 'Delivery address must be at least 5 characters.';
+
+    } else if (this.customerCheckout.deliveryAddress.trim().length > 500) {
+
+      this.errors['deliveryAddress'] = 'Delivery address cannot exceed 500 characters.';
+
+    }
+
+    // Phone Number
+    if (!this.customerCheckout.phoneNumber.trim()) {
+
+      this.errors['phoneNumber'] = 'Phone number is required.';
+
+    } else if (!/^\d{10,15}$/.test(this.customerCheckout.phoneNumber.trim())) {
+
+      this.errors['phoneNumber'] = 'Please enter a valid 10 to 15 digit phone number.';
+
+    }
+
+    // Return true if no errors.
+    return Object.keys(this.errors).length === 0;
+
+  }
 
   // Calculate complete bill.
   calculateBill(): void {
@@ -127,6 +176,16 @@ constructor(
 
   // Save checkout details and move to payment page.
   placeOrder(): void {
+
+    // Mark form as submitted.
+    this.submitted = true;
+
+    // Validate delivery address and phone.
+    if (!this.validateForm()) {
+
+      return;
+
+    }
 
     // Save checkout information.
     this.checkoutService

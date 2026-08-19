@@ -56,6 +56,38 @@ namespace QuickEats.API.Services
 
         public async Task CreateAsync(int userId, CreateAddressDto dto)
         {
+            // Validate required fields.
+
+            if (string.IsNullOrWhiteSpace(dto.CustomerName))
+                throw new BadRequestException("Customer name is required.");
+
+            if (string.IsNullOrWhiteSpace(dto.PhoneNumber))
+                throw new BadRequestException("Phone number is required.");
+
+            if (dto.PhoneNumber.Length < 10 || dto.PhoneNumber.Length > 15)
+                throw new BadRequestException("Phone number must be between 10 and 15 characters.");
+
+            if (string.IsNullOrWhiteSpace(dto.HouseNumber))
+                throw new BadRequestException("House number is required.");
+
+            if (string.IsNullOrWhiteSpace(dto.Area))
+                throw new BadRequestException("Area is required.");
+
+            if (string.IsNullOrWhiteSpace(dto.City))
+                throw new BadRequestException("City is required.");
+
+            if (string.IsNullOrWhiteSpace(dto.State))
+                throw new BadRequestException("State is required.");
+
+            if (string.IsNullOrWhiteSpace(dto.Pincode))
+                throw new BadRequestException("Pincode is required.");
+
+            if (!System.Text.RegularExpressions.Regex.IsMatch(dto.Pincode, @"^\d{6}$"))
+                throw new BadRequestException("Pincode must be exactly 6 digits.");
+
+            if (string.IsNullOrWhiteSpace(dto.AddressType))
+                throw new BadRequestException("Address type is required.");
+
             // First Address is always the Default one.
 
             var existingAddresses = await _addressRepository.GetByUserIdAsync(userId);

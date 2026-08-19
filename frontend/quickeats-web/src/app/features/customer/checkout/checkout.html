@@ -14,8 +14,19 @@
 
                 <input
                     type="text"
-                    placeholder="Enter Delivery Address"
-                    [(ngModel)]="customerCheckout.deliveryAddress">
+                    placeholder="Enter Delivery Address *"
+                    [(ngModel)]="customerCheckout.deliveryAddress"
+                    [class.input-error]="submitted && errors['deliveryAddress']">
+
+                @if(submitted && errors['deliveryAddress']){
+
+                <span class="error-text">
+
+                    {{errors['deliveryAddress']}}
+
+                </span>
+
+                }
 
                 <input
                     type="text"
@@ -24,8 +35,19 @@
 
                 <input
                     type="text"
-                    placeholder="Mobile Number"
-                    [(ngModel)]="customerCheckout.phoneNumber">
+                    placeholder="Mobile Number *"
+                    [(ngModel)]="customerCheckout.phoneNumber"
+                    [class.input-error]="submitted && errors['phoneNumber']">
+
+                @if(submitted && errors['phoneNumber']){
+
+                <span class="error-text">
+
+                    {{errors['phoneNumber']}}
+
+                </span>
+
+                }
 
             </div>
 

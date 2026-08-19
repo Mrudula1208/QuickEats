@@ -8,56 +8,200 @@
 
     <div class="address-form">
 
-        <input
-            type="text"
-            placeholder="Customer Name"
-            [(ngModel)]="newAddress.customerName">
+        <!-- Customer Name -->
 
-        <input
-            type="text"
-            placeholder="Phone Number"
-            [(ngModel)]="newAddress.phoneNumber">
+        <div class="form-group">
 
-        <input
-            type="text"
-            placeholder="House Number"
-            [(ngModel)]="newAddress.houseNumber">
+            <input
+                type="text"
+                placeholder="Customer Name *"
+                [(ngModel)]="newAddress.customerName"
+                [class.input-error]="submitted && errors['customerName']">
 
-        <input
-            type="text"
-            placeholder="Area"
-            [(ngModel)]="newAddress.area">
+            @if(submitted && errors['customerName']){
 
-        <input
-            type="text"
-            placeholder="Landmark"
-            [(ngModel)]="newAddress.landmark">
+            <span class="error-text">
 
-        <input
-            type="text"
-            placeholder="City"
-            [(ngModel)]="newAddress.city">
+                {{errors['customerName']}}
 
-        <input
-            type="text"
-            placeholder="State"
-            [(ngModel)]="newAddress.state">
+            </span>
 
-        <input
-            type="text"
-            placeholder="Pincode"
-            [(ngModel)]="newAddress.pincode">
+            }
 
-        <select
-            [(ngModel)]="newAddress.addressType">
+        </div>
 
-            <option>Home</option>
+        <!-- Phone Number -->
 
-            <option>Office</option>
+        <div class="form-group">
 
-            <option>Other</option>
+            <input
+                type="text"
+                placeholder="Phone Number *"
+                [(ngModel)]="newAddress.phoneNumber"
+                [class.input-error]="submitted && errors['phoneNumber']">
 
-        </select>
+            @if(submitted && errors['phoneNumber']){
+
+            <span class="error-text">
+
+                {{errors['phoneNumber']}}
+
+            </span>
+
+            }
+
+        </div>
+
+        <!-- House Number -->
+
+        <div class="form-group">
+
+            <input
+                type="text"
+                placeholder="House Number *"
+                [(ngModel)]="newAddress.houseNumber"
+                [class.input-error]="submitted && errors['houseNumber']">
+
+            @if(submitted && errors['houseNumber']){
+
+            <span class="error-text">
+
+                {{errors['houseNumber']}}
+
+            </span>
+
+            }
+
+        </div>
+
+        <!-- Area -->
+
+        <div class="form-group">
+
+            <input
+                type="text"
+                placeholder="Area *"
+                [(ngModel)]="newAddress.area"
+                [class.input-error]="submitted && errors['area']">
+
+            @if(submitted && errors['area']){
+
+            <span class="error-text">
+
+                {{errors['area']}}
+
+            </span>
+
+            }
+
+        </div>
+
+        <!-- Landmark -->
+
+        <div class="form-group">
+
+            <input
+                type="text"
+                placeholder="Landmark"
+                [(ngModel)]="newAddress.landmark">
+
+        </div>
+
+        <!-- City -->
+
+        <div class="form-group">
+
+            <input
+                type="text"
+                placeholder="City *"
+                [(ngModel)]="newAddress.city"
+                [class.input-error]="submitted && errors['city']">
+
+            @if(submitted && errors['city']){
+
+            <span class="error-text">
+
+                {{errors['city']}}
+
+            </span>
+
+            }
+
+        </div>
+
+        <!-- State -->
+
+        <div class="form-group">
+
+            <input
+                type="text"
+                placeholder="State *"
+                [(ngModel)]="newAddress.state"
+                [class.input-error]="submitted && errors['state']">
+
+            @if(submitted && errors['state']){
+
+            <span class="error-text">
+
+                {{errors['state']}}
+
+            </span>
+
+            }
+
+        </div>
+
+        <!-- Pincode -->
+
+        <div class="form-group">
+
+            <input
+                type="text"
+                placeholder="Pincode (6 digits) *"
+                [(ngModel)]="newAddress.pincode"
+                [class.input-error]="submitted && errors['pincode']">
+
+            @if(submitted && errors['pincode']){
+
+            <span class="error-text">
+
+                {{errors['pincode']}}
+
+            </span>
+
+            }
+
+        </div>
+
+        <!-- Address Type -->
+
+        <div class="form-group">
+
+            <select
+                [(ngModel)]="newAddress.addressType"
+                [class.input-error]="submitted && errors['addressType']">
+
+                <option>Home</option>
+
+                <option>Office</option>
+
+                <option>Other</option>
+
+            </select>
+
+            @if(submitted && errors['addressType']){
+
+            <span class="error-text">
+
+                {{errors['addressType']}}
+
+            </span>
+
+            }
+
+        </div>
+
+        <!-- Submit Button -->
 
         <button
 

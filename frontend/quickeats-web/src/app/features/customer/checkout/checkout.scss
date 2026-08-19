@@ -45,6 +45,19 @@
     border-color:#ff6b00;
 }
 
+.input-error{
+    border-color:#ef5350 !important;
+}
+
+.error-text{
+    color:#ef5350;
+    font-size:13px;
+    margin-top:-10px;
+    margin-bottom:10px;
+    padding-left:4px;
+    display:block;
+}
+
 .checkout-form label{
     display:block;
     margin-bottom:15px;
