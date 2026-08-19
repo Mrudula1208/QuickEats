@@ -141,7 +141,16 @@
 
                     <span>Delivery Charge</span>
 
-                    <span>₹{{ customerCheckout.deliveryCharge }}</span>
+                    <span>
+
+                        @if(customerCheckout.deliveryCharge === 0){
+                            FREE
+                        }
+                        @else{
+                            ₹{{ customerCheckout.deliveryCharge }}
+                        }
+
+                    </span>
 
                 </div>
 
@@ -152,6 +161,18 @@
                     <span>₹{{ customerCheckout.platformFee }}</span>
 
                 </div>
+
+                @if(customerCheckout.discountAmount > 0){
+
+                <div class="bill-row discount">
+
+                    <span>Coupon Discount</span>
+
+                    <span>- ₹{{ customerCheckout.discountAmount }}</span>
+
+                </div>
+
+                }
 
                 <hr>
 

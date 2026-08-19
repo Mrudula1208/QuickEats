@@ -44,6 +44,17 @@ export class PaymentComponent {
   // Stores selected payment method.
   paymentMethod = 'Cash On Delivery';
 
+  // Bill breakdown.
+  foodTotal = 0;
+
+  gstAmount = 0;
+
+  deliveryFee = 0;
+
+  platformFee = 0;
+
+  couponDiscount = 0;
+
   constructor(
 
     // Reads data entered on Checkout page.
@@ -68,6 +79,17 @@ export class PaymentComponent {
 
     // Read total amount from Checkout.
     this.amount = this.checkoutData.total;
+
+    // Read bill breakdown.
+    this.foodTotal = this.checkoutData.foodTotal;
+
+    this.gstAmount = this.checkoutData.gstAmount;
+
+    this.deliveryFee = this.checkoutData.deliveryFee;
+
+    this.platformFee = this.checkoutData.platformFee;
+
+    this.couponDiscount = this.checkoutData.couponDiscount;
 
   }
 

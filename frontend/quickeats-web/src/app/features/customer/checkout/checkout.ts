@@ -155,6 +155,14 @@ export class CheckoutComponent {
     this.customerCheckout.deliveryCharge =
       this.cartService.getDeliveryFee();
 
+    // Coupon discount.
+    this.customerCheckout.discountAmount =
+      this.cartService.getCouponDiscount();
+
+    // Coupon code.
+    this.customerCheckout.couponCode =
+      this.cartService.getCouponCode();
+
     // Reward points.
     this.customerCheckout.rewardPoints =
       Math.floor(this.customerCheckout.subTotal / 100);
@@ -205,6 +213,22 @@ export class CheckoutComponent {
 
     this.checkoutData.total =
       this.customerCheckout.grandTotal;
+
+    // Pass bill breakdown to Payment page.
+    this.checkoutData.foodTotal =
+      this.customerCheckout.subTotal;
+
+    this.checkoutData.gstAmount =
+      this.customerCheckout.gstAmount;
+
+    this.checkoutData.deliveryFee =
+      this.customerCheckout.deliveryCharge;
+
+    this.checkoutData.platformFee =
+      this.customerCheckout.platformFee;
+
+    this.checkoutData.couponDiscount =
+      this.customerCheckout.discountAmount;
 
     // Open Payment Page.
     this.router.navigate(['/payment']);

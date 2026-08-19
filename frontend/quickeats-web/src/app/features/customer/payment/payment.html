@@ -16,9 +16,25 @@
 
         <div class="summary-row">
 
-            <span>Subtotal</span>
+            <span>Food Total</span>
 
-            <strong>₹{{amount}}</strong>
+            <strong>₹{{foodTotal}}</strong>
+
+        </div>
+
+        <div class="summary-row">
+
+            <span>GST (5%)</span>
+
+            <strong>₹{{gstAmount}}</strong>
+
+        </div>
+
+        <div class="summary-row">
+
+            <span>Platform Fee</span>
+
+            <strong>₹{{platformFee}}</strong>
 
         </div>
 
@@ -26,9 +42,30 @@
 
             <span>Delivery Fee</span>
 
-            <strong>FREE</strong>
+            <strong>
+
+                @if(deliveryFee === 0){
+                    FREE
+                }
+                @else{
+                    ₹{{deliveryFee}}
+                }
+
+            </strong>
 
         </div>
+
+        @if(couponDiscount > 0){
+
+        <div class="summary-row">
+
+            <span>Coupon Discount</span>
+
+            <strong>- ₹{{couponDiscount}}</strong>
+
+        </div>
+
+        }
 
         <hr>
 
