@@ -2,44 +2,55 @@
 
 <h1>Menu Categories</h1>
 
-@if(categories.length===0){
+<div class="add-row">
+    <input
+        type="text"
+        placeholder="New category name"
+        [(ngModel)]="newName"
+        (keyup.enter)="addCategory()">
+    <button class="btn-add" (click)="addCategory()" [disabled]="!newName.trim()">Add Category</button>
+</div>
 
-<h2>No Categories Found</h2>
-
+@if(categories.length === 0){
+    <p class="empty">No Categories Found</p>
 }
-
 @else{
-
-<table>
-
-<thead>
-
-<tr>
-
-<th>Category</th>
-
-<th>Menu Items</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-@for(category of categories; track category.name){
-
-<tr>
-
-<td>{{category.name}}</td>
-
-<td>{{category.count}}</td>
-
-</tr>
-
-}
-
-</tbody>
-
-</table>
-
+    <table>
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Menu Items</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for(cat of categories; track cat.id){
+                <tr>
+                    <td>
+                        @if(editId === cat.id){
+                            <input
+                                type="text"
+                                [(ngModel)]="editName"
+                                (keyup.enter)="saveEdit()"
+                                (keyup.escape)="cancelEdit()">
+                        }
+                        @else{
+                            {{cat.name}}
+                        }
+                    </td>
+                    <td>{{cat.menuItemCount}}</td>
+                    <td class="actions">
+                        @if(editId === cat.id){
+                            <button class="btn-save" (click)="saveEdit()">Save</button>
+                            <button class="btn-cancel" (click)="cancelEdit()">Cancel</button>
+                        }
+                        @else{
+                            <button class="btn-edit" (click)="startEdit(cat)">Edit</button>
+                            <button class="btn-delete" (click)="deleteCategory(cat.id)">Delete</button>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 }

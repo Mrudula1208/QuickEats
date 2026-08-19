@@ -15,16 +15,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 // Router navigates back to the menu.
 
 import { OwnerNavComponent } from '../../../shared/owner-nav/owner-nav';
-// Top navigation bar.
-
 import { MenuService } from '../../../core/services/menu.service';
-// Saves menu items.
-
+import { CategoryService } from '../../../core/services/category.service';
 import { ImageService } from '../../../core/services/image.service';
-// Handles image upload.
-
 import { MenuItem } from '../../../core/models/menu.model';
-// Structure of one menu item.
+import { Category } from '../../../core/models/category.model';
 
 @Component({
   selector: 'app-owner-menu-item-form',
@@ -65,12 +60,22 @@ export class OwnerMenuItemFormComponent {
   // Is file currently uploading.
   isUploading = false;
 
+  // Available categories from backend.
+  categories: Category[] = [];
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private menuService: MenuService,
+    private categoryService: CategoryService,
     private imageService: ImageService
   ) {
+
+    // Load categories from backend.
+    this.categoryService.getCategories().subscribe({
+      next: (data) => this.categories = data,
+      error: (err) => console.log(err)
+    });
 
     // Read the restaurant id and the menu item id from the URL.
     this.restaurantId = Number(

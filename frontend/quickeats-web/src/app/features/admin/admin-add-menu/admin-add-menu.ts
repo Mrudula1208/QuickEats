@@ -11,13 +11,10 @@ import { Router } from '@angular/router';
 // Used for Navigation.
 
 import { MenuService } from '../../../core/services/menu.service';
-// Calls Menu APIs.
-
+import { CategoryService } from '../../../core/services/category.service';
 import { ImageService } from '../../../core/services/image.service';
-// Handles image upload.
-
 import { MenuItem } from '../../../core/models/menu.model';
-// Menu Structure.
+import { Category } from '../../../core/models/category.model';
 
 @Component({
   selector: 'app-admin-add-menu',
@@ -72,10 +69,16 @@ export class AdminAddMenu {
   // Is file currently uploading.
   isUploading = false;
 
+  // Available categories from backend.
+  categories: Category[] = [];
+
   constructor(
 
     // Menu API.
     private menuService: MenuService,
+
+    // Category API.
+    private categoryService: CategoryService,
 
     // Image upload API.
     private imageService: ImageService,
@@ -83,7 +86,13 @@ export class AdminAddMenu {
     // Navigation.
     private router: Router
 
-  ) { }
+  ) {
+    // Load categories from backend.
+    this.categoryService.getCategories().subscribe({
+      next: (data) => this.categories = data,
+      error: (err) => console.log(err)
+    });
+  }
 
   // When user selects a file.
   onFileSelected(event: Event): void {

@@ -11,13 +11,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 // Reads Menu Id and Navigates.
 
 import { MenuService } from '../../../core/services/menu.service';
-// Calls Menu APIs.
-
+import { CategoryService } from '../../../core/services/category.service';
 import { ImageService } from '../../../core/services/image.service';
-// Handles image upload.
-
 import { MenuItem } from '../../../core/models/menu.model';
-// Menu Structure.
+import { Category } from '../../../core/models/category.model';
 
 @Component({
   selector: 'app-admin-edit-menu',
@@ -47,6 +44,9 @@ export class AdminEditMenu {
   // Is file currently uploading.
   isUploading = false;
 
+  // Available categories from backend.
+  categories: Category[] = [];
+
   constructor(
 
     // Read URL Id.
@@ -55,6 +55,9 @@ export class AdminEditMenu {
     // Menu API.
     private menuService: MenuService,
 
+    // Category API.
+    private categoryService: CategoryService,
+
     // Image upload API.
     private imageService: ImageService,
 
@@ -62,6 +65,11 @@ export class AdminEditMenu {
     private router: Router
 
   ) {
+    // Load categories from backend.
+    this.categoryService.getCategories().subscribe({
+      next: (data) => this.categories = data,
+      error: (err) => console.log(err)
+    });
 
     const id = Number(
 

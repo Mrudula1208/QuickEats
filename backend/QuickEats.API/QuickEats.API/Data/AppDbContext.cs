@@ -32,6 +32,7 @@ namespace QuickEats.API.Data
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<SavedAddress> SavedAddresses { get; set; }
         public DbSet<Favorite> Favorites { get; set; }
+        public DbSet<Category> Categories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -73,6 +74,16 @@ namespace QuickEats.API.Data
             modelBuilder.Entity<Coupon>()
                 .Property(c => c.DiscountAmount)
                 .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Category>().HasData(
+                new Category { Id = 1, Name = "Starters" },
+                new Category { Id = 2, Name = "Main Course" },
+                new Category { Id = 3, Name = "Biryani" },
+                new Category { Id = 4, Name = "Pizza" },
+                new Category { Id = 5, Name = "Burgers" },
+                new Category { Id = 6, Name = "Desserts" },
+                new Category { Id = 7, Name = "Beverages" }
+            );
 
             base.OnModelCreating(modelBuilder);
         }
