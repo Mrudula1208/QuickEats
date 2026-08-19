@@ -18,6 +18,14 @@ import { CouponModel } from '../../../core/models/coupon.model';
 // CouponModel.
 // Defines one Coupon.
 
+import { CartService } from '../../../core/services/cart.service';
+// CartService.
+// Applies coupon to cart.
+
+import { ToastrService } from 'ngx-toastr';
+// ToastrService.
+// Shows success or error messages.
+
 @Component({
 
   selector: 'app-coupons',
@@ -44,8 +52,14 @@ export class CouponsComponent {
     // Coupon Service.
     private couponService: CouponService,
 
+    // Cart Service.
+    private cartService: CartService,
+
     // Router.
-    private router: Router
+    private router: Router,
+
+    // Toast notifications.
+    private toastr: ToastrService
 
   ) {
 
@@ -116,7 +130,7 @@ export class CouponsComponent {
   // ==========================================
 
   // applyCoupon
-  // Applies Coupon.
+  // Applies Coupon and navigates to checkout.
   //
   // selectedCoupon
   // Selected Coupon.
@@ -130,26 +144,82 @@ export class CouponsComponent {
   ): void {
 
     //
-    // selectedCoupon
-    // Coupon selected by customer.
+    // Check if cart is empty.
     //
-    console.log(selectedCoupon);
+    if (this.cartService.cartItems().length === 0) {
+
+      this.toastr.warning('Your cart is empty. Add items before applying a coupon.');
+
+      return;
+
+    }
 
     //
-    // this
-    // Current Component.
+    // Check if coupon is active.
     //
-    // router
-    // Router Object.
-    //
-    // navigate()
-    // Open another page.
-    //
-    this.router.navigate([
+    if (!selectedCoupon.isActive) {
 
-      '/checkout'
+      this.toastr.error('This coupon is no longer active.');
 
-    ]);
+      return;
+
+    }
+
+    //
+    // Check if coupon is expired.
+    //
+    const now = new Date();
+
+    if (new Date(selectedCoupon.expiryDate) < now) {
+
+      this.toastr.error('This coupon has expired.');
+
+      return;
+
+    }
+
+    //
+    // Check if order meets minimum amount.
+    //
+    const foodTotal = this.cartService.getFoodTotal();
+
+    if (foodTotal < selectedCoupon.minimumOrderAmount) {
+
+      this.toastr.error(
+        `Minimum order of ₹${selectedCoupon.minimumOrderAmount} required. Your cart total is ₹${foodTotal.toFixed(2)}.`
+      );
+
+      return;
+
+    }
+
+    //
+    // Check if discount exceeds food total.
+    //
+    if (selectedCoupon.discountAmount >= foodTotal) {
+
+      this.toastr.error('Discount cannot be greater than or equal to the cart total.');
+
+      return;
+
+    }
+
+    //
+    // Apply the coupon to cart.
+    //
+    this.cartService.couponCode.set(selectedCoupon.couponCode);
+
+    this.cartService.appliedCoupon.set(selectedCoupon);
+
+    //
+    // Show success message.
+    //
+    this.toastr.success(`Coupon '${selectedCoupon.couponCode}' applied! You save ₹${selectedCoupon.discountAmount}.`);
+
+    //
+    // Navigate to Checkout Page.
+    //
+    this.router.navigate(['/checkout']);
 
   }
 

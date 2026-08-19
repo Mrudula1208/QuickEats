@@ -196,10 +196,17 @@ export class CartService {
 
   }
 
+  // Get the applied coupon code.
+  getCouponCode(): string {
+
+    return this.couponCode();
+
+  }
+
   // Grand total = food + gst + platform + delivery - coupon.
   getGrandTotal(): number {
 
-    return this.getFoodTotal() +
+    const total = this.getFoodTotal() +
 
       this.getGstAmount() +
 
@@ -209,28 +216,50 @@ export class CartService {
 
       this.getCouponDiscount();
 
+    // Ensure total never goes below zero.
+    return total < 0 ? 0 : total;
+
   }
 
   // Apply a coupon code.
   // Checks the coupon with the Backend.
-  // Returns true if the coupon is valid.
-  applyCoupon(code: string): Observable<boolean> {
+  // Returns empty string on success, error message on failure.
+  applyCoupon(code: string): Observable<string> {
+
+    if (!code || code.trim() === '') {
+
+      return of('Please enter a coupon code.');
+
+    }
 
     return this.couponService
       .getCouponByCode(code)
       .pipe(
         map((coupon) => {
 
+          if (!coupon.isActive) {
+
+            return 'This coupon is no longer active.';
+
+          }
+
           const now = new Date();
 
-          const expired = new Date(coupon.expiryDate) < now;
+          if (new Date(coupon.expiryDate) < now) {
 
-          const belowMinimum =
-            this.getFoodTotal() < coupon.minimumOrderAmount;
+            return 'This coupon has expired.';
 
-          if (!coupon.isActive || expired || belowMinimum) {
+          }
 
-            return false;
+          if (this.getFoodTotal() < coupon.minimumOrderAmount) {
+
+            return `Minimum order of ₹${coupon.minimumOrderAmount} required. Your cart total is ₹${this.getFoodTotal().toFixed(2)}.`;
+
+          }
+
+          if (coupon.discountAmount >= this.getFoodTotal()) {
+
+            return 'Discount cannot be greater than or equal to the cart total.';
 
           }
 
@@ -238,12 +267,12 @@ export class CartService {
 
           this.appliedCoupon.set(coupon);
 
-          return true;
+          return '';
 
         }),
         catchError(() => {
 
-          return of(false);
+          return of('Invalid coupon code. Please check and try again.');
 
         })
       );

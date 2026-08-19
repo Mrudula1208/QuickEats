@@ -75,9 +75,43 @@ namespace QuickEats.API.Services
 
         public async Task CreateAsync(CreateCouponDto dto)
         {
+            // Validate coupon code is not empty.
+            if (string.IsNullOrWhiteSpace(dto.CouponCode))
+                throw new BadRequestException("Coupon code is required.");
+
+            // Validate coupon code format.
+            var code = dto.CouponCode.Trim().ToUpper();
+
+            if (code.Length < 3 || code.Length > 20)
+                throw new BadRequestException("Coupon code must be between 3 and 20 characters.");
+
+            if (!System.Text.RegularExpressions.Regex.IsMatch(code, @"^[A-Z0-9]+$"))
+                throw new BadRequestException("Coupon code must contain only uppercase letters and numbers.");
+
+            // Check for duplicate coupon code.
+            var existing = await _couponRepository.GetByCodeAsync(code);
+            if (existing != null)
+                throw new BadRequestException($"Coupon with code '{code}' already exists.");
+
+            // Validate minimum order amount.
+            if (dto.MinimumOrderAmount < 1)
+                throw new BadRequestException("Minimum order amount must be at least 1.");
+
+            // Validate discount amount.
+            if (dto.DiscountAmount < 1)
+                throw new BadRequestException("Discount amount must be at least 1.");
+
+            // Validate discount is not greater than minimum order.
+            if (dto.DiscountAmount >= dto.MinimumOrderAmount)
+                throw new BadRequestException("Discount amount must be less than the minimum order amount.");
+
+            // Validate expiry date is in the future.
+            if (dto.ExpiryDate <= DateTime.UtcNow)
+                throw new BadRequestException("Expiry date must be a future date.");
+
             var coupon = new Coupon
             {
-                Code = dto.CouponCode.Trim().ToUpper(),
+                Code = code,
                 Description = dto.Description,
                 MinimumOrderAmount = dto.MinimumOrderAmount,
                 DiscountAmount = dto.DiscountAmount,

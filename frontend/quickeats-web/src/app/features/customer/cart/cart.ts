@@ -109,16 +109,17 @@ export class CartComponent {
     this.cartService
       .applyCoupon(this.couponInput)
       .subscribe({
-        next: (valid) => {
+        next: (errorMsg) => {
 
-          if (valid) {
+          if (errorMsg === '') {
 
-            this.couponMessage = 'Coupon applied!';
+            this.couponMessage = '';
+            this.couponInput = '';
 
           }
           else {
 
-            this.couponMessage = 'Invalid, expired or not eligible coupon.';
+            this.couponMessage = errorMsg;
 
           }
 
@@ -131,6 +132,21 @@ export class CartComponent {
 
         }
       });
+
+  }
+
+  // Remove the applied coupon.
+  removeCoupon(): void {
+
+    this.cartService.removeCoupon();
+    this.couponMessage = '';
+
+  }
+
+  // Get the applied coupon code.
+  getCouponCode(): string {
+
+    return this.cartService.getCouponCode();
 
   }
 

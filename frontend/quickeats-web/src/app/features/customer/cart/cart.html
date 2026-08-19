@@ -86,6 +86,8 @@
 
         <div class="coupon-box">
 
+            @if(!getCouponDiscount()){
+
             <input
                 type="text"
                 placeholder="Enter Coupon Code (SAVE10, FLAT50)"
@@ -97,6 +99,32 @@
                 Apply
 
             </button>
+
+            }
+
+            @else{
+
+            <div class="coupon-applied">
+
+                <span class="coupon-code-text">
+
+                    🎉 {{ getCouponCode() }} applied
+
+                    (- ₹{{ getCouponDiscount() }})
+
+                </span>
+
+                <button
+                    class="remove-coupon-btn"
+                    (click)="removeCoupon()">
+
+                    Remove
+
+                </button>
+
+            </div>
+
+            }
 
             @if(couponMessage){
 
