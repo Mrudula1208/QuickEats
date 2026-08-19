@@ -1,23 +1,102 @@
 <div class="order-details-page">
 
     @if(selectedOrder){
-    <!-- @if checks whether selectedOrder contains data.
-         If data exists, Angular displays the complete Order Details page.
-         Otherwise it goes to the @else block.
-    -->
 
     <div class="order-card">
 
-        <h1>{{ selectedOrder.restaurantName }}</h1>
-        <!-- {{ }} is called Interpolation.
-             It displays TypeScript data inside HTML.
-             Here it prints Restaurant Name.
-        -->
+        <div class="order-header">
 
-        <p>
-            Order ID :
-            <strong>#{{ selectedOrder.id }}</strong>
-        </p>
+            <div>
+
+                <h1>{{ selectedOrder.restaurantName }}</h1>
+
+                <p>
+
+                    Order ID :
+
+                    <strong>#{{ selectedOrder.id }}</strong>
+
+                </p>
+
+            </div>
+
+            <button class="refresh-btn" (click)="refreshOrder()">
+
+                ↻ Refresh
+
+            </button>
+
+        </div>
+
+        <hr>
+
+        <!-- Status Timeline -->
+
+        @if(selectedOrder.status !== 'Cancelled'){
+
+        <div class="timeline">
+
+            <div class="timeline-step" [class.completed]="isStepCompleted(0, selectedOrder.status)">
+
+                <div class="step-dot"></div>
+
+                <span>Pending</span>
+
+            </div>
+
+            <div class="timeline-line" [class.completed]="isStepCompleted(1, selectedOrder.status)"></div>
+
+            <div class="timeline-step" [class.completed]="isStepCompleted(1, selectedOrder.status)">
+
+                <div class="step-dot"></div>
+
+                <span>Confirmed</span>
+
+            </div>
+
+            <div class="timeline-line" [class.completed]="isStepCompleted(2, selectedOrder.status)"></div>
+
+            <div class="timeline-step" [class.completed]="isStepCompleted(2, selectedOrder.status)">
+
+                <div class="step-dot"></div>
+
+                <span>Preparing</span>
+
+            </div>
+
+            <div class="timeline-line" [class.completed]="isStepCompleted(3, selectedOrder.status)"></div>
+
+            <div class="timeline-step" [class.completed]="isStepCompleted(3, selectedOrder.status)">
+
+                <div class="step-dot"></div>
+
+                <span>Out for Delivery</span>
+
+            </div>
+
+            <div class="timeline-line" [class.completed]="isStepCompleted(4, selectedOrder.status)"></div>
+
+            <div class="timeline-step" [class.completed]="isStepCompleted(4, selectedOrder.status)">
+
+                <div class="step-dot"></div>
+
+                <span>Delivered</span>
+
+            </div>
+
+        </div>
+
+        }
+
+        @else{
+
+        <div class="cancelled-banner">
+
+            This order has been cancelled.
+
+        </div>
+
+        }
 
         <hr>
 
@@ -62,7 +141,6 @@
                 </span>
 
             </div>
-            <!-- Shows customer's selected payment method. -->
 
             <div class="information-row">
 
@@ -75,7 +153,6 @@
                 </span>
 
             </div>
-            <!-- Displays final order amount. -->
 
             <div class="information-row">
 
@@ -88,7 +165,6 @@
                 </span>
 
             </div>
-            <!-- Displays delivery location. -->
 
             <div class="information-row">
 
@@ -106,19 +182,13 @@
 
                 <span>Order Status</span>
 
-                <span class="status">
+                <span class="status" [ngClass]="getStatusClass(selectedOrder.status)">
 
                     {{ selectedOrder.status }}
 
                 </span>
 
             </div>
-            <!-- Displays current order status.
-                 Example:
-                 Preparing
-                 Out For Delivery
-                 Delivered
-            -->
 
         </div>
 
@@ -129,11 +199,6 @@
             Track My Order
 
         </button>
-        <!-- (click) is Event Binding.
-             When customer clicks this button,
-             Angular executes openDeliveryTracking()
-             inside order-details.ts
-        -->
 
         @if (canCancel()) {
             <button
@@ -150,10 +215,6 @@
     }
 
     @else{
-
-    <!-- If no order is found,
-         Angular displays this message.
-    -->
 
     <div class="order-not-found">
 

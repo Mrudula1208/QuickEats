@@ -4,16 +4,40 @@
     margin:40px auto;
 }
 
-.orders-page h1{
+.page-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:35px;
+}
+
+.page-header h1{
     font-size:42px;
     color:#222;
     margin-bottom:8px;
 }
 
-.orders-page>p{
+.page-header>p{
     color:#666;
-    margin-bottom:35px;
+    margin-bottom:0;
     font-size:18px;
+}
+
+.refresh-btn{
+    padding:12px 24px;
+    border:2px solid #eee;
+    border-radius:12px;
+    background:#fff;
+    color:#555;
+    font-size:16px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.refresh-btn:hover{
+    border-color:#ff5f00;
+    color:#ff5f00;
 }
 
 .empty-order{
@@ -72,6 +96,36 @@
     font-weight:600;
 }
 
+.status-pending{
+    background:#fff3e0;
+    color:#e65100;
+}
+
+.status-confirmed{
+    background:#e3f2fd;
+    color:#1565c0;
+}
+
+.status-preparing{
+    background:#f3e5f5;
+    color:#7b1fa2;
+}
+
+.status-out{
+    background:#e8f5e9;
+    color:#2e7d32;
+}
+
+.status-delivered{
+    background:#e8f5e9;
+    color:#1b5e20;
+}
+
+.status-cancelled{
+    background:#ffebee;
+    color:#c62828;
+}
+
 .order-card button{
     width:100%;
     padding:15px;
@@ -96,7 +150,13 @@
         width:95%;
     }
 
-    .orders-page h1{
+    .page-header{
+        flex-direction:column;
+        gap:15px;
+        align-items:flex-start;
+    }
+
+    .page-header h1{
         font-size:34px;
     }
 

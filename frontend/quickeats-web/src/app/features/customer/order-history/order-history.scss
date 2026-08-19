@@ -8,11 +8,21 @@
 
 }
 
-.page-title{
+.page-header{
 
-    text-align:center;
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
 
     margin-bottom:40px;
+
+}
+
+.page-title{
+
+    text-align:left;
 
 }
 
@@ -28,6 +38,23 @@
 
     color:#777;
 
+}
+
+.refresh-btn{
+    padding:12px 24px;
+    border:2px solid #eee;
+    border-radius:12px;
+    background:#fff;
+    color:#555;
+    font-size:16px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.refresh-btn:hover{
+    border-color:#ff5a5f;
+    color:#ff5a5f;
 }
 
 .orders-grid{
@@ -86,6 +113,36 @@
 
 }
 
+.status-pending{
+    background:#fff3e0 !important;
+    color:#e65100 !important;
+}
+
+.status-confirmed{
+    background:#e3f2fd !important;
+    color:#1565c0 !important;
+}
+
+.status-preparing{
+    background:#f3e5f5 !important;
+    color:#7b1fa2 !important;
+}
+
+.status-out{
+    background:#e8f5e9 !important;
+    color:#2e7d32 !important;
+}
+
+.status-delivered{
+    background:#e8f5e9 !important;
+    color:#1b5e20 !important;
+}
+
+.status-cancelled{
+    background:#ffebee !important;
+    color:#c62828 !important;
+}
+
 .order-card p{
 
     margin:18px 0;
@@ -139,5 +196,33 @@
     text-align:center;
 
     margin-top:80px;
+
+}
+
+.cancel-btn{
+    width:100%;
+    margin-top:10px;
+    padding:12px;
+    border:none;
+    border-radius:8px;
+    background:#ffebee;
+    color:#d32f2f;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.cancel-btn:hover{
+    background:#ffcdd2;
+}
+
+@media(max-width:768px){
+
+    .page-header{
+        flex-direction:column;
+        gap:15px;
+        align-items:flex-start;
+    }
 
 }

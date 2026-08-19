@@ -39,8 +39,6 @@ export class OrderHistoryComponent {
   // Fetch orders of the logged in customer.
   loadOrders(): void {
 
-    // The Backend stores the user id.
-    // We saved it in localStorage during login.
     const userId = Number(localStorage.getItem('userId') || 1);
 
     this.orderService
@@ -65,6 +63,36 @@ export class OrderHistoryComponent {
         }
 
       });
+
+  }
+
+  // Refresh orders to see latest status.
+  refreshOrders(): void {
+
+    this.loadOrders();
+
+  }
+
+  // Get CSS class for status badge.
+  getStatusClass(status: string): string {
+
+    const classes: Record<string, string> = {
+
+      'Pending': 'status-pending',
+
+      'Confirmed': 'status-confirmed',
+
+      'Preparing': 'status-preparing',
+
+      'Out for Delivery': 'status-out',
+
+      'Delivered': 'status-delivered',
+
+      'Cancelled': 'status-cancelled'
+
+    };
+
+    return classes[status] || '';
 
   }
 

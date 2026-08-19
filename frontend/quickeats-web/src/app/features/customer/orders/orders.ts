@@ -67,6 +67,36 @@ export class OrdersComponent {
 
   }
 
+  // Refresh orders to see latest status.
+  refreshOrders(): void {
+
+    this.loadCustomerOrders();
+
+  }
+
+  // Get CSS class for status badge.
+  getStatusClass(status: string): string {
+
+    const classes: Record<string, string> = {
+
+      'Pending': 'status-pending',
+
+      'Confirmed': 'status-confirmed',
+
+      'Preparing': 'status-preparing',
+
+      'Out for Delivery': 'status-out',
+
+      'Delivered': 'status-delivered',
+
+      'Cancelled': 'status-cancelled'
+
+    };
+
+    return classes[status] || '';
+
+  }
+
   // Open selected order details page.
   openOrderDetails(selectedOrderId: number): void {
 

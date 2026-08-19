@@ -1,8 +1,22 @@
 <div class="orders-page">
 
-    <h1>My Orders</h1>
+    <div class="page-header">
 
-    <p>Your recent food orders</p>
+        <div>
+
+            <h1>My Orders</h1>
+
+            <p>Your recent food orders</p>
+
+        </div>
+
+        <button class="refresh-btn" (click)="refreshOrders()">
+
+            ↻ Refresh
+
+        </button>
+
+    </div>
 
     @if(customerOrders.length===0){
 
@@ -32,7 +46,7 @@
 
             <p>₹{{order.totalAmount}}</p>
 
-            <span class="status">
+            <span class="status" [ngClass]="getStatusClass(order.status)">
 
                 {{order.status}}
 

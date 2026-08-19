@@ -76,14 +76,6 @@ export class OrderDetailsComponent {
     const selectedOrderId =
       Number(this.currentRoute.snapshot.paramMap.get('id'));
 
-    // Read Order Id from URL.
-    // paramMap.get('id') always returns string.
-    // Number() converts string into integer.
-    // Example:
-    // URL:
-    // /orders/105
-    // selectedOrderId = 105
-
     // Ask the Backend for that one order.
     this.orderService
       .getOrderById(selectedOrderId)
@@ -104,6 +96,61 @@ export class OrderDetailsComponent {
         }
 
       });
+
+  }
+
+  // Refresh order to see latest status.
+  refreshOrder(): void {
+
+    this.loadSelectedOrder();
+
+  }
+
+  // Get CSS class for status badge.
+  getStatusClass(status: string): string {
+
+    const classes: Record<string, string> = {
+
+      'Pending': 'status-pending',
+
+      'Confirmed': 'status-confirmed',
+
+      'Preparing': 'status-preparing',
+
+      'Out for Delivery': 'status-out',
+
+      'Delivered': 'status-delivered',
+
+      'Cancelled': 'status-cancelled'
+
+    };
+
+    return classes[status] || '';
+
+  }
+
+  // Get the status step index for timeline (0-based).
+  // Returns -1 for Cancelled.
+  getStatusStep(status: string): number {
+
+    const steps = [
+      'Pending',
+      'Confirmed',
+      'Preparing',
+      'Out for Delivery',
+      'Delivered'
+    ];
+
+    return steps.indexOf(status);
+
+  }
+
+  // Check if a timeline step is completed.
+  isStepCompleted(stepIndex: number, currentStatus: string): boolean {
+
+    if (currentStatus === 'Cancelled') return false;
+
+    return this.getStatusStep(currentStatus) >= stepIndex;
 
   }
 
