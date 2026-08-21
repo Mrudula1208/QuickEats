@@ -57,15 +57,9 @@ export class LoginComponent {
   // Runs when Login button is clicked.
   login(): void {
 
-    console.log("Login Button Clicked");
-
-    console.log(this.loginUser);
-
     // Call Backend Login API.
   this.authService.login(this.loginUser).subscribe({
   next: (response) => {
-
-    console.log(response);
 
     // Save user data
     localStorage.setItem('token', response.token);

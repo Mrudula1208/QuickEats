@@ -34,10 +34,6 @@ export class RegisterComponent {
 
 register(): void {
 
-  console.log("Register button clicked");
-
-  console.log(this.user);
-
   this.authService.register(this.user)
   .subscribe({
     next: () => {

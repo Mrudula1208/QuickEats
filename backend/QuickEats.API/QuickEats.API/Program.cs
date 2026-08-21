@@ -90,6 +90,19 @@ namespace QuickEats.API
             builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
             builder.Services.AddScoped<IJwtService, JwtService>();
 
+            // Fail fast if the JWT secret is missing or too weak.
+            var jwtConfig = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
+            if (jwtConfig == null || string.IsNullOrWhiteSpace(jwtConfig.Key))
+            {
+                throw new InvalidOperationException(
+                    "JWT Key is missing. Set it with 'dotnet user-secrets set \"Jwt:Key\" \"<your-key>\"' (Development) " +
+                    "or the 'Jwt__Key' environment variable (Production).");
+            }
+            if (jwtConfig.Key.Length < 32)
+            {
+                throw new InvalidOperationException("JWT Key must be at least 32 characters long.");
+            }
+
             builder.Services.AddScoped< IReviewRepository,ReviewRepository>();
             builder.Services.AddScoped< IReviewService,  ReviewService>();
             builder.Services.AddScoped<IWishlistRepository, WishlistRepository>();
@@ -146,6 +159,12 @@ builder.Services.AddCors(options =>
             }
 
             app.UseHttpsRedirection();
+
+            if (!app.Environment.IsDevelopment())
+            {
+                app.UseHsts();
+            }
+
             app.UseAuthentication();
             app.UseAuthorization();
 

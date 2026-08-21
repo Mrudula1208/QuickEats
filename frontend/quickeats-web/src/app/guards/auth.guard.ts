@@ -4,19 +4,14 @@ import { isPlatformBrowser } from '@angular/common';
 
 export const authGuard: CanActivateFn = () => {
 
-  console.log('✅ AUTH GUARD EXECUTED');
-
   const router = inject(Router);
   const platformId = inject(PLATFORM_ID);
 
   if (!isPlatformBrowser(platformId)) {
-    console.log('Running on server');
     return true;
   }
 
   const token = localStorage.getItem('token');
-
-  console.log('Token =', token);
 
   if (token) {
     return true;
