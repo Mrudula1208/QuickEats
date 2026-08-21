@@ -54,7 +54,7 @@ namespace QuickEats.API.Controllers
 
             if (coupon == null)
             {
-                return NotFound();
+                return NotFound("Coupon not found.");
             }
 
             return Ok(coupon);

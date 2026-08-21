@@ -31,7 +31,7 @@ namespace QuickEats.API.Controllers
             var rating = await _restaurantRatingService.GetByIdAsync(id);
             if (rating == null)
             {
-                return NotFound();
+                return NotFound("Restaurant rating not found.");
             }
             return Ok(rating);
 

@@ -99,7 +99,7 @@ namespace QuickEats.API.Controllers
                 // HTTP 404
                 // Means Review was not found.
 
-                return NotFound();
+                return NotFound("Review not found.");
             }
 
 

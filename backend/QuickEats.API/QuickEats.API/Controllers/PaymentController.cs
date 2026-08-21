@@ -32,7 +32,7 @@ namespace QuickEats.API.Controllers
             var payments = await _paymentService.GetByIdAsync(id);
             if (payments == null)
             {
-                return NotFound();
+                return NotFound("Payment not found.");
             }
             return Ok(payments);
         }
@@ -42,7 +42,7 @@ namespace QuickEats.API.Controllers
         {
             var payments = await _paymentService.GetByOrderIdAsync(orderId);
             if (payments == null) {
-                return NotFound();
+                return NotFound("Payment not found.");
 
             }
             return Ok(payments);

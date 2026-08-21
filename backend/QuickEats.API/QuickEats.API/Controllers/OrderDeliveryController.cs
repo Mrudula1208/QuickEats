@@ -47,7 +47,7 @@ namespace QuickEats.API.Controllers
             var delivery = await _orderDeliveryService.GetByIdAsync(id);
             if (delivery == null)
             {
-                return NotFound();
+                return NotFound("Delivery not found.");
             }
             return Ok(delivery);
         }
@@ -58,7 +58,7 @@ namespace QuickEats.API.Controllers
             var delivery = await _orderDeliveryService.GetByOrderidAsync(orderId);
             if (delivery == null)
             {
-                return NotFound();
+                return NotFound("Delivery not found.");
             }
             return Ok(delivery);
         }

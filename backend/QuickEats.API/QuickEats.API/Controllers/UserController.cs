@@ -57,7 +57,7 @@ namespace QuickEats.API.Controllers
 
             await _userService.UpdateProfileImageUrlAsync(userId, dto.ProfileImageUrl);
 
-            return Ok(new { message = "Profile image updated." });
+            return Ok("Profile image updated successfully.");
         }
     }
 }

@@ -36,7 +36,7 @@ namespace QuickEats.API.Controllers
             var order = await _orderService.GetByIdAsync(id);
             if (order == null)
             {
-                return NotFound();
+                return NotFound("Order not found.");
             }
             return Ok(order);
         }
