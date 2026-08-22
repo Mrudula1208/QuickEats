@@ -80,7 +80,7 @@ export class CheckoutComponent {
           );
           this.calculateBill();
         },
-        error: (err) => console.log(err)
+        error: () => {}
       });
   }
 
@@ -133,7 +133,7 @@ export class CheckoutComponent {
     // Minimum order check.
     if (this.cartService.isBelowMinimumOrder()) {
       this.errors['minimumOrder'] =
-        `Minimum order is ₹${this.cartService.minimumOrder()}.`;
+        `Minimum order is â‚¹${this.cartService.minimumOrder()}.`;
     }
 
     // Delivery Address
@@ -182,7 +182,7 @@ export class CheckoutComponent {
     this.customerCheckout.platformFee =
       this.cartService.getPlatformFee();
 
-    // Free delivery above ₹500.
+    // Free delivery above â‚¹500.
     this.customerCheckout.deliveryCharge =
       this.cartService.getDeliveryFee();
 

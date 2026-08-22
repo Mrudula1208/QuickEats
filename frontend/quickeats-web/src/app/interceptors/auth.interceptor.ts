@@ -36,35 +36,35 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 // Simple Flow
 // User Login
 
-// ↓
+// â†“
 
 // JWT Token Saved
 
-// ↓
+// â†“
 
 // User opens Orders
 
-// ↓
+// â†“
 
 // Angular calls API
 
-// ↓
+// â†“
 
 // Interceptor runs
 
-// ↓
+// â†“
 
 // Checks Token
 
-// ↓
+// â†“
 
 // Adds Token
 
-// ↓
+// â†“
 
 // Backend receives request
 
-// ↓
+// â†“
 
 // Returns Data
 

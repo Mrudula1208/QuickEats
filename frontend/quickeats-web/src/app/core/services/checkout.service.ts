@@ -16,9 +16,7 @@ export class CheckoutService {
 
         this.checkoutDetails.set(checkout);
 
-        console.log("Checkout Details Saved");
 
-        console.log(this.checkoutDetails());
 
     }
 

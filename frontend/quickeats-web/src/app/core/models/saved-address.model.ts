@@ -10,15 +10,15 @@
 // Flow
 //
 // Database
-//      ↓
+//      â†“
 // Backend API
-//      ↓
+//      â†“
 // Address Model
-//      ↓
+//      â†“
 // Address Service
-//      ↓
+//      â†“
 // Address Component
-//      ↓
+//      â†“
 // HTML
 
 export interface SavedAddressModel {

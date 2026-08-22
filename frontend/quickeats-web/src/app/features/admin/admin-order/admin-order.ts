@@ -78,15 +78,10 @@ loadOrders(): void {
         // Store all orders inside the orders array.
         this.orders = data;
 
-        console.log(this.orders);
 
       },
 
-      error: (err) => {
-
-        console.log(err);
-
-      }
+      error: () => {}
 
     });
 
@@ -118,11 +113,7 @@ updateStatus(
 
       },
 
-      error: (err) => {
-
-        console.log(err);
-
-      }
+      error: () => {}
 
     });
 
@@ -154,11 +145,7 @@ deleteOrder(
 
       },
 
-      error: (err) => {
-
-        console.log(err);
-
-      }
+      error: () => {}
 
     });
 

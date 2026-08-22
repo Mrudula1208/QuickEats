@@ -90,7 +90,7 @@ export class AdminAddMenu {
     // Load categories from backend.
     this.categoryService.getCategories().subscribe({
       next: (data) => this.categories = data,
-      error: (err) => console.log(err)
+      error: () => {}
     });
   }
 
@@ -121,8 +121,7 @@ export class AdminAddMenu {
           this.isUploading = false;
           this.createMenu();
         },
-        error: (err) => {
-          console.log(err);
+        error: () => {
           this.isUploading = false;
         }
       });
@@ -139,7 +138,6 @@ export class AdminAddMenu {
 
         next: () => {
 
-          console.log("Menu Added");
 
           this.router.navigate(
 
@@ -149,11 +147,7 @@ export class AdminAddMenu {
 
         },
 
-        error: (err: any) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
   }

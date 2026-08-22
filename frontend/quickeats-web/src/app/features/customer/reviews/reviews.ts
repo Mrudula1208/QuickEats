@@ -120,11 +120,7 @@ export class ReviewsComponent {
         },
 
         // API Failed.
-        error: (err: any) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
 
@@ -145,11 +141,7 @@ export class ReviewsComponent {
         },
 
         // API Failed.
-        error: (err: any) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
 
@@ -276,7 +268,7 @@ export class ReviewsComponent {
         },
 
         // API Failed.
-        error: (err: any) => {
+        error: () => {
 
           this.toastr.error('Failed to submit review. Please try again.');
 

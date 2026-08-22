@@ -96,8 +96,7 @@ export class ProfileComponent {
           this.isUploading = false;
           this.updateProfile();
         },
-        error: (err) => {
-          console.log(err);
+        error: () => {
           this.isUploading = false;
           this.toastr.error('Failed to upload image');
         }

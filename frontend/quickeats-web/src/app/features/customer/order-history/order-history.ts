@@ -56,11 +56,7 @@ export class OrderHistoryComponent {
 
         },
 
-        error: (err) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
 
@@ -116,7 +112,6 @@ export class OrderHistoryComponent {
         this.loadOrders();
       },
       error: (err) => {
-        console.log(err);
         alert(err.error || 'Failed to cancel order.');
       }
     });

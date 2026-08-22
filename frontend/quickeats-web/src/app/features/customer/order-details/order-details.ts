@@ -58,7 +58,7 @@ export class OrderDetailsComponent {
     private router: Router
     // Router helps us open another page.
     // Example:
-    // Order Details → Delivery Tracking
+    // Order Details â†’ Delivery Tracking
 
   ) {
 
@@ -85,15 +85,10 @@ export class OrderDetailsComponent {
 
           this.selectedOrder = data;
 
-          console.log(this.selectedOrder);
 
         },
 
-        error: (err) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
 
@@ -197,7 +192,6 @@ export class OrderDetailsComponent {
         }
       },
       error: (err) => {
-        console.log(err);
         alert(err.error || 'Failed to cancel order.');
       }
     });

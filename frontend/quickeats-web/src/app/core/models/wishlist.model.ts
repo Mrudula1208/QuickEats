@@ -11,13 +11,13 @@
 // Flow
 //
 // Restaurant
-//      ↓
+//      â†“
 // Menu Item
-//      ↓
+//      â†“
 // Wishlist Model
-//      ↓
+//      â†“
 // Wishlist Service
-//      ↓
+//      â†“
 // Wishlist Component
 
 export interface WishlistModel {

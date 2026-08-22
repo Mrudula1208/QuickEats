@@ -58,11 +58,7 @@ export class AdminEditRestaurant {
 
         },
 
-        error: (err: any) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
 
@@ -94,8 +90,7 @@ export class AdminEditRestaurant {
           this.isUploading = false;
           this.saveRestaurant();
         },
-        error: (err) => {
-          console.log(err);
+        error: () => {
           this.isUploading = false;
         }
       });
@@ -112,7 +107,6 @@ export class AdminEditRestaurant {
 
         next: () => {
 
-          console.log("Restaurant Updated");
 
           this.router.navigate(
 
@@ -122,11 +116,7 @@ export class AdminEditRestaurant {
 
         },
 
-        error: (err: any) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
   }

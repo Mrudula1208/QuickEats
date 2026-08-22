@@ -45,23 +45,23 @@ Flow
 
 Database
 
-↓
+â†“
 
 Backend API
 
-↓
+â†“
 
 ProfileModel
 
-↓
+â†“
 
 Profile Service
 
-↓
+â†“
 
 Profile Component
 
-↓
+â†“
 
 HTML
 

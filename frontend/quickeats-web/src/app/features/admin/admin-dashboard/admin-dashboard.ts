@@ -61,16 +61,11 @@ export class AdminDashboard {
           // Store Backend Data.
           this.dashboard = data;
 
-          console.log(this.dashboard);
 
         },
 
         // Backend Error.
-        error: (err: any) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
 

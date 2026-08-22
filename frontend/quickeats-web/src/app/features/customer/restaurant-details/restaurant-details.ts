@@ -161,14 +161,12 @@ export class RestaurantDetailsComponent {
 
           this.isLoadingRestaurant = false;
 
-          console.log(this.restaurant);
 
         },
 
         // API Failed.
-        error: (err) => {
+        error: () => {
 
-          console.log(err);
 
           this.isLoadingRestaurant = false;
 
@@ -196,16 +194,14 @@ export class RestaurantDetailsComponent {
               .filter((value, index, array) =>
                 array.indexOf(value) === index);
 
-          console.log(this.menus);
 
           this.isLoadingMenu = false;
 
         },
 
         // API Failed.
-        error: (err) => {
+        error: () => {
 
-          console.log(err);
 
           this.isLoadingMenu = false;
 
@@ -235,16 +231,11 @@ export class RestaurantDetailsComponent {
 
           this.reviewCount = data.length;
 
-          console.log(this.reviews);
 
         },
 
         // API Failed.
-        error: (err) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
 
@@ -265,11 +256,7 @@ export class RestaurantDetailsComponent {
         },
 
         // API Failed.
-        error: (err) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
 
@@ -381,7 +368,7 @@ export class RestaurantDetailsComponent {
         },
 
         // API Failed.
-        error: (err) => {
+        error: () => {
 
           this.toastr.error('Failed to submit review. Please try again.');
 
@@ -523,16 +510,11 @@ export class RestaurantDetailsComponent {
       // API Success.
       next: () => {
 
-        console.log("Item added to wishlist");
 
       },
 
       // API Failed.
-      error: (err) => {
-
-        console.log(err);
-
-      }
+      error: () => {}
 
     });
 

@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
-// 1️⃣ Executes First.
+// 1ï¸âƒ£ Executes First.
 // Import Component because every Angular page is a Component.
 
 import { CommonModule } from '@angular/common';
-// 2️⃣ Executes Second.
+// 2ï¸âƒ£ Executes Second.
 // CommonModule allows HTML to use Angular directives like @if and @for.
 
 import { Router } from '@angular/router';
-// 3️⃣ Executes Third.
+// 3ï¸âƒ£ Executes Third.
 // Router is used to open another page.
 
 import { ToastrService } from 'ngx-toastr';
@@ -41,17 +41,17 @@ export class CustomerDashboardComponent {
   // EXECUTION FLOW
   // ====================================================
   //
-  // 1️⃣ Angular loads this component.
+  // 1ï¸âƒ£ Angular loads this component.
   //
-  // 2️⃣ Variables are created.
+  // 2ï¸âƒ£ Variables are created.
   //
-  // 3️⃣ Constructor executes automatically.
+  // 3ï¸âƒ£ Constructor executes automatically.
   //
-  // 4️⃣ HTML receives all variables.
+  // 4ï¸âƒ£ HTML receives all variables.
   //
-  // 5️⃣ User clicks a card.
+  // 5ï¸âƒ£ User clicks a card.
   //
-  // 6️⃣ Corresponding method executes.
+  // 6ï¸âƒ£ Corresponding method executes.
   //
   // ====================================================
 
@@ -184,27 +184,27 @@ Flow
 
 Login
 
-↓
+â†“
 
 Dashboard Opens
 
-↓
+â†“
 
 Variables Created
 
-↓
+â†“
 
 HTML Displays Data
 
-↓
+â†“
 
 Customer Clicks Card
 
-↓
+â†“
 
 Method Executes
 
-↓
+â†“
 
 Router Opens New Page
 

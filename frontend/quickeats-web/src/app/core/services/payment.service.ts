@@ -8,10 +8,10 @@ import { HttpClient } from '@angular/common/http';
 // Used to send HTTP requests to the ASP.NET Core Backend.
 //
 // We use:
-// GET    → read data
-// POST   → create data
-// PUT    → update data
-// DELETE → delete data
+// GET    â†’ read data
+// POST   â†’ create data
+// PUT    â†’ update data
+// DELETE â†’ delete data
 
 import { Observable } from 'rxjs';
 // Observable

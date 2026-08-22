@@ -117,7 +117,7 @@ namespace QuickEats.API.Services
                 Name = menuItem.Name,
                 Description = menuItem.Description,
                 Price = menuItem.Price,
-                ImageUrl = menuItem.ImageUrl,
+                ImageUrl = GetImageUrl(menuItem.ImageUrl),
                 IsAvailable = menuItem.IsAvailable,
                     Category = menuItem.Category,
                     IsVeg = menuItem.IsVeg,

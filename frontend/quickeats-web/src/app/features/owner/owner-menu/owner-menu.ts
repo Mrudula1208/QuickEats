@@ -57,9 +57,7 @@ export class OwnerMenuComponent {
         next: (data) => {
           this.menuItems = data;
         },
-        error: (err) => {
-          console.log(err);
-        }
+        error: () => {}
       });
 
   }
@@ -73,9 +71,7 @@ export class OwnerMenuComponent {
         next: () => {
           this.loadMenu();
         },
-        error: (err) => {
-          console.log(err);
-        }
+        error: () => {}
       });
 
   }
@@ -95,9 +91,7 @@ export class OwnerMenuComponent {
         next: () => {
           this.loadMenu();
         },
-        error: (err) => {
-          console.log(err);
-        }
+        error: () => {}
       });
 
   }

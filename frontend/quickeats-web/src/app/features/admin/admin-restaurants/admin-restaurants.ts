@@ -20,7 +20,6 @@ export class AdminRestaurants {
     this.restaurantService.getRestaurants().subscribe({
       next: (data: Restaurant[]) => {
         this.restaurants = data;
-        console.log(this.restaurants);
       },
       error: (err: any) => {
         console.error(err);
@@ -50,7 +49,6 @@ deleteRestaurant(
       // Success.
       next: () => {
 
-        console.log("Restaurant Deleted");
 
         // Reload Data.
         this.loadRestaurants();
@@ -58,11 +56,7 @@ deleteRestaurant(
       },
 
       // Error.
-      error: (err: any) => {
-
-        console.log(err);
-
-      }
+      error: () => {}
 
     });
 

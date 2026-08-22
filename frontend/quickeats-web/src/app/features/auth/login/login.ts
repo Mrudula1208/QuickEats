@@ -74,10 +74,9 @@ export class LoginComponent {
     this.router.navigate(['/']);
   },
 
-  error: (err) => {
+  error: () => {
 
     // Error handled by error interceptor.
-    console.log(err);
   }
 });
 
@@ -89,79 +88,79 @@ EXECUTION FLOW
 
 1. Angular opens Login Page
 
-↓
+â†“
 
 2. LoginComponent created
 
-↓
+â†“
 
 3. loginUser object created
 
-↓
+â†“
 
 4. Constructor runs
 
-↓
+â†“
 
 5. HTML loads
 
-↓
+â†“
 
 6. User enters Email
 
-↓
+â†“
 
 loginUser.email updated
 
-↓
+â†“
 
 7. User enters Password
 
-↓
+â†“
 
 loginUser.password updated
 
-↓
+â†“
 
 8. Click Login
 
-↓
+â†“
 
 9. login() executes
 
-↓
+â†“
 
 10. AuthService.login()
 
-↓
+â†“
 
 11. ASP.NET Login API
 
-↓
+â†“
 
 12. Database checks Email
 
-↓
+â†“
 
 13. Password Verified
 
-↓
+â†“
 
 14. JWT Token Generated
 
-↓
+â†“
 
 15. Angular receives token
 
-↓
+â†“
 
 16. saveToken()
 
-↓
+â†“
 
 17. localStorage
 
-↓
+â†“
 
 18. Navigate Home Page
 

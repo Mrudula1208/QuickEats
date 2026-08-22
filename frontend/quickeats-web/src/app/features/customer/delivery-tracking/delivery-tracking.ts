@@ -1,22 +1,22 @@
 import { Component } from '@angular/core';
-// 1️⃣ Executes First.
+// 1ï¸âƒ£ Executes First.
 // Import Component because this file controls the Delivery Tracking page.
 // Every Angular page starts with a Component.
 
 import { CommonModule } from '@angular/common';
-// 2️⃣ Executes Second.
+// 2ï¸âƒ£ Executes Second.
 // Import CommonModule because HTML uses Angular features like @if and @for.
 
 import { Router, ActivatedRoute } from '@angular/router';
-// 3️⃣ Executes Third.
+// 3ï¸âƒ£ Executes Third.
 // Router helps move the user to another page.
 
 import { DeliveryService } from '../../../core/services/delivery.service';
-// 4️⃣ Executes Fourth.
+// 4ï¸âƒ£ Executes Fourth.
 // Import DeliveryService because it stores current delivery information.
 
 import { Delivery } from '../../../core/models/delivery.model';
-// 5️⃣ Executes Fifth.
+// 5ï¸âƒ£ Executes Fifth.
 // Import Delivery model because it defines the structure of delivery data.
 
 @Component({
@@ -43,44 +43,44 @@ export class DeliveryTrackingComponent {
   // EXECUTION FLOW
   // ==========================================================
   //
-  // 1️⃣ Angular creates DeliveryTrackingComponent.
-  // 2️⃣ Variables are created.
-  // 3️⃣ Constructor runs automatically.
-  // 4️⃣ Delivery information is loaded.
-  // 5️⃣ HTML automatically shows delivery details.
-  // 6️⃣ User clicks Back button.
-  // 7️⃣ Router opens Orders page.
+  // 1ï¸âƒ£ Angular creates DeliveryTrackingComponent.
+  // 2ï¸âƒ£ Variables are created.
+  // 3ï¸âƒ£ Constructor runs automatically.
+  // 4ï¸âƒ£ Delivery information is loaded.
+  // 5ï¸âƒ£ HTML automatically shows delivery details.
+  // 6ï¸âƒ£ User clicks Back button.
+  // 7ï¸âƒ£ Router opens Orders page.
   //
   // ==========================================================
 
   currentDelivery: Delivery | null = null;
-  // 6️⃣ Executes Sixth.
+  // 6ï¸âƒ£ Executes Sixth.
   //
   // Delivery | null
   // Means:
   // This variable can store either:
-  // • Delivery object
-  // • null
+  // â€¢ Delivery object
+  // â€¢ null
   //
   // Initially no value is loaded.
 
   constructor(
 
     private deliveryService: DeliveryService,
-    // 7️⃣ Angular automatically injects DeliveryService.
+    // 7ï¸âƒ£ Angular automatically injects DeliveryService.
     // We never create it using new DeliveryService().
 
     private router: Router,
-    // 8️⃣ Angular injects Router.
+    // 8ï¸âƒ£ Angular injects Router.
     // Router helps move between pages.
 
     private route: ActivatedRoute
-    // 8️⃣ Angular injects ActivatedRoute.
+    // 8ï¸âƒ£ Angular injects ActivatedRoute.
     // ActivatedRoute helps read URL parameters.
 
   ) {
 
-    // 9️⃣ Constructor executes automatically.
+    // 9ï¸âƒ£ Constructor executes automatically.
     // Load current delivery immediately.
 
     this.loadCurrentDelivery();
@@ -97,7 +97,6 @@ export class DeliveryTrackingComponent {
     this.deliveryService.getDeliveryByOrderId(orderId).subscribe({
       next: (data) => {
         this.currentDelivery = data;
-        console.log("Loaded current delivery:", this.currentDelivery);
       },
       error: (err) => {
         console.error("Failed to load delivery info", err);

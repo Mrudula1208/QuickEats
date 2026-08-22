@@ -40,10 +40,9 @@ register(): void {
       this.toastr.success('Registration Successful', 'Welcome');
       this.router.navigate(['/login']);
     },
-    error: (err) => {
+    error: () => {
 
       // Error handled by error interceptor.
-      console.log(err);
     }
   });
 
@@ -55,63 +54,63 @@ register(): void {
 
 // 1. Angular opens Register Page
 
-// ↓
+// â†“
 
 // 2. RegisterComponent created
 
-// ↓
+// â†“
 
 // 3. user object created
 
-// ↓
+// â†“
 
 // 4. User types Name
 
-// ↓
+// â†“
 
 // user.name updated
 
-// ↓
+// â†“
 
 // 5. User types Email
 
-// ↓
+// â†“
 
 // user.email updated
 
-// ↓
+// â†“
 
 // 6. User types Password
 
-// ↓
+// â†“
 
 // user.password updated
 
-// ↓
+// â†“
 
 // 7. User clicks Register
 
-// ↓
+// â†“
 
 // 8. register() executes
 
-// ↓
+// â†“
 
 // 9. AuthService.register(user)
 
-// ↓
+// â†“
 
 // 10. ASP.NET API
 
-// ↓
+// â†“
 
 // 11. SQL Server
 
-// ↓
+// â†“
 
 // 12. Success
 
-// ↓
+// â†“
 
 // 13. Login Page
 
@@ -129,18 +128,18 @@ register(): void {
 
 // http://localhost:4200/register
 
-//         │
-//         ▼
+//         â”‚
+//         â–¼
 
 // 2. Angular checks app.routes.ts
 
-//         │
-//         ▼
+//         â”‚
+//         â–¼
 
 // 3. RegisterComponent is created
 
-//         │
-//         ▼
+//         â”‚
+//         â–¼
 
 // 4. user object is created
 
@@ -154,56 +153,56 @@ register(): void {
 
 // }
 
-//         │
-//         ▼
+//         â”‚
+//         â–¼
 
 // 5. Constructor runs
 
-// AuthService ✔
+// AuthService âœ”
 
-// Router ✔
+// Router âœ”
 
-//         │
-//         ▼
+//         â”‚
+//         â–¼
 
 // 6. register.html loads
 
-//         │
-//         ▼
+//         â”‚
+//         â–¼
 
 // 7. Textboxes connect to user object
 
-//         │
-//         ▼
+//         â”‚
+//         â–¼
 
 // 8. User types data
 
-//         │
-//         ▼
+//         â”‚
+//         â–¼
 
 // 9. user object gets updated
 
-//         │
-//         ▼
+//         â”‚
+//         â–¼
 
 // 10. Click Register
 
-//         │
-//         ▼
+//         â”‚
+//         â–¼
 
 // 11. register()
 
-//         │
-//         ▼
+//         â”‚
+//         â–¼
 
 // 12. AuthService
 
-//         │
-//         ▼
+//         â”‚
+//         â–¼
 
 // 13. ASP.NET API
 
-//         │
-//         ▼
+//         â”‚
+//         â–¼
 
 // 14. Database

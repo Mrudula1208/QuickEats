@@ -10,13 +10,13 @@
 // Flow
 //
 // Database
-//      ↓
+//      â†“
 // Backend API
-//      ↓
+//      â†“
 // Coupon Model
-//      ↓
+//      â†“
 // Coupon Service
-//      ↓
+//      â†“
 // Coupon Component
 
 export interface CouponModel {

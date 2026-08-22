@@ -45,9 +45,7 @@ export class DeliveryPartnerComponent {
         next: (data) => {
           this.deliveries = data;
         },
-        error: (err) => {
-          console.log(err);
-        }
+        error: () => {}
       });
 
   }
@@ -59,11 +57,8 @@ export class DeliveryPartnerComponent {
       .updateDeliveryStatus(delivery.id, delivery.deliveryStatus)
       .subscribe({
         next: () => {
-          console.log('Delivery status updated');
         },
-        error: (err) => {
-          console.log(err);
-        }
+        error: () => {}
       });
 
   }

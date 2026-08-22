@@ -16,8 +16,6 @@ export class FeaturedRestaurantsComponent {
 
   constructor() {
     effect(() => {
-      console.log("Child Received:");
-      console.log(this.restaurants());
     });
   }
 

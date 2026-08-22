@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-// 1️⃣ Executes First.
+// 1ï¸âƒ£ Executes First.
 // Import Component because every Angular page starts with Component.
 
 import { CommonModule } from '@angular/common';
@@ -47,21 +47,21 @@ export class WishlistComponent {
   // EXECUTION FLOW
   // ===============================================
   //
-  // 1️⃣ Angular creates WishlistComponent.
+  // 1ï¸âƒ£ Angular creates WishlistComponent.
   //
-  // 2️⃣ Constructor executes automatically.
+  // 2ï¸âƒ£ Constructor executes automatically.
   //
-  // 3️⃣ loadWishlist() executes.
+  // 3ï¸âƒ£ loadWishlist() executes.
   //
-  // 4️⃣ Service returns all wishlist items.
+  // 4ï¸âƒ£ Service returns all wishlist items.
   //
-  // 5️⃣ HTML displays Wishlist.
+  // 5ï¸âƒ£ HTML displays Wishlist.
   //
-  // 6️⃣ Customer clicks Remove.
+  // 6ï¸âƒ£ Customer clicks Remove.
   //
-  // 7️⃣ Service removes item.
+  // 7ï¸âƒ£ Service removes item.
   //
-  // 8️⃣ HTML refreshes automatically.
+  // 8ï¸âƒ£ HTML refreshes automatically.
   //
   // ===============================================
 
@@ -102,11 +102,7 @@ export class WishlistComponent {
           this.wishlistItems=data;
         },
 
-            error: (err: any) => {
-
-                console.log(err);
-
-            }
+            error: () => {}
       });
     
     
@@ -126,11 +122,7 @@ removeWishlistItem(
 
             },
 
-            error: (err: any) => {
-
-                console.log(err);
-
-            }
+            error: () => {}
 
         });
 
@@ -161,45 +153,45 @@ WHY DO WE WRITE THIS FILE?
 
 This component controls
 
-✔ View Wishlist
+âœ” View Wishlist
 
-✔ Remove Wishlist Item
+âœ” Remove Wishlist Item
 
-✔ Open Restaurant
+âœ” Open Restaurant
 
 Flow
 
 Wishlist Page Opens
 
-↓
+â†“
 
 Constructor Executes
 
-↓
+â†“
 
 loadWishlist()
 
-↓
+â†“
 
 Wishlist Service
 
-↓
+â†“
 
 Wishlist Items
 
-↓
+â†“
 
 HTML Displays Cards
 
-↓
+â†“
 
 Customer Removes Item
 
-↓
+â†“
 
 Service Updates
 
-↓
+â†“
 
 HTML Refreshes
 

@@ -61,9 +61,7 @@ export class OwnerOrdersComponent {
                    new Date(a.createdAt).getTime();
           });
         },
-        error: (err) => {
-          console.log(err);
-        }
+        error: () => {}
       });
 
   }
@@ -75,10 +73,8 @@ export class OwnerOrdersComponent {
       .updateOrderStatusApi(order.id, order.status)
       .subscribe({
         next: () => {
-          console.log('Status updated');
         },
         error: (err) => {
-          console.log(err);
           alert(err.error || 'Failed to update status.');
           this.loadOrders();
         }
@@ -87,7 +83,7 @@ export class OwnerOrdersComponent {
   }
 
   // Quick advance to next status.
-  // Pending → Confirmed → Preparing → Out for Delivery → Delivered
+  // Pending â†’ Confirmed â†’ Preparing â†’ Out for Delivery â†’ Delivered
   getNextStatus(current: string): string {
     const flow: Record<string, string> = {
       'Pending': 'Confirmed',
@@ -102,7 +98,7 @@ export class OwnerOrdersComponent {
   getNextStatusLabel(current: string): string {
     const next = this.getNextStatus(current);
     if (!next) return '';
-    return '→ ' + next;
+    return 'â†’ ' + next;
   }
 
   // Advance order to next status.
@@ -117,7 +113,6 @@ export class OwnerOrdersComponent {
           this.loadOrders();
         },
         error: (err) => {
-          console.log(err);
           alert(err.error || 'Failed to update status.');
         }
       });

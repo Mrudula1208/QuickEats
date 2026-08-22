@@ -67,11 +67,7 @@ export class HeaderComponent {
         },
 
         // API Failed.
-        error: (err: any) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
 

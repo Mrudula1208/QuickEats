@@ -27,7 +27,6 @@ export class AdminCoupons {
     this.couponService.getCoupons().subscribe({
       next: (data: CouponModel[]) => {
         this.coupons = data;
-        console.log(this.coupons);
       },
       error: (err: any) => {
         console.error(err);
@@ -47,7 +46,6 @@ export class AdminCoupons {
 
     this.couponService.createCoupon(coupon).subscribe({
       next: () => {
-        console.log('Coupon Created');
         this.couponCode = '';
         this.description = '';
         this.minimumOrderAmount = 0;
@@ -65,7 +63,6 @@ export class AdminCoupons {
   deleteCoupon(id: number): void {
     this.couponService.deleteCoupon(id).subscribe({
       next: () => {
-        console.log('Coupon Deleted');
         this.loadCoupons();
       },
       error: (err: any) => {

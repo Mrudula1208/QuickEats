@@ -45,9 +45,7 @@ export class OwnerRestaurantsComponent {
         next: (data) => {
           this.restaurants = data;
         },
-        error: (err) => {
-          console.log(err);
-        }
+        error: () => {}
       });
 
   }
@@ -61,9 +59,7 @@ export class OwnerRestaurantsComponent {
         next: () => {
           this.loadRestaurants();
         },
-        error: (err) => {
-          console.log(err);
-        }
+        error: () => {}
       });
 
   }
@@ -74,9 +70,7 @@ export class OwnerRestaurantsComponent {
       next: () => {
         this.loadRestaurants();
       },
-      error: (err) => {
-        console.log(err);
-      }
+      error: () => {}
     });
   }
 

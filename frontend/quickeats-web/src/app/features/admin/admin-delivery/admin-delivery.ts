@@ -116,20 +116,12 @@ export class AdminDelivery {
 
           this.deliveries = data;
 
-          console.log(
-            this.deliveries
-          );
-
         },
 
 
         // Backend/API request failed.
 
-        error: (err: any) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
 
@@ -166,10 +158,6 @@ updateDeliveryStatus(
 
       next: () => {
 
-        console.log(
-          "Delivery Status Updated"
-        );
-
         // STEP 3
         // Load latest delivery data
         // from Backend.
@@ -180,11 +168,7 @@ updateDeliveryStatus(
 
       // Backend/API error.
 
-      error: (err: any) => {
-
-        console.log(err);
-
-      }
+      error: () => {}
 
     });
 
@@ -214,10 +198,6 @@ deleteDelivery(
 
       next: () => {
 
-        console.log(
-          "Delivery Deleted Successfully"
-        );
-
         // STEP 3
         // Load the latest delivery list
         // from Backend.
@@ -228,11 +208,7 @@ deleteDelivery(
 
       // Backend/API error.
 
-      error: (err: any) => {
-
-        console.log(err);
-
-      }
+      error: () => {}
 
     });
 

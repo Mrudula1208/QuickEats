@@ -81,16 +81,11 @@ export class AdminMenu {
           // Store Backend data.
           this.menus = data;
 
-          console.log(this.menus);
 
         },
 
         // Backend/API error.
-        error: (err: any) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
 
@@ -146,7 +141,6 @@ export class AdminMenu {
         // Delete successful.
         next: () => {
 
-          console.log("Menu Deleted");
 
           // Load updated menu list.
           this.loadMenus();
@@ -154,11 +148,7 @@ export class AdminMenu {
         },
 
         // Delete failed.
-        error: (err: any) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
 

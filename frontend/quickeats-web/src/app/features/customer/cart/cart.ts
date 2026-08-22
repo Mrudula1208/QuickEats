@@ -88,11 +88,7 @@ export class CartComponent {
 
         },
 
-        error: (err) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
 
@@ -137,9 +133,8 @@ export class CartComponent {
           }
 
         },
-        error: (err) => {
+        error: () => {
 
-          console.log(err);
 
           this.couponMessage = 'Coupon not available.';
 

@@ -19,7 +19,6 @@ export class AdminOwners {
     this.userService.getUsers().subscribe({
       next: (data: UserModel[]) => {
         this.owners = data.filter(u => u.role === 'Owner');
-        console.log(this.owners);
       },
       error: (err: any) => {
         console.error(err);

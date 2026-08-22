@@ -1,4 +1,4 @@
-﻿using QuickEats.API.Common;
+using QuickEats.API.Common;
 using QuickEats.API.DTos.Notification;
 using QuickEats.API.DTos.Order;
 using QuickEats.API.Exceptions;
@@ -278,7 +278,7 @@ namespace QuickEats.API.Services
             var order = await _orderRepository.GetByIdAsync(id);
             if (order == null)
             {
-                throw new NotFoundException($"Order with Id {id} not found");
+                throw new NotFoundException($"Order with id {id} not found.");
 
             }
 
@@ -329,13 +329,13 @@ namespace QuickEats.API.Services
             var order = await _orderRepository.GetByIdAsync(id);
             if (order == null)
             {
-                throw new NotFoundException($"Order with Id {id} not found");
+                throw new NotFoundException($"Order with id {id} not found.");
             }
 
             // Only the order owner can cancel.
             if (order.UserId != userId)
             {
-                throw new UnauthorizedAccessException("You can only cancel your own orders.");
+                throw new ForbiddenException("You can only cancel your own orders.");
             }
 
             // Only Pending or Confirmed orders can be cancelled.
@@ -371,7 +371,7 @@ namespace QuickEats.API.Services
 
             if(order == null)
             {
-                throw new NotFoundException($"order with id {id} not found");
+                throw new NotFoundException($"Order with id {id} not found.");
             }
             _orderRepository.Delete(order);
           await _orderRepository.SaveChangesAsync();

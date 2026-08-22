@@ -114,18 +114,10 @@ loadPayments(): void {
         // inside the Component variable.
         this.payments = data;
 
-        console.log(
-          this.payments
-        );
-
       },
 
       // Backend/API request failed.
-      error: (err: any) => {
-
-        console.log(err);
-
-      }
+      error: () => {}
 
     });
 
@@ -187,10 +179,6 @@ updatePaymentStatus(
 
       next: () => {
 
-        console.log(
-          "Payment Status Updated"
-        );
-
         // STEP 3
         // Load payments again.
         //
@@ -204,11 +192,7 @@ updatePaymentStatus(
       // error
       // Runs when the Backend request fails.
 
-      error: (err: any) => {
-
-        console.log(err);
-
-      }
+      error: () => {}
 
     });
 
@@ -235,10 +219,6 @@ deletePayment(
       // Backend successfully deleted payment.
       next: () => {
 
-        console.log(
-          "Payment Deleted Successfully"
-        );
-
         // STEP 3
         // Reload payments from Backend.
         this.loadPayments();
@@ -246,11 +226,7 @@ deletePayment(
       },
 
       // Backend/API error.
-      error: (err: any) => {
-
-        console.log(err);
-
-      }
+      error: () => {}
 
     });
 

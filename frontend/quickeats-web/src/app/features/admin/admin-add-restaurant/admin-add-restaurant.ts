@@ -114,8 +114,7 @@ export class AdminAddRestaurant {
           this.isUploading = false;
           this.createRestaurant();
         },
-        error: (err) => {
-          console.log(err);
+        error: () => {
           this.isUploading = false;
         }
       });
@@ -134,7 +133,6 @@ export class AdminAddRestaurant {
 
         next: () => {
 
-          console.log("Restaurant Added");
 
           this.router.navigate(
 
@@ -144,11 +142,7 @@ export class AdminAddRestaurant {
 
         },
 
-        error: (err: any) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
   }

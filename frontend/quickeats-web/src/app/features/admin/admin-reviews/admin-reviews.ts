@@ -116,20 +116,12 @@ export class AdminReviews {
 
           this.reviews = data;
 
-          console.log(
-            this.reviews
-          );
-
         },
 
 
         // Backend/API request failed.
 
-        error: (err: any) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
 
@@ -162,10 +154,6 @@ export class AdminReviews {
 
         next: () => {
 
-          console.log(
-            "Review Deleted Successfully"
-          );
-
           // STEP 3
           // Load the latest reviews
           // from Backend.
@@ -177,11 +165,7 @@ export class AdminReviews {
 
         // Backend/API error.
 
-        error: (err: any) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
 

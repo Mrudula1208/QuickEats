@@ -138,11 +138,7 @@ export class PaymentComponent {
         },
 
         // Order creation failed.
-        error: (err) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
 
@@ -170,11 +166,7 @@ export class PaymentComponent {
         },
 
         // Payment failed.
-        error: (err) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
 

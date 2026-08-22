@@ -39,11 +39,11 @@ private apiUrl = 'https://localhost:7278/api/Auth';
   // ==========================================
 // AuthService
 
-// ↓
+// â†“
 
 // I received one object.
 
-// ↓
+// â†“
 
 //I'll call it user.
 
@@ -142,40 +142,40 @@ comes here.
 
 Register
 
-↓
+â†“
 
 AuthService
 
-↓
+â†“
 
 Backend
 
 
 Login
 
-↓
+â†“
 
 AuthService
 
-↓
+â†“
 
 Backend
 
 
 Backend returns JWT
 
-↓
+â†“
 
 AuthService
 
-↓
+â†“
 
 localStorage
 
 
 Logout
 
-↓
+â†“
 
 Remove JWT
 
@@ -189,15 +189,15 @@ Flow
 
 RegisterComponent
 
-↓
+â†“
 
 AuthService
 
-↓
+â†“
 
 ASP.NET API
 
-↓
+â†“
 
 Database
 

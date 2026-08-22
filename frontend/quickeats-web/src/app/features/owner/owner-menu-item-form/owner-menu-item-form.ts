@@ -74,7 +74,7 @@ export class OwnerMenuItemFormComponent {
     // Load categories from backend.
     this.categoryService.getCategories().subscribe({
       next: (data) => this.categories = data,
-      error: (err) => console.log(err)
+      error: () => {}
     });
 
     // Read the restaurant id and the menu item id from the URL.
@@ -96,9 +96,7 @@ export class OwnerMenuItemFormComponent {
           next: (data) => {
             this.item = data;
           },
-          error: (err) => {
-            console.log(err);
-          }
+          error: () => {}
         });
 
     }
@@ -132,8 +130,7 @@ export class OwnerMenuItemFormComponent {
           this.isUploading = false;
           this.submitItem();
         },
-        error: (err) => {
-          console.log(err);
+        error: () => {
           this.isUploading = false;
         }
       });
@@ -165,9 +162,7 @@ export class OwnerMenuItemFormComponent {
           next: () => {
             this.router.navigate(['/owner/menu', this.restaurantId]);
           },
-          error: (err) => {
-            console.log(err);
-          }
+          error: () => {}
         });
 
     }
@@ -183,9 +178,7 @@ export class OwnerMenuItemFormComponent {
           next: () => {
             this.router.navigate(['/owner/menu', this.restaurantId]);
           },
-          error: (err) => {
-            console.log(err);
-          }
+          error: () => {}
         });
 
     }

@@ -68,7 +68,7 @@ export class AdminEditMenu {
     // Load categories from backend.
     this.categoryService.getCategories().subscribe({
       next: (data) => this.categories = data,
-      error: (err) => console.log(err)
+      error: () => {}
     });
 
     const id = Number(
@@ -87,11 +87,7 @@ export class AdminEditMenu {
 
         },
 
-        error: (err: any) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
 
@@ -123,8 +119,7 @@ export class AdminEditMenu {
           this.isUploading = false;
           this.saveMenu();
         },
-        error: (err) => {
-          console.log(err);
+        error: () => {
           this.isUploading = false;
         }
       });
@@ -158,7 +153,6 @@ export class AdminEditMenu {
 
         next: () => {
 
-          console.log("Menu Updated");
 
           this.router.navigate(
 
@@ -168,11 +162,7 @@ export class AdminEditMenu {
 
         },
 
-        error: (err: any) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
   }

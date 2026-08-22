@@ -52,11 +52,7 @@ export class FavoritesComponent {
         this.customerFavorites = data;
       },
       // Runs if API Fails.
-      error: (err: any) => {
-
-        console.log(err);
-
-      }
+      error: () => {}
     });
 
   }
@@ -80,15 +76,15 @@ export class FavoritesComponent {
 
 // Backend sends data
 
-// ↓
+// â†“
 
 // next runs
 
-// ↓
+// â†“
 
 // Store data into customerFavorites
 
-// ↓
+// â†“
 
 // Print customerFavorites
 

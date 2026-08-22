@@ -86,9 +86,7 @@ export class OwnerRestaurantFormComponent {
           next: (data) => {
             this.restaurant = data;
           },
-          error: (err) => {
-            console.log(err);
-          }
+          error: () => {}
         });
 
     }
@@ -122,8 +120,7 @@ export class OwnerRestaurantFormComponent {
           this.isUploading = false;
           this.submitRestaurant();
         },
-        error: (err) => {
-          console.log(err);
+        error: () => {
           this.isUploading = false;
         }
       });
@@ -143,9 +140,7 @@ export class OwnerRestaurantFormComponent {
           next: () => {
             this.router.navigate(['/owner/restaurants']);
           },
-          error: (err) => {
-            console.log(err);
-          }
+          error: () => {}
         });
 
     }
@@ -158,9 +153,7 @@ export class OwnerRestaurantFormComponent {
           next: () => {
             this.router.navigate(['/owner/restaurants']);
           },
-          error: (err) => {
-            console.log(err);
-          }
+          error: () => {}
         });
 
     }

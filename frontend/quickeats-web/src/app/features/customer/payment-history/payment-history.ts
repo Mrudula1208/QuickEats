@@ -18,7 +18,6 @@ payments :Payment[]=[];
     this.paymentService.getPayments().subscribe({
       next: (data) => {
         this.payments = data;
-        console.log("Payment History", this.payments);
       },
       error: (err) => {
         console.error(err);

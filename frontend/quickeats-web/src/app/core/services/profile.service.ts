@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-// 1️⃣ Executes First.
+// 1ï¸âƒ£ Executes First.
 //
 // Injectable
 // Means Angular can create this service.
@@ -10,7 +10,7 @@ import { Injectable, signal } from '@angular/core';
 // Angular automatically refreshes UI.
 
 import { ProfileModel } from '../models/profile.model';
-// 2️⃣ Import ProfileModel.
+// 2ï¸âƒ£ Import ProfileModel.
 // We need this because
 // service stores ProfileModel object.
 
@@ -30,13 +30,13 @@ export class ProfileService {
     // EXECUTION FLOW
     // =====================================================
     //
-    // 1️⃣ Angular creates ProfileService.
+    // 1ï¸âƒ£ Angular creates ProfileService.
     //
-    // 2️⃣ profileData signal is created.
+    // 2ï¸âƒ£ profileData signal is created.
     //
-    // 3️⃣ Component calls getProfile().
+    // 3ï¸âƒ£ Component calls getProfile().
     //
-    // 4️⃣ HTML displays profile.
+    // 4ï¸âƒ£ HTML displays profile.
     //
     // =====================================================
 
@@ -108,9 +108,7 @@ export class ProfileService {
 
         );
 
-        console.log("Profile Updated");
 
-        console.log(this.profileData());
 
     }
 
@@ -131,15 +129,15 @@ Flow
 
 Component
 
-↓
+â†“
 
 Profile Service
 
-↓
+â†“
 
 Profile Signal
 
-↓
+â†“
 
 HTML
 
@@ -147,15 +145,15 @@ Later
 
 Backend API
 
-↓
+â†“
 
 Profile Service
 
-↓
+â†“
 
 Component
 
-↓
+â†“
 
 HTML
 

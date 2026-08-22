@@ -142,9 +142,7 @@ export class AdminPaymentDetails {
         },
 
         // API Failed.
-        error: (err: any) => {
-          console.log(err);
-        }
+        error: () => {}
 
       });
 

@@ -57,9 +57,7 @@ export class OwnerDashboardComponent {
         next: (data) => {
           this.restaurantCount = data.length;
         },
-        error: (err) => {
-          console.log(err);
-        }
+        error: () => {}
       });
 
   }
@@ -77,9 +75,7 @@ export class OwnerDashboardComponent {
             0
           );
         },
-        error: (err) => {
-          console.log(err);
-        }
+        error: () => {}
       });
 
   }

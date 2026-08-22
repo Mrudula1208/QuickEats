@@ -60,11 +60,7 @@ export class NotificationsComponent {
         },
 
         // API Failed.
-        error: (err: any) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
 
@@ -85,11 +81,7 @@ export class NotificationsComponent {
         },
 
         // API Failed.
-        error: (err: any) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
 
@@ -112,11 +104,7 @@ export class NotificationsComponent {
         },
 
         // API Failed.
-        error: (err: any) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
 
@@ -139,11 +127,7 @@ export class NotificationsComponent {
         },
 
         // API Failed.
-        error: (err: any) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
 
@@ -166,11 +150,7 @@ export class NotificationsComponent {
         },
 
         // API Failed.
-        error: (err: any) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
 
@@ -193,11 +173,7 @@ export class NotificationsComponent {
         },
 
         // API Failed.
-        error: (err: any) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
 
@@ -212,17 +188,17 @@ export class NotificationsComponent {
 
     if (title.includes('order')) {
 
-      return '📦';
+      return 'ðŸ“¦';
 
     }
 
     if (title.includes('cancelled')) {
 
-      return '❌';
+      return 'âŒ';
 
     }
 
-    return '🔔';
+    return 'ðŸ””';
 
   }
 

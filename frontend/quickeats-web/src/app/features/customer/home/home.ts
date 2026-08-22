@@ -45,8 +45,7 @@ export class Home {
         this.applyFilters();
         this.isLoading.set(false);
       },
-      error: (err) => {
-        console.log(err);
+      error: () => {
         this.isLoading.set(false);
       }
     });

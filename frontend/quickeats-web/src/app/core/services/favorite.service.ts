@@ -1,6 +1,5 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable } from '@angular/core';
 // Injectable creates Angular Service.
-// signal stores live Favorite data.
 
 // Import Favorite Model./ Backend Caller.
 // Calls ASP.NET Core APIs.

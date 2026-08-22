@@ -107,7 +107,6 @@ export class CouponsComponent {
           //
           this.coupons = data;
 
-          console.log(this.coupons);
 
         },
 
@@ -115,11 +114,7 @@ export class CouponsComponent {
         // error
         // Runs if API Fails.
         //
-        error: (err: any) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
 
@@ -186,7 +181,7 @@ export class CouponsComponent {
     if (foodTotal < selectedCoupon.minimumOrderAmount) {
 
       this.toastr.error(
-        `Minimum order of ₹${selectedCoupon.minimumOrderAmount} required. Your cart total is ₹${foodTotal.toFixed(2)}.`
+        `Minimum order of â‚¹${selectedCoupon.minimumOrderAmount} required. Your cart total is â‚¹${foodTotal.toFixed(2)}.`
       );
 
       return;
@@ -214,7 +209,7 @@ export class CouponsComponent {
     //
     // Show success message.
     //
-    this.toastr.success(`Coupon '${selectedCoupon.couponCode}' applied! You save ₹${selectedCoupon.discountAmount}.`);
+    this.toastr.success(`Coupon '${selectedCoupon.couponCode}' applied! You save â‚¹${selectedCoupon.discountAmount}.`);
 
     //
     // Navigate to Checkout Page.

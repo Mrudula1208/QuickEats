@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QuickEats.API.DTos.Menu;
@@ -51,7 +51,7 @@ namespace QuickEats.API.Controllers
             var menuItems=await _menuService.GetByIdAsync(id);
             if (menuItems == null)
             {
-                return NotFound("Menu Item not found");  
+                return NotFound($"Menu item with id {id} not found.");  
             }
             return Ok(menuItems);
         }
@@ -100,7 +100,7 @@ namespace QuickEats.API.Controllers
             }
 
             await _menuService.CreateAsync(dto);
-            return Ok("Menu Item Created successfully");
+            return Ok("Menu item created successfully.");
         }
         /// <summary>
         /// Updates an existing menu item.
@@ -118,7 +118,7 @@ namespace QuickEats.API.Controllers
                 var menuItem = await _menuService.GetByIdAsync(id);
                 if (menuItem == null)
                 {
-                    return NotFound("Menu Item not found");
+                    return NotFound($"Menu item with id {id} not found.");
                 }
                 if (!await IsOwnerOfRestaurant(menuItem.RestaurantId))
                 {
@@ -127,7 +127,7 @@ namespace QuickEats.API.Controllers
             }
 
             await _menuService.UpdateAsync(id, dto);
-            return Ok("Menu Item Updated successfully");
+            return Ok("Menu item updated successfully.");
         }
         /// <summary>
         /// Deletes a menu item.
@@ -144,7 +144,7 @@ namespace QuickEats.API.Controllers
                 var menuItem = await _menuService.GetByIdAsync(id);
                 if (menuItem == null)
                 {
-                    return NotFound("Menu Item not found");
+                    return NotFound($"Menu item with id {id} not found.");
                 }
                 if (!await IsOwnerOfRestaurant(menuItem.RestaurantId))
                 {
@@ -153,7 +153,7 @@ namespace QuickEats.API.Controllers
             }
 
             await _menuService.DeleteAsync(id);
-            return Ok("Menu Item Deleted successfully");
+            return Ok("Menu item deleted successfully.");
         }
 
         /// <summary>
@@ -170,7 +170,7 @@ namespace QuickEats.API.Controllers
                 var menuItem = await _menuService.GetByIdAsync(id);
                 if (menuItem == null)
                 {
-                    return NotFound("Menu Item not found");
+                    return NotFound($"Menu item with id {id} not found.");
                 }
                 if (!await IsOwnerOfRestaurant(menuItem.RestaurantId))
                 {

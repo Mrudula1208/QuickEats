@@ -202,17 +202,12 @@ export class SavedAddressComponent {
           // Store Addresses.
           this.customerAddresses = data;
 
-          console.log(this.customerAddresses);
 
         },
 
         // error
         // Runs if API Fails.
-        error: (err: any) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
 
@@ -287,11 +282,7 @@ export class SavedAddressComponent {
 
         // error
         // Runs if API Fails.
-        error: (err: any) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
 
@@ -327,11 +318,7 @@ export class SavedAddressComponent {
 
         // error
         // Runs if API Fails.
-        error: (err: any) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
 
@@ -367,11 +354,7 @@ export class SavedAddressComponent {
 
         // error
         // Runs if API Fails.
-        error: (err: any) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
 

@@ -120,11 +120,7 @@ export class AdminOrderDetails {
 
         },
 
-        error: (err) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
 

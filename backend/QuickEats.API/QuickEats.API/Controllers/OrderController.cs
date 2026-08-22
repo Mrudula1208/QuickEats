@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QuickEats.API.DTos.Order;
@@ -48,7 +48,7 @@ namespace QuickEats.API.Controllers
             var order = await _orderService.GetByIdAsync(id);
             if (order == null)
             {
-                return NotFound("Order not found.");
+                return NotFound($"Order with id {id} not found.");
             }
             return Ok(order);
         }
@@ -159,7 +159,7 @@ namespace QuickEats.API.Controllers
         public async Task<IActionResult> Delete(int id)
         {
         await _orderService.DeleteAsync(id);
-            return Ok("Order Delete successfully.");
+            return Ok("Order deleted successfully.");
 
     }
 

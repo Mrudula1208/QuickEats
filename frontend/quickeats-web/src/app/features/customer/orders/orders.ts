@@ -53,15 +53,10 @@ export class OrdersComponent {
 
           this.customerOrders = data;
 
-          console.log(this.customerOrders);
 
         },
 
-        error: (err) => {
-
-          console.log(err);
-
-        }
+        error: () => {}
 
       });
 
@@ -127,7 +122,6 @@ export class OrdersComponent {
         this.loadCustomerOrders();
       },
       error: (err) => {
-        console.log(err);
         alert(err.error || 'Failed to cancel order.');
       }
     });

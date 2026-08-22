@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QuickEats.API.DTos.Payment;
@@ -85,7 +85,7 @@ namespace QuickEats.API.Controllers
         public async Task <IActionResult>UpdateStatus(int id,UpdatePaymentStatusDto dto)
         {
             await _paymentService.UpdateStatusAsync(id, dto);
-            return Ok("Payment Updated successfully.");
+            return Ok("Payment updated successfully.");
         }
 
         /// <summary>
