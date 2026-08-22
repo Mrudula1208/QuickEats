@@ -2,6 +2,7 @@ import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FeaturedRestaurantsComponent } from '../components/featured-restaurants/featured-restaurants';
+import { LoadingSpinnerComponent } from '../../../shared/loading-spinner/loading-spinner';
 import { Restaurant } from '../../../core/models/restaurant.model';
 import { RestaurantService } from '../../../core/services/restaurant.service';
 
@@ -11,7 +12,8 @@ import { RestaurantService } from '../../../core/services/restaurant.service';
   imports: [
     CommonModule,
     FormsModule,
-    FeaturedRestaurantsComponent
+    FeaturedRestaurantsComponent,
+    LoadingSpinnerComponent
   ],
   templateUrl: './home.html',
   styleUrl: './home.scss'
@@ -20,6 +22,9 @@ export class Home {
 
   restaurants = signal<Restaurant[]>([]);
   filteredRestaurants = signal<Restaurant[]>([]);
+
+  // true = restaurant list is still loading.
+  isLoading = signal(true);
 
   searchText = '';
   showOpenOnly = false;
@@ -33,13 +38,16 @@ export class Home {
   }
 
   loadRestaurants(): void {
+    this.isLoading.set(true);
     this.restaurantService.getRestaurants().subscribe({
       next: (data) => {
         this.restaurants.set(data);
         this.applyFilters();
+        this.isLoading.set(false);
       },
       error: (err) => {
         console.log(err);
+        this.isLoading.set(false);
       }
     });
   }

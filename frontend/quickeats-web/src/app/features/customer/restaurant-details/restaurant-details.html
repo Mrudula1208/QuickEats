@@ -1,5 +1,11 @@
+ 
+@if (isLoadingRestaurant) {
 
-@if (restaurant) {
+<app-loading-spinner message="Loading restaurant..."></app-loading-spinner>
+
+}
+
+@else if (restaurant) {
 
 <div class="restaurant-banner">
 

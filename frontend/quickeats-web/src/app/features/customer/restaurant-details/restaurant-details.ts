@@ -42,10 +42,13 @@ import { AuthService } from '../../../core/services/auth.service';
 import { ToastrService } from 'ngx-toastr';
 // Used to show success/error notifications.
 
+import { LoadingSpinnerComponent } from '../../../shared/loading-spinner/loading-spinner';
+// Shared spinner shown while data is loading.
+
 @Component({
   selector: 'app-restaurant-details',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, LoadingSpinnerComponent],
   templateUrl: './restaurant-details.html',
   styleUrl: './restaurant-details.scss'
 })
@@ -54,6 +57,12 @@ export class RestaurantDetailsComponent {
 
   // Store restaurant details.
   restaurant?: Restaurant;
+
+  // true = restaurant details are still loading.
+  isLoadingRestaurant = true;
+
+  // true = menu items are still loading.
+  isLoadingMenu = true;
 
   // Store all menu items.
   menus: MenuItem[] = [];
@@ -150,6 +159,8 @@ export class RestaurantDetailsComponent {
           // Store restaurant.
           this.restaurant = data;
 
+          this.isLoadingRestaurant = false;
+
           console.log(this.restaurant);
 
         },
@@ -158,6 +169,8 @@ export class RestaurantDetailsComponent {
         error: (err) => {
 
           console.log(err);
+
+          this.isLoadingRestaurant = false;
 
         }
 
@@ -185,12 +198,16 @@ export class RestaurantDetailsComponent {
 
           console.log(this.menus);
 
+          this.isLoadingMenu = false;
+
         },
 
         // API Failed.
         error: (err) => {
 
           console.log(err);
+
+          this.isLoadingMenu = false;
 
         }
 

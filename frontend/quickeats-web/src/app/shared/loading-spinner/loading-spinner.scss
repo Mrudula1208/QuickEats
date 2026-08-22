@@ -1,0 +1,31 @@
+// Centers the spinner inside its container.
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+}
+
+// Rotating ring.
+.spinner {
+  width: 42px;
+  height: 42px;
+  border: 4px solid rgba(255, 107, 0, .2);
+  border-top-color: #ff6b00;
+  border-radius: 50%;
+  animation: spinner-rotate .8s linear infinite;
+}
+
+@keyframes spinner-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Optional text below the spinner.
+.spinner-message {
+  margin: 12px 0 0;
+  color: #888;
+  font-size: 14px;
+}
