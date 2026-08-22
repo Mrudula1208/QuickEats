@@ -7,6 +7,10 @@ using System.Security.Claims;
 
 namespace QuickEats.API.Controllers
 {
+    /// <summary>
+    /// Delivery management: assign deliveries (Admin) and update delivery status (Delivery Partner).
+    /// </summary>
+    [Tags("Deliveries")]
     [Authorize]
 
     [Route("api/[controller]")]
@@ -19,7 +23,9 @@ namespace QuickEats.API.Controllers
             _orderDeliveryService = orderDeliveryService;
 
         }
-        // Only Admin can see all deliveries.
+        /// <summary>
+        /// Gets all deliveries (Admin only).
+        /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAll()
@@ -28,7 +34,9 @@ namespace QuickEats.API.Controllers
             return Ok(deliveries);
         }
 
-        // A Delivery Partner sees only their own deliveries.
+        /// <summary>
+        /// Gets the deliveries assigned to the logged in Delivery Partner.
+        /// </summary>
         [Authorize(Roles = "DeliveryPartner")]
         [HttpGet("partner")]
         public async Task<IActionResult> GetPartnerDeliveries()
@@ -40,8 +48,11 @@ namespace QuickEats.API.Controllers
             return Ok(deliveries);
         }
 
+        /// <summary>
+        /// Gets a single delivery by id.
+        /// </summary>
+        /// <param name="id">Delivery id.</param>
         [HttpGet("{id}")]
-
         public async Task<IActionResult> GetById(int id)
         {
             var delivery = await _orderDeliveryService.GetByIdAsync(id);
@@ -52,6 +63,10 @@ namespace QuickEats.API.Controllers
             return Ok(delivery);
         }
 
+        /// <summary>
+        /// Gets the delivery of one order.
+        /// </summary>
+        /// <param name="orderId">Order id.</param>
         [HttpGet("order/{orderId}")]
         public async Task <IActionResult> GetByOrderId(int orderId)
         {
@@ -62,6 +77,11 @@ namespace QuickEats.API.Controllers
             }
             return Ok(delivery);
         }
+
+        /// <summary>
+        /// Assigns a delivery partner to an order (Admin only).
+        /// </summary>
+        /// <param name="dto">Order id and delivery partner id.</param>
         [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create(CreateOrderDeliveryDto dto)
@@ -69,6 +89,12 @@ namespace QuickEats.API.Controllers
             await _orderDeliveryService.CreateAsync(dto);
             return Ok("Delivery created successfully.");
         }
+
+        /// <summary>
+        /// Updates the delivery status (Delivery Partner only).
+        /// </summary>
+        /// <param name="id">Delivery id.</param>
+        /// <param name="dto">New status (Assigned, Picked Up, Out For Delivery, Delivered).</param>
         [Authorize(Roles = "DeliveryPartner")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateStatus(int id, UpdateDeliveryStatusDto dto)
@@ -76,6 +102,11 @@ namespace QuickEats.API.Controllers
            await _orderDeliveryService.UpdateStatusAsync(id, dto);
             return Ok("Delivery updated successfully.");
         }
+
+        /// <summary>
+        /// Deletes a delivery (Admin only).
+        /// </summary>
+        /// <param name="id">Delivery id.</param>
         [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)

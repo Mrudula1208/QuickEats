@@ -7,6 +7,10 @@ using System.Security.Claims;
 
 namespace QuickEats.API.Controllers
 {
+    /// <summary>
+    /// Restaurant star ratings submitted by customers.
+    /// </summary>
+    [Tags("Restaurant Ratings")]
     [Authorize]
 
     [Route("api/[controller]")]
@@ -19,12 +23,20 @@ namespace QuickEats.API.Controllers
             _restaurantRatingService = restaurantRatingService;
         }
 
+        /// <summary>
+        /// Gets all restaurant ratings.
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var ratings = await _restaurantRatingService.GetAllAsync();
             return Ok(ratings);
         }
+
+        /// <summary>
+        /// Gets a single rating by id.
+        /// </summary>
+        /// <param name="id">Rating id.</param>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -38,6 +50,11 @@ namespace QuickEats.API.Controllers
 
 
         }
+
+        /// <summary>
+        /// Gets the rating of one restaurant.
+        /// </summary>
+        /// <param name="restaurantId">Restaurant id.</param>
         [HttpGet("restaurant/{restaurantId}")]
 
         public async Task <IActionResult> GetByRestaurantId(int restaurantId)
@@ -46,6 +63,10 @@ namespace QuickEats.API.Controllers
 return Ok(rating);
         }
 
+        /// <summary>
+        /// Rates a restaurant (Customer only). The customer id comes from the JWT token.
+        /// </summary>
+        /// <param name="dto">Restaurant id and rating value.</param>
         [Authorize(Roles = "Customer")]
         [HttpPost]
         public async Task<IActionResult> Create(CreateRestaurantRatingDto dto)
@@ -57,6 +78,11 @@ return Ok(rating);
 
             return Ok("Restaurant Rating created successfully.");
         }
+
+        /// <summary>
+        /// Deletes a rating (Customer only).
+        /// </summary>
+        /// <param name="id">Rating id.</param>
         [Authorize(Roles = "Customer")]
         [HttpDelete("{id}")]
         public async Task  <IActionResult> Delete (int id)

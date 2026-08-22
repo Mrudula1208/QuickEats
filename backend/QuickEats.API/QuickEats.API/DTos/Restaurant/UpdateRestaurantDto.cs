@@ -2,6 +2,7 @@
 
 namespace QuickEats.API.DTos.Restaurant
 {
+    /// <summary>Updated restaurant details.</summary>
     public class UpdateRestaurantDto
     {
         // Restaurant Name

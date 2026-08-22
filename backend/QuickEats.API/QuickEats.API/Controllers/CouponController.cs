@@ -5,8 +5,11 @@ using QuickEats.API.Services.Interfaces;
 
 namespace QuickEats.API.Controllers
 {
-    // API Controller for Coupons.
+    /// <summary>
+    /// Discount coupon management: validate coupons (any logged in user) and manage them (Admin).
+    /// </summary>
 
+    [Tags("Coupons")]
     [Authorize]
     // User must be logged in
     // to access these APIs.
@@ -29,9 +32,9 @@ namespace QuickEats.API.Controllers
             _couponService = couponService;
         }
 
-        // GET: /api/Coupon
-        //
-        // Get all Coupons.
+        /// <summary>
+        /// Gets all available coupons.
+        /// </summary>
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
@@ -41,11 +44,14 @@ namespace QuickEats.API.Controllers
             return Ok(coupons);
         }
 
-        // GET: /api/Coupon/WELCOME50
-        //
-        // Get one Coupon by Code.
+        /// <summary>
+        /// Gets one coupon by its code (e.g. "SAVE10").
+        /// </summary>
+        /// <param name="code">Coupon code.</param>
 
         [HttpGet("{code}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetByCode(
             string code
         )
@@ -60,9 +66,10 @@ namespace QuickEats.API.Controllers
             return Ok(coupon);
         }
 
-        // POST: /api/Coupon
-        //
-        // Admin creates a new Coupon.
+        /// <summary>
+        /// Creates a new coupon (Admin only).
+        /// </summary>
+        /// <param name="dto">Coupon details (code, discount, minimum order, expiry).</param>
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
@@ -75,9 +82,10 @@ namespace QuickEats.API.Controllers
             return Ok("Coupon created successfully.");
         }
 
-        // DELETE: /api/Coupon/5
-        //
-        // Admin deletes a Coupon.
+        /// <summary>
+        /// Deletes a coupon (Admin only).
+        /// </summary>
+        /// <param name="id">Coupon id.</param>
 
         [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]

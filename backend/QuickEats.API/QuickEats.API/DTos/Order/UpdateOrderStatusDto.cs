@@ -2,6 +2,7 @@
 
 namespace QuickEats.API.DTos.Order
 {
+    /// <summary>New order status (Pending, Confirmed, Preparing, Out for Delivery, Delivered, Cancelled).</summary>
     public class UpdateOrderStatusDto
     {
         [Required(ErrorMessage = "Status is required")]

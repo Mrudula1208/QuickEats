@@ -8,6 +8,10 @@ using System.Security.Claims;
 
 namespace QuickEats.API.Controllers
 {
+    /// <summary>
+    /// User management: list registered users (Admin) and update profile (any logged in user).
+    /// </summary>
+    [Tags("Users")]
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
@@ -22,7 +26,9 @@ namespace QuickEats.API.Controllers
             _userService = userService;
         }
 
-        // Admin sees all registered users.
+        /// <summary>
+        /// Gets all registered users (Admin only). Passwords are never returned.
+        /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAll()
@@ -48,7 +54,10 @@ namespace QuickEats.API.Controllers
             return Ok(response);
         }
 
-        // Any logged-in user can update their profile image.
+        /// <summary>
+        /// Updates the profile image URL of the logged in user.
+        /// </summary>
+        /// <param name="dto">New profile image URL.</param>
         [HttpPut("profile-image")]
         public async Task<IActionResult> UpdateProfileImage([FromBody] UpdateProfileImageDto dto)
         {

@@ -6,8 +6,11 @@ using System.Security.Claims;
 
 namespace QuickEats.API.Controllers
 {
-    // API Controller for Saved Addresses.
+    /// <summary>
+    /// Saved delivery addresses of the logged in user.
+    /// </summary>
 
+    [Tags("Saved Addresses")]
     [Authorize]
     // User must be logged in
     // to access these APIs.
@@ -30,10 +33,9 @@ namespace QuickEats.API.Controllers
             _addressService = addressService;
         }
 
-        // GET: /api/SavedAddress
-        //
-        // Get all Addresses
-        // of the logged in User.
+        /// <summary>
+        /// Gets all saved addresses of the logged in user.
+        /// </summary>
 
         [HttpGet]
         public async Task<IActionResult> GetMyAddresses()
@@ -46,9 +48,10 @@ namespace QuickEats.API.Controllers
             return Ok(addresses);
         }
 
-        // POST: /api/SavedAddress
-        //
-        // Add a new Address.
+        /// <summary>
+        /// Saves a new address for the logged in user.
+        /// </summary>
+        /// <param name="dto">Address details (label, address line, city, pin code).</param>
 
         [HttpPost]
         public async Task<IActionResult> Create(
@@ -63,9 +66,10 @@ namespace QuickEats.API.Controllers
             return Ok("Address saved successfully.");
         }
 
-        // DELETE: /api/SavedAddress/5
-        //
-        // Delete one Address.
+        /// <summary>
+        /// Deletes one saved address of the logged in user.
+        /// </summary>
+        /// <param name="id">Address id.</param>
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(
@@ -80,9 +84,10 @@ namespace QuickEats.API.Controllers
             return Ok("Address deleted successfully.");
         }
 
-        // PUT: /api/SavedAddress/default/5
-        //
-        // Set one Address as Default.
+        /// <summary>
+        /// Sets one address as the default for the logged in user.
+        /// </summary>
+        /// <param name="id">Address id.</param>
 
         [HttpPut("default/{id}")]
         public async Task<IActionResult> SetDefault(

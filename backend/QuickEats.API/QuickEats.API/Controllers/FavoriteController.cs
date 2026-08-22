@@ -6,8 +6,11 @@ using System.Security.Claims;
 
 namespace QuickEats.API.Controllers
 {
-    // API Controller for Favorite Restaurants.
+    /// <summary>
+    /// Favorite restaurants of the logged in user.
+    /// </summary>
 
+    [Tags("Favorites")]
     [Authorize]
     // User must be logged in
     // to access these APIs.
@@ -30,10 +33,9 @@ namespace QuickEats.API.Controllers
             _favoriteService = favoriteService;
         }
 
-        // GET: /api/Favorite
-        //
-        // Get all Favorite Restaurants
-        // of the logged in User.
+        /// <summary>
+        /// Gets all favorite restaurants of the logged in user.
+        /// </summary>
 
         [HttpGet]
         public async Task<IActionResult> GetMyFavorites()
@@ -46,9 +48,10 @@ namespace QuickEats.API.Controllers
             return Ok(favorites);
         }
 
-        // POST: /api/Favorite
-        //
-        // Add a Restaurant into Favorites.
+        /// <summary>
+        /// Adds a restaurant to the logged in user's favorites.
+        /// </summary>
+        /// <param name="dto">Restaurant id to favorite.</param>
 
         [HttpPost]
         public async Task<IActionResult> Create(

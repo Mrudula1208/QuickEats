@@ -8,6 +8,10 @@ using System.Threading.Tasks;
 
 namespace QuickEats.API.Controllers
 {
+    /// <summary>
+    /// Menu item management: browse menus (public) and create/update/delete items (Admin/Owner).
+    /// </summary>
+    [Tags("Menu")]
     [Authorize]
 
     [Route("api/[controller]")]
@@ -22,6 +26,9 @@ namespace QuickEats.API.Controllers
             _restaurantService = restaurantService;
         }
 
+        /// <summary>
+        /// Gets all menu items of all restaurants.
+        /// </summary>
         [AllowAnonymous]
         [HttpGet]
 
@@ -31,8 +38,14 @@ namespace QuickEats.API.Controllers
             return Ok(menuItems);
         }
 
+        /// <summary>
+        /// Gets a single menu item by id.
+        /// </summary>
+        /// <param name="id">Menu item id.</param>
         [AllowAnonymous]
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task <IActionResult>GetByID(int id)
         {
             var menuItems=await _menuService.GetByIdAsync(id);
@@ -43,6 +56,9 @@ namespace QuickEats.API.Controllers
             return Ok(menuItems);
         }
 
+        /// <summary>
+        /// Gets all distinct menu categories.
+        /// </summary>
         [AllowAnonymous]
         [HttpGet("categories")]
         public async Task<IActionResult> GetCategories()
@@ -51,6 +67,10 @@ namespace QuickEats.API.Controllers
             return Ok(categories);
         }
 
+        /// <summary>
+        /// Gets the full menu of one restaurant.
+        /// </summary>
+        /// <param name="restaurantId">Restaurant id.</param>
         [AllowAnonymous]
         [HttpGet("restaurant/{restaurantId}")]
         public async Task <IActionResult> GetByRestaurantId(int restaurantId)
@@ -61,8 +81,15 @@ namespace QuickEats.API.Controllers
 
 
 
+        /// <summary>
+        /// Creates a new menu item.
+        /// </summary>
+        /// <remarks>Owners can only add items to their own restaurants.</remarks>
+        /// <param name="dto">Menu item details.</param>
         [Authorize(Roles = "Admin,Owner")]
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task <IActionResult> Create(CreateMenuDto dto)
         {
             // An Owner can add items only to their own restaurant.
@@ -75,6 +102,12 @@ namespace QuickEats.API.Controllers
             await _menuService.CreateAsync(dto);
             return Ok("Menu Item Created successfully");
         }
+        /// <summary>
+        /// Updates an existing menu item.
+        /// </summary>
+        /// <remarks>Owners can only edit items of their own restaurants.</remarks>
+        /// <param name="id">Menu item id.</param>
+        /// <param name="dto">Updated menu item details.</param>
         [Authorize(Roles = "Admin,Owner")]
         [HttpPut("{id}")]
         public async Task <IActionResult> Update(int id, UpdateMenuDto dto)
@@ -96,6 +129,11 @@ namespace QuickEats.API.Controllers
             await _menuService.UpdateAsync(id, dto);
             return Ok("Menu Item Updated successfully");
         }
+        /// <summary>
+        /// Deletes a menu item.
+        /// </summary>
+        /// <remarks>Owners can only delete items of their own restaurants.</remarks>
+        /// <param name="id">Menu item id.</param>
         [Authorize(Roles = "Admin,Owner")]
         [HttpDelete("{id}")]
         public async Task <IActionResult> Delete(int id)
@@ -118,7 +156,11 @@ namespace QuickEats.API.Controllers
             return Ok("Menu Item Deleted successfully");
         }
 
-        // Quick toggle menu item availability (Available / Out of Stock).
+        /// <summary>
+        /// Toggles menu item availability (Available / Out of Stock).
+        /// </summary>
+        /// <remarks>Owners can only toggle items of their own restaurants.</remarks>
+        /// <param name="id">Menu item id.</param>
         [Authorize(Roles = "Admin,Owner")]
         [HttpPatch("{id}/toggle-availability")]
         public async Task<IActionResult> ToggleAvailability(int id)

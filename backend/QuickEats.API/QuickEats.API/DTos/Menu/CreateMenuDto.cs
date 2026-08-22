@@ -2,6 +2,7 @@
 
 namespace QuickEats.API.DTos.Menu
 {
+    /// <summary>Details required to create a new menu item.</summary>
     public class CreateMenuDto
         //Used to receive new menu item data from the frontend.
     {//which restaurant the menu belongs to

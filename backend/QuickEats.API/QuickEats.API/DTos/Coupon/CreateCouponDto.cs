@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace QuickEats.API.DTos.Coupon
 {
+    /// <summary>Details required to create a discount coupon.</summary>
     // DTO used when Admin creates
     // or updates a Coupon.
 

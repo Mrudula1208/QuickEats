@@ -7,6 +7,10 @@ using QuickEats.API.Services.Interfaces;
 
 namespace QuickEats.API.Controllers
 {
+    /// <summary>
+    /// Payment records for orders: create payments (Customer), view/manage them (Admin).
+    /// </summary>
+    [Tags("Payments")]
     [Authorize]
 
     [Route("api/[controller]")]
@@ -18,7 +22,9 @@ namespace QuickEats.API.Controllers
             _paymentService = paymentService;
         }
 
-        // Only Admin can see all payments of all users.
+        /// <summary>
+        /// Gets all payments of all users (Admin only).
+        /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAll()
@@ -26,6 +32,11 @@ namespace QuickEats.API.Controllers
             var payments = await _paymentService.GetAllAsync();
             return Ok(payments);
         }
+
+        /// <summary>
+        /// Gets a single payment by id.
+        /// </summary>
+        /// <param name="id">Payment id.</param>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -37,6 +48,10 @@ namespace QuickEats.API.Controllers
             return Ok(payments);
         }
 
+        /// <summary>
+        /// Gets the payment of one order.
+        /// </summary>
+        /// <param name="orderId">Order id.</param>
         [HttpGet("order/{orderId}")]
         public async Task<IActionResult> GetByOrderId(int orderId)
         {
@@ -47,6 +62,11 @@ namespace QuickEats.API.Controllers
             }
             return Ok(payments);
         }
+
+        /// <summary>
+        /// Records a new payment for an order (Customer only).
+        /// </summary>
+        /// <param name="dto">Payment details (order id, amount, method, status).</param>
         [Authorize(Roles = "Customer")]
         [HttpPost]
         public async Task <IActionResult> Create (CreatePaymentDto dto)
@@ -54,6 +74,12 @@ namespace QuickEats.API.Controllers
             await _paymentService.CreateAsync(dto);
             return Ok("Payment created successfully.");
         }
+
+        /// <summary>
+        /// Updates a payment status (Admin only).
+        /// </summary>
+        /// <param name="id">Payment id.</param>
+        /// <param name="dto">New status (Pending, Success, Failed, Refunded).</param>
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task <IActionResult>UpdateStatus(int id,UpdatePaymentStatusDto dto)
@@ -61,6 +87,11 @@ namespace QuickEats.API.Controllers
             await _paymentService.UpdateStatusAsync(id, dto);
             return Ok("Payment Updated successfully.");
         }
+
+        /// <summary>
+        /// Deletes a payment record (Admin only).
+        /// </summary>
+        /// <param name="id">Payment id.</param>
         [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)

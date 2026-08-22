@@ -2,6 +2,7 @@
 
 namespace QuickEats.API.DTos.Auth
 {
+    /// <summary>Details required to register a new Customer or Owner account.</summary>
     public class RegisterRequestDto
     {
         [Required(ErrorMessage = "Name is required")]

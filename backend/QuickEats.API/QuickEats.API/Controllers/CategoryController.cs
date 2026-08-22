@@ -5,6 +5,10 @@ using QuickEats.API.Services.Interfaces;
 
 namespace QuickEats.API.Controllers
 {
+    /// <summary>
+    /// Menu category management: browse categories (public), manage them (Admin).
+    /// </summary>
+    [Tags("Categories")]
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
@@ -17,6 +21,9 @@ namespace QuickEats.API.Controllers
             _categoryService = categoryService;
         }
 
+        /// <summary>
+        /// Gets all menu categories.
+        /// </summary>
         [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAll()
@@ -25,6 +32,10 @@ namespace QuickEats.API.Controllers
             return Ok(categories);
         }
 
+        /// <summary>
+        /// Gets a single category by id.
+        /// </summary>
+        /// <param name="id">Category id.</param>
         [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
@@ -35,6 +46,10 @@ namespace QuickEats.API.Controllers
             return Ok(category);
         }
 
+        /// <summary>
+        /// Creates a new menu category (Admin only).
+        /// </summary>
+        /// <param name="dto">Category name.</param>
         [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create(CreateCategoryDto dto)
@@ -43,6 +58,11 @@ namespace QuickEats.API.Controllers
             return Ok("Category created successfully.");
         }
 
+        /// <summary>
+        /// Renames a menu category (Admin only).
+        /// </summary>
+        /// <param name="id">Category id.</param>
+        /// <param name="dto">New category name.</param>
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateCategoryDto dto)
@@ -51,6 +71,10 @@ namespace QuickEats.API.Controllers
             return Ok("Category updated successfully.");
         }
 
+        /// <summary>
+        /// Deletes a menu category (Admin only).
+        /// </summary>
+        /// <param name="id">Category id.</param>
         [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)

@@ -2,6 +2,7 @@
 
 namespace QuickEats.API.DTos.Order
 {
+    /// <summary>One line item of an order (menu item and quantity).</summary>
     public class OrderItemDto
     {
         // Menu Item selected by the custumer.

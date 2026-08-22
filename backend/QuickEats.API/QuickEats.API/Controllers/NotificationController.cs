@@ -6,6 +6,10 @@ using System.Security.Claims;
 
 namespace QuickEats.API.Controllers
 {
+    /// <summary>
+    /// Notifications of the logged in user (order updates, status changes, etc.).
+    /// </summary>
+    [Tags("Notifications")]
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
@@ -20,10 +24,9 @@ namespace QuickEats.API.Controllers
             _notificationService = notificationService;
         }
 
-        // GET: /api/Notification
-        //
-        // Get all Notifications
-        // of the logged in User.
+        /// <summary>
+        /// Gets all notifications of the logged in user.
+        /// </summary>
 
         [HttpGet]
         public async Task<IActionResult> GetMyNotifications()
@@ -36,9 +39,9 @@ namespace QuickEats.API.Controllers
             return Ok(notifications);
         }
 
-        // GET: /api/Notification/unread-count
-        //
-        // Get unread Notification count.
+        /// <summary>
+        /// Gets the unread notification count of the logged in user.
+        /// </summary>
 
         [HttpGet("unread-count")]
         public async Task<IActionResult> GetUnreadCount()
@@ -51,9 +54,10 @@ namespace QuickEats.API.Controllers
             return Ok(count);
         }
 
-        // PUT: /api/Notification/5
-        //
-        // Mark one Notification as Read.
+        /// <summary>
+        /// Marks one notification as read.
+        /// </summary>
+        /// <param name="id">Notification id.</param>
 
         [HttpPut("{id}")]
         public async Task<IActionResult> MarkAsRead(int id)
@@ -66,9 +70,9 @@ namespace QuickEats.API.Controllers
             return Ok("Notification marked as read.");
         }
 
-        // PUT: /api/Notification/mark-all
-        //
-        // Mark all Notifications as Read.
+        /// <summary>
+        /// Marks all notifications of the logged in user as read.
+        /// </summary>
 
         [HttpPut("mark-all")]
         public async Task<IActionResult> MarkAllAsRead()
@@ -81,9 +85,10 @@ namespace QuickEats.API.Controllers
             return Ok("All notifications marked as read.");
         }
 
-        // DELETE: /api/Notification/5
-        //
-        // Delete one Notification.
+        /// <summary>
+        /// Deletes one notification of the logged in user.
+        /// </summary>
+        /// <param name="id">Notification id.</param>
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
@@ -96,9 +101,9 @@ namespace QuickEats.API.Controllers
             return Ok("Notification deleted successfully.");
         }
 
-        // DELETE: /api/Notification/clear
-        //
-        // Clear all Notifications.
+        /// <summary>
+        /// Clears all notifications of the logged in user.
+        /// </summary>
 
         [HttpDelete("clear")]
         public async Task<IActionResult> ClearAll()

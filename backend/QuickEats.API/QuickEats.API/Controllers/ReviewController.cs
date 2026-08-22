@@ -18,8 +18,11 @@ using System.Security.Claims;
 
 namespace QuickEats.API.Controllers
 {
-    // API Controller for Reviews.
+    /// <summary>
+    /// Written restaurant reviews: browse reviews (public), create (Customer) and delete (Admin).
+    /// </summary>
 
+    [Tags("Reviews")]
     [Authorize]
     // User must be logged in
     // to access these APIs.
@@ -52,9 +55,9 @@ namespace QuickEats.API.Controllers
         }
 
 
-        // GET: /api/Review
-        //
-        // Get all Reviews.
+        /// <summary>
+        /// Gets all reviews.
+        /// </summary>
 
         [AllowAnonymous]
         [HttpGet]
@@ -74,9 +77,10 @@ namespace QuickEats.API.Controllers
         }
 
 
-        // GET: /api/Review/5
-        //
-        // Get one Review.
+        /// <summary>
+        /// Gets one review by id.
+        /// </summary>
+        /// <param name="id">Review id.</param>
 
         [AllowAnonymous]
         [HttpGet("{id}")]
@@ -110,9 +114,10 @@ namespace QuickEats.API.Controllers
         }
 
 
-        // GET: /api/Review/restaurant/5
-        //
-        // Get all Reviews of one Restaurant.
+        /// <summary>
+        /// Gets all reviews of one restaurant.
+        /// </summary>
+        /// <param name="restaurantId">Restaurant id.</param>
 
         [AllowAnonymous]
         [HttpGet("restaurant/{restaurantId}")]
@@ -135,9 +140,10 @@ namespace QuickEats.API.Controllers
         }
 
 
-        // GET: /api/Review/restaurant/5/average
-        //
-        // Get average Rating of one Restaurant.
+        /// <summary>
+        /// Gets the average rating of one restaurant (null when no reviews exist).
+        /// </summary>
+        /// <param name="restaurantId">Restaurant id.</param>
 
         [AllowAnonymous]
         [HttpGet("restaurant/{restaurantId}/average")]
@@ -163,9 +169,10 @@ namespace QuickEats.API.Controllers
         }
 
 
-        // POST: /api/Review
-        //
-        // Create a new Review.
+        /// <summary>
+        /// Creates a new review (Customer only). The customer id always comes from the JWT token.
+        /// </summary>
+        /// <param name="dto">Restaurant id, rating (1-5) and comment.</param>
 
         [Authorize(Roles = "Customer")]
         // Only Customer can create a Review.
@@ -200,9 +207,10 @@ namespace QuickEats.API.Controllers
         }
 
 
-        // DELETE: /api/Review/5
-        //
-        // Delete a Review.
+        /// <summary>
+        /// Deletes a review (Admin only).
+        /// </summary>
+        /// <param name="id">Review id.</param>
 
         [Authorize(Roles = "Admin")]
         // Only Admin can delete Reviews.

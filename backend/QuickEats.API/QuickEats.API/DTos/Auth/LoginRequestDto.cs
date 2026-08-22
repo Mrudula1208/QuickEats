@@ -2,6 +2,7 @@
 
 namespace QuickEats.API.DTos.Auth
 {
+    /// <summary>Login credentials of an existing account.</summary>
     public class LoginRequestDto
     {
         [Required(ErrorMessage = "Email is required")]

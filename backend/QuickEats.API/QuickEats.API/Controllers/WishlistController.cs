@@ -6,8 +6,11 @@ using System.Security.Claims;
 
 namespace QuickEats.API.Controllers
 {
-    // API Controller for Wishlist.
+    /// <summary>
+    /// Saved food items (wishlist) of the logged in customer.
+    /// </summary>
 
+    [Tags("Wishlist")]
     [Authorize]
     // User must be logged in
     // to access these APIs.
@@ -30,10 +33,9 @@ namespace QuickEats.API.Controllers
             _wishlistService = wishlistService;
         }
 
-        // GET: /api/Wishlist
-        //
-        // Get all Wishlist items
-        // of the logged in Customer.
+        /// <summary>
+        /// Gets all wishlist items of the logged in customer.
+        /// </summary>
 
         [HttpGet]
         public async Task<IActionResult> GetMyWishlist()
@@ -46,9 +48,10 @@ namespace QuickEats.API.Controllers
             return Ok(items);
         }
 
-        // POST: /api/Wishlist
-        //
-        // Add a food item into the Wishlist.
+        /// <summary>
+        /// Adds a food item into the logged in customer's wishlist.
+        /// </summary>
+        /// <param name="dto">Menu item details to save.</param>
 
         [HttpPost]
         public async Task<IActionResult> Create(
@@ -63,9 +66,10 @@ namespace QuickEats.API.Controllers
             return Ok("Item added to wishlist successfully.");
         }
 
-        // DELETE: /api/Wishlist/5
-        //
-        // Remove one item using Menu Id.
+        /// <summary>
+        /// Removes one wishlist item using its menu id.
+        /// </summary>
+        /// <param name="menuId">Menu item id.</param>
 
         [HttpDelete("{menuId}")]
         public async Task<IActionResult> DeleteByMenu(
@@ -80,9 +84,9 @@ namespace QuickEats.API.Controllers
             return Ok("Item removed from wishlist successfully.");
         }
 
-        // DELETE: /api/Wishlist/clear
-        //
-        // Remove all Wishlist items.
+        /// <summary>
+        /// Removes all wishlist items of the logged in customer.
+        /// </summary>
 
         [HttpDelete("clear")]
         public async Task<IActionResult> Clear()

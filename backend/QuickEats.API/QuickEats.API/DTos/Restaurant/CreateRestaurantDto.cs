@@ -2,6 +2,7 @@
 
 namespace QuickEats.API.DTos.Restaurant
 {
+    /// <summary>Details required to create a new restaurant.</summary>
     public class CreateRestaurantDto
     {
         [Required(ErrorMessage = "Restaurant name is required")]

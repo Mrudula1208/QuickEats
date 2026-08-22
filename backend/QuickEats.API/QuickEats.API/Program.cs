@@ -12,6 +12,7 @@ using QuickEats.API.Repositories;
 using QuickEats.API.Repositories.Interfaces;
 using QuickEats.API.Services;
 using QuickEats.API.Services.Interfaces;
+using System.Reflection;
 using System.Text;
 
 namespace QuickEats.API
@@ -32,9 +33,32 @@ namespace QuickEats.API
                 options.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Title = "QuickEats API",
-                    Version = "v1"
+                    Version = "v1",
+                    Description =
+                        "REST API for the QuickEats food ordering platform. " +
+                        "Customers browse restaurants and menus, place orders and pay. " +
+                        "Owners manage their restaurants, menus and incoming orders. " +
+                        "Admins manage users, categories, coupons, deliveries and payments.",
+                    Contact = new Microsoft.OpenApi.Models.OpenApiContact
+                    {
+                        Name = "QuickEats Team"
+                    },
+                    License = new Microsoft.OpenApi.Models.OpenApiLicense
+                    {
+                        Name = "MIT"
+                    }
                 });
 
+                // Include XML comments from the generated doc file,
+                // so <summary> text appears on endpoints and schemas.
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                if (File.Exists(xmlPath))
+                {
+                    options.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
+                }
+
+                // JWT Bearer authentication support in Swagger UI.
                 options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Name = "Authorization",
@@ -42,7 +66,7 @@ namespace QuickEats.API
                     Scheme = "bearer",
                     BearerFormat = "JWT",
                     In = ParameterLocation.Header,
-                    Description = "Enter: Bearer {your JWT token}"
+                    Description = "Paste the JWT token returned by POST /api/Auth/login (without the 'Bearer ' prefix)."
                 });
 
                 options.AddSecurityRequirement(new OpenApiSecurityRequirement

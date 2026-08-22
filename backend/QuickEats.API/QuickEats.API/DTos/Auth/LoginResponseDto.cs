@@ -1,5 +1,6 @@
 ﻿namespace QuickEats.API.DTos.Auth
 {
+    /// <summary>Successful login result: JWT token plus basic profile info.</summary>
     public class LoginResponseDto
     {
         public int Id { get; set; }

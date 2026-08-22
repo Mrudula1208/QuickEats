@@ -5,6 +5,10 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>1a9bd914-0442-4342-a078-4269bafae921</UserSecretsId>
+    <!-- Generate XML docs so Swagger can show controller/DTO descriptions. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- 1591: hide warnings for undocumented public members. -->
+    <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

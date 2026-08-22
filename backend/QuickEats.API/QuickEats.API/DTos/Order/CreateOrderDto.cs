@@ -2,6 +2,7 @@
 
 namespace QuickEats.API.DTos.Order
 {
+    /// <summary>Details required to place a new order (restaurant, delivery info and items).</summary>
     public class CreateOrderDto
     {
         [Range(1, int.MaxValue, ErrorMessage = "Valid restaurant ID is required")]

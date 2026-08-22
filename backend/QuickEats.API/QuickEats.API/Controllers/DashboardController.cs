@@ -4,7 +4,10 @@ using QuickEats.API.Services.Interfaces;
 
 namespace QuickEats.API.Controllers
 {
-    // Only Admin can see the dashboard statistics.
+    /// <summary>
+    /// Admin dashboard statistics (totals for restaurants, menus, orders, users and revenue).
+    /// </summary>
+    [Tags("Dashboard")]
     [Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
@@ -26,7 +29,10 @@ namespace QuickEats.API.Controllers
 
         }
 
-        // Get Dashboard.
+        /// <summary>
+        /// Gets the admin dashboard statistics.
+        /// </summary>
+
         [HttpGet]
 
         public async Task<IActionResult> GetDashboard()

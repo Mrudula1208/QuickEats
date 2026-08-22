@@ -3,6 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace QuickEats.API.Controllers
 {
+    /// <summary>
+    /// Image uploads for restaurants, menu items and profile pictures.
+    /// </summary>
+    [Tags("Images")]
     [Route("api/[controller]")]
     [ApiController]
     public class ImageController : ControllerBase
@@ -22,8 +26,22 @@ namespace QuickEats.API.Controllers
         // Max file size: 5 MB
         private const long MaxFileSize = 5 * 1024 * 1024;
 
+        /// <summary>
+        /// Uploads an image and returns its public URL.
+        /// </summary>
+        /// <remarks>
+        /// Allowed categories: "restaurants", "menu", "profile".
+        /// Max file size is 5 MB; allowed types are JPG, PNG, WebP and GIF.
+        /// </remarks>
+        /// <param name="category">Upload category (restaurants, menu or profile).</param>
+        /// <param name="file">The image file to upload.</param>
+        /// <returns>An object with the relative image URL in the "imageUrl" field.</returns>
+        /// <response code="200">Returns the uploaded image URL.</response>
+        /// <response code="400">Invalid category, missing file, wrong type or file too large.</response>
         [Authorize(Roles = "Admin,Owner")]
         [HttpPost("upload/{category}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Upload(string category, IFormFile file)
         {
             // Validate category
