@@ -6,8 +6,8 @@ namespace QuickEats.API.Services.Interfaces
     public interface IOrderDeliveryService
     {
         Task<IEnumerable<OrderDeliveryResponseDto>> GetAllAsync();
-        Task<OrderDeliveryResponseDto> GetByIdAsync(int id);
-        Task<OrderDeliveryResponseDto> GetByOrderidAsync(int orderId);
+        Task<OrderDeliveryResponseDto?> GetByIdAsync(int id);
+        Task<OrderDeliveryResponseDto?> GetByOrderidAsync(int orderId);
         Task<IEnumerable<OrderDeliveryResponseDto>> GetByPartnerIdAsync(int partnerId);
         Task CreateAsync(CreateOrderDeliveryDto dto);
         Task UpdateStatusAsync(int id, UpdateDeliveryStatusDto dto);

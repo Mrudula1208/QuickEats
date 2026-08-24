@@ -1,6 +1,7 @@
 // Service Annotation.
 // Makes this file Angular Service.
 import { Injectable } from '@angular/core';
+import { environment } from '../../../environments/environment';
 
 // Backend Caller.
 // Calls ASP.NET Core APIs.
@@ -24,7 +25,7 @@ import { DashboardModel } from '../models/dashboard.model';
 export class DashboardService{
 
 // Backend URL.
-private apiUrl='https://localhost:7278/api/Dashboard';
+private apiUrl=`${environment.apiUrl}/Dashboard`;
 
 constructor(
 

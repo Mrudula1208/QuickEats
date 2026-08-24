@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { OrderModel } from '../models/order.model';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,7 @@ import { Observable } from 'rxjs';
 export class OrderService {
 
   // Backend Order API URL.
-  private apiUrl = 'https://localhost:7278/api/Order';
+  private apiUrl = `${environment.apiUrl}/Order`;
 
   constructor(private http: HttpClient) { }
 

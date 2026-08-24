@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { environment } from '../../../environments/environment';
 // Injectable creates Angular Service.
 
 // Import Favorite Model./ Backend Caller.
@@ -22,7 +23,7 @@ providedIn:'root'
 export class FavoriteService{
 
 // Store all favorite restaurants.
-  private apiUrl = 'https://localhost:7278/api/Favorite';
+  private apiUrl = `${environment.apiUrl}/Favorite`;
 
 
 constructor(private http: HttpClient) { }

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { environment } from '../../../environments/environment';
 // Injectable
 // Tells Angular this is a Service
 // that Angular can create automatically.
@@ -38,7 +39,7 @@ export class ReviewService {
   // inside this Service.
 
   private apiUrl =
-    'https://localhost:7278/api/Review';
+    `${environment.apiUrl}/Review`;
 
 
   constructor(

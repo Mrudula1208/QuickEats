@@ -11,7 +11,7 @@
         public string ImageUrl { get; set; } = string.Empty;
 
         public int OwnerId { get; set; }
-        public User Owner { get; set; }
+        public User? Owner { get; set; }
 
         public bool IsActive { get; set; } = true;
 

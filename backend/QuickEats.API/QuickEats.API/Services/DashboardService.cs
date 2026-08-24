@@ -19,11 +19,6 @@ namespace QuickEats.API.Services
         {
             var dashboard = await _dashboardRepository.GetDashboardAsync();
 
-            if (dashboard == null)
-            {
-                return null;
-            }
-
             return new DashboardDto
             {
                 TotalRestaurants = dashboard.TotalRestaurants,

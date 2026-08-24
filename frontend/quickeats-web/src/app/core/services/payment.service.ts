@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { environment } from '../../../environments/environment';
 // Injectable
 // Tells Angular that this file is a Service
 // and Angular can create this Service automatically.
@@ -55,7 +56,7 @@ export class PaymentService {
   // Assigns the Backend URL to the variable.
 
   private apiUrl =
-    'https://localhost:7278/api/Payment';
+    `${environment.apiUrl}/Payment`;
 
 
   constructor(

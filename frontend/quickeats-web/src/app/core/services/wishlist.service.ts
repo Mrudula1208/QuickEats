@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { environment } from '../../../environments/environment';
 // Makes this file an Angular Service.
 
 import { HttpClient } from '@angular/common/http';
@@ -19,7 +20,7 @@ import { WishlistModel } from '../models/wishlist.model';
 export class WishlistService {
 
   // Backend API URL.
-  private apiUrl = 'https://localhost:7278/api/Wishlist';
+  private apiUrl = `${environment.apiUrl}/Wishlist`;
 
   constructor(
 

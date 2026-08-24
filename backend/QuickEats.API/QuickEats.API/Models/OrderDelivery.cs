@@ -12,6 +12,6 @@
 
         public DateTime AssignedAt { get; set; } = DateTime.UtcNow;
 
-        public Order Order { get; set; } = null;
+        public Order? Order { get; set; }
     }
 }

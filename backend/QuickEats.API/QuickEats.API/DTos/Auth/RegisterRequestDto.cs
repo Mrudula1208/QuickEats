@@ -7,7 +7,7 @@ namespace QuickEats.API.DTos.Auth
     {
         [Required(ErrorMessage = "Name is required")]
         [StringLength(100, MinimumLength = 2, ErrorMessage = "Name must be between 2 and 100 characters")]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Invalid email format")]
@@ -15,11 +15,11 @@ namespace QuickEats.API.DTos.Auth
 
         [Required(ErrorMessage = "Phone number is required")]
         [Phone(ErrorMessage = "Invalid phone number")]
-        public string PhoneNumber { get; set; }
+        public string PhoneNumber { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Password is required")]
         [StringLength(100, MinimumLength = 6, ErrorMessage = "Password must be at least 6 characters")]
-        public string Password { get; set; }
+        public string Password { get; set; } = string.Empty;
 
         public string Role { get; set; } = "Customer";
     }

@@ -1,6 +1,7 @@
 // Service Annotation.
 // Makes this file an Angular Service.
 import { Injectable } from '@angular/core';
+import { environment } from '../../../environments/environment';
 
 // Backend Caller.
 // Calls ASP.NET Core APIs.
@@ -25,7 +26,7 @@ export class SavedAddressService {
 
   // API URL Variable.
   // Stores Backend Address.
-  private apiUrl = 'https://localhost:7278/api/SavedAddress';
+  private apiUrl = `${environment.apiUrl}/SavedAddress`;
 
   constructor(
 

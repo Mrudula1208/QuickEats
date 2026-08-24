@@ -142,27 +142,34 @@ namespace QuickEats.API
             builder.Services.AddScoped<ILoggerService, LoggerService>();
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
-                var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
+                // jwtConfig was already validated (non-null, key length checked) above.
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = jwtSettings.Issuer,
-                    ValidAudience = jwtSettings.Audience,
+                    ValidIssuer = jwtConfig.Issuer,
+                    ValidAudience = jwtConfig.Audience,
                     IssuerSigningKey = new SymmetricSecurityKey(
-    Encoding.UTF8.GetBytes(jwtSettings.Key))
+    Encoding.UTF8.GetBytes(jwtConfig.Key))
                 };
             });
             builder.Services.AddAuthorization();
            
+            // Allowed browser origins come from configuration so production
+            // can override them with the 'Cors__AllowedOrigins__N' environment
+            // variables instead of a code change.
+            var allowedOrigins = builder.Configuration
+                .GetSection("Cors:AllowedOrigins")
+                .Get<string[]>() ?? new[] { "http://localhost:4200" };
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngular",
         policy =>
         {
-            policy.WithOrigins("http://localhost:4200")
+            policy.WithOrigins(allowedOrigins)
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });

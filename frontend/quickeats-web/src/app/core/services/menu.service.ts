@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core'; 
+import { environment } from '../../../environments/environment';
 // We import Injectable so Angular can create and manage this service automatically.
 
 import { HttpClient } from '@angular/common/http';
@@ -18,7 +19,7 @@ import { MenuItem } from '../models/menu.model';
 export class MenuService {
 // We create a service because all API calling logic should be kept outside components.
 
-  private apiUrl = 'https://localhost:7278/api/Menu';
+  private apiUrl = `${environment.apiUrl}/Menu`;
 // We store the API URL in one variable so if the Backend URL changes, we update it only once.
 
   constructor(private http: HttpClient) {}

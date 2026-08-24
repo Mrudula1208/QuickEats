@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { environment } from '../../../environments/environment';
 // Injectable
 // Makes this file an Angular Service.
 
@@ -28,7 +29,7 @@ export class DeliveryService {
 
   // Backend Delivery API URL.
   private apiUrl =
-    'https://localhost:7278/api/OrderDelivery';
+    `${environment.apiUrl}/OrderDelivery`;
 
 
   constructor(

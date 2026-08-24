@@ -3,6 +3,7 @@
 // Angular Service
 
 import { Injectable } from '@angular/core';
+import { environment } from '../../../environments/environment';
 
 // Used to call ASP.NET API
 import { HttpClient } from '@angular/common/http';
@@ -25,7 +26,7 @@ export class AuthService {
 
   // Backend API URL
 
-private apiUrl = 'https://localhost:7278/api/Auth';
+private apiUrl = `${environment.apiUrl}/Auth`;
   constructor(
 
     // Used for calling API

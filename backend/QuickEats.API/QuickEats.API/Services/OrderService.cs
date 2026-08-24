@@ -97,7 +97,7 @@ namespace QuickEats.API.Services
             };
         }
 
-        public async Task <OrderResponseDto>GetByIdAsync(int id)
+        public async Task<OrderResponseDto?> GetByIdAsync(int id)
         {
             var order= await _orderRepository.GetByIdAsync(id);
             if(order== null)
