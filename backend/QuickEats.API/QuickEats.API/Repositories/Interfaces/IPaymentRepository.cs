@@ -7,6 +7,7 @@ namespace QuickEats.API.Repositories.Interfaces
         Task<IEnumerable<Payment>> GetAllAsync();
         Task<Payment> GetByIdAsync(int id);
         Task<Payment>GetByOrderIdAsync(int orderId);
+        Task<IEnumerable<Payment>> GetByUserIdAsync(int userId);
         Task AddAsync(Payment payment);
 
         void Update (Payment payment);

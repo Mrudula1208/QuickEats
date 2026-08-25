@@ -261,6 +261,9 @@ export class CheckoutComponent {
     this.checkoutData.couponDiscount =
       this.customerCheckout.discountAmount;
 
+    this.checkoutData.paymentMethod =
+      this.customerCheckout.paymentMethod;
+
     // Open Payment Page.
     this.router.navigate(['/payment']);
 

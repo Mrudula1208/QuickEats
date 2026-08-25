@@ -19,12 +19,15 @@ import { ImageService } from '../../../core/services/image.service';
 import { Restaurant } from '../../../core/models/restaurant.model';
 // Restaurant structure.
 
+import { AdminNavComponent } from '../../../shared/admin-nav/admin-nav';
+
 @Component({
   selector: 'app-admin-add-restaurant',
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule
+    FormsModule,
+    AdminNavComponent
   ],
   templateUrl: './admin-add-restaurant.html',
   styleUrl: './admin-add-restaurant.scss'

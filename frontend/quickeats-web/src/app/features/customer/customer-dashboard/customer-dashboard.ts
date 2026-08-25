@@ -162,6 +162,7 @@ export class CustomerDashboardComponent {
     localStorage.removeItem('name');
     localStorage.removeItem('email');
     localStorage.removeItem('role');
+    localStorage.removeItem('profileImageUrl');
 
     this.toastr.success('Logged out successfully');
 

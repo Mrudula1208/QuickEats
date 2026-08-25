@@ -61,6 +61,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
           localStorage.removeItem('name');
           localStorage.removeItem('email');
           localStorage.removeItem('role');
+          localStorage.removeItem('profileImageUrl');
           router.navigate(['/login']);
           break;
 

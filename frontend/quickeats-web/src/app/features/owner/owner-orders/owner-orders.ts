@@ -73,6 +73,7 @@ export class OwnerOrdersComponent {
       .updateOrderStatusApi(order.id, order.status)
       .subscribe({
         next: () => {
+          this.loadOrders();
         },
         error: (err) => {
           alert(err.error || 'Failed to update status.');

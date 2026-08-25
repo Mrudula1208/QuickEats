@@ -15,7 +15,7 @@ payments :Payment[]=[];
   constructor (
     private paymentService:PaymentService
   ){
-    this.paymentService.getPayments().subscribe({
+    this.paymentService.getUserPayments(Number(localStorage.getItem('userId'))).subscribe({
       next: (data) => {
         this.payments = data;
       },

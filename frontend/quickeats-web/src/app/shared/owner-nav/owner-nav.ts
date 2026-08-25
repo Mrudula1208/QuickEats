@@ -27,6 +27,7 @@ export class OwnerNavComponent {
     localStorage.removeItem('name');
     localStorage.removeItem('email');
     localStorage.removeItem('role');
+    localStorage.removeItem('profileImageUrl');
 
     this.router.navigate(['/login']);
   }

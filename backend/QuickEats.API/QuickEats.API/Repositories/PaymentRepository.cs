@@ -32,6 +32,13 @@ namespace QuickEats.API.Repositories
             return await _context.Payments.FirstOrDefaultAsync(p => p.OrderId == orderId);
         }
 
+        public async Task<IEnumerable<Payment>> GetByUserIdAsync(int userId)
+        {
+            return await _context.Payments
+                .Where(p => _context.Orders.Any(o => o.Id == p.OrderId && o.UserId == userId))
+                .ToListAsync();
+        }
+
 
         public async Task AddAsync(Payment payment)
         {

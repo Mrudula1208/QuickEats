@@ -10,6 +10,8 @@ namespace QuickEats.API.Services.Interfaces
 
         Task<PaymentResponseDto?> GetByOrderIdAsync(int orderId);
 
+        Task<IEnumerable<PaymentResponseDto>> GetByUserIdAsync(int userId);
+
         Task CreateAsync(CreatePaymentDto dto);
 
         Task UpdateStatusAsync(int id, UpdatePaymentStatusDto dto);

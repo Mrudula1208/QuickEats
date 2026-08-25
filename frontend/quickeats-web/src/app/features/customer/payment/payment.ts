@@ -91,10 +91,19 @@ export class PaymentComponent {
 
     this.couponDiscount = this.checkoutData.couponDiscount;
 
+    // Read payment method from checkout.
+    this.paymentMethod = this.checkoutData.paymentMethod;
+
   }
 
   // Runs when user clicks "Pay Now".
   payNow(): void {
+
+    // Guard: redirect if no checkout data (direct URL access).
+    if (!this.checkoutData.cartItems || this.checkoutData.cartItems.length === 0) {
+      this.router.navigate(['/cart']);
+      return;
+    }
 
     // Take the restaurant id from the first cart item.
     const restaurantId =

@@ -89,6 +89,25 @@ namespace QuickEats.API.Services
             };
         }
 
+        //========================================================
+        // Get Payments By User Id
+        //========================================================
+
+        public async Task<IEnumerable<PaymentResponseDto>> GetByUserIdAsync(int userId)
+        {
+            var payments = await _paymentRepository.GetByUserIdAsync(userId);
+
+            return payments.Select(p => new PaymentResponseDto
+            {
+                Id = p.Id,
+                OrderId = p.OrderId,
+                Amount = p.Amount,
+                PaymentMethod = p.PaymentMethod,
+                PaymentStatus = p.PaymentStatus,
+                PaidAt = p.PaidAt
+            });
+        }
+
         public async Task CreateAsync(CreatePaymentDto dto)
         {
             // Get Order

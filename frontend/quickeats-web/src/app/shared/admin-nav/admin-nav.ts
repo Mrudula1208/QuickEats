@@ -27,6 +27,7 @@ export class AdminNavComponent {
     localStorage.removeItem('name');
     localStorage.removeItem('email');
     localStorage.removeItem('role');
+    localStorage.removeItem('profileImageUrl');
 
     this.router.navigate(['/login']);
   }

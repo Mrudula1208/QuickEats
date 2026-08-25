@@ -6,13 +6,15 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { RestaurantService } from '../../../core/services/restaurant.service';
 import { ImageService } from '../../../core/services/image.service';
 import { Restaurant } from '../../../core/models/restaurant.model';
+import { AdminNavComponent } from '../../../shared/admin-nav/admin-nav';
 
 @Component({
   selector: 'app-admin-edit-restaurant',
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule
+    FormsModule,
+    AdminNavComponent
   ],
   templateUrl: './admin-edit-restaurant.html',
   styleUrl: './admin-edit-restaurant.scss'

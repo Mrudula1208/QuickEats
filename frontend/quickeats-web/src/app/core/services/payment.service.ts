@@ -78,28 +78,20 @@ export class PaymentService {
   ) { }
 
 
-  // Get all payments from Backend.
+  // Get all payments from Backend (Admin only).
   getPayments(): Observable<Payment[]> {
-
-    // this
-    // Refers to the current PaymentService.
-
-    // http
-    // Our HttpClient object.
-
-    // get()
-    // Sends an HTTP GET request.
-
-    // <Payment[]>
-    // Tells TypeScript:
-    // "Backend should return an array of Payment objects."
-
-    // this.apiUrl
-    // Sends the request to:
-    // https://localhost:7278/api/Payment
 
     return this.http.get<Payment[]>(
       this.apiUrl
+    );
+
+  }
+
+  // Get payments for a specific user.
+  getUserPayments(userId: number): Observable<Payment[]> {
+
+    return this.http.get<Payment[]>(
+      `${this.apiUrl}/user/${userId}`
     );
 
   }

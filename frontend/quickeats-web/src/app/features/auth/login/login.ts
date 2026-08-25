@@ -71,7 +71,14 @@ export class LoginComponent {
 
     this.toastr.success('Login Successful', 'Welcome Back');
 
-    this.router.navigate(['/']);
+    const role = response.role;
+    if (role === 'Owner') {
+      this.router.navigate(['/owner']);
+    } else if (role === 'Admin') {
+      this.router.navigate(['/admin/dashboard']);
+    } else {
+      this.router.navigate(['/']);
+    }
   },
 
   error: () => {

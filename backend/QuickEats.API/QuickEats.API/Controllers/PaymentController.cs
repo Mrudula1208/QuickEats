@@ -64,6 +64,17 @@ namespace QuickEats.API.Controllers
         }
 
         /// <summary>
+        /// Gets payments of a specific user (Customer sees own, Admin sees any).
+        /// </summary>
+        /// <param name="userId">User id.</param>
+        [HttpGet("user/{userId}")]
+        public async Task<IActionResult> GetByUserId(int userId)
+        {
+            var payments = await _paymentService.GetByUserIdAsync(userId);
+            return Ok(payments);
+        }
+
+        /// <summary>
         /// Records a new payment for an order (Customer only).
         /// </summary>
         /// <param name="dto">Payment details (order id, amount, method, status).</param>
