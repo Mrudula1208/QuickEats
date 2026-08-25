@@ -60,6 +60,13 @@ namespace QuickEats.API.Controllers
             {
                 return NotFound("Delivery not found.");
             }
+
+            var currentUserId = int.Parse(
+                User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            if (!User.IsInRole("Admin") && delivery.DeliveryPartnerId != currentUserId)
+                return Forbid();
+
             return Ok(delivery);
         }
 
@@ -75,6 +82,13 @@ namespace QuickEats.API.Controllers
             {
                 return NotFound("Delivery not found.");
             }
+
+            var currentUserId = int.Parse(
+                User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            if (!User.IsInRole("Admin") && delivery.DeliveryPartnerId != currentUserId)
+                return Forbid();
+
             return Ok(delivery);
         }
 
@@ -99,7 +113,17 @@ namespace QuickEats.API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateStatus(int id, UpdateDeliveryStatusDto dto)
         {
-           await _orderDeliveryService.UpdateStatusAsync(id, dto);
+            var delivery = await _orderDeliveryService.GetByIdAsync(id);
+            if (delivery == null)
+                return NotFound("Delivery not found.");
+
+            var currentUserId = int.Parse(
+                User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            if (delivery.DeliveryPartnerId != currentUserId)
+                return Forbid();
+
+            await _orderDeliveryService.UpdateStatusAsync(id, dto);
             return Ok("Delivery updated successfully.");
         }
 

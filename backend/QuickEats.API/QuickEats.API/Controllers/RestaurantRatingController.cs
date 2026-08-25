@@ -80,13 +80,23 @@ return Ok(rating);
         }
 
         /// <summary>
-        /// Deletes a rating (Customer only).
+        /// Deletes a rating (Customer only). The customer can only delete their own ratings.
         /// </summary>
         /// <param name="id">Rating id.</param>
         [Authorize(Roles = "Customer")]
         [HttpDelete("{id}")]
         public async Task  <IActionResult> Delete (int id)
         {
+            var rating = await _restaurantRatingService.GetByIdAsync(id);
+            if (rating == null)
+                return NotFound("Rating not found.");
+
+            var currentUserId = int.Parse(
+                User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            if (rating.UserId != currentUserId)
+                return Forbid();
+
             await _restaurantRatingService.DeleteAsync(id);
             return Ok("Restaurant Rating deleted successfully.");
         }

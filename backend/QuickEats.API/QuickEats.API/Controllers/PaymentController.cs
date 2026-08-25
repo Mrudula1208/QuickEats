@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using QuickEats.API.DTos.Payment;
 using QuickEats.API.Models;
 using QuickEats.API.Services.Interfaces;
+using System.Security.Claims;
 
 namespace QuickEats.API.Controllers
 {
@@ -18,8 +19,10 @@ namespace QuickEats.API.Controllers
     public class PaymentController : ControllerBase
     {
         private readonly IPaymentService _paymentService;
-        public PaymentController(IPaymentService paymentService) {
+        private readonly IOrderService _orderService;
+        public PaymentController(IPaymentService paymentService, IOrderService orderService) {
             _paymentService = paymentService;
+            _orderService = orderService;
         }
 
         /// <summary>
@@ -40,12 +43,23 @@ namespace QuickEats.API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var payments = await _paymentService.GetByIdAsync(id);
-            if (payments == null)
+            var payment = await _paymentService.GetByIdAsync(id);
+            if (payment == null)
             {
                 return NotFound("Payment not found.");
             }
-            return Ok(payments);
+
+            var currentUserId = int.Parse(
+                User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            if (!User.IsInRole("Admin"))
+            {
+                var order = await _orderService.GetByIdAsync(payment.OrderId);
+                if (order == null || order.UserId != currentUserId)
+                    return Forbid();
+            }
+
+            return Ok(payment);
         }
 
         /// <summary>
@@ -55,12 +69,23 @@ namespace QuickEats.API.Controllers
         [HttpGet("order/{orderId}")]
         public async Task<IActionResult> GetByOrderId(int orderId)
         {
-            var payments = await _paymentService.GetByOrderIdAsync(orderId);
-            if (payments == null) {
+            var payment = await _paymentService.GetByOrderIdAsync(orderId);
+            if (payment == null) {
                 return NotFound("Payment not found.");
 
             }
-            return Ok(payments);
+
+            var currentUserId = int.Parse(
+                User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            if (!User.IsInRole("Admin"))
+            {
+                var order = await _orderService.GetByIdAsync(orderId);
+                if (order == null || order.UserId != currentUserId)
+                    return Forbid();
+            }
+
+            return Ok(payment);
         }
 
         /// <summary>
@@ -70,6 +95,12 @@ namespace QuickEats.API.Controllers
         [HttpGet("user/{userId}")]
         public async Task<IActionResult> GetByUserId(int userId)
         {
+            var currentUserId = int.Parse(
+                User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            if (!User.IsInRole("Admin") && currentUserId != userId)
+                return Forbid();
+
             var payments = await _paymentService.GetByUserIdAsync(userId);
             return Ok(payments);
         }
@@ -82,6 +113,16 @@ namespace QuickEats.API.Controllers
         [HttpPost]
         public async Task <IActionResult> Create (CreatePaymentDto dto)
         {
+            var currentUserId = int.Parse(
+                User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            var order = await _orderService.GetByIdAsync(dto.OrderId);
+            if (order == null)
+                return NotFound("Order not found.");
+
+            if (order.UserId != currentUserId)
+                return Forbid();
+
             await _paymentService.CreateAsync(dto);
             return Ok("Payment created successfully.");
         }

@@ -19,10 +19,12 @@ namespace QuickEats.API.Controllers
     {
         private readonly IOrderService _orderService;
         private readonly IRestaurantService _restaurantService;
-        public OrderController(IOrderService orderService, IRestaurantService restaurantService)
+        private readonly IOrderDeliveryService _orderDeliveryService;
+        public OrderController(IOrderService orderService, IRestaurantService restaurantService, IOrderDeliveryService orderDeliveryService)
         {
             _orderService = orderService;
             _restaurantService = restaurantService;
+            _orderDeliveryService = orderDeliveryService;
         }
 
         /// <summary>
@@ -50,6 +52,26 @@ namespace QuickEats.API.Controllers
             {
                 return NotFound($"Order with id {id} not found.");
             }
+
+            var currentUserId = int.Parse(
+                User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            if (User.IsInRole("Admin"))
+                return Ok(order);
+
+            if (User.IsInRole("Customer") && order.UserId != currentUserId)
+                return Forbid();
+
+            if (User.IsInRole("Owner") && !await IsOrderOfOwner(id))
+                return Forbid();
+
+            if (User.IsInRole("DeliveryPartner"))
+            {
+                var delivery = await _orderDeliveryService.GetByOrderidAsync(id);
+                if (delivery == null || delivery.DeliveryPartnerId != currentUserId)
+                    return Forbid();
+            }
+
             return Ok(order);
         }
         
@@ -62,8 +84,6 @@ namespace QuickEats.API.Controllers
     [HttpGet("user/{userId}")]
             public async Task<IActionResult> GetByUserId(int userId)
             {
-                Console.WriteLine($"UserId from URL = {userId}");
-
                 // A customer can only view their own orders.
                 var currentUserId = int.Parse(
                     User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
@@ -74,8 +94,6 @@ namespace QuickEats.API.Controllers
                 }
 
                 var orders = await _orderService.GetByUserIdAsync(userId);
-
-                Console.WriteLine($"Orders Count = {orders.Count()}");
 
                 return Ok(orders);
             }

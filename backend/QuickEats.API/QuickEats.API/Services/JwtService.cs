@@ -36,7 +36,7 @@ namespace QuickEats.API.Services
                 issuer: _jwtSettings.Issuer,
                 audience: _jwtSettings.Audience,
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(_jwtSettings.ExpiresInMinutes),
+                expires: DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiresInMinutes),
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);

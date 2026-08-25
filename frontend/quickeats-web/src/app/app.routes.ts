@@ -111,12 +111,14 @@ export const routes: Routes = [
     path: 'dashboard',
     loadComponent: () =>
         import('./features/customer/customer-dashboard/customer-dashboard')
-            .then(m => m.CustomerDashboardComponent)
+            .then(m => m.CustomerDashboardComponent),
+    canActivate: [authGuard]
 },{
     path: 'profile',
     loadComponent: () =>
         import('./features/customer/profile/profile')
-        .then(m => m.ProfileComponent)
+        .then(m => m.ProfileComponent),
+    canActivate: [authGuard]
 },
 {
     path: 'wishlist',

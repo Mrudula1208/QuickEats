@@ -30,7 +30,6 @@ namespace QuickEats.API.Services
                 throw new BadRequestException("User already exists");
             }
 
-            Console.WriteLine(request.Role);
             var user = new User
             {
                 Name = request.Name,
