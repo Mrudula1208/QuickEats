@@ -36,7 +36,7 @@ namespace QuickEats.API.Services
             return response; }
 
 
-        public async Task<RestaurantRatingResponseDto> GetByIdAsync(int id)
+        public async Task<RestaurantRatingResponseDto?> GetByIdAsync(int id)
         {
             var rating = await _restaurantRatingRepository.GetByIdAsync(id);
 

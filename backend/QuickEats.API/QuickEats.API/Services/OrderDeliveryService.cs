@@ -33,7 +33,7 @@ namespace QuickEats.API.Services
 
 
 
-        public async Task <OrderDeliveryResponseDto>GetByIdAsync(int id)
+        public async Task <OrderDeliveryResponseDto?>GetByIdAsync(int id)
         {
             var delivery = await _orderDeliveryRepository.GetByIdAsync(id);
             if (delivery == null)
@@ -45,7 +45,7 @@ namespace QuickEats.API.Services
 
         }
 
-        public async Task <OrderDeliveryResponseDto> GetByOrderidAsync(int orderId)
+        public async Task <OrderDeliveryResponseDto?> GetByOrderidAsync(int orderId)
         {
             var delivery = await _orderDeliveryRepository.GetByOrderIdAsync(orderId);
             if (delivery == null)

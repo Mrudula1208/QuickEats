@@ -19,11 +19,11 @@ namespace QuickEats.API.Repositories
         private IQueryable<OrderDelivery> QueryWithOrder()
         {
             return _context.OrderDeliveries
-                .Include(d => d.Order)
+                .Include(d => d.Order!)
                     .ThenInclude(o => o.User)
-                .Include(d => d.Order)
+                .Include(d => d.Order!)
                     .ThenInclude(o => o.Restaurant)
-                .Include(d => d.Order)
+                .Include(d => d.Order!)
                     .ThenInclude(o => o.OrderItems)
                         .ThenInclude(oi => oi.MenuItem);
         }
@@ -34,13 +34,13 @@ namespace QuickEats.API.Repositories
 
         }
 
-        public async Task <OrderDelivery> GetByIdAsync(int id)
+        public async Task <OrderDelivery?> GetByIdAsync(int id)
         {
             return await QueryWithOrder()
                 .FirstOrDefaultAsync(o => o.Id == id);
 
         }
-        public async Task <OrderDelivery> GetByOrderIdAsync(int orderId)
+        public async Task <OrderDelivery?> GetByOrderIdAsync(int orderId)
         {
             return await QueryWithOrder()
                 .FirstOrDefaultAsync(o=>o.OrderId==orderId);

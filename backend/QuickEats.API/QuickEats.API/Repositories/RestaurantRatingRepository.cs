@@ -19,7 +19,7 @@ namespace QuickEats.API.Repositories
             return await _context.RestaurantRatings.ToListAsync();
         }
 
-        public async Task <RestaurantRating>GetByIdAsync(int id)
+        public async Task <RestaurantRating?>GetByIdAsync(int id)
         {
             return await _context.RestaurantRatings.FirstOrDefaultAsync(r => r.Id == id);
         }
