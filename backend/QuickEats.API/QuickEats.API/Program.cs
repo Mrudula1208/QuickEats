@@ -177,7 +177,11 @@ if (jwtConfig.Key.Length < 32)
                 c.RoutePrefix = "swagger"; // Exposes the page at your /swagger URL path
             });
 
-            app.UseHttpsRedirection();
+            // Only redirect to HTTPS if not running in Production (Somee Free uses HTTP port 80)
+            if (!app.Environment.IsProduction())
+            {
+                app.UseHttpsRedirection();
+            }
             
             // Standard middleware setup
             app.UseRouting();
