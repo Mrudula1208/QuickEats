@@ -3,12 +3,6 @@
   publish = "dist/quickeats-web/browser"
 
 [[redirects]]
-  from = "/uploads/*"
-  to = "http://quickeats.somee.com/uploads/:splat"
-  status = 200
-  force = true
-
-[[redirects]]
   from = "/api/*"
   to = "http://quickeats.somee.com/api/:splat"
   status = 200

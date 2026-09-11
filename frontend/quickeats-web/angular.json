@@ -29,6 +29,11 @@
     "input": "src/assets",
     "output": "assets"
   },
+  {
+    "glob": "**/*",
+    "input": "public/uploads",
+    "output": "uploads"
+  },
   "src/_redirects"
 
             ],
