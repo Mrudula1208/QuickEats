@@ -197,32 +197,89 @@ if (jwtConfig.Key.Length < 32)
                 try
                 {
                     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                    var rider = db.Users.FirstOrDefault(u => u.Email == "rider@gmail.com");
-                    if (rider == null)
+                    // Ensure all 4 demo accounts exist with known passwords and roles
+                    var demoAccounts = new[]
                     {
-                        db.Users.Add(new QuickEats.API.Models.User
+                        new { Name = "Admin", Email = "admin@gmail.com", Role = "Admin", Password = "Admin@123", Phone = "9999999999" },
+                        new { Name = "Pizza Owner", Email = "owner@gmail.com", Role = "Owner", Password = "Owner@123", Phone = "9888888888" },
+                        new { Name = "Alex Rider", Email = "rider@gmail.com", Role = "DeliveryPartner", Password = "Password@123", Phone = "9876543210" },
+                        new { Name = "John Doe", Email = "customer@gmail.com", Role = "Customer", Password = "Password@123", Phone = "9111111111" }
+                    };
+
+                    foreach (var acc in demoAccounts)
+                    {
+                        var user = db.Users.FirstOrDefault(u => u.Email == acc.Email);
+                        if (user == null)
                         {
-                            Name = "Alex Rider",
-                            Email = "rider@gmail.com",
-                            PhoneNumber = "9876543210",
-                            PasswordHash = QuickEats.API.Helpers.PasswordHasher.Hash("Password@123"),
-                            Role = "DeliveryPartner",
-                            IsActive = true,
-                            CreatedAt = DateTime.UtcNow
-                        });
-                        db.SaveChanges();
+                            db.Users.Add(new QuickEats.API.Models.User
+                            {
+                                Name = acc.Name,
+                                Email = acc.Email,
+                                PhoneNumber = acc.Phone,
+                                PasswordHash = QuickEats.API.Helpers.PasswordHasher.Hash(acc.Password),
+                                Role = acc.Role,
+                                IsActive = true,
+                                CreatedAt = DateTime.UtcNow
+                            });
+                        }
+                        else
+                        {
+                            user.Name = acc.Name;
+                            user.Role = acc.Role;
+                            user.PasswordHash = QuickEats.API.Helpers.PasswordHasher.Hash(acc.Password);
+                            user.IsActive = true;
+                        }
                     }
-                    else
+                    db.SaveChanges();
+
+                    var rider = db.Users.FirstOrDefault(u => u.Email == "rider@gmail.com");
+
+                    // Seed realistic demo deliveries and order states if no deliveries exist
+                    if (!db.OrderDeliveries.Any() && rider != null)
                     {
-                        rider.PasswordHash = QuickEats.API.Helpers.PasswordHasher.Hash("Password@123");
-                        rider.IsActive = true;
-                        rider.Role = "DeliveryPartner";
-                        db.SaveChanges();
+                        var availableOrders = db.Orders.Take(6).ToList();
+                        if (availableOrders.Count >= 3)
+                        {
+                            availableOrders[0].Status = "Delivered";
+                            availableOrders[1].Status = "Out for Delivery";
+                            availableOrders[2].Status = "Assigned";
+                            if (availableOrders.Count >= 4) availableOrders[3].Status = "Ready for Pickup";
+                            if (availableOrders.Count >= 5) availableOrders[4].Status = "Preparing";
+                            if (availableOrders.Count >= 6) availableOrders[5].Status = "Confirmed";
+
+                            db.OrderDeliveries.AddRange(
+                                new QuickEats.API.Models.OrderDelivery
+                                {
+                                    OrderId = availableOrders[0].Id,
+                                    DeliveryPartnerId = rider.Id,
+                                    DeliveryStatus = "Delivered",
+                                    AssignedAt = DateTime.UtcNow.AddHours(-4),
+                                    PickedUpAt = DateTime.UtcNow.AddHours(-3),
+                                    DeliveredAt = DateTime.UtcNow.AddHours(-3)
+                                },
+                                new QuickEats.API.Models.OrderDelivery
+                                {
+                                    OrderId = availableOrders[1].Id,
+                                    DeliveryPartnerId = rider.Id,
+                                    DeliveryStatus = "Out for Delivery",
+                                    AssignedAt = DateTime.UtcNow.AddMinutes(-45),
+                                    PickedUpAt = DateTime.UtcNow.AddMinutes(-15)
+                                },
+                                new QuickEats.API.Models.OrderDelivery
+                                {
+                                    OrderId = availableOrders[2].Id,
+                                    DeliveryPartnerId = rider.Id,
+                                    DeliveryStatus = "Assigned",
+                                    AssignedAt = DateTime.UtcNow.AddMinutes(-10)
+                                }
+                            );
+                            db.SaveChanges();
+                        }
                     }
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"[Startup] Warning: Could not seed rider account: {ex.Message}");
+                    Console.WriteLine($"[Startup] Warning: Could not seed rider/deliveries: {ex.Message}");
                 }
             }
 
