@@ -24,5 +24,9 @@ namespace QuickEats.API.Services.Interfaces
         // Delete one Coupon.
 
         Task DeleteAsync(int id);
+
+        // Update one Coupon.
+
+        Task UpdateAsync(int id, UpdateCouponDto dto);
     }
 }

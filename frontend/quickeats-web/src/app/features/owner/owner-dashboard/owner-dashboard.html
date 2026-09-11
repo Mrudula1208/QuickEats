@@ -1,45 +1,201 @@
 <app-owner-nav></app-owner-nav>
 
-<div class="owner-page">
+<section class="od-hero">
+  <div class="od-hero-inner">
+    <h1>Welcome back, {{ ownerName }}</h1>
+    <p>Here's what's happening with your restaurants today</p>
+  </div>
+</section>
 
-    <h1>Dashboard</h1>
+<section class="od-content">
+  <div class="od-container">
 
-    <p>Welcome back, {{ ownerName }}</p>
+    @if (isLoading()) {
+      <div class="od-loading">
+        <span class="material-icons spinning">progress_activity</span>
+        <p>Loading dashboard...</p>
+      </div>
+    } @else if (loadError() && restaurants().length === 0) {
+      <div class="od-error">
+        <span class="material-icons">cloud_off</span>
+        <h3>Couldn't load your dashboard</h3>
+        <p>{{ loadError() }}</p>
+        <button class="od-retry-btn" (click)="retry()">
+          <span class="material-icons">refresh</span>
+          Try Again
+        </button>
+      </div>
+    } @else {
+      <!-- Partial load warning -->
+      @if (loadError()) {
+        <div class="od-banner">
+          <span class="material-icons">warning</span>
+          <span>{{ loadError() }}</span>
+          <button (click)="retry()">Try Again</button>
+        </div>
+      }
 
-    <div class="stats-grid">
-
-        <div class="stat-card">
-
-            <h2>{{ restaurantCount }}</h2>
-
-            <p>My Restaurants</p>
-
+      <!-- Stats Grid -->
+      <div class="od-stats">
+        <div class="od-stat-card stat-revenue">
+          <div class="od-stat-icon">
+            <span class="material-icons">payments</span>
+          </div>
+          <div class="od-stat-info">
+            <span class="od-stat-value">₹{{ revenue | number:'1.0-0' }}</span>
+            <span class="od-stat-label">Total Revenue</span>
+          </div>
         </div>
 
-        <div class="stat-card">
-
-            <h2>{{ orderCount }}</h2>
-
-            <p>Total Orders</p>
-
+        <div class="od-stat-card stat-orders">
+          <div class="od-stat-icon">
+            <span class="material-icons">receipt_long</span>
+          </div>
+          <div class="od-stat-info">
+            <span class="od-stat-value">{{ totalOrders }}</span>
+            <span class="od-stat-label">Total Orders</span>
+          </div>
         </div>
 
-        <div class="stat-card">
-
-            <h2>₹{{ revenue }}</h2>
-
-            <p>Total Revenue</p>
-
+        <div class="od-stat-card stat-today">
+          <div class="od-stat-icon">
+            <span class="material-icons">today</span>
+          </div>
+          <div class="od-stat-info">
+            <span class="od-stat-value">{{ todayOrders }}</span>
+            <span class="od-stat-label">Today's Orders</span>
+          </div>
         </div>
 
-    </div>
+        <div class="od-stat-card stat-pending">
+          <div class="od-stat-icon">
+            <span class="material-icons">pending_actions</span>
+          </div>
+          <div class="od-stat-info">
+            <span class="od-stat-value">{{ pendingOrders }}</span>
+            <span class="od-stat-label">Pending Orders</span>
+          </div>
+        </div>
+      </div>
 
-    <div class="quick-links">
+      <!-- Restaurant Status -->
+      @if (mainRestaurant) {
+        <div class="od-status-card">
+          <div class="od-status-icon">
+            <span class="material-icons">storefront</span>
+          </div>
+          <div class="od-status-info">
+            <span class="od-status-label">My Restaurant</span>
+            <span class="od-status-name">{{ mainRestaurant.name }}</span>
+            <span class="od-status-hours">
+              <span class="material-icons">schedule</span>
+              {{ mainRestaurant.openingTime }} - {{ mainRestaurant.closingTime }}
+            </span>
+          </div>
+          <div class="od-status-right">
+            @if (mainRestaurant.isOpenNow) {
+              <span class="od-open-badge">
+                <span class="od-status-dot od-status-dot--open"></span>
+                Open Now
+              </span>
+            } @else {
+              <span class="od-open-badge od-open-badge--closed">
+                <span class="od-status-dot od-status-dot--closed"></span>
+                Closed
+              </span>
+            }
+            @if (!mainRestaurant.isActive) {
+              <span class="od-inactive-tag">Deactivated</span>
+            }
+          </div>
+        </div>
+      }
 
-        <a routerLink="/owner/restaurants">Manage Restaurants</a>
+      <!-- Two Column Layout -->
+      <div class="od-grid">
+        <!-- Recent Orders -->
+        <div class="od-card">
+          <div class="od-card-header">
+            <h3>
+              <span class="material-icons">recent_actors</span>
+              Recent Orders
+            </h3>
+            <a routerLink="/owner/orders" class="od-view-all">View All</a>
+          </div>
+          <div class="od-card-body">
+            @if (recentOrders().length === 0) {
+              <div class="od-empty-inline">
+                <span class="material-icons">inbox</span>
+                <p>No orders yet</p>
+              </div>
+            } @else {
+              @for (order of recentOrders(); track order.id) {
+                <div class="od-order-row">
+                  <div class="od-order-avatar">{{ getInitial(order.customerName) }}</div>
+                  <div class="od-order-info">
+                    <h4>{{ order.customerName }}</h4>
+                    <small>{{ order.restaurantName }} &middot; {{ order.items.length }} items</small>
+                  </div>
+                  <div class="od-order-meta">
+                    <span class="od-order-amount">₹{{ order.totalAmount }}</span>
+                    <span class="od-order-status" [class]="getStatusClass(order.status)">{{ order.status }}</span>
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        </div>
 
-        <a routerLink="/owner/orders">View Orders</a>
+        <!-- Popular Items -->
+        <div class="od-card">
+          <div class="od-card-header">
+            <h3>
+              <span class="material-icons">trending_up</span>
+              Popular Items
+            </h3>
+          </div>
+          <div class="od-card-body">
+            @if (popularItems.length === 0) {
+              <div class="od-empty-inline">
+                <span class="material-icons">restaurant_menu</span>
+                <p>No items ordered yet</p>
+              </div>
+            } @else {
+              @for (item of popularItems; track item.name) {
+                <div class="od-popular-row">
+                  <div class="od-popular-rank">{{ $index + 1 }}</div>
+                  <div class="od-popular-info">
+                    <h4>{{ item.name }}</h4>
+                    <small>{{ item.restaurant }}</small>
+                  </div>
+                  <span class="od-popular-count">{{ item.count }} ordered</span>
+                </div>
+              }
+            }
+          </div>
+        </div>
+      </div>
 
-    </div>
+      <!-- Quick Links -->
+      <div class="od-links">
+        <a routerLink="/owner/restaurants" class="od-link-card">
+          <span class="material-icons">storefront</span>
+          <span>My Restaurant</span>
+        </a>
+        <a [routerLink]="mainRestaurantMenuLink" class="od-link-card">
+          <span class="material-icons">restaurant_menu</span>
+          <span>Manage Menu</span>
+        </a>
+        <a routerLink="/owner/orders" class="od-link-card">
+          <span class="material-icons">receipt_long</span>
+          <span>Orders</span>
+        </a>
+        <a routerLink="/owner/reviews" class="od-link-card">
+          <span class="material-icons">rate_review</span>
+          <span>Reviews</span>
+        </a>
+      </div>
+    }
 
-</div>
+  </div>
+</section>

@@ -1,163 +1,134 @@
 <app-owner-nav></app-owner-nav>
 
-<div class="owner-page form-page">
+<section class="omf-hero">
+  <div class="omf-hero-inner">
+    <h1>{{ isEdit ? 'Edit Menu Item' : 'Add Menu Item' }}</h1>
+    <p>{{ isEdit ? 'Update item details below' : 'Add a new item to your restaurant menu' }}</p>
+  </div>
+</section>
 
-    <h1>
+<section class="omf-content">
+  <div class="omf-container">
+    <form #menuForm="ngForm" (ngSubmit)="saveItem()" class="omf-form">
 
-        @if(isEdit){
-            Edit Menu Item
-        }
-        @else{
-            Add Menu Item
-        }
+      <div class="omf-grid">
 
-    </h1>
+        <div class="omf-left">
+          <div class="omf-card">
+            <h3><span class="material-icons">info</span> Basic Details</h3>
 
-    <form #menuForm="ngForm" (ngSubmit)="saveItem()">
+            <div class="omf-field">
+              <label>Item Name *</label>
+              <input type="text" placeholder="e.g. Butter Chicken" name="name"
+                [(ngModel)]="item.name" required minlength="2" maxlength="200" #name="ngModel">
+              @if (name.invalid && name.touched) {
+                <span class="omf-error">
+                  @if (name.errors?.['required']) { Name is required }
+                  @else if (name.errors?.['minlength']) { Minimum 2 characters }
+                </span>
+              }
+            </div>
 
-    <label>Item Name</label>
+            <div class="omf-field">
+              <label>Description</label>
+              <textarea placeholder="Describe this dish..." name="description"
+                [(ngModel)]="item.description" maxlength="1000" rows="3"></textarea>
+            </div>
 
-    <input
-        type="text"
-        placeholder="Enter Name"
-        name="name"
-        [(ngModel)]="item.name"
-        required
-        minlength="2"
-        maxlength="200"
-        #name="ngModel">
-
-    @if (name.invalid && name.touched) {
-        <div class="error">
-            @if (name.errors?.['required']) {
-                Item name is required
-            }
-            @else if (name.errors?.['minlength']) {
-                Name must be at least 2 characters
-            }
+            <div class="omf-row">
+              <div class="omf-field">
+                <label>Category *</label>
+                <select name="category" [(ngModel)]="item.category" required #category="ngModel">
+                  @for (cat of categories; track cat.id) {
+                    <option [value]="cat.name">{{ cat.name }}</option>
+                  }
+                </select>
+              </div>
+              <div class="omf-field">
+                <label>Price (₹) *</label>
+                <input type="number" name="price" [(ngModel)]="item.price"
+                  required min="0.01" max="999999" #price="ngModel">
+                @if (price.invalid && price.touched) {
+                  <span class="omf-error">
+                    @if (price.errors?.['required']) { Price is required }
+                    @else if (price.errors?.['min']) { Minimum ₹0.01 }
+                  </span>
+                }
+              </div>
+              <div class="omf-field">
+                <label>Discount %</label>
+                <input type="number" name="discountPercent" [(ngModel)]="item.discountPercent"
+                  min="0" max="100">
+              </div>
+            </div>
+          </div>
         </div>
-    }
 
-    <label>Description</label>
+        <div class="omf-right">
+          <div class="omf-card">
+            <h3><span class="material-icons">image</span> Item Image</h3>
 
-    <textarea
-        placeholder="Describe this item"
-        name="description"
-        [(ngModel)]="item.description"
-        maxlength="1000"></textarea>
-
-    <label>Price (₹)</label>
-
-    <input
-        type="number"
-        name="price"
-        [(ngModel)]="item.price"
-        required
-        min="0.01"
-        max="999999"
-        #price="ngModel">
-
-    @if (price.invalid && price.touched) {
-        <div class="error">
-            @if (price.errors?.['required']) {
-                Price is required
+            @if (item.imageUrl && !imagePreview) {
+              <div class="omf-preview">
+                <img [src]="item.imageUrl" alt="Current image">
+              </div>
             }
-            @else if (price.errors?.['min']) {
-                Price must be at least 0.01
+
+            <label class="omf-upload">
+              <span class="material-icons">cloud_upload</span>
+              <span>{{ imagePreview ? 'Change Image' : 'Upload Image' }}</span>
+              <input type="file" accept="image/jpeg,image/png,image/webp"
+                (change)="onFileSelected($event)" hidden>
+            </label>
+
+            @if (imagePreview) {
+              <div class="omf-preview">
+                <img [src]="imagePreview" alt="Preview">
+              </div>
             }
+          </div>
+
+          <div class="omf-card">
+            <h3><span class="material-icons">tune</span> Options</h3>
+
+            <div class="omf-toggles">
+              <label class="omf-toggle">
+                <input type="checkbox" name="isVeg" [(ngModel)]="item.isVeg">
+                <span class="omf-switch"></span>
+                <span>Veg</span>
+              </label>
+              <label class="omf-toggle">
+                <input type="checkbox" name="isBestseller" [(ngModel)]="item.isBestseller">
+                <span class="omf-switch"></span>
+                <span>Bestseller</span>
+              </label>
+              <label class="omf-toggle">
+                <input type="checkbox" name="isAvailable" [(ngModel)]="item.isAvailable">
+                <span class="omf-switch"></span>
+                <span>Available</span>
+              </label>
+            </div>
+          </div>
         </div>
-    }
 
-    <!-- Image Upload -->
-    <label>Menu Item Image</label>
+      </div>
 
-    @if (item.imageUrl && !imagePreview) {
-        <img [src]="item.imageUrl" class="image-preview" alt="Current">
-    }
-
-    <input
-        type="file"
-        accept="image/jpeg,image/png,image/webp"
-        (change)="onFileSelected($event)">
-
-    @if (imagePreview) {
-        <img [src]="imagePreview" class="image-preview" alt="New Preview">
-    }
-
-    <label>Category</label>
-
-    <select
-        name="category"
-        [(ngModel)]="item.category"
-        required
-        #category="ngModel">
-
-        @for(cat of categories; track cat.id){
-            <option [value]="cat.name">{{cat.name}}</option>
-        }
-
-    </select>
-
-    <label>Discount %</label>
-
-    <input
-        type="number"
-        name="discountPercent"
-        [(ngModel)]="item.discountPercent"
-        min="0"
-        max="100">
-
-    <div class="switch-row">
-
-        <label>
-
-            <input
-                type="checkbox"
-                name="isVeg"
-                [(ngModel)]="item.isVeg">
-
-            Veg
-
-        </label>
-
-        <label>
-
-            <input
-                type="checkbox"
-                name="isBestseller"
-                [(ngModel)]="item.isBestseller">
-
-            Bestseller
-
-        </label>
-
-        <label>
-
-            <input
-                type="checkbox"
-                name="isAvailable"
-                [(ngModel)]="item.isAvailable">
-
-            Available
-
-        </label>
-
-    </div>
-
-    <button
-        class="save-btn"
-        type="submit"
-        [disabled]="menuForm.invalid || isUploading">
-
-        @if (isUploading) {
+      <div class="omf-actions">
+        <a class="omf-cancel" [routerLink]="['/owner/menu', restaurantId]">Cancel</a>
+        <button class="omf-save" type="submit" [disabled]="menuForm.invalid || isSaving">
+          @if (isSaving) {
+            <span class="material-icons spinning">progress_activity</span>
+            Saving...
+          } @else if (isUploading) {
+            <span class="material-icons spinning">progress_activity</span>
             Uploading...
-        }
-        @else {
-            Save Item
-        }
-
-    </button>
+          } @else {
+            <span class="material-icons">{{ isEdit ? 'save' : 'add_circle' }}</span>
+            {{ isEdit ? 'Update Item' : 'Add Item' }}
+          }
+        </button>
+      </div>
 
     </form>
-
-</div>
+  </div>
+</section>

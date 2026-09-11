@@ -1,0 +1,119 @@
+<div class="help-page">
+  <div class="page-header">
+    <h1>Help & Support</h1>
+    <p>We are here to assist you with any questions, orders, or payment concerns.</p>
+  </div>
+
+  <div class="help-container">
+    <!-- FAQ Section -->
+    <div class="faq-section">
+      <div class="faq-header-controls">
+        <h2>Frequently Asked Questions</h2>
+        
+        <!-- Search bar -->
+        <div class="faq-search-box">
+          <span class="material-icons">search</span>
+          <input 
+            type="text" 
+            placeholder="Search questions or keywords..."
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event)">
+        </div>
+
+        <!-- Category filter chips -->
+        <div class="faq-categories">
+          @for (cat of categories; track cat) {
+            <button 
+              type="button" 
+              class="cat-chip" 
+              [class.active]="selectedCategory() === cat"
+              (click)="selectCategory(cat)">
+              {{ cat }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="faq-list">
+        @if (filteredFaqs().length === 0) {
+          <div class="no-faqs">
+            <span class="material-icons">help_outline</span>
+            <p>No matching questions found. Try a different search or submit a support request.</p>
+          </div>
+        } @else {
+          @for (item of filteredFaqs(); track item.question) {
+            <div class="faq-item" [class.open]="item.isOpen">
+              <div class="faq-question" (click)="toggleFaq(item)">
+                <span class="faq-title">{{ item.question }}</span>
+                <span class="material-icons faq-arrow">{{ item.isOpen ? 'expand_less' : 'expand_more' }}</span>
+              </div>
+              @if (item.isOpen) {
+                <div class="faq-answer">
+                  <p>{{ item.answer }}</p>
+                </div>
+              }
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- Contact Form Section -->
+    <div class="contact-section">
+      <h2>Submit a Support Request</h2>
+      <p class="contact-subtitle">Can't find what you need? Send us a message and our support team will get in touch.</p>
+      
+      <form (ngSubmit)="submitTicket()" #supportForm="ngForm" class="support-form">
+        <div class="form-group">
+          <label for="name">Your Name *</label>
+          <input type="text" id="name" name="name" [(ngModel)]="contactForm.name" required #name="ngModel" placeholder="e.g. John Doe">
+          @if (name.invalid && name.touched) {
+            <span class="form-error">Name is required</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email Address *</label>
+          <input type="email" id="email" name="email" [(ngModel)]="contactForm.email" required email #email="ngModel" placeholder="e.g. john@example.com">
+          @if (email.invalid && email.touched) {
+            <span class="form-error">Please enter a valid email address</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="subject">Topic *</label>
+          <select id="subject" name="subject" [(ngModel)]="contactForm.subject">
+            <option value="Order Help">Order & Delivery Issue</option>
+            <option value="Payment Issue">Payment / Billing Issue</option>
+            <option value="Refund Request">Refund / Cancellation Request</option>
+            <option value="Restaurant Feedback">Restaurant Quality Feedback</option>
+            <option value="General Inquiry">General Inquiry</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="orderId">Order ID <span class="optional">(Optional)</span></label>
+          <input type="text" id="orderId" name="orderId" [(ngModel)]="contactForm.orderId" placeholder="e.g. #1042">
+        </div>
+
+        <div class="form-group">
+          <label for="message">Message *</label>
+          <textarea id="message" name="message" rows="4" [(ngModel)]="contactForm.message" required #message="ngModel" placeholder="Describe the issue you are experiencing..."></textarea>
+          @if (message.invalid && message.touched) {
+            <span class="form-error">Message is required</span>
+          }
+        </div>
+
+        <button type="submit" class="submit-ticket-btn" [disabled]="supportForm.invalid || isSubmitting()">
+          @if (isSubmitting()) {
+            <span class="material-icons spinning">sync</span>
+            Submitting Ticket...
+          } @else {
+            <span class="material-icons">send</span>
+            Submit Request
+          }
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

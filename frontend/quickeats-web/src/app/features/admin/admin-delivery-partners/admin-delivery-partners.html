@@ -1,0 +1,357 @@
+<app-admin-nav></app-admin-nav>
+
+<div class="adp-wrapper">
+  <div class="adp-container">
+    
+    <!-- Header -->
+    <div class="adp-header">
+      <div class="adp-header-left">
+        <div class="adp-breadcrumbs">
+          <span>Admin</span>
+          <span class="material-icons">chevron_right</span>
+          <span class="active">Delivery Partners</span>
+        </div>
+        <h1 class="adp-title">Delivery Partners Management</h1>
+        <p class="adp-subtitle">Manage registered delivery riders, monitor delivery performance, and control account status.</p>
+      </div>
+      <div class="adp-header-actions">
+        <button class="btn-primary" (click)="openAddModal()">
+          <span class="material-icons">person_add</span>
+          Add Delivery Partner
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="adp-stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon stat-icon--total">
+          <span class="material-icons">sports_motorsports</span>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Total Riders</span>
+          <h3>{{ stats().total }}</h3>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon stat-icon--active">
+          <span class="material-icons">check_circle</span>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Active Partners</span>
+          <h3 class="text-success">{{ stats().active }}</h3>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon stat-icon--inactive">
+          <span class="material-icons">block</span>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Inactive Partners</span>
+          <h3 class="text-danger">{{ stats().inactive }}</h3>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon stat-icon--deliveries">
+          <span class="material-icons">task_alt</span>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Completed Deliveries</span>
+          <h3 class="text-info">{{ stats().totalCompleted }}</h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="adp-toolbar">
+      <div class="adp-search-box">
+        <span class="material-icons search-icon">search</span>
+        <input 
+          type="text" 
+          placeholder="Search by name, email, phone, or address..." 
+          [value]="searchText()"
+          (input)="searchText.set($any($event.target).value)"
+          class="search-input"
+        />
+        @if (searchText()) {
+          <button class="clear-btn" (click)="searchText.set('')">
+            <span class="material-icons">close</span>
+          </button>
+        }
+      </div>
+
+      <div class="adp-filter-tabs">
+        <button 
+          class="tab-btn" 
+          [class.active]="selectedFilter() === 'all'"
+          (click)="selectedFilter.set('all')">
+          All ({{ partners().length }})
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="selectedFilter() === 'active'"
+          (click)="selectedFilter.set('active')">
+          Active ({{ stats().active }})
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="selectedFilter() === 'inactive'"
+          (click)="selectedFilter.set('inactive')">
+          Inactive ({{ stats().inactive }})
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    @if (isLoading()) {
+      <div class="adp-state-card">
+        <span class="material-icons spinning state-icon">progress_activity</span>
+        <p>Loading delivery partners...</p>
+      </div>
+    }
+
+    <!-- Error State -->
+    @else if (loadError()) {
+      <div class="adp-state-card">
+        <span class="material-icons text-danger state-icon">error_outline</span>
+        <h3>{{ loadError() }}</h3>
+        <p>Could not retrieve delivery partners list.</p>
+        <button class="btn-primary" (click)="retry()">
+          <span class="material-icons">refresh</span> Try Again
+        </button>
+      </div>
+    }
+
+    <!-- Empty State -->
+    @else if (filteredPartners().length === 0) {
+      <div class="adp-state-card">
+        <span class="material-icons state-icon">person_off</span>
+        <h3>No Delivery Partners Found</h3>
+        <p>There are no delivery partners matching your criteria.</p>
+        @if (searchText() || selectedFilter() !== 'all') {
+          <button class="btn-secondary" (click)="searchText.set(''); selectedFilter.set('all')">
+            Clear Filters
+          </button>
+        }
+      </div>
+    }
+
+    <!-- Partners Table -->
+    @else {
+      <div class="adp-table-card">
+        <div class="table-responsive">
+          <table class="adp-table">
+            <thead>
+              <tr>
+                <th>Partner ID</th>
+                <th>Delivery Rider</th>
+                <th>Contact Info</th>
+                <th>Active Orders</th>
+                <th>Completed</th>
+                <th>Status</th>
+                <th>Joined</th>
+                <th class="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (partner of filteredPartners(); track partner.id) {
+                <tr>
+                  <!-- Partner ID -->
+                  <td>
+                    <span class="id-badge">#{{ partner.id }}</span>
+                  </td>
+
+                  <!-- Name & Avatar -->
+                  <td>
+                    <div class="partner-user-cell">
+                      <div class="avatar" [class.avatar--inactive]="!partner.isActive">
+                        <span class="material-icons">sports_motorsports</span>
+                      </div>
+                      <div class="partner-meta">
+                        <strong class="name">{{ partner.name }}</strong>
+                        <span class="role-tag">Delivery Partner</span>
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- Contact Info -->
+                  <td>
+                    <div class="contact-cell">
+                      <span class="email">
+                        <span class="material-icons">email</span> {{ partner.email }}
+                      </span>
+                      @if (partner.phone) {
+                        <span class="phone">
+                          <span class="material-icons">phone</span> {{ partner.phone }}
+                        </span>
+                      }
+                      @if (partner.address) {
+                        <span class="address" title="{{ partner.address }}">
+                          <span class="material-icons">place</span> {{ partner.address }}
+                        </span>
+                      }
+                    </div>
+                  </td>
+
+                  <!-- Active Orders -->
+                  <td>
+                    <span class="count-badge count-badge--active">
+                      {{ partner.activeDeliveriesCount }} active
+                    </span>
+                  </td>
+
+                  <!-- Completed Deliveries -->
+                  <td>
+                    <span class="count-badge count-badge--completed">
+                      {{ partner.completedDeliveriesCount }} delivered
+                    </span>
+                  </td>
+
+                  <!-- Status -->
+                  <td>
+                    @if (partner.isActive) {
+                      <span class="status-pill status-pill--active">
+                        <span class="dot"></span> Active
+                      </span>
+                    } @else {
+                      <span class="status-pill status-pill--inactive">
+                        <span class="dot"></span> Inactive
+                      </span>
+                    }
+                  </td>
+
+                  <!-- Created At -->
+                  <td>
+                    <span class="date-text">{{ partner.createdAt | date:'mediumDate' }}</span>
+                  </td>
+
+                  <!-- Actions -->
+                  <td class="text-right">
+                    <button 
+                      class="status-toggle-btn"
+                      [class.btn-deactivate]="partner.isActive"
+                      [class.btn-activate]="!partner.isActive"
+                      (click)="toggleStatus(partner)"
+                      title="{{ partner.isActive ? 'Deactivate Account' : 'Activate Account' }}">
+                      <span class="material-icons">
+                        {{ partner.isActive ? 'person_off' : 'check_circle' }}
+                      </span>
+                      {{ partner.isActive ? 'Deactivate' : 'Activate' }}
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- ========================================================= -->
+<!-- MODAL: ADD NEW DELIVERY PARTNER                          -->
+<!-- ========================================================= -->
+@if (isAddModalOpen()) {
+  <div class="modal-backdrop" (click)="closeAddModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="material-icons modal-icon">person_add</span>
+          <div>
+            <h3>Add Delivery Partner</h3>
+            <p>Register a new delivery rider to assign and fulfill orders</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" (click)="closeAddModal()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <form (ngSubmit)="submitAddPartner()">
+          <div class="form-group">
+            <label for="pName">Full Name *</label>
+            <input 
+              type="text" 
+              id="pName" 
+              class="form-control" 
+              placeholder="e.g. John Rider"
+              [(ngModel)]="newPartner.name" 
+              name="name" 
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="pEmail">Email Address *</label>
+            <input 
+              type="email" 
+              id="pEmail" 
+              class="form-control" 
+              placeholder="e.g. rider@quickeats.com"
+              [(ngModel)]="newPartner.email" 
+              name="email" 
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="pPassword">Password *</label>
+            <input 
+              type="password" 
+              id="pPassword" 
+              class="form-control" 
+              placeholder="Minimum 6 characters"
+              [(ngModel)]="newPartner.password" 
+              name="password" 
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="pPhone">Phone Number *</label>
+            <input 
+              type="tel" 
+              id="pPhone" 
+              class="form-control" 
+              placeholder="e.g. 9876543210"
+              [(ngModel)]="newPartner.phone" 
+              name="phone" 
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="pAddress">Service Area / Address</label>
+            <textarea 
+              id="pAddress" 
+              class="form-control" 
+              rows="2" 
+              placeholder="e.g. Sector 18, Central City"
+              [(ngModel)]="newPartner.address" 
+              name="address"
+            ></textarea>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeAddModal()" [disabled]="isSubmitting()">Cancel</button>
+        <button 
+          class="btn-primary" 
+          (click)="submitAddPartner()" 
+          [disabled]="isSubmitting() || !newPartner.name || !newPartner.email || !newPartner.password || !newPartner.phone">
+          @if (isSubmitting()) {
+            <span class="material-icons spinning">progress_activity</span> Registering...
+          } @else {
+            <span class="material-icons">save</span> Create Partner
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}

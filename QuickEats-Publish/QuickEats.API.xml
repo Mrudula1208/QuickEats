@@ -1,0 +1,828 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>QuickEats.API</name>
+    </assembly>
+    <members>
+        <member name="T:QuickEats.API.Controllers.AuthController">
+            <summary>
+            Authentication endpoints: register a new account and log in to receive a JWT token.
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.AuthController.Register(QuickEats.API.DTos.Auth.RegisterRequestDto)">
+            <summary>
+            Registers a new Customer, Owner, or Delivery Partner account.
+            </summary>
+            <remarks>
+            Passwords are stored as BCrypt hashes.
+            </remarks>
+            <param name="request">Registration details (name, email, phone, password, role).</param>
+            <returns>A confirmation message.</returns>
+            <response code="200">Account created successfully.</response>
+            <response code="400">Validation failed (invalid email, short password, etc.).</response>
+        </member>
+        <member name="M:QuickEats.API.Controllers.AuthController.Login(QuickEats.API.DTos.Auth.LoginRequestDto)">
+            <summary>
+            Logs a user in and returns a JWT token with basic profile info.
+            </summary>
+            <param name="request">Email and password of the account.</param>
+            <returns>The JWT token plus user id, name, email, role and profile image URL.</returns>
+            <response code="200">Returns a <see cref="T:QuickEats.API.DTos.Auth.LoginResponseDto"/> with the JWT token.</response>
+            <response code="401">Invalid email or password.</response>
+        </member>
+        <member name="T:QuickEats.API.Controllers.CategoryController">
+            <summary>
+            Menu category management: browse categories (public), manage them (Admin).
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.CategoryController.GetAll">
+            <summary>
+            Gets all menu categories.
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.CategoryController.GetById(System.Int32)">
+            <summary>
+            Gets a single category by id.
+            </summary>
+            <param name="id">Category id.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.CategoryController.Create(QuickEats.API.DTos.Category.CreateCategoryDto)">
+            <summary>
+            Creates a new menu category (Admin only).
+            </summary>
+            <param name="dto">Category name.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.CategoryController.Update(System.Int32,QuickEats.API.DTos.Category.UpdateCategoryDto)">
+            <summary>
+            Renames a menu category (Admin only).
+            </summary>
+            <param name="id">Category id.</param>
+            <param name="dto">New category name.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.CategoryController.Delete(System.Int32)">
+            <summary>
+            Deletes a menu category (Admin only).
+            </summary>
+            <param name="id">Category id.</param>
+        </member>
+        <member name="T:QuickEats.API.Controllers.CouponController">
+            <summary>
+            Discount coupon management: validate coupons (any logged in user) and manage them (Admin).
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.CouponController.GetAll">
+            <summary>
+            Gets all available coupons.
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.CouponController.GetByCode(System.String)">
+            <summary>
+            Gets one coupon by its code (e.g. "SAVE10").
+            </summary>
+            <param name="code">Coupon code.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.CouponController.Create(QuickEats.API.DTos.Coupon.CreateCouponDto)">
+            <summary>
+            Creates a new coupon (Admin only).
+            </summary>
+            <param name="dto">Coupon details (code, discount, minimum order, expiry).</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.CouponController.Update(System.Int32,QuickEats.API.DTos.Coupon.UpdateCouponDto)">
+            <summary>
+            Updates an existing coupon (Admin only).
+            </summary>
+            <param name="id">Coupon id.</param>
+            <param name="dto">Updated coupon details.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.CouponController.Delete(System.Int32)">
+            <summary>
+            Deletes a coupon (Admin only).
+            </summary>
+            <param name="id">Coupon id.</param>
+        </member>
+        <member name="T:QuickEats.API.Controllers.DashboardController">
+            <summary>
+            Dashboard statistics: Admin sees platform-wide totals, Owner sees data for their own restaurants only.
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.DashboardController.GetDashboard">
+            <summary>
+            Gets dashboard statistics. Admin sees platform-wide data; Owner sees only their own restaurant data.
+            </summary>
+        </member>
+        <member name="T:QuickEats.API.Controllers.FavoriteController">
+            <summary>
+            Favorite restaurants of the logged in user.
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.FavoriteController.GetMyFavorites">
+            <summary>
+            Gets all favorite restaurants of the logged in user.
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.FavoriteController.Create(QuickEats.API.DTos.Favorite.CreateFavoriteDto)">
+            <summary>
+            Adds a restaurant to the logged in user's favorites.
+            </summary>
+            <param name="dto">Restaurant id to favorite.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.FavoriteController.Delete(System.Int32)">
+            <summary>
+            Removes a restaurant from the logged in user's favorites.
+            </summary>
+            <param name="id">Favorite id to remove.</param>
+        </member>
+        <member name="T:QuickEats.API.Controllers.ImageController">
+            <summary>
+            Image uploads for restaurants, menu items and profile pictures.
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.ImageController.Upload(System.String,Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            Uploads an image and returns its public URL.
+            </summary>
+            <remarks>
+            Allowed categories: "restaurants", "menu", "profile".
+            Max file size is 5 MB; allowed types are JPG, PNG, WebP and GIF.
+            </remarks>
+            <param name="category">Upload category (restaurants, menu or profile).</param>
+            <param name="file">The image file to upload.</param>
+            <returns>An object with the relative image URL in the "imageUrl" field.</returns>
+            <response code="200">Returns the uploaded image URL.</response>
+            <response code="400">Invalid category, missing file, wrong type or file too large.</response>
+        </member>
+        <member name="T:QuickEats.API.Controllers.MenuController">
+            <summary>
+            Menu item management: browse menus (public) and create/update/delete items (Admin/Owner).
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.MenuController.GetAll">
+            <summary>
+            Gets all menu items of all restaurants.
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.MenuController.GetByID(System.Int32)">
+            <summary>
+            Gets a single menu item by id.
+            </summary>
+            <param name="id">Menu item id.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.MenuController.GetCategories">
+            <summary>
+            Gets all distinct menu categories.
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.MenuController.GetByRestaurantId(System.Int32)">
+            <summary>
+            Gets the full menu of one restaurant.
+            </summary>
+            <param name="restaurantId">Restaurant id.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.MenuController.Create(QuickEats.API.DTos.Menu.CreateMenuDto)">
+            <summary>
+            Creates a new menu item.
+            </summary>
+            <remarks>Owners can only add items to their own restaurants.</remarks>
+            <param name="dto">Menu item details.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.MenuController.Update(System.Int32,QuickEats.API.DTos.Menu.UpdateMenuDto)">
+            <summary>
+            Updates an existing menu item.
+            </summary>
+            <remarks>Owners can only edit items of their own restaurants.</remarks>
+            <param name="id">Menu item id.</param>
+            <param name="dto">Updated menu item details.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.MenuController.Delete(System.Int32)">
+            <summary>
+            Deletes a menu item.
+            </summary>
+            <remarks>Owners can only delete items of their own restaurants.</remarks>
+            <param name="id">Menu item id.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.MenuController.ToggleAvailability(System.Int32)">
+            <summary>
+            Toggles menu item availability (Available / Out of Stock).
+            </summary>
+            <remarks>Owners can only toggle items of their own restaurants.</remarks>
+            <param name="id">Menu item id.</param>
+        </member>
+        <member name="T:QuickEats.API.Controllers.NotificationController">
+            <summary>
+            Notifications of the logged in user (order updates, status changes, etc.).
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.NotificationController.GetMyNotifications">
+            <summary>
+            Gets all notifications of the logged in user.
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.NotificationController.GetUnreadCount">
+            <summary>
+            Gets the unread notification count of the logged in user.
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.NotificationController.MarkAsRead(System.Int32)">
+            <summary>
+            Marks one notification as read.
+            </summary>
+            <param name="id">Notification id.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.NotificationController.MarkAllAsRead">
+            <summary>
+            Marks all notifications of the logged in user as read.
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.NotificationController.Delete(System.Int32)">
+            <summary>
+            Deletes one notification of the logged in user.
+            </summary>
+            <param name="id">Notification id.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.NotificationController.ClearAll">
+            <summary>
+            Clears all notifications of the logged in user.
+            </summary>
+        </member>
+        <member name="T:QuickEats.API.Controllers.OrderController">
+            <summary>
+            Order management: customers place/cancel orders, owners and admins manage order status.
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.OrderController.GetAll">
+            <summary>
+            Gets all orders (Admin only).
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.OrderController.GetByIdAsync(System.Int32)">
+            <summary>
+            Gets a single order by id.
+            </summary>
+            <param name="id">Order id.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.OrderController.GetByUserId(System.Int32)">
+            <summary>
+            Gets all orders of one user. Customers can only view their own orders.
+            </summary>
+            <param name="userId">User id.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.OrderController.GetOwnerOrders">
+            <summary>
+            Gets all orders of the logged in Owner's restaurants.
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.OrderController.Create(QuickEats.API.DTos.Order.CreateOrderDto)">
+            <summary>
+            Places a new order for the logged in Customer.
+            </summary>
+            <param name="dto">Order details (restaurant, address, payment method and items).</param>
+            <returns>The id of the newly created order.</returns>
+        </member>
+        <member name="M:QuickEats.API.Controllers.OrderController.UpdateStatus(System.Int32,QuickEats.API.DTos.Order.UpdateOrderStatusDto)">
+            <summary>
+            Updates the status of an order (Admin, or Owner of the order's restaurant).
+            </summary>
+            <param name="id">Order id.</param>
+            <param name="dto">New status (Pending, Confirmed, Preparing, Ready for Pickup, Out for Delivery, Delivered, Cancelled).</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.OrderController.Cancel(System.Int32)">
+            <summary>
+            Cancels an order belonging to the logged in Customer.
+            </summary>
+            <param name="id">Order id.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.OrderController.Delete(System.Int32)">
+            <summary>
+            Deletes an order permanently (Admin only).
+            </summary>
+            <param name="id">Order id.</param>
+        </member>
+        <member name="T:QuickEats.API.Controllers.OrderDeliveryController">
+            <summary>
+            Delivery management: assign deliveries (Admin) and update delivery status (Delivery Partner).
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.OrderDeliveryController.GetAll">
+            <summary>
+            Gets all deliveries (Admin only).
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.OrderDeliveryController.GetPartnerDeliveries">
+            <summary>
+            Gets the deliveries assigned to the logged in Delivery Partner.
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.OrderDeliveryController.GetById(System.Int32)">
+            <summary>
+            Gets a single delivery by id (Admin, Delivery Partner, or Customer who placed the order).
+            </summary>
+            <param name="id">Delivery id.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.OrderDeliveryController.GetByOrderId(System.Int32)">
+            <summary>
+            Gets the delivery of one order (Admin, Delivery Partner, or Customer who placed the order).
+            </summary>
+            <param name="orderId">Order id.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.OrderDeliveryController.Create(QuickEats.API.DTos.OrderDelivery.CreateOrderDeliveryDto)">
+            <summary>
+            Assigns a delivery partner to an order (Admin only).
+            </summary>
+            <param name="dto">Order id and delivery partner id.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.OrderDeliveryController.UpdateStatus(System.Int32,QuickEats.API.DTos.OrderDelivery.UpdateDeliveryStatusDto)">
+            <summary>
+            Updates the delivery status (Delivery Partner or Admin).
+            </summary>
+            <param name="id">Delivery id.</param>
+            <param name="dto">New status (Assigned, Picked Up, Out for Delivery, Delivered).</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.OrderDeliveryController.Delete(System.Int32)">
+            <summary>
+            Deletes a delivery (Admin only).
+            </summary>
+            <param name="id">Delivery id.</param>
+        </member>
+        <member name="T:QuickEats.API.Controllers.PaymentController">
+            <summary>
+            Payment records for orders: create payments (Customer), view/manage them (Admin).
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.PaymentController.GetAll">
+            <summary>
+            Gets all payments of all users (Admin only).
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.PaymentController.GetById(System.Int32)">
+            <summary>
+            Gets a single payment by id.
+            </summary>
+            <param name="id">Payment id.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.PaymentController.GetByOrderId(System.Int32)">
+            <summary>
+            Gets the payment of one order.
+            </summary>
+            <param name="orderId">Order id.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.PaymentController.GetByUserId(System.Int32)">
+            <summary>
+            Gets payments of a specific user (Customer sees own, Admin sees any).
+            </summary>
+            <param name="userId">User id.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.PaymentController.Create(QuickEats.API.DTos.Payment.CreatePaymentDto)">
+            <summary>
+            Records a new payment for an order (Customer only).
+            </summary>
+            <param name="dto">Payment details (order id, amount, method, status).</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.PaymentController.UpdateStatus(System.Int32,QuickEats.API.DTos.Payment.UpdatePaymentStatusDto)">
+            <summary>
+            Updates a payment status (Admin only).
+            </summary>
+            <param name="id">Payment id.</param>
+            <param name="dto">New status (Pending, Success, Failed, Refunded).</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.PaymentController.Delete(System.Int32)">
+            <summary>
+            Deletes a payment record (Admin only).
+            </summary>
+            <param name="id">Payment id.</param>
+        </member>
+        <member name="T:QuickEats.API.Controllers.RestaurantController">
+            <summary>
+            Restaurant management: browse restaurants (public) and create/update/delete them (Admin/Owner).
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.RestaurantController.GetAllAsync">
+            <summary>
+            Gets all restaurants.
+            </summary>
+            <returns>List of all restaurants.</returns>
+        </member>
+        <member name="M:QuickEats.API.Controllers.RestaurantController.GetById(System.Int32)">
+            <summary>
+            Gets a single restaurant by id.
+            </summary>
+            <param name="id">Restaurant id.</param>
+            <returns>The restaurant details.</returns>
+        </member>
+        <member name="M:QuickEats.API.Controllers.RestaurantController.GetMine">
+            <summary>
+            Gets the restaurants owned by the logged in Owner.
+            </summary>
+            <returns>List of the Owner's restaurants.</returns>
+        </member>
+        <member name="M:QuickEats.API.Controllers.RestaurantController.Create(QuickEats.API.DTos.Restaurant.CreateRestaurantDto)">
+            <summary>
+            Creates a new restaurant.
+            </summary>
+            <remarks>The restaurant is linked to the authenticated user's owner id.</remarks>
+            <param name="dto">Restaurant details.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.RestaurantController.Update(System.Int32,QuickEats.API.DTos.Restaurant.UpdateRestaurantDto)">
+            <summary>
+            Updates an existing restaurant.
+            </summary>
+            <remarks>Owners can only update their own restaurants.</remarks>
+            <param name="id">Restaurant id.</param>
+            <param name="dto">Updated restaurant details.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.RestaurantController.Delete(System.Int32)">
+            <summary>
+            Deletes a restaurant.
+            </summary>
+            <remarks>Owners can only delete their own restaurants.</remarks>
+            <param name="id">Restaurant id.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.RestaurantController.ToggleStatus(System.Int32)">
+            <summary>
+            Toggles the open/closed status of a restaurant.
+            </summary>
+            <remarks>Owners can only toggle their own restaurants.</remarks>
+            <param name="id">Restaurant id.</param>
+        </member>
+        <member name="T:QuickEats.API.Controllers.RestaurantRatingController">
+            <summary>
+            Restaurant star ratings submitted by customers.
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.RestaurantRatingController.GetAll">
+            <summary>
+            Gets all restaurant ratings (Admin only).
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.RestaurantRatingController.GetById(System.Int32)">
+            <summary>
+            Gets a single rating by id.
+            </summary>
+            <param name="id">Rating id.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.RestaurantRatingController.GetByRestaurantId(System.Int32)">
+            <summary>
+            Gets the rating of one restaurant.
+            </summary>
+            <param name="restaurantId">Restaurant id.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.RestaurantRatingController.Create(QuickEats.API.DTos.RestaurantRating.CreateRestaurantRatingDto)">
+            <summary>
+            Rates a restaurant (Customer only). The customer id comes from the JWT token.
+            </summary>
+            <param name="dto">Restaurant id and rating value.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.RestaurantRatingController.Delete(System.Int32)">
+            <summary>
+            Deletes a rating (Customer only). The customer can only delete their own ratings.
+            </summary>
+            <param name="id">Rating id.</param>
+        </member>
+        <member name="T:QuickEats.API.Controllers.ReviewController">
+            <summary>
+            Written restaurant reviews: browse reviews (public), create (Customer) and delete (Admin).
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.ReviewController.GetAll">
+            <summary>
+            Gets all reviews.
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.ReviewController.GetById(System.Int32)">
+            <summary>
+            Gets one review by id.
+            </summary>
+            <param name="id">Review id.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.ReviewController.GetByRestaurantId(System.Int32)">
+            <summary>
+            Gets all reviews of one restaurant.
+            </summary>
+            <param name="restaurantId">Restaurant id.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.ReviewController.GetOwnerReviews">
+            <summary>
+            Gets all reviews for the logged in Owner's restaurants.
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.ReviewController.GetAverageRating(System.Int32)">
+            <summary>
+            Gets the average rating of one restaurant (null when no reviews exist).
+            </summary>
+            <param name="restaurantId">Restaurant id.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.ReviewController.Create(QuickEats.API.DTos.Review.CreateReviewDto)">
+            <summary>
+            Creates a new review (Customer only). The customer id always comes from the JWT token.
+            </summary>
+            <param name="dto">Restaurant id, rating (1-5) and comment.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.ReviewController.Delete(System.Int32)">
+            <summary>
+            Deletes a review (Admin only).
+            </summary>
+            <param name="id">Review id.</param>
+        </member>
+        <member name="T:QuickEats.API.Controllers.SavedAddressController">
+            <summary>
+            Saved delivery addresses of the logged in user.
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.SavedAddressController.GetMyAddresses">
+            <summary>
+            Gets all saved addresses of the logged in user.
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.SavedAddressController.Create(QuickEats.API.DTos.SavedAddress.CreateAddressDto)">
+            <summary>
+            Saves a new address for the logged in user.
+            </summary>
+            <param name="dto">Address details (label, address line, city, pin code).</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.SavedAddressController.Delete(System.Int32)">
+            <summary>
+            Deletes one saved address of the logged in user.
+            </summary>
+            <param name="id">Address id.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.SavedAddressController.SetDefault(System.Int32)">
+            <summary>
+            Sets one address as the default for the logged in user.
+            </summary>
+            <param name="id">Address id.</param>
+        </member>
+        <member name="T:QuickEats.API.Controllers.UserController">
+            <summary>
+            User management: list registered users (Admin) and update profile (any logged in user).
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.UserController.GetAll">
+            <summary>
+            Gets all registered users (Admin only). Passwords are never returned.
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.UserController.GetDeliveryPartners">
+            <summary>
+            Gets all delivery partners with delivery stats (Admin only).
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.UserController.CreateDeliveryPartner(QuickEats.API.DTos.User.CreateDeliveryPartnerDto)">
+            <summary>
+            Creates a new delivery partner account (Admin only).
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.UserController.ToggleUserStatus(System.Int32)">
+            <summary>
+            Toggles active/inactive status for a user or delivery partner (Admin only).
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.UserController.Delete(System.Int32)">
+            <summary>
+            Deletes a user by id (Admin only).
+            </summary>
+            <param name="id">User id.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.UserController.UpdateProfileImage(QuickEats.API.DTos.Auth.UpdateProfileImageDto)">
+            <summary>
+            Updates the profile image URL of the logged in user.
+            </summary>
+            <param name="dto">New profile image URL.</param>
+        </member>
+        <member name="T:QuickEats.API.Controllers.WishlistController">
+            <summary>
+            Saved food items (wishlist) of the logged in customer.
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.WishlistController.GetMyWishlist">
+            <summary>
+            Gets all wishlist items of the logged in customer.
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.WishlistController.Create(QuickEats.API.DTos.Wishlist.CreateWishlistDto)">
+            <summary>
+            Adds a food item into the logged in customer's wishlist.
+            </summary>
+            <param name="dto">Menu item details to save.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.WishlistController.DeleteByMenu(System.Int32)">
+            <summary>
+            Removes one wishlist item using its menu id.
+            </summary>
+            <param name="menuId">Menu item id.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.WishlistController.Clear">
+            <summary>
+            Removes all wishlist items of the logged in customer.
+            </summary>
+        </member>
+        <member name="T:QuickEats.API.DTos.Auth.LoginRequestDto">
+            <summary>Login credentials of an existing account.</summary>
+        </member>
+        <member name="T:QuickEats.API.DTos.Auth.LoginResponseDto">
+            <summary>Successful login result: JWT token plus basic profile info.</summary>
+        </member>
+        <member name="T:QuickEats.API.DTos.Auth.RegisterRequestDto">
+            <summary>Details required to register a new Customer or Owner account.</summary>
+        </member>
+        <member name="T:QuickEats.API.DTos.Coupon.CreateCouponDto">
+            <summary>Details required to create a discount coupon.</summary>
+        </member>
+        <member name="T:QuickEats.API.DTos.Menu.CreateMenuDto">
+            <summary>Details required to create a new menu item.</summary>
+        </member>
+        <member name="T:QuickEats.API.DTos.Order.CreateOrderDto">
+            <summary>Details required to place a new order (restaurant, delivery info and items).</summary>
+        </member>
+        <member name="T:QuickEats.API.DTos.Order.OrderItemDto">
+            <summary>One line item of an order (menu item and quantity).</summary>
+        </member>
+        <member name="T:QuickEats.API.DTos.Order.UpdateOrderStatusDto">
+            <summary>New order status (Pending, Confirmed, Preparing, Out for Delivery, Delivered, Cancelled).</summary>
+        </member>
+        <member name="T:QuickEats.API.DTos.Restaurant.CreateRestaurantDto">
+            <summary>Details required to create a new restaurant.</summary>
+        </member>
+        <member name="T:QuickEats.API.DTos.Restaurant.UpdateRestaurantDto">
+            <summary>Updated restaurant details.</summary>
+        </member>
+        <member name="T:QuickEats.API.Migrations.InitialCreate">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.InitialCreate.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.InitialCreate.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.InitialCreate.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:QuickEats.API.Migrations.AddRestaurantTable">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddRestaurantTable.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddRestaurantTable.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddRestaurantTable.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:QuickEats.API.Migrations.AddCoreEntities">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddCoreEntities.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddCoreEntities.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddCoreEntities.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:QuickEats.API.Migrations.UpdatedField">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.UpdatedField.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.UpdatedField.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.UpdatedField.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:QuickEats.API.Migrations.UpdateUserTable">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.UpdateUserTable.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.UpdateUserTable.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.UpdateUserTable.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:QuickEats.API.Migrations.UpdateOrderDeliveryModel">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.UpdateOrderDeliveryModel.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.UpdateOrderDeliveryModel.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.UpdateOrderDeliveryModel.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:QuickEats.API.Migrations.AddRestaurantOwner">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddRestaurantOwner.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddRestaurantOwner.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddRestaurantOwner.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:QuickEats.API.Migrations.AddReviewTable">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddReviewTable.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddReviewTable.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddReviewTable.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:QuickEats.API.Migrations.AddMenuDetails">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddMenuDetails.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddMenuDetails.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddMenuDetails.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:QuickEats.API.Migrations.AddOrderDetails">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddOrderDetails.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddOrderDetails.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddOrderDetails.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:QuickEats.API.Migrations.AddWishlistCouponNotificationAddressFavorite">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddWishlistCouponNotificationAddressFavorite.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddWishlistCouponNotificationAddressFavorite.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddWishlistCouponNotificationAddressFavorite.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:QuickEats.API.Migrations.AddRestaurantHoursAndProfileImage">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddRestaurantHoursAndProfileImage.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddRestaurantHoursAndProfileImage.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddRestaurantHoursAndProfileImage.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:QuickEats.API.Migrations.AddCategoryTable">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddCategoryTable.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddCategoryTable.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddCategoryTable.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:QuickEats.API.Migrations.AddRestaurantDeliveryFields">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddRestaurantDeliveryFields.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddRestaurantDeliveryFields.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddRestaurantDeliveryFields.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:QuickEats.API.Migrations.AddDeliveryWorkflowAndUserStatus">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddDeliveryWorkflowAndUserStatus.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddDeliveryWorkflowAndUserStatus.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddDeliveryWorkflowAndUserStatus.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+    </members>
+</doc>

@@ -1,233 +1,213 @@
-<div class="order-details-page">
+<!-- Page Header -->
+<section class="page-hero">
+  <div class="container">
+    <a routerLink="/orders" class="breadcrumb">
+      <span class="material-icons">arrow_back</span>
+      Back to Orders
+    </a>
+    <h1 class="page-title">Order Details</h1>
+  </div>
+</section>
 
-    @if(selectedOrder){
+<section class="details-section">
+  <div class="container">
 
-    <div class="order-card">
+    @if (isLoading()) {
+      <div class="loading-state">
+        <span class="material-icons spinning">sync</span>
+        <p>Loading order details...</p>
+      </div>
+    } @else if (!selectedOrder()) {
+      <div class="empty-state">
+        <div class="empty-icon-wrap">
+          <span class="material-icons">receipt_long</span>
+        </div>
+        <h2>Order not found</h2>
+        <p>We couldn't find the requested order</p>
+        <a routerLink="/orders" class="browse-btn">Back to Orders</a>
+      </div>
+    } @else {
 
-        <div class="order-header">
+      <div class="details-layout">
 
-            <div>
+        <!-- Left: Main Content -->
+        <div class="details-main">
 
-                <h1>{{ selectedOrder.restaurantName }}</h1>
-
-                <p>
-
-                    Order ID :
-
-                    <strong>#{{ selectedOrder.id }}</strong>
-
-                </p>
-
+          <!-- Order Header Card -->
+          <div class="card order-header-card">
+            <div class="order-header-top">
+              <div>
+                <h2 class="restaurant-name">{{ selectedOrder()!.restaurantName }}</h2>
+                <span class="order-id">Order #{{ selectedOrder()!.id }}</span>
+              </div>
+              <div class="header-actions">
+                <span class="status-badge" [ngClass]="getStatusClass(selectedOrder()!.status)">
+                  <span class="material-icons">{{ getStatusIcon(selectedOrder()!.status) }}</span>
+                  {{ selectedOrder()!.status }}
+                </span>
+                <button class="refresh-btn" (click)="refreshOrder()" title="Refresh status">
+                  <span class="material-icons">refresh</span>
+                </button>
+              </div>
             </div>
+          </div>
 
-            <button class="refresh-btn" (click)="refreshOrder()">
+          <!-- Tracking Timeline -->
+          @if (selectedOrder()!.status !== 'Cancelled') {
+            <div class="card timeline-card">
+              <h3 class="card-title">
+                <span class="material-icons">timeline</span>
+                Order Progress
+              </h3>
+              <div class="timeline">
+                @for (step of timelineSteps; track step; let i = $index) {
+                  <div class="timeline-step"
+                    [class.completed]="isStepCompleted(i, selectedOrder()!.status)"
+                    [class.active]="isStepActive(i, selectedOrder()!.status)">
+                    <div class="step-circle">
+                      @if (isStepCompleted(i, selectedOrder()!.status)) {
+                        <span class="material-icons">check</span>
+                      } @else {
+                        <span class="step-number">{{ i + 1 }}</span>
+                      }
+                    </div>
+                    <span class="step-label">{{ step }}</span>
+                  </div>
+                  @if (i < timelineSteps.length - 1) {
+                    <div class="step-line" [class.completed]="isStepCompleted(i + 1, selectedOrder()!.status)"></div>
+                  }
+                }
+              </div>
+            </div>
+          } @else {
+            <div class="card cancelled-card">
+              <span class="material-icons">cancel</span>
+              <div>
+                <h3>Order Cancelled</h3>
+                <p>This order has been cancelled</p>
+              </div>
+            </div>
+          }
 
-                ↻ Refresh
+          <!-- Delivery Partner Info -->
+          @if (delivery()) {
+            <div class="card delivery-info-card">
+              <h3 class="card-title">
+                <span class="material-icons">local_shipping</span>
+                Delivery Partner
+              </h3>
+              <div class="delivery-grid">
+                <div class="delivery-item">
+                  <span class="delivery-label">Partner ID</span>
+                  <span class="delivery-value">#{{ delivery()!.deliveryPartnerId }}</span>
+                </div>
+                <div class="delivery-item">
+                  <span class="delivery-label">Assigned At</span>
+                  <span class="delivery-value">{{ delivery()!.assignedAt | date:'medium' }}</span>
+                </div>
+                <div class="delivery-item">
+                  <span class="delivery-label">Delivery Status</span>
+                  <span class="delivery-value">{{ delivery()!.deliveryStatus }}</span>
+                </div>
+              </div>
+            </div>
+          }
 
-            </button>
+          <!-- Ordered Items -->
+          <div class="card items-card">
+            <h3 class="card-title">
+              <span class="material-icons">restaurant</span>
+              Ordered Items
+            </h3>
+            <div class="items-list">
+              @for (item of selectedOrder()!.items; track item.menuItemId) {
+                <div class="item-row">
+                  <div class="item-info">
+                    <span class="item-qty">{{ item.quantity }}x</span>
+                    <span class="item-name">{{ item.name }}</span>
+                  </div>
+                  <span class="item-price">₹{{ item.totalPrice | number:'1.0-0' }}</span>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Order Info -->
+          <div class="card info-card">
+            <h3 class="card-title">
+              <span class="material-icons">info</span>
+              Order Information
+            </h3>
+            <div class="info-grid">
+              <div class="info-row">
+                <span class="info-label">Payment Method</span>
+                <span class="info-value">{{ selectedOrder()!.paymentMethod }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Delivery Address</span>
+                <span class="info-value">{{ selectedOrder()!.deliveryAddress }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Phone Number</span>
+                <span class="info-value">{{ selectedOrder()!.phoneNumber }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Customer Name</span>
+                <span class="info-value">{{ selectedOrder()!.customerName }}</span>
+              </div>
+            </div>
+          </div>
 
         </div>
 
-        <hr>
+        <!-- Right: Amount Summary -->
+        <div class="details-sidebar">
+          <div class="card summary-card">
+            <h3 class="card-title">
+              <span class="material-icons">payments</span>
+              Payment Summary
+            </h3>
 
-        <!-- Status Timeline -->
-
-        @if(selectedOrder.status !== 'Cancelled'){
-
-        <div class="timeline">
-
-            <div class="timeline-step" [class.completed]="isStepCompleted(0, selectedOrder.status)">
-
-                <div class="step-dot"></div>
-
-                <span>Pending</span>
-
+            <div class="summary-amount">
+              <span class="amount-label">Total Amount</span>
+              <span class="amount-value">₹{{ selectedOrder()!.totalAmount | number:'1.0-0' }}</span>
             </div>
 
-            <div class="timeline-line" [class.completed]="isStepCompleted(1, selectedOrder.status)"></div>
-
-            <div class="timeline-step" [class.completed]="isStepCompleted(1, selectedOrder.status)">
-
-                <div class="step-dot"></div>
-
-                <span>Confirmed</span>
-
+            <div class="summary-date">
+              <span class="material-icons">calendar_today</span>
+              {{ selectedOrder()!.createdAt | date:'full' }}
             </div>
 
-            <div class="timeline-line" [class.completed]="isStepCompleted(2, selectedOrder.status)"></div>
-
-            <div class="timeline-step" [class.completed]="isStepCompleted(2, selectedOrder.status)">
-
-                <div class="step-dot"></div>
-
-                <span>Preparing</span>
-
+            <div class="summary-time">
+              <span class="material-icons">schedule</span>
+              {{ selectedOrder()!.createdAt | date:'shortTime' }}
             </div>
 
-            <div class="timeline-line" [class.completed]="isStepCompleted(3, selectedOrder.status)"></div>
-
-            <div class="timeline-step" [class.completed]="isStepCompleted(3, selectedOrder.status)">
-
-                <div class="step-dot"></div>
-
-                <span>Out for Delivery</span>
-
+            <div class="summary-actions">
+              @if (canTrack()) {
+                <button class="action-btn action-btn--track" (click)="trackOrder()">
+                  <span class="material-icons">route</span>
+                  Track Order
+                </button>
+              }
+              @if (canCancel()) {
+                <button class="action-btn action-btn--cancel" (click)="cancelOrder()">
+                  <span class="material-icons">close</span>
+                  Cancel Order
+                </button>
+              }
+              @if (selectedOrder()!.status === 'Delivered') {
+                <button class="action-btn action-btn--wishlist" (click)="addOrderToWishlist()">
+                  <span class="material-icons">favorite_border</span>
+                  Add to Wishlist
+                </button>
+              }
             </div>
-
-            <div class="timeline-line" [class.completed]="isStepCompleted(4, selectedOrder.status)"></div>
-
-            <div class="timeline-step" [class.completed]="isStepCompleted(4, selectedOrder.status)">
-
-                <div class="step-dot"></div>
-
-                <span>Delivered</span>
-
-            </div>
-
+          </div>
         </div>
 
-        }
-
-        @else{
-
-        <div class="cancelled-banner">
-
-            This order has been cancelled.
-
-        </div>
-
-        }
-
-        <hr>
-
-        <!-- Order Items -->
-
-        <h2>Ordered Items</h2>
-
-        <div class="order-items">
-
-            @for(item of selectedOrder.items; track item.menuItemId){
-
-            <div class="item-row">
-
-                <span>
-
-                    {{ item.name }}
-
-                    <small> × {{ item.quantity }}</small>
-
-                </span>
-
-                <span>₹{{ item.totalPrice }}</span>
-
-            </div>
-
-            }
-
-        </div>
-
-        <hr>
-
-        <div class="order-information">
-
-            <div class="information-row">
-
-                <span>Payment Method</span>
-
-                <span>
-
-                    {{ selectedOrder.paymentMethod }}
-
-                </span>
-
-            </div>
-
-            <div class="information-row">
-
-                <span>Total Amount</span>
-
-                <span>
-
-                    ₹{{ selectedOrder.totalAmount }}
-
-                </span>
-
-            </div>
-
-            <div class="information-row">
-
-                <span>Delivery Address</span>
-
-                <span>
-
-                    {{ selectedOrder.deliveryAddress }}
-
-                </span>
-
-            </div>
-
-            <div class="information-row">
-
-                <span>Phone Number</span>
-
-                <span>
-
-                    {{ selectedOrder.phoneNumber }}
-
-                </span>
-
-            </div>
-
-            <div class="information-row">
-
-                <span>Order Status</span>
-
-                <span class="status" [ngClass]="getStatusClass(selectedOrder.status)">
-
-                    {{ selectedOrder.status }}
-
-                </span>
-
-            </div>
-
-        </div>
-
-        <button
-
-            (click)="openDeliveryTracking()">
-
-            Track My Order
-
-        </button>
-
-        @if (canCancel()) {
-            <button
-                class="cancel-btn"
-                (click)="cancelOrder()">
-
-                Cancel Order
-
-            </button>
-        }
-
-    </div>
-
+      </div>
     }
 
-    @else{
-
-    <div class="order-not-found">
-
-        <h2>Order Not Found</h2>
-
-        <p>
-
-            We couldn't find the requested order.
-
-        </p>
-
-    </div>
-
-    }
-
-</div>
+  </div>
+</section>

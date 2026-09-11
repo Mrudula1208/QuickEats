@@ -1,22 +1,342 @@
-.login-container{
+$primary: #E85D3A;
+$primary-dark: #D14A2A;
+$primary-light: #F28C72;
+$primary-bg: #FEF0EC;
+$secondary: #2D6A4F;
+$secondary-light: #52B788;
+$accent: #F4A261;
+$dark: #1B2838;
+$dark-600: #2B3A4E;
+$dark-500: #3D4F63;
+$dark-400: #5A6B7F;
+$dark-300: #8494A7;
+$warm-bg: #FFF8F0;
+$light-bg: #F7F8FC;
+$white: #FFFFFF;
+$border: #E8ECF1;
+$shadow-sm: 0 1px 3px rgba(27, 40, 56, 0.06);
+$shadow-md: 0 4px 16px rgba(27, 40, 56, 0.08);
+$shadow-lg: 0 12px 40px rgba(27, 40, 56, 0.12);
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 16px;
+$radius-xl: 24px;
+$radius-full: 9999px;
+$font-heading: 'DM Sans', sans-serif;
+$font-body: 'Inter', sans-serif;
+$transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
-    width:350px;
-    margin:50px auto;
-    padding:20px;
-    border:1px solid #ddd;
-    border-radius:10px;
-    display:flex;
-    flex-direction:column;
-    gap:15px;
+:host {
+  display: block;
+  min-height: 100vh;
 }
 
-input{
-
-    padding:10px;
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+  background: linear-gradient(135deg, #fdf1ec 0%, $light-bg 55%, #eefaf1 100%);
+  box-sizing: border-box;
 }
 
-button{
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  background: $white;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-lg;
+  padding: 40px 36px 28px;
+  box-sizing: border-box;
+  border-top: 4px solid $primary;
+}
 
-    padding:10px;
-    cursor:pointer;
+/* Brand */
+.auth-brand {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.brand-logo {
+  font-size: 44px;
+  color: $primary;
+  display: inline-block;
+  margin-bottom: 8px;
+}
+
+.brand-name {
+  font-family: $font-heading;
+  font-size: 26px;
+  font-weight: 800;
+  color: $dark;
+  margin-bottom: 2px;
+}
+
+.brand-tagline {
+  font-size: 13px;
+  color: $dark-300;
+}
+
+/* Form */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.form-title {
+  font-family: $font-heading;
+  font-size: 22px;
+  font-weight: 700;
+  color: $dark;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.form-subtitle {
+  font-size: 13px;
+  color: $dark-400;
+  text-align: center;
+  margin: 0 0 24px;
+}
+
+/* API Error */
+.api-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fdecea;
+  border: 1px solid #f5c6cb;
+  color: #b02a37;
+  font-size: 13px;
+  border-radius: $radius-sm;
+  padding: 10px 14px;
+  margin-bottom: 18px;
+
+  .material-icons { font-size: 18px; flex-shrink: 0; }
+}
+
+/* Form Group */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: $dark-500;
+  margin-bottom: 6px;
+}
+
+.input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 14px;
+  font-size: 20px;
+  color: $dark-300;
+  pointer-events: none;
+}
+
+.input-wrap input {
+  width: 100%;
+  padding: 12px 14px 12px 44px;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  font-size: 14px;
+  color: $dark;
+  background: $white;
+  transition: all $transition;
+  outline: none;
+  box-sizing: border-box;
+
+  &::placeholder {
+    color: $dark-300;
+  }
+
+  &:focus {
+    border-color: $primary;
+    box-shadow: 0 0 0 3px rgba($primary, 0.12);
+  }
+
+  &:focus + .password-toggle,
+  &:has(+ .password-toggle):focus {
+    border-color: $primary;
+  }
+}
+
+.field-error {
+  font-size: 12px;
+  color: #dc3545;
+  margin-top: 5px;
+}
+
+/* Password toggle */
+.password-toggle {
+  position: absolute;
+  right: 8px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background $transition;
+
+  .material-icons {
+    font-size: 20px;
+    color: $dark-300;
+  }
+
+  &:hover {
+    background: $light-bg;
+
+    .material-icons { color: $primary; }
+  }
+}
+
+/* Options */
+.form-options {
+  display: flex;
+  justify-content: flex-end;
+  margin: -6px 0 18px;
+}
+
+.forgot-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: $primary;
+  cursor: pointer;
+  transition: color $transition;
+
+  &:hover {
+    color: $primary-dark;
+  }
+}
+
+/* Submit */
+.submit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 13px 20px;
+  background: linear-gradient(135deg, $primary, $primary-dark);
+  color: $white;
+  border: none;
+  border-radius: $radius-md;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all $transition;
+
+  .material-icons { font-size: 20px; }
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba($primary, 0.35);
+  }
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Back button */
+.back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 10px;
+  background: none;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  font-size: 13px;
+  font-weight: 600;
+  color: $dark-400;
+  cursor: pointer;
+  transition: all $transition;
+
+  .material-icons { font-size: 18px; }
+
+  &:hover {
+    background: $light-bg;
+    color: $dark-500;
+  }
+}
+
+/* Auth switch */
+.auth-switch {
+  text-align: center;
+  font-size: 14px;
+  color: $dark-400;
+  margin: 20px 0 0;
+
+  a {
+    color: $primary;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color $transition;
+
+    &:hover {
+      color: $primary-dark;
+    }
+  }
+}
+
+.auth-footer-note {
+  text-align: center;
+  font-size: 11px;
+  color: $dark-300;
+  margin: 24px 0 0;
+  line-height: 1.5;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 480px) {
+  .auth-page {
+    padding: 20px 16px;
+    align-items: flex-start;
+    padding-top: 40px;
+  }
+
+  .auth-card {
+    padding: 32px 22px 24px;
+  }
+
+  .brand-logo {
+    font-size: 38px;
+  }
+
+  .brand-name {
+    font-size: 24px;
+  }
 }

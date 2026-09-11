@@ -1,53 +1,181 @@
 <app-admin-nav></app-admin-nav>
 
-<h1>Customers</h1>
+<section class="au-hero">
+  <div class="au-hero-inner">
+    <h1>User Management</h1>
+    <p>Manage all registered users on the platform</p>
+  </div>
+</section>
 
-@if(users.length===0){
+<section class="au-content">
+  <div class="au-container">
 
-<h2>No Customers Found</h2>
+    @if (isLoading()) {
+      <div class="au-loading">
+        <span class="material-icons spinning">progress_activity</span>
+        <p>Loading users...</p>
+      </div>
+    } @else {
 
-}
+      <div class="au-stats">
+        <div class="au-stat">
+          <span class="au-stat-num">{{ counts().total }}</span>
+          <span class="au-stat-label">Total Users</span>
+        </div>
+        <div class="au-stat customers">
+          <span class="au-stat-num">{{ counts().customers }}</span>
+          <span class="au-stat-label">Customers</span>
+        </div>
+        <div class="au-stat owners">
+          <span class="au-stat-num">{{ counts().owners }}</span>
+          <span class="au-stat-label">Owners</span>
+        </div>
+        <div class="au-stat admins">
+          <span class="au-stat-num">{{ counts().admins }}</span>
+          <span class="au-stat-label">Admins</span>
+        </div>
+      </div>
 
-@else{
+      <div class="au-toolbar">
+        <div class="au-search">
+          <span class="material-icons">search</span>
+          <input type="text" placeholder="Search by name, email or phone..." [ngModel]="searchText()" (ngModelChange)="searchText.set($event)">
+        </div>
+      </div>
 
-<table>
+      <div class="au-filters">
+        @for (tab of roleTabs; track tab) {
+          <button class="au-filter-chip" [class.active]="selectedRole() === tab" (click)="selectedRole.set(tab)">
+            {{ tab }}
+          </button>
+        }
+      </div>
 
-<thead>
+      @if (filteredUsers().length === 0) {
+        <div class="au-empty">
+          <span class="material-icons">people</span>
+          <h3>No Users Found</h3>
+          <p>{{ users().length === 0 ? 'No users registered yet.' : 'No users match your search.' }}</p>
+        </div>
+      } @else {
+        <div class="au-table-wrap">
+          <table class="au-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Role</th>
+                <th>Joined</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (user of displayedUsers(); track user.id) {
+                <tr>
+                  <td>
+                    <div class="au-user-cell">
+                      <div class="au-avatar">{{ getInitial(user.name) }}</div>
+                      <span class="au-user-name">{{ user.name }}</span>
+                    </div>
+                  </td>
+                  <td>{{ user.email }}</td>
+                  <td>{{ user.phoneNumber || '—' }}</td>
+                  <td>
+                    <span class="au-role-badge" [ngClass]="getRoleBadgeClass(user.role)">{{ user.role }}</span>
+                  </td>
+                  <td>{{ user.createdAt | date:'MMM d, yyyy' }}</td>
+                  <td>
+                    <div class="au-row-actions">
+                      <button class="au-btn-icon view" (click)="viewUser(user)" title="View details">
+                        <span class="material-icons">visibility</span>
+                      </button>
+                      <button class="au-btn-icon delete" (click)="deleteUser(user)" title="Delete user">
+                        <span class="material-icons">delete_outline</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
 
-<tr>
+        <!-- Pagination Controls -->
+        @if (filteredUsers().length > 10) {
+          <div class="table-pagination-footer">
+            <span class="pagination-info">
+              Showing <strong>{{ displayedUsers().length }}</strong> of <strong>{{ filteredUsers().length }}</strong> users
+            </span>
+            <div class="pagination-actions">
+              @if (hasMore()) {
+                <button class="btn-pagination btn-show-more" (click)="showMore()">
+                  <span class="material-icons">expand_more</span>
+                  Show More (+10)
+                </button>
+              }
+              <button class="btn-pagination btn-show-all" (click)="toggleShowAll()">
+                <span class="material-icons">{{ showAll() ? 'unfold_less' : 'unfold_more' }}</span>
+                {{ showAll() ? 'Collapse to 10' : 'Show All (' + filteredUsers().length + ')' }}
+              </button>
+            </div>
+          </div>
+        }
+      }
+    }
 
-<th>Name</th>
+  </div>
+</section>
 
-<th>Email</th>
+@if (selectedUser()) {
+  <div class="au-overlay" (click)="closeDetail()"></div>
+  <div class="au-detail-panel">
+    <div class="au-detail-header">
+      <h3>User Details</h3>
+      <button class="au-close" (click)="closeDetail()">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+    <div class="au-detail-body">
+      <div class="au-detail-avatar">{{ getInitial(selectedUser()!.name) }}</div>
+      <h2>{{ selectedUser()!.name }}</h2>
+      <span class="au-role-badge large" [ngClass]="getRoleBadgeClass(selectedUser()!.role)">{{ selectedUser()!.role }}</span>
 
-<th>Phone</th>
+      <div class="au-detail-fields">
+        <div class="au-detail-field">
+          <span class="material-icons">email</span>
+          <div>
+            <span class="au-field-label">Email</span>
+            <span class="au-field-value">{{ selectedUser()!.email }}</span>
+          </div>
+        </div>
+        <div class="au-detail-field">
+          <span class="material-icons">phone</span>
+          <div>
+            <span class="au-field-label">Phone</span>
+            <span class="au-field-value">{{ selectedUser()!.phoneNumber || 'Not provided' }}</span>
+          </div>
+        </div>
+        <div class="au-detail-field">
+          <span class="material-icons">calendar_today</span>
+          <div>
+            <span class="au-field-label">Joined</span>
+            <span class="au-field-value">{{ selectedUser()!.createdAt | date:'MMMM d, yyyy' }}</span>
+          </div>
+        </div>
+        <div class="au-detail-field">
+          <span class="material-icons">tag</span>
+          <div>
+            <span class="au-field-label">User ID</span>
+            <span class="au-field-value">#{{ selectedUser()!.id }}</span>
+          </div>
+        </div>
+      </div>
 
-<th>Joined</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-@for(user of users; track user.id){
-
-<tr>
-
-<td>{{user.name}}</td>
-
-<td>{{user.email}}</td>
-
-<td>{{user.phoneNumber}}</td>
-
-<td>{{user.createdAt | date:'mediumDate'}}</td>
-
-</tr>
-
-}
-
-</tbody>
-
-</table>
-
+      <button class="au-delete-btn" (click)="deleteUser(selectedUser()!)">
+        <span class="material-icons">delete_outline</span>
+        Delete User
+      </button>
+    </div>
+  </div>
 }

@@ -1,133 +1,88 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment';
-// Injectable
-// Makes this file an Angular Service.
-
 import { HttpClient } from '@angular/common/http';
-// HttpClient
-// Sends HTTP requests to ASP.NET Core Backend.
-
 import { Observable } from 'rxjs';
-// Observable
-// Represents the response that will come
-// from the Backend.
-
-import { Delivery } from '../models/delivery.model';
-// Delivery
-// Defines the structure of one delivery.
-
+import { environment } from '../../../environments/environment';
+import { 
+  Delivery, 
+  OrderDeliveryResponse, 
+  DeliveryPartnerSummary, 
+  CreateDeliveryPartnerDto,
+  CreateOrderDeliveryDto 
+} from '../models/delivery.model';
 
 @Injectable({
-  // root
-  // Creates one shared instance
-  // of this Service.
   providedIn: 'root'
 })
-
-
 export class DeliveryService {
+  private apiUrl = `${environment.apiUrl}/OrderDelivery`;
 
-  // Backend Delivery API URL.
-  private apiUrl =
-    `${environment.apiUrl}/OrderDelivery`;
+  constructor(private http: HttpClient) { }
 
-
-  constructor(
-
-    // http
-    // Variable used to call Backend APIs.
-
-    // HttpClient
-    // Type of the http variable.
-
-    private http: HttpClient
-
-  ) { }
-
-
-  // Get all deliveries.
-  getDeliveries(): Observable<Delivery[]> {
-
-    // GET
-    // Reads all deliveries from Backend.
-
-    return this.http.get<Delivery[]>(
-      this.apiUrl
-    );
-
+  // Get all deliveries (Admin)
+  getDeliveries(): Observable<OrderDeliveryResponse[]> {
+    return this.http.get<OrderDeliveryResponse[]>(this.apiUrl);
   }
 
-  // Get deliveries assigned to the logged in Delivery Partner.
-  getPartnerDeliveries(): Observable<Delivery[]> {
-
-    // GET
-    // Reads only my deliveries from Backend.
-
-    return this.http.get<Delivery[]>(
-      `${this.apiUrl}/partner`
-    );
-
+  // Get deliveries assigned to the logged in Delivery Partner
+  getPartnerDeliveries(): Observable<OrderDeliveryResponse[]> {
+    return this.http.get<OrderDeliveryResponse[]>(`${this.apiUrl}/partner`);
   }
 
-
-  // Get delivery by order ID.
-  getDeliveryByOrderId(orderId: number): Observable<Delivery> {
-    return this.http.get<Delivery>(`${this.apiUrl}/order/${orderId}`);
+  // Get delivery by order ID
+  getDeliveryByOrderId(orderId: number): Observable<OrderDeliveryResponse> {
+    return this.http.get<OrderDeliveryResponse>(`${this.apiUrl}/order/${orderId}`);
   }
 
+  // Get delivery by delivery ID
+  getDeliveryById(id: number): Observable<OrderDeliveryResponse> {
+    return this.http.get<OrderDeliveryResponse>(`${this.apiUrl}/${id}`);
+  }
 
-  // Update delivery status.
-  updateDeliveryStatus(
-
-    // ID of delivery to update.
-    deliveryId: number,
-
-    // New delivery status.
-    newStatus: string
-
-  ): Observable<any> {
-
-    // Object sent to Backend.
-    //
-    // DeliveryStatus
-    // Must match UpdateDeliveryStatusDto
-    // property in your C# Backend.
-
-    const data = {
-
-      DeliveryStatus: newStatus
-
+  // Assign or reassign a delivery partner to an order (Admin only)
+  createDelivery(dto: CreateOrderDeliveryDto): Observable<any> {
+    const payload = {
+      orderId: dto.orderId,
+      deliveryPartnerId: dto.deliveryPartnerId
     };
-
-
-    // PUT
-    // Updates existing delivery.
-
-    return this.http.put(
-
-      `${this.apiUrl}/${deliveryId}`,
-
-      data
-
-    );
-
+    return this.http.post(this.apiUrl, payload);
   }
 
-
-  // Delete delivery.
-  deleteDelivery(
-    deliveryId: number
-  ): Observable<any> {
-
-    // DELETE
-    // Removes the delivery from Backend.
-
-    return this.http.delete(
-
-      `${this.apiUrl}/${deliveryId}`
-
-    );
-
+  // Assign delivery partner alias
+  assignDeliveryPartner(orderId: number, deliveryPartnerId: number): Observable<any> {
+    return this.createDelivery({ orderId, deliveryPartnerId });
   }
 
+  // Update delivery status (Delivery Partner or Admin)
+  updateDeliveryStatus(deliveryId: number, newStatus: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${deliveryId}`, {
+      DeliveryStatus: newStatus
+    });
+  }
+
+  // Get all delivery partners with metrics (Admin only)
+  getDeliveryPartners(): Observable<DeliveryPartnerSummary[]> {
+    return this.http.get<DeliveryPartnerSummary[]>(`${environment.apiUrl}/User/delivery-partners`);
+  }
+
+  // Create a new delivery partner account (Admin only)
+  createDeliveryPartner(dto: CreateDeliveryPartnerDto): Observable<any> {
+    const payload = {
+      name: dto.name,
+      email: dto.email,
+      phoneNumber: dto.phone || dto.phoneNumber,
+      password: dto.password,
+      address: dto.address
+    };
+    return this.http.post(`${environment.apiUrl}/User/delivery-partner`, payload);
+  }
+
+  // Toggle active/inactive status for a user/delivery partner (Admin only)
+  toggleUserStatus(userId: number): Observable<any> {
+    return this.http.patch(`${environment.apiUrl}/User/${userId}/toggle-status`, {});
+  }
+
+  // Delete delivery (Admin only)
+  deleteDelivery(deliveryId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${deliveryId}`);
+  }
 }

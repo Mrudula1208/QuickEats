@@ -1,203 +1,210 @@
-.coupons-page{
+$primary: #E85D3A;
+$primary-dark: #D14A2A;
+$primary-light: #F28C72;
+$primary-bg: #FEF0EC;
+$secondary: #2D6A4F;
+$secondary-light: #52B788;
+$accent: #F4A261;
+$dark: #1B2838;
+$dark-600: #2B3A4E;
+$dark-400: #5A6B7F;
+$dark-300: #8494A7;
+$light-bg: #F7F8FC;
+$white: #FFFFFF;
+$border: #E8ECF1;
 
-    max-width:1200px;
+.page-hero {
+  background: linear-gradient(135deg, $secondary 0%, $secondary-light 60%, $primary-light 100%);
+  padding: 48px 20px 40px;
 
-    margin:40px auto;
+  .breadcrumb {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    margin-bottom: 14px;
 
-    padding:20px;
+    &:hover { color: #fff; }
+  }
 
+  .page-title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 6px;
+  }
+
+  .page-subtitle {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+  }
 }
 
-.coupons-page h1{
-
-    text-align:center;
-
-    color:#fc8019;
-
-    font-size:36px;
-
-    margin-bottom:10px;
-
+.coupons-section {
+  padding: 32px 0 60px;
+  background: $light-bg;
+  min-height: 55vh;
 }
 
-.coupons-page p{
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 80px 20px;
+  text-align: center;
 
-    text-align:center;
-
-    color:#666;
-
-    margin-bottom:30px;
-
+  .material-icons { font-size: 44px; color: $dark-300; }
+  p { margin: 0; font-size: 15px; color: $dark-400; }
 }
 
-.empty-coupon{
+.spinning { animation: spin 1s linear infinite; }
 
-    background:white;
-
-    padding:60px;
-
-    border-radius:18px;
-
-    text-align:center;
-
-    box-shadow:0 10px 25px rgba(0,0,0,.08);
-
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-.empty-coupon h2{
+.retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 24px;
+  background: $secondary;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
 
-    color:#fc8019;
-
-    margin-bottom:15px;
-
+  .material-icons { font-size: 18px; color: #fff; margin: 0; }
+  &:hover { background: $secondary-light; }
 }
 
-.coupon-grid{
-
-    display:grid;
-
-    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
-
-    gap:30px;
-
+.coupon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 22px;
 }
 
-.coupon-card{
+.coupon-card {
+  background: $white;
+  border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.3s, transform 0.3s;
+  border-top: 4px solid $primary;
 
-    background:white;
+  &:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    transform: translateY(-3px);
+  }
 
-    border-radius:18px;
-
-    padding:25px;
-
-    box-shadow:0 10px 25px rgba(0,0,0,.08);
-
-    transition:.3s;
-
-    border-left:6px solid #fc8019;
-
+  &--expired {
+    border-top-color: $dark-300;
+    opacity: 0.72;
+  }
 }
 
-.coupon-card:hover{
-
-    transform:translateY(-8px);
-
-    box-shadow:0 15px 35px rgba(0,0,0,.15);
-
+.coupon-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 20px;
+  background: $primary-bg;
 }
 
-.coupon-card h2{
-
-    color:#fc8019;
-
-    font-size:28px;
-
-    margin-bottom:15px;
-
+.coupon-code {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: $primary;
+  text-transform: uppercase;
 }
 
-.coupon-card p{
+.coupon-save {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: $secondary;
+  background: rgba(82, 183, 136, 0.15);
+  padding: 4px 10px;
+  border-radius: 12px;
+  white-space: nowrap;
 
-    text-align:left;
-
-    margin:10px 0;
-
-    color:#555;
-
+  &--expired {
+    color: $dark-400;
+    background: rgba(133, 148, 167, 0.15);
+  }
 }
 
-.coupon-card h3{
-
-    color:#2e7d32;
-
-    margin:20px 0;
-
+.coupon-body {
+  padding: 18px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
 }
 
-.active{
-
-    display:inline-block;
-
-    background:#4caf50;
-
-    color:white;
-
-    padding:6px 14px;
-
-    border-radius:20px;
-
-    margin-bottom:20px;
-
-    font-size:14px;
-
+.coupon-desc {
+  margin: 0;
+  font-size: 14px;
+  color: $dark-600;
+  line-height: 1.5;
 }
 
-.expired{
-
-    display:inline-block;
-
-    background:#e53935;
-
-    color:white;
-
-    padding:6px 14px;
-
-    border-radius:20px;
-
-    margin-bottom:20px;
-
-    font-size:14px;
-
+.coupon-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.coupon-card button{
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: $dark-400;
 
-    width:100%;
-
-    padding:14px;
-
-    border:none;
-
-    border-radius:10px;
-
-    background:#fc8019;
-
-    color:white;
-
-    cursor:pointer;
-
-    font-size:16px;
-
-    transition:.3s;
-
+  .material-icons { font-size: 16px; color: $accent; }
 }
 
-.coupon-card button:hover{
+.apply-btn {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 10px;
+  background: $primary;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
 
-    background:#e56d00;
+  .material-icons { font-size: 18px; }
 
+  &:hover { background: $primary-dark; }
 }
 
-.coupon-card button:disabled{
-
-    background:#bdbdbd;
-
-    cursor:not-allowed;
-
-}
-
-@media(max-width:768px){
-
-    .coupons-page{
-
-        padding:15px;
-
-    }
-
-    .coupon-card{
-
-        padding:20px;
-
-    }
-
+@media (max-width: 768px) {
+  .page-hero { padding: 36px 16px 32px; .page-title { font-size: 24px; } }
+  .coupons-section { padding: 24px 0 48px; }
+  .coupon-grid { grid-template-columns: 1fr; }
 }

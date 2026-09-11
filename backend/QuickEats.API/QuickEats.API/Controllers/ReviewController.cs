@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 // Authorization
 // Used to control which users can access Review APIs.
 
@@ -10,6 +10,7 @@ using QuickEats.API.DTos.Review;
 
 using QuickEats.API.Services.Interfaces;
 // Import IReviewService.
+// Import IRestaurantService (for Owner ownership checks).
 
 using System.Security.Claims;
 // ClaimTypes.NameIdentifier
@@ -37,21 +38,29 @@ namespace QuickEats.API.Controllers
     public class ReviewController : ControllerBase
     {
         // Store Review Service.
+        // Store Restaurant Service (for Owner ownership checks).
 
         private readonly IReviewService
             _reviewService;
+
+        private readonly IRestaurantService
+            _restaurantService;
 
 
         // Constructor.
 
         public ReviewController(
-            IReviewService reviewService
+            IReviewService reviewService,
+            IRestaurantService restaurantService
         )
         {
-            // Store injected ReviewService.
+            // Store injected services.
 
             _reviewService =
                 reviewService;
+
+            _restaurantService =
+                restaurantService;
         }
 
 
@@ -121,10 +130,16 @@ namespace QuickEats.API.Controllers
 
         [AllowAnonymous]
         [HttpGet("restaurant/{restaurantId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> GetByRestaurantId(
             int restaurantId
         )
         {
+            // Owner can only see reviews of their own restaurants.
+            if (User.IsInRole("Owner") && !await IsOwnerOfRestaurant(restaurantId))
+                return Forbid();
+
             // Ask Service for Reviews
             // of the given Restaurant.
 
@@ -136,6 +151,21 @@ namespace QuickEats.API.Controllers
             // HTTP 200
             // Return Reviews.
 
+            return Ok(reviews);
+        }
+
+        /// <summary>
+        /// Gets all reviews for the logged in Owner's restaurants.
+        /// </summary>
+        [Authorize(Roles = "Owner")]
+        [HttpGet("owner")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetOwnerReviews()
+        {
+            var ownerId = int.Parse(
+                User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            var reviews = await _reviewService.GetByOwnerIdAsync(ownerId);
             return Ok(reviews);
         }
 
@@ -233,6 +263,17 @@ namespace QuickEats.API.Controllers
             return Ok(
                 "Review deleted successfully."
             );
+        }
+
+        // Check whether the logged in Owner owns this restaurant.
+        private async Task<bool> IsOwnerOfRestaurant(int restaurantId)
+        {
+            var ownerId = int.Parse(
+                User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            var restaurants = await _restaurantService.GetByOwnerIdAsync(ownerId);
+
+            return restaurants.Any(r => r.Id == restaurantId);
         }
     }
 }

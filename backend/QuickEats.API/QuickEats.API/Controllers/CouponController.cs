@@ -35,7 +35,7 @@ namespace QuickEats.API.Controllers
         /// <summary>
         /// Gets all available coupons.
         /// </summary>
-
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -48,7 +48,7 @@ namespace QuickEats.API.Controllers
         /// Gets one coupon by its code (e.g. "SAVE10").
         /// </summary>
         /// <param name="code">Coupon code.</param>
-
+        [AllowAnonymous]
         [HttpGet("{code}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -80,6 +80,21 @@ namespace QuickEats.API.Controllers
             await _couponService.CreateAsync(dto);
 
             return Ok("Coupon created successfully.");
+        }
+
+        /// <summary>
+        /// Updates an existing coupon (Admin only).
+        /// </summary>
+        /// <param name="id">Coupon id.</param>
+        /// <param name="dto">Updated coupon details.</param>
+        [Authorize(Roles = "Admin")]
+        [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Update(int id, UpdateCouponDto dto)
+        {
+            await _couponService.UpdateAsync(id, dto);
+            return Ok("Coupon updated successfully.");
         }
 
         /// <summary>

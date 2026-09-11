@@ -137,5 +137,48 @@ namespace QuickEats.API.Services
             _couponRepository.Delete(coupon);
             await _couponRepository.SaveChangesAsync();
         }
+
+        // Update one Coupon.
+
+        public async Task UpdateAsync(int id, UpdateCouponDto dto)
+        {
+            var coupon = await _couponRepository.GetByIdAsync(id);
+
+            if (coupon == null)
+            {
+                throw new NotFoundException($"Coupon with Id {id} not found.");
+            }
+
+            var code = dto.CouponCode.Trim().ToUpper();
+
+            if (code.Length < 3 || code.Length > 20)
+                throw new BadRequestException("Coupon code must be between 3 and 20 characters.");
+
+            if (!System.Text.RegularExpressions.Regex.IsMatch(code, @"^[A-Z0-9]+$"))
+                throw new BadRequestException("Coupon code must contain only uppercase letters and numbers.");
+
+            var existing = await _couponRepository.GetByCodeAsync(code);
+            if (existing != null && existing.Id != id)
+                throw new BadRequestException($"Coupon with code '{code}' already exists.");
+
+            if (dto.MinimumOrderAmount < 1)
+                throw new BadRequestException("Minimum order amount must be at least 1.");
+
+            if (dto.DiscountAmount < 1)
+                throw new BadRequestException("Discount amount must be at least 1.");
+
+            if (dto.DiscountAmount >= dto.MinimumOrderAmount)
+                throw new BadRequestException("Discount amount must be less than the minimum order amount.");
+
+            coupon.Code = code;
+            coupon.Description = dto.Description;
+            coupon.MinimumOrderAmount = dto.MinimumOrderAmount;
+            coupon.DiscountAmount = dto.DiscountAmount;
+            coupon.ExpiryDate = dto.ExpiryDate;
+            coupon.IsActive = dto.IsActive;
+
+            _couponRepository.Update(coupon);
+            await _couponRepository.SaveChangesAsync();
+        }
     }
 }

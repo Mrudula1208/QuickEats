@@ -1,264 +1,254 @@
 <app-admin-nav></app-admin-nav>
 
-<h1>Admin Orders</h1>
-
-<!--
-    @if
-
-    Checks a condition.
-
-    orders.length
-    Means number of orders in the array.
-
-    === 0
-    Means exactly equal to zero.
-
-    So:
-
-    If there are no orders,
-    show "No Orders Found".
--->
-
-@if (orders.length === 0) {
-
-    <h2>
-        No Orders Found
-    </h2>
-
-}
-
-@else {
-
-    <!--
-        @for
-
-        Repeats HTML for every order.
-
-        orders
-        ↓
-        Order 1
-        Order 2
-        Order 3
-        etc.
-
-        order
-        Means the current order.
-
-        track order.id
-        Tells Angular to identify each order
-        using its unique id.
-    -->
-
-    @for (order of orders; track order.id) {
-
-        <div class="order-card">
-
-            <!-- Order ID -->
-
-            <h2>
-                Order #{{order.id}}
-            </h2>
-
-
-            <!-- Customer Name -->
-
-            <p>
-
-                <strong>
-                    Customer:
-                </strong>
-
-                {{order.customerName}}
-
-            </p>
-
-
-            <!-- Restaurant -->
-
-            <p>
-
-                <strong>
-                    Restaurant:
-                </strong>
-
-                {{order.restaurantName}}
-
-            </p>
-
-
-            <!-- Address -->
-
-            <p>
-
-                <strong>
-                    Address:
-                </strong>
-
-                {{order.deliveryAddress}}
-
-            </p>
-
-
-            <!-- Phone -->
-
-            <p>
-
-                <strong>
-                    Phone:
-                </strong>
-
-                {{order.phoneNumber}}
-
-            </p>
-
-
-            <!-- Total -->
-
-            <p>
-
-                <strong>
-                    Total:
-                </strong>
-
-                ₹{{order.totalAmount}}
-
-            </p>
-
-
-            <!-- Payment Method -->
-
-            <p>
-
-                <strong>
-                    Payment:
-                </strong>
-
-                {{order.paymentMethod}}
-
-            </p>
-
-
-     <!-- Order Status -->
-
-<p>
-
-    <!--
-        strong
-        Makes the label bold.
-
-        {{ order.status }}
-        Displays the current order status.
-    -->
-
-    <strong>
-        Status:
-    </strong>
-
-    {{ order.status }}
-
-</p>
-
-
-<!--
-    View Details Button.
-
-    (click)
-    Runs a TypeScript method when clicked.
-
-    order.id
-    Sends the selected order's ID.
--->
-
-<button
-    (click)="viewOrder(order.id)"
->
-    View Details
-</button>
-
-
-<!--
-    select
-    Creates a dropdown list.
-
-    [(ngModel)]
-    Two-way binding.
-
-    It connects the dropdown value
-    with order.status.
-
-    So when Admin changes the dropdown,
-    order.status changes automatically.
--->
-
-<select
-    [(ngModel)]="order.status"
->
-
-    <!--
-        option
-        Creates one option inside the dropdown.
-
-        value
-        Is the actual value sent/stored.
-    -->
-
-    <option value="Pending">
-        Pending
-    </option>
-
-    <option value="Confirmed">
-        Confirmed
-    </option>
-
-    <option value="Preparing">
-        Preparing
-    </option>
-
-    <option value="Out for Delivery">
-        Out for Delivery
-    </option>
-
-    <option value="Delivered">
-        Delivered
-    </option>
-
-    <option value="Cancelled">
-        Cancelled
-    </option>
-
-</select>
-
-
-<!--
-    Update Status Button.
-
-    order.id
-    Sends the selected order ID.
-
-    order.status
-    Sends the newly selected status.
--->
-
-<button
-    (click)="updateStatus(order.id, order.status)"
->
-    Update Status
-</button>
-<!--
-    Delete Order Button.
-
-    order.id
-    Sends the ID of the order
-    that the Admin wants to delete.
--->
-
-<button
-    (click)="deleteOrder(order.id)"
->
-    Delete
-</button>
+<div class="ao-wrapper">
+  <div class="container">
+
+    <!-- Header -->
+    <div class="ao-header">
+      <div class="ao-header-left">
+        <div class="ao-breadcrumbs">
+          <span class="material-icons">admin_panel_settings</span>
+          <span>Admin Portal</span>
+          <span class="material-icons">chevron_right</span>
+          <span class="active">Orders</span>
+        </div>
+        <h1 class="ao-title">Order Management</h1>
+        <p class="ao-subtitle">Monitor live customer orders, update delivery progress, and view receipts</p>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="ao-stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon stat-icon--total">
+          <span class="material-icons">receipt_long</span>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Total Orders</span>
+          <h3>{{ stats().total }}</h3>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon stat-icon--pending">
+          <span class="material-icons">pending_actions</span>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">In Progress</span>
+          <h3 class="text-warning">{{ stats().pending }}</h3>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon stat-icon--delivered">
+          <span class="material-icons">task_alt</span>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Delivered</span>
+          <h3 class="text-success">{{ stats().delivered }}</h3>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon stat-icon--revenue">
+          <span class="material-icons">account_balance_wallet</span>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Total Volume</span>
+          <h3>₹{{ stats().revenue | number:'1.0-0' }}</h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search & Filters Toolbar -->
+    <div class="ao-toolbar">
+      <div class="ao-search-box">
+        <span class="material-icons search-icon">search</span>
+        <input
+          type="text"
+          placeholder="Search by Order #, Customer, Phone, Restaurant..."
+          [ngModel]="searchText()"
+          (ngModelChange)="searchText.set($event)"
+          class="search-input">
+        @if (searchText()) {
+          <button class="clear-btn" (click)="searchText.set('')">
+            <span class="material-icons">close</span>
+          </button>
+        }
+      </div>
+
+      <div class="ao-status-tabs">
+        <button
+          class="tab-btn"
+          [class.active]="selectedStatus() === 'all'"
+          (click)="selectedStatus.set('all')">
+          All Orders
+        </button>
+        <button
+          class="tab-btn"
+          [class.active]="selectedStatus() === 'pending'"
+          (click)="selectedStatus.set('pending')">
+          Pending
+        </button>
+        <button
+          class="tab-btn"
+          [class.active]="selectedStatus() === 'preparing'"
+          (click)="selectedStatus.set('preparing')">
+          Preparing
+        </button>
+        <button
+          class="tab-btn"
+          [class.active]="selectedStatus() === 'outfordelivery'"
+          (click)="selectedStatus.set('outfordelivery')">
+          Out for Delivery
+        </button>
+        <button
+          class="tab-btn"
+          [class.active]="selectedStatus() === 'delivered'"
+          (click)="selectedStatus.set('delivered')">
+          Delivered
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    @if (isLoading()) {
+      <div class="ao-skeleton-list">
+        <div class="skeleton-row skeleton-shimmer"></div>
+        <div class="skeleton-row skeleton-shimmer"></div>
+        <div class="skeleton-row skeleton-shimmer"></div>
+      </div>
+    } @else if (loadError()) {
+      <div class="ao-state-card error-card">
+        <span class="material-icons state-icon">cloud_off</span>
+        <h3>Failed to Load Orders</h3>
+        <p>{{ loadError() }}</p>
+        <button class="btn-primary" (click)="loadOrders()">
+          <span class="material-icons">refresh</span>
+          Retry
+        </button>
+      </div>
+    } @else if (filteredOrders().length === 0) {
+      <div class="ao-state-card empty-card">
+        <span class="material-icons state-icon">inbox</span>
+        <h3>No Orders Found</h3>
+        <p>{{ searchText() || selectedStatus() !== 'all' ? 'No orders match your filter criteria.' : 'No customer orders have been placed yet.' }}</p>
+      </div>
+    } @else {
+      <div class="ao-table-card">
+        <div class="table-responsive">
+          <table class="ao-table">
+            <thead>
+              <tr>
+                <th>Order</th>
+                <th>Customer Details</th>
+                <th>Restaurant</th>
+                <th>Items & Total</th>
+                <th>Payment</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th class="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (order of displayedOrders(); track order.id) {
+                <tr>
+                  <!-- Order ID -->
+                  <td>
+                    <strong class="order-id-badge">#{{ order.id }}</strong>
+                  </td>
+
+                  <!-- Customer Details -->
+                  <td>
+                    <div class="customer-info-cell">
+                      <strong class="customer-name">{{ order.customerName }}</strong>
+                      <span class="customer-phone">{{ order.phoneNumber || 'N/A' }}</span>
+                      @if (order.deliveryAddress) {
+                        <span class="customer-addr" title="{{ order.deliveryAddress }}">{{ order.deliveryAddress }}</span>
+                      }
+                    </div>
+                  </td>
+
+                  <!-- Restaurant -->
+                  <td>
+                    <span class="restaurant-name-pill">
+                      <span class="material-icons">storefront</span>
+                      {{ order.restaurantName || 'Restaurant #' + order.restaurantId }}
+                    </span>
+                  </td>
+
+                  <!-- Items & Total -->
+                  <td>
+                    <div class="order-total-cell">
+                      <strong class="total-amount">₹{{ order.totalAmount | number:'1.0-2' }}</strong>
+                      <span class="items-count">{{ order.items?.length || 0 }} items</span>
+                    </div>
+                  </td>
+
+                  <!-- Payment Status -->
+                  <td>
+                    <span class="payment-badge" [class.paid]="order.paymentStatus === 'Paid'">
+                      {{ order.paymentStatus || 'Pending' }}
+                    </span>
+                  </td>
+
+                  <!-- Status -->
+                  <td>
+                    <select
+                      class="status-select"
+                      [class]="getStatusClass(order.status)"
+                      [ngModel]="order.status"
+                      (ngModelChange)="updateStatus(order.id, $event)">
+                      @for (s of statusList; track s) {
+                        <option [value]="s">{{ s }}</option>
+                      }
+                    </select>
+                  </td>
+
+                  <!-- Date -->
+                  <td>
+                    <span class="order-date">{{ order.createdAt | date:'mediumDate' }}</span>
+                  </td>
+
+                  <!-- Actions -->
+                  <td class="text-right">
+                    <div class="actions-group">
+                      <button (click)="viewOrder(order.id)" class="action-btn view-btn" title="View Order Details">
+                        <span class="material-icons">visibility</span>
+                      </button>
+                      <button (click)="deleteOrder(order.id)" class="action-btn delete-btn" title="Delete Order">
+                        <span class="material-icons">delete_outline</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
         </div>
 
+        <!-- Pagination Controls -->
+        @if (filteredOrders().length > 10) {
+          <div class="table-pagination-footer">
+            <span class="pagination-info">
+              Showing <strong>{{ displayedOrders().length }}</strong> of <strong>{{ filteredOrders().length }}</strong> orders
+            </span>
+            <div class="pagination-actions">
+              @if (hasMore()) {
+                <button class="btn-pagination btn-show-more" (click)="showMore()">
+                  <span class="material-icons">expand_more</span>
+                  Show More (+10)
+                </button>
+              }
+              <button class="btn-pagination btn-show-all" (click)="toggleShowAll()">
+                <span class="material-icons">{{ showAll() ? 'unfold_less' : 'unfold_more' }}</span>
+                {{ showAll() ? 'Collapse to 10' : 'Show All (' + filteredOrders().length + ')' }}
+              </button>
+            </div>
+          </div>
+        }
+      </div>
     }
 
-}
+  </div>
+</div>

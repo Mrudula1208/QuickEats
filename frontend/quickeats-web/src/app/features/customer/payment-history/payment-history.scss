@@ -1,67 +1,172 @@
-.page-title{
+$primary: #E85D3A;
+$primary-dark: #D14A2A;
+$primary-light: #F28C72;
+$primary-bg: #FEF0EC;
+$secondary: #2D6A4F;
+$secondary-light: #52B788;
+$accent: #F4A261;
+$dark: #1B2838;
+$dark-600: #2B3A4E;
+$dark-400: #5A6B7F;
+$dark-300: #8494A7;
+$light-bg: #F7F8FC;
+$white: #FFFFFF;
+$border: #E8ECF1;
 
-text-align:center;
+.page-hero {
+  background: linear-gradient(135deg, $secondary 0%, $secondary-light 60%, $primary-light 100%);
+  padding: 48px 20px 40px;
 
-margin:40px;
+  .breadcrumb {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    margin-bottom: 14px;
 
+    &:hover { color: #fff; }
+  }
+
+  .page-title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 6px;
+  }
+
+  .page-subtitle {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+  }
 }
 
-.page-title h1{
-
-color:#ff5a5f;
-
-font-size:38px;
-
+.ph-content {
+  background: $light-bg;
+  min-height: 60vh;
+  padding: 32px 0 60px;
 }
 
-.payment-grid{
+.ph-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 90px 20px;
+  text-align: center;
 
-display:grid;
-
-grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
-
-gap:25px;
-
-padding:30px;
-
+  .material-icons { font-size: 52px; color: $dark-300; }
+  h2 { font-family: 'DM Sans', sans-serif; font-size: 20px; font-weight: 700; color: $dark; margin: 0; }
+  p { margin: 0; font-size: 15px; color: $dark-400; }
 }
 
-.payment-card{
+.spinning { animation: phSpin 1s linear infinite; }
 
-background:white;
-
-padding:25px;
-
-border-radius:15px;
-
-box-shadow:0 8px 25px rgba(0,0,0,.08);
-
-transition:.3s;
-
+@keyframes phSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-.payment-card:hover{
+.ph-retry {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 24px;
+  background: $secondary;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
 
-transform:translateY(-5px);
-
+  .material-icons { font-size: 18px; color: #fff; margin: 0; }
+  &:hover { background: $secondary-light; }
 }
 
-.payment-card h2{
-
-color:#ff5a5f;
-
+.payment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 22px;
 }
 
-.payment-card p{
+.payment-card {
+  background: $white;
+  border: 1px solid $border;
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.3s, transform 0.3s;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 
-margin:10px 0;
-
+  &:hover {
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.09);
+    transform: translateY(-3px);
+  }
 }
 
-.empty{
+.payment-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 
-text-align:center;
+  h3 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: $dark;
+    margin: 0;
+  }
+}
 
-margin-top:100px;
+.payment-status {
+  font-size: 12px;
+  font-weight: 700;
+  color: $dark-400;
+  background: rgba(90, 107, 127, 0.12);
+  padding: 4px 10px;
+  border-radius: 12px;
 
+  &.completed {
+    color: $secondary;
+    background: rgba(45, 106, 79, 0.12);
+  }
+}
+
+.payment-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: $dark-400;
+
+  .material-icons { font-size: 18px; color: $accent; }
+
+  span:nth-child(2) { flex: 1; }
+  strong { color: $dark-600; font-weight: 600; text-align: right; }
+}
+
+.payment-amount {
+  margin-top: 6px;
+  padding-top: 14px;
+  border-top: 1px dashed $border;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: $primary;
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .page-hero { padding: 36px 16px 32px; .page-title { font-size: 24px; } }
+  .ph-content { padding: 24px 0 48px; }
+  .payment-grid { grid-template-columns: 1fr; }
 }

@@ -1,133 +1,148 @@
-<h1>Order Details</h1>
+<app-admin-nav></app-admin-nav>
 
-<!--
-  @if
+@if (isLoading) {
+  <div class="adm-state">
+    <span class="material-icons spinning">progress_activity</span>
+    <p>Loading...</p>
+  </div>
+} @else if (loadError) {
+  <div class="adm-state">
+    <span class="material-icons">error_outline</span>
+    <p>{{ loadError }}</p>
+    <button class="adm-state-btn" (click)="retry()">Try Again</button>
+  </div>
+} @else {
+  <h1 class="adm-title">Order Details</h1>
 
-  Checks whether the order exists.
+  <!--
+    @if
 
-  order
-  Contains the selected Order object.
--->
+    Checks whether the order exists.
 
-@if (order) {
+    order
+    Contains the selected Order object.
+  -->
 
-  <div class="order-details">
+  @if (order) {
 
-
-    <!--
-      {{ }}
-
-      Angular interpolation.
-
-      Takes a value from TypeScript
-      and displays it on the screen.
-    -->
-
-    <h2>
-      Order #{{ order.id }}
-    </h2>
-
-
-    <p>
-
-      <strong>Customer:</strong>
-
-      {{ order.customerName }}
-
-    </p>
+    <div class="order-details">
 
 
-    <p>
+      <!--
+        {{ }}
 
-      <strong>Restaurant:</strong>
+        Angular interpolation.
 
-      {{ order.restaurantName }}
+        Takes a value from TypeScript
+        and displays it on the screen.
+      -->
 
-    </p>
+      <h2>
+        Order #{{ order.id }}
+      </h2>
 
-
-    <p>
-
-      <strong>Address:</strong>
-
-      {{ order.deliveryAddress }}
-
-    </p>
-
-
-    <p>
-
-      <strong>Phone:</strong>
-
-      {{ order.phoneNumber }}
-
-    </p>
-
-
-    <p>
-
-      <strong>Total:</strong>
-
-      ₹{{ order.totalAmount }}
-
-    </p>
-
-
-    <p>
-
-      <strong>Payment Method:</strong>
-
-      {{ order.paymentMethod }}
-
-    </p>
-
-
-    <p>
-
-      <strong>Status:</strong>
-
-      {{ order.status }}
-
-    </p>
-
-
-    <p>
-
-      <strong>Date:</strong>
-
-      {{ order.createdAt | date:'medium' }}
-
-    </p>
-
-
-    <h3>Items</h3>
-
-
-    <!--
-      @for
-
-      Repeats the HTML for every item
-      inside the order.items array.
-
-      item
-      Represents one item.
-
-      $index
-      Angular's automatic index number.
-    -->
-
-    @for (item of order.items; track $index) {
 
       <p>
 
-        {{ item.name }} × {{ item.quantity }}
-        — ₹{{ item.totalPrice }}
+        <strong>Customer:</strong>
+
+        {{ order.customerName }}
 
       </p>
 
-    }
+
+      <p>
+
+        <strong>Restaurant:</strong>
+
+        {{ order.restaurantName }}
+
+      </p>
 
 
-  </div>
+      <p>
 
+        <strong>Address:</strong>
+
+        {{ order.deliveryAddress }}
+
+      </p>
+
+
+      <p>
+
+        <strong>Phone:</strong>
+
+        {{ order.phoneNumber }}
+
+      </p>
+
+
+      <p>
+
+        <strong>Total:</strong>
+
+        ₹{{ order.totalAmount }}
+
+      </p>
+
+
+      <p>
+
+        <strong>Payment Method:</strong>
+
+        {{ order.paymentMethod }}
+
+      </p>
+
+
+      <p>
+
+        <strong>Status:</strong>
+
+        {{ order.status }}
+
+      </p>
+
+
+      <p>
+
+        <strong>Date:</strong>
+
+        {{ order.createdAt | date:'medium' }}
+
+      </p>
+
+
+      <h3>Items</h3>
+
+
+      <!--
+        @for
+
+        Repeats the HTML for every item
+        inside the order.items array.
+
+        item
+        Represents one item.
+
+        $index
+        Angular's automatic index number.
+      -->
+
+      @for (item of order.items; track $index) {
+
+        <p>
+
+          {{ item.name }} × {{ item.quantity }}
+          — ₹{{ item.totalPrice }}
+
+        </p>
+
+      }
+
+
+    </div>
+
+  }
 }

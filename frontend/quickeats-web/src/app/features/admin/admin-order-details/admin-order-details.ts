@@ -26,6 +26,10 @@ import { OrderModel } from '../../../core/models/order.model';
 // OrderModel
 // Defines the structure of one Order object.
 
+import { AdminNavComponent } from '../../../shared/admin-nav/admin-nav';
+
+import { ToastrService } from 'ngx-toastr';
+
 
 @Component({
 
@@ -38,7 +42,8 @@ import { OrderModel } from '../../../core/models/order.model';
   // Means this Component works independently.
 
   imports: [
-    CommonModule
+    CommonModule,
+    AdminNavComponent
   ],
   // imports
   // Lists the Angular modules required by this Component.
@@ -68,6 +73,12 @@ export class AdminOrderDetails {
   // "This variable will receive a value later."
   order!: OrderModel;
 
+  // True while the order is being fetched.
+  isLoading = true;
+
+  // Holds the error message if loading fails.
+  loadError: string | null = null;
+
 
   constructor(
 
@@ -82,9 +93,22 @@ export class AdminOrderDetails {
     // OrderService
     // Gives us access to order data.
 
-    private orderService: OrderService
+    private orderService: OrderService,
+
+    // ToastrService
+    // Shows toast notifications.
+    private toastr: ToastrService
 
   ) {
+
+    this.loadOrder();
+
+  }
+
+  loadOrder(): void {
+
+    this.isLoading = true;
+    this.loadError = null;
 
     // Read Order ID from URL.
     //
@@ -117,13 +141,22 @@ export class AdminOrderDetails {
         next: (data) => {
 
           this.order = data;
+          this.isLoading = false;
 
         },
 
-        error: () => {}
+        error: () => {
+          this.isLoading = false;
+          this.loadError = 'Failed to load order details';
+          this.toastr.error('Failed to load order details');
+        }
 
       });
 
+  }
+
+  retry(): void {
+    this.loadOrder();
   }
 
 }

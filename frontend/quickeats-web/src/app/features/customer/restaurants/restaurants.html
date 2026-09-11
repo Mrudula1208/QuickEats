@@ -1,0 +1,516 @@
+<!-- Page Hero -->
+<section class="page-hero">
+  <div class="container">
+    <h1 class="page-hero-title">Restaurants & Dishes near you</h1>
+    <p class="page-hero-sub">Craving something? Search for dishes, cuisines or restaurants.</p>
+
+    <div class="page-search">
+      <span class="material-icons page-search-icon">search</span>
+      <input
+        type="text"
+        [(ngModel)]="searchText"
+        (keyup.enter)="onSearch()"
+        placeholder="Search for Pizza, Burgers, Biryani, or restaurants..."
+        class="page-search-input">
+      @if (searchText) {
+        <button class="page-search-clear" (click)="clearSearch()">
+          <span class="material-icons">close</span>
+        </button>
+      }
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="discovery-layout">
+
+    <!-- Mobile Filter Toggle -->
+    <button class="mobile-filter-toggle" (click)="toggleMobileFilters()">
+      <span class="material-icons">tune</span>
+      Filters & Sort
+      @if (hasActiveFilters()) {
+        <span class="filter-active-dot"></span>
+      }
+    </button>
+
+    <!-- Sidebar Filters -->
+    <aside class="filter-sidebar" [class.open]="mobileFiltersOpen()">
+      <div class="filter-sidebar-head">
+        <h4 class="filter-sidebar-title">
+          <span class="material-icons">tune</span>
+          Filters
+        </h4>
+        <button class="filter-sidebar-close" (click)="toggleMobileFilters()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <!-- View Switcher in Sidebar -->
+      <div class="filter-group">
+        <h4 class="filter-group-title">
+          <span class="material-icons">visibility</span>
+          View By
+        </h4>
+        <div class="filter-options">
+          <button class="filter-check" [class.active]="activeView() === 'dishes'" (click)="setView('dishes')">
+            <span class="material-icons filter-star-icon">restaurant_menu</span>
+            Dishes ({{ filteredMenuItems().length }})
+          </button>
+          <button class="filter-check" [class.active]="activeView() === 'restaurants'" (click)="setView('restaurants')">
+            <span class="material-icons filter-star-icon">storefront</span>
+            Restaurants ({{ filteredRestaurants().length }})
+          </button>
+        </div>
+      </div>
+
+      <!-- Sort -->
+      <div class="filter-group">
+        <h4 class="filter-group-title">
+          <span class="material-icons">sort</span>
+          Sort By
+        </h4>
+        <select class="filter-select" [(ngModel)]="sortBy" (ngModelChange)="onSortChange()">
+          <option value="default">Recommended</option>
+          <option value="rating">Top Rated / Bestsellers</option>
+          <option value="priceLow">Price: Low to High</option>
+          <option value="priceHigh">Price: High to Low</option>
+          <option value="delivery">Fastest Delivery</option>
+        </select>
+      </div>
+
+      <!-- Dietary Preference -->
+      <div class="filter-group">
+        <h4 class="filter-group-title">
+          <span class="material-icons">eco</span>
+          Dietary
+        </h4>
+        <div class="filter-options">
+          <button class="filter-check" [class.active]="showVegOnly" (click)="toggleVeg()">
+            <span class="veg-dot-sm veg-dot-sm--veg"></span>
+            Pure Veg Only
+          </button>
+          <button class="filter-check" [class.active]="showNonVegOnly" (click)="toggleNonVeg()">
+            <span class="veg-dot-sm veg-dot-sm--nonveg"></span>
+            Non-Veg Only
+          </button>
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div class="filter-group">
+        <h4 class="filter-group-title">
+          <span class="material-icons">schedule</span>
+          Availability
+        </h4>
+        <div class="filter-options">
+          <button class="filter-check" [class.active]="showOpenOnly" (click)="toggleOpen()">
+            <span class="filter-check-dot filter-check-dot--open"></span>
+            Open Now
+          </button>
+          <button class="filter-check" [class.active]="showClosedOnly" (click)="toggleClosed()">
+            <span class="filter-check-dot filter-check-dot--closed"></span>
+            Closed
+          </button>
+        </div>
+      </div>
+
+      <!-- Rating -->
+      <div class="filter-group">
+        <h4 class="filter-group-title">
+          <span class="material-icons">star</span>
+          Rating
+        </h4>
+        <div class="filter-options">
+          <button class="filter-check" [class.active]="minRating === 4" (click)="setMinRating(4)">
+            <span class="material-icons filter-star-icon">star</span>
+            4+ Excellent
+          </button>
+          <button class="filter-check" [class.active]="minRating === 3" (click)="setMinRating(3)">
+            <span class="material-icons filter-star-icon">star</span>
+            3+ Good
+          </button>
+        </div>
+      </div>
+
+      <!-- Reset -->
+      @if (hasActiveFilters()) {
+        <button class="reset-btn" (click)="resetFilters()">
+          <span class="material-icons">restart_alt</span>
+          Clear All Filters
+        </button>
+      }
+    </aside>
+
+    <!-- Main Content -->
+    <main class="discovery-main">
+
+      <!-- Cuisine Tags (horizontal scroll) -->
+      @if (cuisineCategories().length > 1) {
+        <div class="cuisine-bar">
+          @for (cuisine of cuisineCategories(); track cuisine) {
+            <button
+              class="cuisine-tag"
+              [class.active]="selectedCuisine === cuisine"
+              (click)="selectCuisine(cuisine)">
+              <span class="material-icons cuisine-tag-icon">
+                {{ cuisineIcons[cuisine] || 'restaurant' }}
+              </span>
+              {{ cuisine }}
+            </button>
+          }
+        </div>
+      }
+
+      <!-- Segmented View Switcher Header -->
+      <div class="view-switcher-bar">
+        <div class="view-switch-pills">
+          <button
+            class="view-pill"
+            [class.active]="activeView() === 'dishes'"
+            (click)="setView('dishes')">
+            <span class="material-icons">restaurant_menu</span>
+            All {{ selectedCuisine !== 'All' ? selectedCuisine : '' }} Dishes
+            <span class="view-pill-badge">{{ filteredMenuItems().length }}</span>
+          </button>
+          <button
+            class="view-pill"
+            [class.active]="activeView() === 'restaurants'"
+            (click)="setView('restaurants')">
+            <span class="material-icons">storefront</span>
+            Restaurants
+            <span class="view-pill-badge">{{ filteredRestaurants().length }}</span>
+          </button>
+        </div>
+
+        @if (selectedCuisine !== 'All') {
+          <div class="category-heading-badge">
+            <span class="material-icons">{{ cuisineIcons[selectedCuisine] || 'restaurant' }}</span>
+            Showing all {{ selectedCuisine }} items
+          </div>
+        }
+      </div>
+
+      <!-- Loading Skeleton -->
+      @if (isLoading()) {
+        <div class="restaurant-grid" aria-label="Loading...">
+          @for (card of skeletonCards; track $index) {
+            <div class="restaurant-card skeleton-card">
+              <div class="skeleton skeleton-img"></div>
+              <div class="card-body">
+                <div class="skeleton skeleton-title"></div>
+                <div class="skeleton skeleton-line"></div>
+                <div class="skeleton skeleton-line short"></div>
+                <div class="card-footer">
+                  <div class="skeleton skeleton-chip"></div>
+                  <div class="skeleton skeleton-chip"></div>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      } @else if (loadError()) {
+        <div class="error-state">
+          <span class="material-icons error-icon">cloud_off</span>
+          <h3>Couldn't load items</h3>
+          <p>{{ loadError() }}</p>
+          <button class="reset-btn reset-btn--inline" (click)="retry()">
+            <span class="material-icons">refresh</span>
+            Try Again
+          </button>
+        </div>
+      } @else {
+
+        <!-- Active Filters Summary -->
+        <div class="results-bar">
+          <span class="results-count">
+            @if (activeView() === 'dishes') {
+              {{ filteredMenuItems().length }} {{ filteredMenuItems().length === 1 ? 'dish' : 'dishes' }} {{ selectedCuisine !== 'All' ? 'in ' + selectedCuisine : '' }} available to order
+            } @else {
+              {{ filteredRestaurants().length }} {{ filteredRestaurants().length === 1 ? 'restaurant' : 'restaurants' }} found
+            }
+          </span>
+          @if (hasActiveFilters()) {
+            <div class="active-tags">
+              @if (searchText) {
+                <span class="active-tag">
+                  "{{ searchText }}"
+                  <button (click)="clearSearch()">
+                    <span class="material-icons">close</span>
+                  </button>
+                </span>
+              }
+              @if (selectedCuisine !== 'All') {
+                <span class="active-tag">
+                  {{ selectedCuisine }}
+                  <button (click)="selectCuisine('All')">
+                    <span class="material-icons">close</span>
+                  </button>
+                </span>
+              }
+              @if (showVegOnly) {
+                <span class="active-tag">
+                  Veg Only
+                  <button (click)="toggleVeg()">
+                    <span class="material-icons">close</span>
+                  </button>
+                </span>
+              }
+              @if (showNonVegOnly) {
+                <span class="active-tag">
+                  Non-Veg Only
+                  <button (click)="toggleNonVeg()">
+                    <span class="material-icons">close</span>
+                  </button>
+                </span>
+              }
+              @if (showOpenOnly) {
+                <span class="active-tag">
+                  Open Now
+                  <button (click)="toggleOpen()">
+                    <span class="material-icons">close</span>
+                  </button>
+                </span>
+              }
+              @if (minRating > 0) {
+                <span class="active-tag">
+                  {{ minRating }}+ rating
+                  <button (click)="setMinRating(minRating)">
+                    <span class="material-icons">close</span>
+                  </button>
+                </span>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- ============================================
+             VIEW 1: DISHES GRID (All Pizzas, Burgers, etc.)
+             ============================================ -->
+        @if (activeView() === 'dishes') {
+          @if (filteredMenuItems().length === 0) {
+            <div class="empty-state">
+              <span class="material-icons empty-icon">search_off</span>
+              <h3>No dishes match your filters</h3>
+              <p>We couldn't find any dishes in this category. Try choosing a different category or clearing filters.</p>
+              @if (hasActiveFilters()) {
+                <button class="reset-btn reset-btn--inline" (click)="resetFilters()">
+                  <span class="material-icons">restart_alt</span>
+                  Reset Filters
+                </button>
+              }
+            </div>
+          } @else {
+            <div class="dishes-grid">
+              @for (dish of visibleMenuItems(); track trackByDishId($index, dish)) {
+                <div class="dish-item-card">
+                  <!-- Dish Image -->
+                  <div class="dish-img-wrap">
+                    <img [src]="dish.imageUrl || 'assets/images/menu/cheese-pizza.png'" [alt]="dish.name" loading="lazy" class="dish-img">
+
+                    <!-- Veg / Non-Veg Indicator -->
+                    @if (dish.isVeg) {
+                      <span class="dish-veg-badge dish-veg-badge--veg" title="Vegetarian">
+                        <span class="dish-veg-dot"></span>
+                      </span>
+                    } @else {
+                      <span class="dish-veg-badge dish-veg-badge--nonveg" title="Non-Vegetarian">
+                        <span class="dish-veg-dot"></span>
+                      </span>
+                    }
+
+                    <!-- Discount Badge -->
+                    @if (dish.discountPercent > 0) {
+                      <span class="dish-discount-tag">{{ dish.discountPercent }}% OFF</span>
+                    }
+
+                    <!-- Wishlist Button -->
+                    <button
+                      class="dish-wishlist-btn"
+                      [class.active]="isDishWishlisted(dish.id)"
+                      (click)="toggleDishWishlist($event, dish)"
+                      [attr.aria-label]="isDishWishlisted(dish.id) ? 'Remove from wishlist' : 'Add to wishlist'">
+                      <span class="material-icons">
+                        {{ isDishWishlisted(dish.id) ? 'favorite' : 'favorite_border' }}
+                      </span>
+                    </button>
+                  </div>
+
+                  <!-- Dish Body -->
+                  <div class="dish-body">
+                    <div class="dish-head">
+                      <h3 class="dish-name">{{ dish.name }}</h3>
+                      @if (dish.isBestseller) {
+                        <span class="bestseller-badge">
+                          <span class="material-icons">local_fire_department</span>
+                          Bestseller
+                        </span>
+                      }
+                    </div>
+
+                    @if (dish.description) {
+                      <p class="dish-desc">{{ dish.description }}</p>
+                    }
+
+                    <!-- Restaurant Link -->
+                    <a class="dish-restaurant-chip" [routerLink]="['/restaurants', dish.restaurantId]">
+                      <span class="material-icons">storefront</span>
+                      <span>{{ getRestaurantName(dish.restaurantId) }}</span>
+                      <span class="material-icons chevron">chevron_right</span>
+                    </a>
+
+                    <!-- Dish Footer: Price & Add to Cart -->
+                    <div class="dish-footer">
+                      <div class="dish-price-group">
+                        @if (dish.discountPercent > 0) {
+                          <span class="dish-old-price">₹{{ dish.price | number:'1.0-0' }}</span>
+                          <span class="dish-current-price">₹{{ getDiscountedPrice(dish) | number:'1.0-0' }}</span>
+                        } @else {
+                          <span class="dish-current-price">₹{{ dish.price | number:'1.0-0' }}</span>
+                        }
+                      </div>
+
+                      <button
+                        class="dish-add-btn"
+                        [disabled]="!dish.isAvailable"
+                        (click)="addToCart(dish)">
+                        <span class="material-icons">add_shopping_cart</span>
+                        {{ dish.isAvailable ? 'Add' : 'Out of Stock' }}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <!-- Load More Dishes -->
+            @if (hasMoreDishes()) {
+              <div class="load-more-wrap">
+                <button class="load-more-btn" (click)="loadMoreDishes()">
+                  Load More Dishes
+                  <span class="load-more-count">({{ remainingDishesCount() }} more)</span>
+                  <span class="material-icons">expand_more</span>
+                </button>
+              </div>
+            }
+          }
+        }
+
+        <!-- ============================================
+             VIEW 2: RESTAURANTS GRID
+             ============================================ -->
+        @if (activeView() === 'restaurants') {
+          @if (filteredRestaurants().length === 0) {
+            <div class="empty-state">
+              <span class="material-icons empty-icon">storefront</span>
+              <h3>No restaurants match your filters</h3>
+              <p>We searched everywhere but couldn't find a match. Try a different search or clear some filters.</p>
+              @if (hasActiveFilters()) {
+                <button class="reset-btn reset-btn--inline" (click)="resetFilters()">
+                  <span class="material-icons">restart_alt</span>
+                  Reset Filters
+                </button>
+              }
+            </div>
+          } @else {
+            <div class="restaurant-grid">
+              @for (restaurant of visibleRestaurants(); track trackById($index, restaurant)) {
+                <a class="restaurant-card" [routerLink]="['/restaurants', restaurant.id]">
+
+                  <!-- Image -->
+                  <div class="card-img">
+                    <img [src]="getCardImage(restaurant)" [alt]="restaurant.name" loading="lazy" class="card-img-el">
+
+                    <!-- Status Badge -->
+                    @if (restaurant.isOpenNow) {
+                      <span class="status-badge status-badge--open">
+                        <span class="status-pulse"></span>
+                        Open
+                      </span>
+                    } @else {
+                      <span class="status-badge status-badge--closed">Closed</span>
+                    }
+
+                    <!-- Favorite -->
+                    <button
+                      class="fav-btn"
+                      [class.fav-btn--active]="isFavorite(restaurant.id)"
+                      (click)="toggleFavorite($event, restaurant)"
+                      [attr.aria-label]="isFavorite(restaurant.id) ? 'Remove from favorites' : 'Add to favorites'">
+                      <span class="material-icons">
+                        {{ isFavorite(restaurant.id) ? 'favorite' : 'favorite_border' }}
+                      </span>
+                    </button>
+
+                    <!-- Free Delivery Badge -->
+                    @if (restaurant.deliveryCharge === 0) {
+                      <span class="delivery-badge">
+                        <span class="material-icons">local_shipping</span>
+                        Free Delivery
+                      </span>
+                    }
+                  </div>
+
+                  <!-- Info -->
+                  <div class="card-body">
+                    <div class="card-top">
+                      <h3 class="card-name">{{ restaurant.name }}</h3>
+                      @if (restaurant.rating && restaurant.rating > 0) {
+                        <span class="rating-pill">
+                          <span class="material-icons">star</span>
+                          {{ restaurant.rating | number:'1.1-1' }}
+                        </span>
+                      }
+                    </div>
+
+                    <p class="card-cuisines">{{ getRestaurantCuisines(restaurant.id) }}</p>
+                    <p class="card-desc">{{ restaurant.description }}</p>
+
+                    <div class="card-meta">
+                      <span class="meta-chip">
+                        <span class="material-icons">location_on</span>
+                        {{ restaurant.address }}
+                      </span>
+                    </div>
+
+                    <div class="card-footer">
+                      <span class="delivery-info-chip">
+                        <span class="material-icons">delivery_dining</span>
+                        {{ getDeliveryTimeEstimate(restaurant) }}
+                      </span>
+                      <span class="delivery-fee" [class.free]="restaurant.deliveryCharge === 0">
+                        <span class="material-icons">payments</span>
+                        {{ getDeliveryLabel(restaurant.deliveryCharge) }}
+                      </span>
+                    </div>
+
+                    @if (restaurant.minimumOrder > 0) {
+                      <p class="min-order">Min. order ₹{{ restaurant.minimumOrder }}</p>
+                    }
+
+                    <button class="view-menu-btn" (click)="$event.stopPropagation()">
+                      View Menu
+                      <span class="material-icons">arrow_forward</span>
+                    </button>
+                  </div>
+                </a>
+              }
+            </div>
+
+            <!-- Load More -->
+            @if (hasMore()) {
+              <div class="load-more-wrap">
+                <button class="load-more-btn" (click)="loadMore()">
+                  Load More
+                  <span class="load-more-count">({{ remainingCount() }} more)</span>
+                  <span class="material-icons">expand_more</span>
+                </button>
+              </div>
+            }
+          }
+        }
+
+      }
+    </main>
+  </div>
+</div>
+

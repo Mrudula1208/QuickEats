@@ -1,198 +1,67 @@
-import { Component } from '@angular/core';
-// 1ï¸âƒ£ Executes First.
-// Import Component because every Angular page starts with Component.
-
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-// Import CommonModule.
-// Required because HTML uses @for and @if.
-
-import { Router } from '@angular/router';
-// Import Router.
-// Used to open Restaurant Details page.
-
+import { RouterLink } from '@angular/router';
 import { WishlistService } from '../../../core/services/wishlist.service';
-// Import WishlistService.
-// All wishlist logic is written inside this service.
-
 import { WishlistModel } from '../../../core/models/wishlist.model';
-// Import WishlistModel.
-// Defines the structure of one wishlist item.
+import { CartService } from '../../../core/services/cart.service';
+import { MenuService } from '../../../core/services/menu.service';
+import { MenuItem } from '../../../core/models/menu.model';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
-
   selector: 'app-wishlist',
-  // HTML selector.
-
   standalone: true,
-  // Standalone component.
-  // No AppModule registration required.
-
-  imports: [
-
-    CommonModule
-
-  ],
-
+  imports: [CommonModule, RouterLink],
   templateUrl: './wishlist.html',
-  // Connect HTML file.
-
   styleUrl: './wishlist.scss'
-  // Connect CSS file.
-
 })
-
 export class WishlistComponent {
 
-  // ===============================================
-  // EXECUTION FLOW
-  // ===============================================
-  //
-  // 1ï¸âƒ£ Angular creates WishlistComponent.
-  //
-  // 2ï¸âƒ£ Constructor executes automatically.
-  //
-  // 3ï¸âƒ£ loadWishlist() executes.
-  //
-  // 4ï¸âƒ£ Service returns all wishlist items.
-  //
-  // 5ï¸âƒ£ HTML displays Wishlist.
-  //
-  // 6ï¸âƒ£ Customer clicks Remove.
-  //
-  // 7ï¸âƒ£ Service removes item.
-  //
-  // 8ï¸âƒ£ HTML refreshes automatically.
-  //
-  // ===============================================
-
-  wishlistItems: WishlistModel[] = [];
-  // WishlistModel[]
-  //
-  // Means:
-  // Store multiple wishlist items.
+  wishlistItems = signal<WishlistModel[]>([]);
+  isLoading = signal(true);
 
   constructor(
-
     private wishlistService: WishlistService,
-    // Angular automatically gives WishlistService object.
-
-    private router: Router
-    // Router is used for navigation.
-
+    private cartService: CartService,
+    private menuService: MenuService,
+    private toastr: ToastrService
   ) {
-
-    // Constructor runs automatically
-    // when page opens.
-
     this.loadWishlist();
-
   }
 
   loadWishlist(): void {
-
-    // (): void
-    //
-    // Means:
-    // This method returns nothing.
-    // It only loads data.
-
-
-      this.wishlistService.getWishlist().subscribe({
-        next :(data :WishlistModel[]) => {
-          this.wishlistItems=data;
-        },
-
-            error: () => {}
-      });
-    
-    
-
-  }
-removeWishlistItem(
-    selectedMenuId: number
-): void {
-
-    this.wishlistService
-        .removeFromWishlist(selectedMenuId)
-        .subscribe({
-
-            next: () => {
-
-                this.loadWishlist();
-
-            },
-
-            error: () => {}
-
-        });
-
-}
-  openRestaurant(
-
-    selectedRestaurantId: number
-
-  ): void {
-
-    // Open Restaurant Details page.
-
-    this.router.navigate([
-
-      '/restaurant',
-
-      selectedRestaurantId
-
-    ]);
-
+    this.isLoading.set(true);
+    this.wishlistService.getWishlist().subscribe({
+      next: (data) => {
+        this.wishlistItems.set(data);
+        this.isLoading.set(false);
+      },
+      error: () => { this.isLoading.set(false); }
+    });
   }
 
+  removeItem(menuId: number): void {
+    this.wishlistService.removeFromWishlist(menuId).subscribe({
+      next: () => {
+        this.wishlistItems.set(this.wishlistItems().filter(i => i.menuId !== menuId));
+        this.toastr.success('Removed from wishlist');
+      },
+      error: () => { this.toastr.error('Failed to remove item'); }
+    });
+  }
+
+  addToCart(item: WishlistModel): void {
+    this.menuService.getMenuByRestaurantId(item.restaurantId).subscribe({
+      next: (menus: MenuItem[]) => {
+        const menuItem = menus.find(m => m.id === item.menuId);
+        if (menuItem) {
+          this.cartService.addToCart(menuItem);
+          this.toastr.success(`${item.foodName} added to cart`);
+        } else {
+          this.toastr.error('Item not available');
+        }
+      },
+      error: () => { this.toastr.error('Failed to add to cart'); }
+    });
+  }
 }
-
-/*
-
-WHY DO WE WRITE THIS FILE?
-
-This component controls
-
-âœ” View Wishlist
-
-âœ” Remove Wishlist Item
-
-âœ” Open Restaurant
-
-Flow
-
-Wishlist Page Opens
-
-â†“
-
-Constructor Executes
-
-â†“
-
-loadWishlist()
-
-â†“
-
-Wishlist Service
-
-â†“
-
-Wishlist Items
-
-â†“
-
-HTML Displays Cards
-
-â†“
-
-Customer Removes Item
-
-â†“
-
-Service Updates
-
-â†“
-
-HTML Refreshes
-
-*/

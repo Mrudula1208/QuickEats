@@ -12,5 +12,7 @@ namespace QuickEats.API.Repositories.Interfaces
         // Wait and return Dashboard.
         Task<DashboardDto> GetDashboardAsync();
 
+        Task<DashboardDto> GetOwnerDashboardAsync(int ownerId);
+
     }
 }

@@ -1,109 +1,118 @@
 <app-owner-nav></app-owner-nav>
 
-<div class="owner-page">
+<section class="om-hero">
+  <div class="om-hero-inner">
+    <h1>Menu Management</h1>
+    <p>Manage your menu items for this restaurant</p>
+  </div>
+</section>
 
-    <h1>Menu Items</h1>
+<section class="om-content">
+  <div class="om-container">
 
-    <button
-        class="add-btn"
-        routerLink="/owner/menu/{{ restaurantId }}/new">
+    <div class="om-toolbar">
+      <div class="om-search">
+        <span class="material-icons">search</span>
+        <input type="text" placeholder="Search menu items..." [(ngModel)]="searchText">
+      </div>
+      <a class="om-add-btn" [routerLink]="['/owner/menu', restaurantId, 'new']">
+        <span class="material-icons">add</span>
+        Add Item
+      </a>
+    </div>
 
-        + Add Menu Item
+    <div class="om-categories">
+      @for (cat of categories(); track cat) {
+        <button class="om-cat-chip" [class.active]="selectedCategory() === cat" (click)="selectedCategory.set(cat)">
+          {{ cat }}
+        </button>
+      }
+    </div>
 
-    </button>
-
-    @if(menuItems.length === 0){
-
-        <div class="empty">
-
-            <h2>No Menu Items</h2>
-
-            <p>Add your first menu item.</p>
-
-        </div>
-
-    }
-    @else{
-
-        <div class="menu-grid">
-
-            @for(item of menuItems; track item.id){
-
-            <div class="menu-card" [class.unavailable]="!item.isAvailable">
-
-                <h2>{{ item.name }}</h2>
-
-                <p>{{ item.description }}</p>
-
-                <p class="price">
-                    ₹{{ item.price }}
-
-                    @if(item.discountPercent > 0){
-                        <span class="discount">
-                            {{ item.discountPercent }}% OFF
-                        </span>
-                    }
-
-                </p>
-
-                <p>
-                    {{ item.category }} •
-                    @if(item.isVeg){
-                        Veg
-                    }
-                    @else{
-                        Non-Veg
-                    }
-                    @if(item.isBestseller){
-                        • 🔥 Bestseller
-                    }
-                </p>
-
-                <p class="availability">
-                    @if(item.isAvailable){
-                        ✅ Available
-                    }
-                    @else{
-                        ❌ Out of Stock
-                    }
-                </p>
-
-                <div class="actions">
-
-                    <button
-                        [class.toggle-on]="item.isAvailable"
-                        [class.toggle-off]="!item.isAvailable"
-                        (click)="toggleAvailability(item.id)">
-
-                        @if(item.isAvailable){
-                            Mark Out of Stock
-                        }
-                        @else{
-                            Mark Available
-                        }
-
-                    </button>
-
-                    <button routerLink="/owner/menu/{{ restaurantId }}/{{ item.id }}/edit">
-                        Edit
-                    </button>
-
-                    <button
-                        class="delete-btn"
-                        (click)="deleteItem(item.id, item.name)">
-
-                        Delete
-
-                    </button>
-
+    @if (isLoading()) {
+      <div class="om-loading">
+        <span class="material-icons spinning">progress_activity</span>
+        <p>Loading menu...</p>
+      </div>
+    } @else if (loadError()) {
+      <div class="om-empty">
+        <span class="material-icons">cloud_off</span>
+        <h3>Couldn't Load the Menu</h3>
+        <p>Something went wrong while loading your menu items. Please try again.</p>
+        <button class="om-retry" (click)="retry()">
+          <span class="material-icons">refresh</span>
+          Try Again
+        </button>
+      </div>
+    } @else if (filteredItems().length === 0) {
+      <div class="om-empty">
+        <span class="material-icons">restaurant_menu</span>
+        <h3>{{ menuItems().length === 0 ? 'No Menu Items Yet' : 'No items match your search' }}</h3>
+        <p>{{ menuItems().length === 0 ? 'Add your first menu item to get started.' : 'Try a different search term.' }}</p>
+        @if (menuItems().length === 0) {
+          <a class="om-add-first" [routerLink]="['/owner/menu', restaurantId, 'new']">
+            <span class="material-icons">add</span>
+            Add First Item
+          </a>
+        }
+      </div>
+    } @else {
+      <div class="om-grid">
+        @for (item of filteredItems(); track item.id) {
+          <div class="om-card" [class.out-of-stock]="!item.isAvailable">
+            <div class="om-card-img">
+              <img [src]="item.imageUrl || ''" [alt]="item.name" (error)="$any($event.target).src='assets/images/no-image.svg'">
+              <div class="om-card-badges">
+                @if (item.isVeg) {
+                  <span class="badge veg">Veg</span>
+                } @else {
+                  <span class="badge non-veg">Non-Veg</span>
+                }
+                @if (item.isBestseller) {
+                  <span class="badge bestseller">Bestseller</span>
+                }
+                @if (item.discountPercent > 0) {
+                  <span class="badge discount">{{ item.discountPercent }}% OFF</span>
+                }
+              </div>
+              @if (!item.isAvailable) {
+                <div class="om-stock-overlay">
+                  <span class="material-icons">block</span>
+                  Out of Stock
                 </div>
-
+              }
             </div>
-
-            }
-
-        </div>
-
+            <div class="om-card-body">
+              <div class="om-card-top">
+                <h3>{{ item.name }}</h3>
+                <span class="om-category-badge">{{ item.category }}</span>
+              </div>
+              <p class="om-desc">{{ item.description || 'No description' }}</p>
+              <div class="om-price-row">
+                <span class="om-price">₹{{ getSalePrice(item) | number:'1.0-0' }}</span>
+                @if (item.discountPercent > 0) {
+                  <span class="om-old-price">₹{{ item.price | number:'1.0-0' }}</span>
+                }
+              </div>
+              <div class="om-card-actions">
+                <button class="om-btn toggle" [class.available]="item.isAvailable" (click)="toggleAvailability(item.id)">
+                  <span class="material-icons">{{ item.isAvailable ? 'check_circle' : 'cancel' }}</span>
+                  {{ item.isAvailable ? 'In Stock' : 'Out of Stock' }}
+                </button>
+                <a class="om-btn edit" [routerLink]="['/owner/menu', restaurantId, item.id, 'edit']">
+                  <span class="material-icons">edit</span>
+                  Edit
+                </a>
+                <button class="om-btn delete" (click)="deleteItem(item.id, item.name)">
+                  <span class="material-icons">delete_outline</span>
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
     }
 
-</div>
+  </div>
+</section>

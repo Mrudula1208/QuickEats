@@ -6,7 +6,7 @@
 
 .saved-address-page h1{
     text-align:center;
-    color:#fc8019;
+    color:#E85D3A;
     margin-bottom:30px;
     font-size:34px;
 }
@@ -36,7 +36,7 @@
 
 .address-form input:focus,
 .address-form select:focus{
-    border-color:#fc8019;
+    border-color:#E85D3A;
 }
 
 .form-group{
@@ -57,7 +57,7 @@
 
 .form-group input:focus,
 .form-group select:focus{
-    border-color:#fc8019;
+    border-color:#E85D3A;
 }
 
 .input-error{
@@ -77,7 +77,7 @@
     padding:15px;
     border:none;
     border-radius:12px;
-    background:#fc8019;
+    background:#E85D3A;
     color:white;
     font-size:17px;
     cursor:pointer;
@@ -85,13 +85,54 @@
 }
 
 .address-form button:hover{
-    background:#e56f00;
+    background:#D14A2A;
 }
 
 .address-list{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(330px,1fr));
     gap:25px;
+}
+
+.state-box{
+    grid-column: 1 / -1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    padding:70px 20px;
+    text-align:center;
+
+    .material-icons{ font-size:48px; color:#8494A7; }
+    h3{ font-family:'DM Sans',sans-serif; font-size:20px; font-weight:700; color:#1B2838; margin:0; }
+    p{ margin:0; font-size:15px; color:#5A6B7F; }
+}
+
+.state-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    border:none;
+    padding:10px 22px;
+    border-radius:24px;
+    background:#2D6A4F;
+    color:white;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    transition:background .3s;
+
+    .material-icons{ font-size:18px; color:#fff; margin:0; }
+
+    &:hover{ background:#52B788; }
+}
+
+.spinning{ animation:saSpin 1s linear infinite; }
+
+@keyframes saSpin{
+    from{ transform:rotate(0deg); }
+    to{ transform:rotate(360deg); }
 }
 
 .address-card{
@@ -108,7 +149,7 @@
 }
 
 .address-card h3{
-    color:#fc8019;
+    color:#E85D3A;
     margin-bottom:15px;
 }
 
@@ -122,10 +163,20 @@
     display:inline-block;
     margin-top:15px;
     padding:8px 14px;
-    background:#fff3e0;
-    color:#fc8019;
+    background:#FEF0EC;
+    color:#E85D3A;
     border-radius:30px;
     font-weight:600;
+}
+
+.default-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:rgba(45,106,79,.1) !important;
+    color:#2D6A4F !important;
+
+    .material-icons{ font-size:16px; color:#F4A261; }
 }
 
 .address-card div{
@@ -145,12 +196,12 @@
 }
 
 .address-card button:first-child{
-    background:#fc8019;
+    background:#E85D3A;
     color:white;
 }
 
 .address-card button:first-child:hover{
-    background:#e56f00;
+    background:#D14A2A;
 }
 
 .address-card button:last-child{

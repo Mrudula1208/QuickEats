@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 // Import Entity Framework Core.
 // Used to communicate with SQL Server.
 
@@ -96,6 +96,18 @@ namespace QuickEats.API.Repositories
                 .Include(review => review.Customer)
                 .Include(review => review.Restaurant)
                 .Where(review => review.RestaurantId == restaurantId)
+                .ToListAsync();
+        }
+
+        // Get all reviews of all Restaurants owned by an Owner.
+        public async Task<IEnumerable<Reviews>> GetByOwnerIdAsync(
+            int ownerId
+        )
+        {
+            return await _context.Reviews
+                .Include(review => review.Customer)
+                .Include(review => review.Restaurant)
+                .Where(review => review.Restaurant.OwnerId == ownerId)
                 .ToListAsync();
         }
 

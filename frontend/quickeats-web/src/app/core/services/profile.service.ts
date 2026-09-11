@@ -1,160 +1,80 @@
 import { Injectable, signal } from '@angular/core';
-// 1ï¸âƒ£ Executes First.
-//
-// Injectable
-// Means Angular can create this service.
-//
-// signal
-// Stores live data.
-// Whenever signal changes,
-// Angular automatically refreshes UI.
-
+import { HttpClient } from '@angular/common/http';
+import { Observable, of } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { ProfileModel } from '../models/profile.model';
-// 2ï¸âƒ£ Import ProfileModel.
-// We need this because
-// service stores ProfileModel object.
+import { environment } from '../../../environments/environment';
 
 @Injectable({
-
-    providedIn: 'root'
-
-    // Angular creates only ONE object
-    // of this service for
-    // entire application.
-
+  providedIn: 'root'
 })
-
 export class ProfileService {
 
-    // =====================================================
-    // EXECUTION FLOW
-    // =====================================================
-    //
-    // 1ï¸âƒ£ Angular creates ProfileService.
-    //
-    // 2ï¸âƒ£ profileData signal is created.
-    //
-    // 3ï¸âƒ£ Component calls getProfile().
-    //
-    // 4ï¸âƒ£ HTML displays profile.
-    //
-    // =====================================================
+  private apiUrl = `${environment.apiUrl}/User`;
 
-    profileData = signal<ProfileModel>({
+  profileData = signal<ProfileModel>({
+    fullName: '',
+    email: '',
+    phoneNumber: '',
+    gender: '',
+    dateOfBirth: '',
+    city: '',
+    state: '',
+    profileImage: '',
+    rewardPoints: 0
+  });
 
-        fullName: "Mrudula More",
+  constructor(private http: HttpClient) {
+    this.loadFromStorage();
+  }
 
-        email: "mrudula@gmail.com",
+  loadFromStorage(): void {
+    const name = localStorage.getItem('name') || '';
+    const email = localStorage.getItem('email') || '';
+    const phone = localStorage.getItem('phoneNumber') || '';
+    const gender = localStorage.getItem('gender') || '';
+    const dob = localStorage.getItem('dateOfBirth') || '';
+    const city = localStorage.getItem('city') || '';
+    const state = localStorage.getItem('state') || '';
+    const image = localStorage.getItem('profileImageUrl') || '';
+    const points = parseInt(localStorage.getItem('rewardPoints') || '0', 10);
 
-        phoneNumber: "9876543210",
-
-        gender: "Female",
-
-        dateOfBirth: "18-05-2004",
-
-        city: "Mumbai",
-
-        state: "Maharashtra",
-
-        profileImage:
-        "https://i.pravatar.cc/200",
-
-        rewardPoints: 245
-
+    this.profileData.set({
+      fullName: name,
+      email: email,
+      phoneNumber: phone,
+      gender: gender,
+      dateOfBirth: dob,
+      city: city,
+      state: state,
+      profileImage: image,
+      rewardPoints: points
     });
+  }
 
-    // signal<ProfileModel>
-    //
-    // Means:
-    //
-    // signal stores live object.
-    //
-    // ProfileModel tells TypeScript
-    // structure of object.
+  getProfile(): ProfileModel {
+    return this.profileData();
+  }
 
-    constructor() {
+  updateProfile(latestProfile: ProfileModel): void {
+    this.profileData.set(latestProfile);
+    localStorage.setItem('name', latestProfile.fullName);
+    localStorage.setItem('email', latestProfile.email);
+    localStorage.setItem('phoneNumber', latestProfile.phoneNumber);
+    localStorage.setItem('gender', latestProfile.gender);
+    localStorage.setItem('dateOfBirth', latestProfile.dateOfBirth);
+    localStorage.setItem('city', latestProfile.city);
+    localStorage.setItem('state', latestProfile.state);
+    localStorage.setItem('profileImageUrl', latestProfile.profileImage);
+    localStorage.setItem('rewardPoints', String(latestProfile.rewardPoints));
+  }
 
-    }
-
-    getProfile(): ProfileModel {
-
-        // (): ProfileModel
-        //
-        // Means this method
-        // returns ProfileModel object.
-
-        return this.profileData();
-
-    }
-
-    updateProfile(
-
-        latestProfile: ProfileModel
-
-    ): void {
-
-        // latestProfile: ProfileModel
-        //
-        // Means input parameter
-        // must follow ProfileModel.
-
-        // ): void
-        //
-        // Means returns nothing.
-
-        this.profileData.set(
-
-            latestProfile
-
-        );
-
-
-
-    }
-
+  updateProfileImage(imageUrl: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/profile-image`, { profileImageUrl: imageUrl }).pipe(
+      tap(() => {
+        const current = this.profileData();
+        this.updateProfile({ ...current, profileImage: imageUrl });
+      })
+    );
+  }
 }
-
-/*
-
-WHY DO WE WRITE THIS FILE?
-
-This service manages customer profile.
-
-Instead of storing profile
-inside component,
-
-we store it here.
-
-Flow
-
-Component
-
-â†“
-
-Profile Service
-
-â†“
-
-Profile Signal
-
-â†“
-
-HTML
-
-Later
-
-Backend API
-
-â†“
-
-Profile Service
-
-â†“
-
-Component
-
-â†“
-
-HTML
-
-*/

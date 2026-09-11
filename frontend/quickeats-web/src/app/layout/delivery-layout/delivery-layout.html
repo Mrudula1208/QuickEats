@@ -1,1 +1,90 @@
-<p>delivery-layout works!</p>
+<!-- Desktop & Tablet Navigation Header -->
+<header class="dl-header">
+  <div class="dl-header-container">
+    
+    <!-- Brand -->
+    <a routerLink="/delivery/dashboard" class="dl-brand">
+      <div class="dl-brand-icon">
+        <span class="material-icons">sports_motorsports</span>
+      </div>
+      <div class="dl-brand-text">
+        <span class="dl-brand-title">QuickEats</span>
+        <span class="dl-brand-badge">Partner</span>
+      </div>
+    </a>
+
+    <!-- Navigation Links (Desktop) -->
+    <nav class="dl-nav-links">
+      <a routerLink="/delivery/dashboard" routerLinkActive="active" class="dl-nav-link">
+        <span class="material-icons">dashboard</span>
+        <span>Dashboard</span>
+      </a>
+      <a routerLink="/delivery/deliveries" routerLinkActive="active" class="dl-nav-link">
+        <span class="material-icons">two_wheeler</span>
+        <span>My Deliveries</span>
+      </a>
+      <a routerLink="/delivery/history" routerLinkActive="active" class="dl-nav-link">
+        <span class="material-icons">history</span>
+        <span>Delivery History</span>
+      </a>
+      <a routerLink="/delivery/profile" routerLinkActive="active" class="dl-nav-link">
+        <span class="material-icons">person</span>
+        <span>Profile</span>
+      </a>
+    </nav>
+
+    <!-- Header Actions -->
+    <div class="dl-header-right">
+      <!-- Availability Switch -->
+      <button 
+        type="button"
+        class="dl-status-toggle" 
+        [class.online]="isAvailable()" 
+        [class.offline]="!isAvailable()"
+        (click)="toggleAvailability()"
+        title="Click to toggle availability">
+        <span class="dl-status-dot"></span>
+        <span class="dl-status-text">{{ isAvailable() ? 'Online' : 'Offline' }}</span>
+      </button>
+
+      <!-- User Pill -->
+      <div class="dl-user-pill">
+        <div class="dl-user-avatar">
+          <span class="material-icons">account_circle</span>
+        </div>
+        <span class="dl-user-name">{{ riderName() }}</span>
+      </div>
+
+      <!-- Logout -->
+      <button type="button" class="dl-logout-btn" (click)="logout()" title="Logout">
+        <span class="material-icons">logout</span>
+      </button>
+    </div>
+
+  </div>
+</header>
+
+<!-- Main Working Content Area -->
+<main class="dl-main-content">
+  <router-outlet></router-outlet>
+</main>
+
+<!-- Mobile Bottom Navigation Bar -->
+<nav class="dl-mobile-bottom-nav">
+  <a routerLink="/delivery/dashboard" routerLinkActive="active" class="dl-mobile-tab">
+    <span class="material-icons">dashboard</span>
+    <span class="tab-label">Dashboard</span>
+  </a>
+  <a routerLink="/delivery/deliveries" routerLinkActive="active" class="dl-mobile-tab">
+    <span class="material-icons">two_wheeler</span>
+    <span class="tab-label">Deliveries</span>
+  </a>
+  <a routerLink="/delivery/history" routerLinkActive="active" class="dl-mobile-tab">
+    <span class="material-icons">history</span>
+    <span class="tab-label">History</span>
+  </a>
+  <a routerLink="/delivery/profile" routerLinkActive="active" class="dl-mobile-tab">
+    <span class="material-icons">person</span>
+    <span class="tab-label">Profile</span>
+  </a>
+</nav>

@@ -1,31 +1,17 @@
 // Import Component decorator.
 import { Component, signal } from '@angular/core';
-
-// Import CommonModule.
 import { CommonModule } from '@angular/common';
-
-// Import FormsModule for the coupon box.
 import { FormsModule } from '@angular/forms';
-
-// Import Cart Service.
+import { Router, RouterLink } from '@angular/router';
 import { CartService } from '../../../core/services/cart.service';
-
-// Import Cart Item model.
 import { CartItem } from '../../../core/models/cart-item.model';
-
-// Import Restaurant Service to show restaurant name.
 import { RestaurantService } from '../../../core/services/restaurant.service';
-
-// Import Router for page navigation.
-import { Router } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
-
   selector: 'app-cart',
-
   standalone: true,
-
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
 
   templateUrl: './cart.html',
 
@@ -50,9 +36,17 @@ export class CartComponent {
   // Message after applying a coupon.
   couponMessage = '';
 
+  // Loading and error states for restaurant info.
+  isLoadingRestaurant = true;
+  restaurantLoadError: string | null = null;
+
+  // Applied coupon code (used to disable input while one is applied).
+  isApplyingCoupon = false;
+
   constructor(
     private cartService: CartService,
     private restaurantService: RestaurantService,
+    private authService: AuthService,
     private router: Router
   ) {
 
@@ -67,7 +61,13 @@ export class CartComponent {
 
     const firstItem = this.cartItems()[0];
 
-    if (!firstItem) return;
+    if (!firstItem) {
+      this.isLoadingRestaurant = false;
+      return;
+    }
+
+    this.isLoadingRestaurant = true;
+    this.restaurantLoadError = null;
 
     this.restaurantService
       .getRestaurantById(firstItem.menu.restaurantId)
@@ -86,9 +86,14 @@ export class CartComponent {
             data.minimumOrder
           );
 
+          this.isLoadingRestaurant = false;
+
         },
 
-        error: () => {}
+        error: () => {
+          this.isLoadingRestaurant = false;
+          this.restaurantLoadError = 'Could not load the restaurant details. Delivery charges may not be accurate.';
+        }
 
       });
 
@@ -115,10 +120,20 @@ export class CartComponent {
   // Apply the coupon code.
   applyCoupon(): void {
 
+    if (!this.couponInput.trim()) {
+      this.couponMessage = 'Please enter a coupon code.';
+      return;
+    }
+
+    this.isApplyingCoupon = true;
+    this.couponMessage = '';
+
     this.cartService
       .applyCoupon(this.couponInput)
       .subscribe({
         next: (errorMsg) => {
+
+          this.isApplyingCoupon = false;
 
           if (errorMsg === '') {
 
@@ -135,7 +150,7 @@ export class CartComponent {
         },
         error: () => {
 
-
+          this.isApplyingCoupon = false;
           this.couponMessage = 'Coupon not available.';
 
         }
@@ -169,8 +184,24 @@ export class CartComponent {
   isBelowMinimumOrder(): boolean { return this.cartService.isBelowMinimumOrder(); }
 
   // Open the Checkout page.
+  // If the customer is not logged in, redirect to Login
+  // (Checkout requires authentication).
   goToCheckout(): void {
+
+    if (!this.authService.isLoggedIn()) {
+
+      this.router.navigate(['/login'], {
+
+        queryParams: { returnUrl: '/checkout' }
+
+      });
+
+      return;
+
+    }
+
     this.router.navigate(['/checkout']);
+
   }
 
 }

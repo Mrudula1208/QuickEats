@@ -20,11 +20,32 @@
   Means there are no reviews.
 -->
 
-@if (reviews.length === 0) {
+@if (isLoading) {
 
-  <h2>
-    No Reviews Found
-  </h2>
+  <div class="adm-state">
+    <span class="material-icons spinning">progress_activity</span>
+    <p>Loading...</p>
+  </div>
+
+}
+
+@else if (loadError) {
+
+  <div class="adm-state">
+    <span class="material-icons">error_outline</span>
+    <p>{{ loadError }}</p>
+    <button class="adm-state-btn" (click)="retry()">Try Again</button>
+  </div>
+
+}
+
+@else if (reviews.length === 0) {
+
+  <div class="adm-state">
+    <span class="material-icons">inbox</span>
+    <h3>No Reviews Found</h3>
+    <p>There are no reviews yet. Reviews will appear here once customers rate their orders.</p>
+  </div>
 
 }
 

@@ -65,5 +65,23 @@ namespace QuickEats.API.Controllers
 
             return Ok("Restaurant added to favorites successfully.");
         }
+
+        /// <summary>
+        /// Removes a restaurant from the logged in user's favorites.
+        /// </summary>
+        /// <param name="id">Favorite id to remove.</param>
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(
+            int id
+        )
+        {
+            var userId = int.Parse(
+                User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            await _favoriteService.DeleteAsync(userId, id);
+
+            return Ok("Restaurant removed from favorites.");
+        }
     }
 }

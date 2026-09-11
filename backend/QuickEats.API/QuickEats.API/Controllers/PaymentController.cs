@@ -20,9 +20,11 @@ namespace QuickEats.API.Controllers
     {
         private readonly IPaymentService _paymentService;
         private readonly IOrderService _orderService;
-        public PaymentController(IPaymentService paymentService, IOrderService orderService) {
+        private readonly IRestaurantService _restaurantService;
+        public PaymentController(IPaymentService paymentService, IOrderService orderService, IRestaurantService restaurantService) {
             _paymentService = paymentService;
             _orderService = orderService;
+            _restaurantService = restaurantService;
         }
 
         /// <summary>
@@ -52,14 +54,26 @@ namespace QuickEats.API.Controllers
             var currentUserId = int.Parse(
                 User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
-            if (!User.IsInRole("Admin"))
+            if (User.IsInRole("Admin"))
+                return Ok(payment);
+
+            if (User.IsInRole("Customer"))
             {
                 var order = await _orderService.GetByIdAsync(payment.OrderId);
                 if (order == null || order.UserId != currentUserId)
                     return Forbid();
+                return Ok(payment);
             }
 
-            return Ok(payment);
+            if (User.IsInRole("Owner"))
+            {
+                var order = await _orderService.GetByIdAsync(payment.OrderId);
+                if (order == null || !await IsOrderOfOwner(order.RestaurantId, currentUserId))
+                    return Forbid();
+                return Ok(payment);
+            }
+
+            return Forbid();
         }
 
         /// <summary>
@@ -78,14 +92,26 @@ namespace QuickEats.API.Controllers
             var currentUserId = int.Parse(
                 User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
-            if (!User.IsInRole("Admin"))
+            if (User.IsInRole("Admin"))
+                return Ok(payment);
+
+            if (User.IsInRole("Customer"))
             {
                 var order = await _orderService.GetByIdAsync(orderId);
                 if (order == null || order.UserId != currentUserId)
                     return Forbid();
+                return Ok(payment);
             }
 
-            return Ok(payment);
+            if (User.IsInRole("Owner"))
+            {
+                var order = await _orderService.GetByIdAsync(orderId);
+                if (order == null || !await IsOrderOfOwner(order.RestaurantId, currentUserId))
+                    return Forbid();
+                return Ok(payment);
+            }
+
+            return Forbid();
         }
 
         /// <summary>
@@ -150,6 +176,12 @@ namespace QuickEats.API.Controllers
         {
             await _paymentService.DeleteAsync(id);
             return Ok("Payment deleted successfully.");
+        }
+
+        private async Task<bool> IsOrderOfOwner(int restaurantId, int ownerId)
+        {
+            var restaurants = await _restaurantService.GetByOwnerIdAsync(ownerId);
+            return restaurants.Any(r => r.Id == restaurantId);
         }
 
     }

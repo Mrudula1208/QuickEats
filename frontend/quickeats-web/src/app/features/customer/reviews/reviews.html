@@ -1,239 +1,175 @@
-<div class="reviews-page">
-
+<section class="rev-hero">
+  <div class="rev-hero-inner">
+    <span class="material-icons rev-hero-icon">rate_review</span>
     <h1>Customer Reviews</h1>
-
-    <p>Share your experience</p>
-
-    <!-- Average Rating Summary -->
-
-    @if(reviewCount > 0){
-
-        <div class="rating-summary">
-
-            <span class="big-star">⭐</span>
-
-            <span class="rating-value">
-
-                {{ averageRating | number:'1.1-1' }}
-
-            </span>
-
-            <div class="rating-stars">
-
-                @for(star of stars; track star){
-
-                    <span
-
-                        class="star"
-
-                        [class.filled]="isStarFilled(star, averageRating)">
-
-                        ★
-
-                    </span>
-
-                }
-
-            </div>
-
-            <span class="rating-count">
-
-                ({{ reviewCount }} Reviews)
-
-            </span>
-
-        </div>
-
-    }
-
-    <!-- Review Form -->
-
-    @if(isLoggedIn){
-
-        <div class="review-form">
-
-            <h3>Write a Review</h3>
-
-            <!-- Restaurant Selector -->
-
-            <select
-
-                [(ngModel)]="selectedRestaurantId"
-
-                class="restaurant-select">
-
-                <option [value]="0" disabled>
-
-                    Select a Restaurant
-
-                </option>
-
-                @for(restaurant of restaurants; track restaurant.id){
-
-                    <option [value]="restaurant.id">
-
-                        {{ restaurant.name }}
-
-                    </option>
-
-                }
-
-            </select>
-
-            <!-- Star Selector -->
-
-            <div class="star-selector">
-
-                @for(star of stars; track star){
-
-                    <button
-
-                        type="button"
-
-                        class="star-btn"
-
-                        [class.active]="star <= newRating"
-
-                        (click)="setRating(star)">
-
-                        ★
-
-                    </button>
-
-                }
-
-                <span>{{ newRating }} / 5</span>
-
-            </div>
-
-            <!-- Comment Textarea -->
-
-            <textarea
-
-                rows="4"
-
-                placeholder="Write your review..."
-
-                [(ngModel)]="newComment"
-
-                (ngModelChange)="validateComment()">
-
-            </textarea>
-
-            @if(commentError){
-
-                <p class="review-error">{{ commentError }}</p>
-
-            }
-
-            @if(reviewSuccess){
-
-                <p class="review-success">Review submitted successfully!</p>
-
-            }
-
-            <!-- Submit Button -->
-
-            <button
-
-                class="submit-review-btn"
-
-                [disabled]="!canSubmitReview()"
-
-                (click)="submitReview()">
-
-                Submit Review
-
-            </button>
-
-        </div>
-
-    }
-
-    @else {
-
-        <p class="login-hint">
-
-            <a routerLink="/login">Log in</a>
-
-            to write a review.
-
-        </p>
-
-    }
-
-    <!-- Empty State -->
-
-    @if(customerReviews.length === 0){
-
-        <div class="no-reviews">
-
-            <h3>No Reviews Yet</h3>
-
-            <p>Be the first one to share your experience!</p>
-
-        </div>
-
-    }
-
-    @else {
-
-        <!-- Review List -->
-
-        <div class="review-list">
-
-            @for(review of customerReviews; track review.id){
-
-                <div class="review-card">
-
-                    <div class="review-top">
-
-                        <div class="review-info">
-
-                            <h4>{{ review.customerName }}</h4>
-
-                            <small class="restaurant-name">
-
-                                {{ review.restaurantName }}
-
-                            </small>
-
-                        </div>
-
-                        <div class="rating-stars">
-
-                            @for(star of stars; track star){
-
-                                <span
-
-                                    class="star"
-
-                                    [class.filled]="isStarFilled(star, review.rating)">
-
-                                    ★
-
-                                </span>
-
-                            }
-
-                        </div>
-
-                    </div>
-
-                    <p>{{ review.comment }}</p>
-
-                    <small>
-
-                        {{ review.createdAt | date:'mediumDate' }}
-
-                    </small>
-
+    <p>See what our customers are saying</p>
+  </div>
+</section>
+
+<section class="rev-content">
+  <div class="rev-container">
+
+    @if (isLoading()) {
+      <div class="rev-loading">
+        <span class="material-icons spinning">progress_activity</span>
+        <p>Loading reviews...</p>
+      </div>
+    } @else {
+      <div class="rev-layout">
+
+        <!-- Left: Summary + Write Review -->
+        <div class="rev-sidebar">
+
+          <!-- Rating Summary -->
+          @if (reviewCount > 0) {
+            <div class="rev-summary-card">
+              <div class="rev-summary-top">
+                <span class="rev-big-number">{{ averageRating | number:'1.1-1' }}</span>
+                <div class="rev-summary-stars">
+                  @for (star of stars; track star) {
+                    <span class="material-icons" [class.filled]="isStarFilled(star, averageRating)">star</span>
+                  }
+                  <span class="rev-summary-count">{{ reviewCount }} {{ reviewCount === 1 ? 'review' : 'reviews' }}</span>
                 </div>
+              </div>
 
-            }
+              <!-- Rating Breakdown -->
+              <div class="rev-breakdown">
+                @for (star of [5, 4, 3, 2, 1]; track star) {
+                  <div class="rev-bar-row">
+                    <span class="rev-bar-label">{{ star }}</span>
+                    <span class="material-icons rev-bar-star">star</span>
+                    <div class="rev-bar-track">
+                      <div class="rev-bar-fill" [style.width.%]="getRatingPercent(star)"></div>
+                    </div>
+                    <span class="rev-bar-count">{{ ratingDistribution[star - 1] }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
 
+          <!-- Write Review -->
+          @if (isLoggedIn) {
+            <div class="rev-write-card">
+              <div class="rev-write-header">
+                <h3>
+                  <span class="material-icons">edit</span>
+                  Write a Review
+                </h3>
+                <button class="rev-toggle-btn" (click)="toggleForm()">
+                  <span class="material-icons">{{ showForm() ? 'expand_less' : 'expand_more' }}</span>
+                </button>
+              </div>
+
+              @if (showForm()) {
+                <div class="rev-write-body">
+                  <div class="rev-form-group">
+                    <label>Select Restaurant</label>
+                    <select [(ngModel)]="selectedRestaurantId">
+                      <option [value]="0" disabled>Choose a restaurant</option>
+                      @for (r of restaurants(); track r.id) {
+                        <option [value]="r.id">{{ r.name }}</option>
+                      }
+                    </select>
+                  </div>
+
+                  <div class="rev-form-group">
+                    <label>Your Rating</label>
+                    <div class="rev-star-selector">
+                      @for (star of stars; track star) {
+                        <button type="button" class="rev-star-btn" [class.active]="star <= newRating" (click)="setRating(star)">
+                          <span class="material-icons">star</span>
+                        </button>
+                      }
+                      <span class="rev-rating-text">{{ newRating }} / 5</span>
+                    </div>
+                  </div>
+
+                  <div class="rev-form-group">
+                    <label>Your Review</label>
+                    <textarea rows="4" placeholder="Share your experience..." [(ngModel)]="newComment" (ngModelChange)="validateComment()"></textarea>
+                    @if (commentError) {
+                      <span class="rev-error">{{ commentError }}</span>
+                    }
+                  </div>
+
+                  @if (reviewSuccess) {
+                    <div class="rev-success">
+                      <span class="material-icons">check_circle</span>
+                      Review submitted successfully!
+                    </div>
+                  }
+
+                  <button class="rev-submit-btn" [disabled]="!canSubmitReview()" (click)="submitReview()">
+                    <span class="material-icons">send</span>
+                    Submit Review
+                  </button>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="rev-login-card">
+              <span class="material-icons">login</span>
+              <p>Log in to write a review</p>
+              <a routerLink="/login" class="rev-login-btn">Log In</a>
+            </div>
+          }
         </div>
 
+        <!-- Right: Review List -->
+        <div class="rev-list">
+          @if (reviewCount === 0) {
+            <div class="rev-empty">
+              <span class="material-icons">chat_bubble_outline</span>
+              <h3>No Reviews Yet</h3>
+              <p>Be the first to share your experience!</p>
+            </div>
+          } @else {
+            <h3 class="rev-list-title">
+              <span class="material-icons">reviews</span>
+              All Reviews ({{ reviewCount }})
+            </h3>
+
+            @for (review of reviews(); track review.id) {
+              <div class="rev-card">
+                <div class="rev-card-header">
+                  <div class="rev-avatar">
+                    {{ getCustomerInitial(review.customerName) }}
+                  </div>
+                  <div class="rev-card-info">
+                    <h4>{{ review.customerName }}</h4>
+                    <small>{{ review.restaurantName }}</small>
+                  </div>
+                  <div class="rev-card-right">
+                    <div class="rev-card-stars">
+                      @for (star of stars; track star) {
+                        <span class="material-icons" [class.filled]="isStarFilled(star, review.rating)">star</span>
+                      }
+                    </div>
+                    <span class="rev-time">{{ getTimeAgo(review.createdAt) }}</span>
+                  </div>
+                </div>
+                <p class="rev-card-text">{{ review.comment }}</p>
+                <div class="rev-card-footer">
+                  <span class="rev-card-date">
+                    <span class="material-icons">schedule</span>
+                    {{ review.createdAt | date:'mediumDate' }}
+                  </span>
+                  @if (isOwnReview(review)) {
+                    <button class="rev-delete-btn" (click)="deleteReview(review.id)">
+                      <span class="material-icons">delete_outline</span>
+                      Delete
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+          }
+        </div>
+
+      </div>
     }
 
-</div>
+  </div>
+</section>

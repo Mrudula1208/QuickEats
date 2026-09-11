@@ -1,162 +1,156 @@
 import { Component } from '@angular/core';
-// 1ï¸âƒ£ Executes First.
-// Import Component because every Angular page is a Component.
 
 import { CommonModule } from '@angular/common';
-// 2ï¸âƒ£ Executes Second.
-// CommonModule allows HTML to use Angular directives like @if and @for.
 
 import { Router } from '@angular/router';
-// 3ï¸âƒ£ Executes Third.
-// Router is used to open another page.
 
 import { ToastrService } from 'ngx-toastr';
 
-// Component Configuration
+import { OrderService } from '../../../core/services/order';
+import { WishlistService } from '../../../core/services/wishlist.service';
+import { SavedAddressService } from '../../../core/services/saved-address.service';
+import { CouponService } from '../../../core/services/coupon.service';
+import { NotificationService } from '../../../core/services/notification.service';
+
 @Component({
 
   selector: 'app-customer-dashboard',
-  // HTML tag name of this component.
 
   standalone: true,
-  // Means this component works independently.
-  // No need to register inside AppModule.
 
   imports: [
     CommonModule
   ],
-  // Import CommonModule for Angular directives.
 
   templateUrl: './customer-dashboard.html',
-  // Connect HTML file.
 
   styleUrl: './customer-dashboard.scss'
-  // Connect CSS file.
 
 })
 
 export class CustomerDashboardComponent {
 
-  // ====================================================
-  // EXECUTION FLOW
-  // ====================================================
-  //
-  // 1ï¸âƒ£ Angular loads this component.
-  //
-  // 2ï¸âƒ£ Variables are created.
-  //
-  // 3ï¸âƒ£ Constructor executes automatically.
-  //
-  // 4ï¸âƒ£ HTML receives all variables.
-  //
-  // 5ï¸âƒ£ User clicks a card.
-  //
-  // 6ï¸âƒ£ Corresponding method executes.
-  //
-  // ====================================================
+  customerName: string = 'there';
 
-  // dashboardHeading: string
-  //
-  // string means this variable stores text.
+  totalOrders = 0;
+  wishlistItems = 0;
+  savedAddresses = 0;
+  availableCoupons = 0;
+  unreadNotifications = 0;
 
-  dashboardHeading: string = "Welcome Back";
+  isLoading = true;
 
-  // customerName stores logged in customer name.
-
-  customerName: string = "Mrudula";
-
-  // rewardPoints stores total earned reward points.
-
-  rewardPoints: number = 245;
-
-  // number means integer or decimal values.
-
-  totalOrders: number = 12;
-
-  favouriteRestaurants: number = 6;
-
-  savedAddresses: number = 3;
-
-  availableCoupons: number = 8;
+  private readonly userId: number = Number(localStorage.getItem('userId') || 0);
 
   constructor(
-
     private router: Router,
-
-    private toastr: ToastrService
-
-    // private
-    // Means only this class can use Router.
-    //
-    // Router
-    // Angular automatically creates Router object.
-    //
-    // We never write:
-    // new Router()
-
+    private toastr: ToastrService,
+    private orderService: OrderService,
+    private wishlistService: WishlistService,
+    private savedAddressService: SavedAddressService,
+    private couponService: CouponService,
+    private notificationService: NotificationService
   ) {
+    const storedName = localStorage.getItem('name');
+    if (storedName) {
+      this.customerName = storedName;
+    }
+    this.loadDashboard();
+  }
 
-    // Constructor currently doesn't need logic.
-    // It automatically runs whenever
-    // Customer Dashboard opens.
+  loadDashboard(): void {
+    this.isLoading = true;
 
+    if (!this.userId) {
+      this.isLoading = false;
+      return;
+    }
+
+    this.orderService.getUserOrders(this.userId).subscribe({
+      next: (orders) => {
+        this.totalOrders = orders.length;
+        this.trackWishlist();
+      },
+      error: () => {
+        this.trackWishlist();
+      }
+    });
+  }
+
+  private trackWishlist(): void {
+    this.wishlistService.getWishlist().subscribe({
+      next: (items) => {
+        this.wishlistItems = items.length;
+        this.trackAddresses();
+      },
+      error: () => {
+        this.trackAddresses();
+      }
+    });
+  }
+
+  private trackAddresses(): void {
+    this.savedAddressService.getAddresses().subscribe({
+      next: (addresses) => {
+        this.savedAddresses = addresses.length;
+        this.trackCoupons();
+      },
+      error: () => {
+        this.trackCoupons();
+      }
+    });
+  }
+
+  private trackCoupons(): void {
+    this.couponService.getCoupons().subscribe({
+      next: (coupons) => {
+        const now = new Date();
+        this.availableCoupons = coupons.filter(c => c.isActive && new Date(c.expiryDate) >= now).length;
+        this.trackNotifications();
+      },
+      error: () => {
+        this.trackNotifications();
+      }
+    });
+  }
+
+  private trackNotifications(): void {
+    this.notificationService.getUnreadCount().subscribe({
+      next: (count) => {
+        this.unreadNotifications = count;
+        this.isLoading = false;
+      },
+      error: () => {
+        this.isLoading = false;
+      }
+    });
   }
 
   openOrders(): void {
-
-    // (): void
-    //
-    // Means this method returns nothing.
-    // It only performs work.
-
-    this.router.navigate([
-      '/orders'
-    ]);
-
+    this.router.navigate(['/orders']);
   }
 
   openWishlist(): void {
-
-    this.router.navigate([
-      '/wishlist'
-    ]);
-
+    this.router.navigate(['/wishlist']);
   }
 
   openAddresses(): void {
-
-    this.router.navigate([
-      '/saved-address'
-    ]);
-
+    this.router.navigate(['/saved-address']);
   }
 
   openCoupons(): void {
-
-    this.router.navigate([
-      '/coupons'
-    ]);
-
+    this.router.navigate(['/coupons']);
   }
 
   openNotifications(): void {
-
-    this.router.navigate([
-      '/notifications'
-    ]);
-
+    this.router.navigate(['/notifications']);
   }
 
   openProfile(): void {
-
-    this.router.navigate([
-      '/profile'
-    ]);
-
+    this.router.navigate(['/profile']);
   }
 
   logout(): void {
-
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
     localStorage.removeItem('name');
@@ -167,46 +161,6 @@ export class CustomerDashboardComponent {
     this.toastr.success('Logged out successfully');
 
     this.router.navigate(['/']);
-
   }
 
 }
-
-/*
-
-WHY DO WE WRITE THIS FILE?
-
-This file controls the complete Dashboard.
-
-Dashboard is the first screen
-after customer login.
-
-Flow
-
-Login
-
-â†“
-
-Dashboard Opens
-
-â†“
-
-Variables Created
-
-â†“
-
-HTML Displays Data
-
-â†“
-
-Customer Clicks Card
-
-â†“
-
-Method Executes
-
-â†“
-
-Router Opens New Page
-
-*/

@@ -1,174 +1,510 @@
-<div class="profile-page">
+<!-- Hero -->
+<section class="profile-hero">
+  <div class="profile-hero-inner">
+    <span class="material-icons profile-hero-icon">person</span>
+    <h1>My Profile</h1>
+    <p>Manage your account, orders, and preferences</p>
+  </div>
+</section>
 
-    <h1>
+<!-- Content -->
+<section class="profile-content">
+  <div class="profile-container">
+    <div class="profile-grid">
 
-        My Profile
+      <!-- ====== LEFT SIDEBAR ====== -->
+      <aside class="profile-sidebar">
+        <div class="profile-card">
+          <div class="profile-avatar-section">
+            <div class="profile-avatar">
+              @if (userImage) {
+                <img [src]="userImage" alt="Profile">
+              } @else {
+                <div class="avatar-placeholder">{{ userName ? userName.charAt(0) : '?' }}</div>
+              }
+              <label class="avatar-upload" for="avatarInput">
+                <span class="material-icons">camera_alt</span>
+              </label>
+              <input type="file" id="avatarInput" accept="image/jpeg,image/png,image/webp" (change)="onFileSelected($event)" hidden>
+            </div>
+            @if (imagePreview) {
+              <p class="upload-hint">New image selected. Click Save to update.</p>
+            }
+            @if (isUploading()) {
+              <p class="upload-hint uploading">
+                <span class="material-icons spinning">sync</span>
+                Uploading image...
+              </p>
+            }
+            <h2 class="profile-name">{{ userName || 'Customer' }}</h2>
+            <span class="profile-role-badge">{{ userRole }}</span>
+            @if (userEmail) {
+              <p class="profile-email">{{ userEmail }}</p>
+            }
+          </div>
 
-    </h1>
+          <div class="profile-stats">
+            <div class="stat-item">
+              <span class="material-icons stat-icon">star</span>
+              <div>
+                <span class="stat-value">{{ profile.rewardPoints }}</span>
+                <span class="stat-label">Reward Points</span>
+              </div>
+            </div>
+          </div>
 
-    <div class="profile-card">
-
-        <img
-
-            [src]="profile.profileImage"
-
-            alt="Profile">
-
-        <!-- Image Upload -->
-        <input
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            (change)="onFileSelected($event)">
-
-        @if (imagePreview) {
-            <img [src]="imagePreview" class="upload-preview" alt="New Preview">
-        }
-
-        @if (isUploading) {
-            <p class="upload-status">Uploading image...</p>
-        }
-
-        <div class="form-group">
-
-            <label>
-
-                Full Name
-
-            </label>
-
-            <input
-
-                type="text"
-
-                [(ngModel)]="profile.fullName">
-
+          <nav class="profile-actions">
+            <button class="profile-action-btn" (click)="toggleEdit()">
+              <span class="material-icons">edit</span>
+              Edit Profile
+            </button>
+            <a class="profile-action-btn" routerLink="/orders">
+              <span class="material-icons">receipt_long</span>
+              My Orders
+            </a>
+            <a class="profile-action-btn" routerLink="/favorites">
+              <span class="material-icons">favorite</span>
+              Favorites
+            </a>
+            <a class="profile-action-btn" routerLink="/coupons">
+              <span class="material-icons">local_offer</span>
+              My Coupons
+            </a>
+            <button class="profile-action-btn" (click)="showPasswordSection.set(!showPasswordSection())">
+              <span class="material-icons">lock_outline</span>
+              Change Password
+            </button>
+            <button class="profile-action-btn profile-action-btn--logout" (click)="logout()">
+              <span class="material-icons">logout</span>
+              Logout
+            </button>
+          </nav>
         </div>
+      </aside>
 
-        <div class="form-group">
+      <!-- ====== RIGHT CONTENT ====== -->
+      <main class="profile-details">
 
-            <label>
-
-                Email
-
-            </label>
-
-            <input
-
-                type="email"
-
-                [(ngModel)]="profile.email">
-
-        </div>
-
-        <div class="form-group">
-
-            <label>
-
-                Phone Number
-
-            </label>
-
-            <input
-
-                type="text"
-
-                [(ngModel)]="profile.phoneNumber">
-
-        </div>
-
-        <div class="form-group">
-
-            <label>
-
-                Gender
-
-            </label>
-
-            <input
-
-                type="text"
-
-                [(ngModel)]="profile.gender">
-
-        </div>
-
-        <div class="form-group">
-
-            <label>
-
-                Date Of Birth
-
-            </label>
-
-            <input
-
-                type="text"
-
-                [(ngModel)]="profile.dateOfBirth">
-
-        </div>
-
-        <div class="form-group">
-
-            <label>
-
-                City
-
-            </label>
-
-            <input
-
-                type="text"
-
-                [(ngModel)]="profile.city">
-
-        </div>
-
-        <div class="form-group">
-
-            <label>
-
-                State
-
-            </label>
-
-            <input
-
-                type="text"
-
-                [(ngModel)]="profile.state">
-
-        </div>
-
-        <div class="reward-box">
-
+        <!-- Personal Information -->
+        <div class="detail-card">
+          <div class="detail-card-header">
             <h3>
-
-                Reward Points
-
+              <span class="material-icons">badge</span>
+              Personal Information
             </h3>
+            <button class="edit-toggle" (click)="toggleEdit()">
+              <span class="material-icons">{{ isEditing() ? 'close' : 'edit' }}</span>
+              {{ isEditing() ? 'Cancel' : 'Edit' }}
+            </button>
+          </div>
 
-            <p>
+          <div class="detail-card-body">
+            @if (isLoadingProfile()) {
+              <div class="loading-inline">
+                <span class="material-icons spinning">progress_activity</span>
+                Loading profile...
+              </div>
+            } @else {
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Full Name *</label>
+                  @if (isEditing()) {
+                    <input type="text" [(ngModel)]="profile.fullName" placeholder="Enter full name" maxlength="100">
+                  } @else {
+                    <div class="detail-value">{{ profile.fullName || 'Not set' }}</div>
+                  }
+                </div>
+                <div class="form-group">
+                  <label>Email</label>
+                  <div class="detail-value detail-value--readonly">{{ profile.email || 'Not set' }}</div>
+                  <span class="field-note">Email cannot be changed</span>
+                </div>
+              </div>
 
-                {{profile.rewardPoints}}
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Phone Number</label>
+                  @if (isEditing()) {
+                    <input type="tel" [(ngModel)]="profile.phoneNumber" placeholder="10-digit phone number" maxlength="10">
+                  } @else {
+                    <div class="detail-value">{{ profile.phoneNumber || 'Not set' }}</div>
+                  }
+                </div>
+                <div class="form-group">
+                  <label>Gender</label>
+                  @if (isEditing()) {
+                    <select [(ngModel)]="profile.gender">
+                      <option value="">Select</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  } @else {
+                    <div class="detail-value">{{ profile.gender || 'Not set' }}</div>
+                  }
+                </div>
+              </div>
 
-            </p>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Date of Birth</label>
+                  @if (isEditing()) {
+                    <input type="date" [(ngModel)]="profile.dateOfBirth">
+                  } @else {
+                    <div class="detail-value">{{ profile.dateOfBirth || 'Not set' }}</div>
+                  }
+                </div>
+                <div class="form-group">
+                  <label>City</label>
+                  @if (isEditing()) {
+                    <input type="text" [(ngModel)]="profile.city" placeholder="City" maxlength="50">
+                  } @else {
+                    <div class="detail-value">{{ profile.city || 'Not set' }}</div>
+                  }
+                </div>
+              </div>
 
+              <div class="form-row">
+                <div class="form-group">
+                  <label>State</label>
+                  @if (isEditing()) {
+                    <input type="text" [(ngModel)]="profile.state" placeholder="State" maxlength="50">
+                  } @else {
+                    <div class="detail-value">{{ profile.state || 'Not set' }}</div>
+                  }
+                </div>
+                <div class="form-group"></div>
+              </div>
+
+              @if (isEditing()) {
+                <div class="form-row-actions">
+                  <button class="btn-cancel" (click)="toggleEdit()">Cancel</button>
+                  <button class="btn-primary" (click)="saveProfile()" [disabled]="isSaving() || isUploading()">
+                    @if (isSaving() || isUploading()) {
+                      <span class="material-icons spinning">sync</span>
+                      Saving...
+                    } @else {
+                      <span class="material-icons">save</span>
+                      Save Changes
+                    }
+                  </button>
+                </div>
+              }
+            }
+          </div>
         </div>
 
-        <button
+        <!-- Saved Addresses -->
+        <div class="detail-card">
+          <div class="detail-card-header">
+            <h3>
+              <span class="material-icons">location_on</span>
+              Saved Addresses
+            </h3>
+            <button class="btn-add" (click)="openAddressForm()">
+              <span class="material-icons">add</span>
+              Add New
+            </button>
+          </div>
 
-            (click)="saveProfile()">
-
-            @if (isUploading) {
-                Uploading...
+          <div class="detail-card-body">
+            @if (isLoadingAddresses()) {
+              <div class="loading-inline">
+                <span class="material-icons spinning">progress_activity</span>
+                Loading addresses...
+              </div>
+            } @else if (addresses().length === 0 && !showAddressForm()) {
+              <div class="empty-state-small">
+                <span class="material-icons">add_location_alt</span>
+                <p>No saved addresses yet</p>
+                <button class="btn-primary" (click)="openAddressForm()">Add Your First Address</button>
+              </div>
+            } @else {
+              <div class="address-list">
+                @for (addr of addresses(); track addr.addressId) {
+                  <div class="address-card" [class.default]="addr.isDefault">
+                    <div class="address-card-top">
+                      <div class="address-type-badge">
+                        <span class="material-icons">{{ getAddressIcon(addr.addressType) }}</span>
+                        {{ addr.addressType }}
+                      </div>
+                      <div class="address-card-actions">
+                        @if (addr.isDefault) {
+                          <span class="default-badge">Default</span>
+                        }
+                        <button class="icon-btn" (click)="editAddress(addr)" title="Edit">
+                          <span class="material-icons">edit</span>
+                        </button>
+                      </div>
+                    </div>
+                    <p class="address-text">
+                      {{ addr.houseNumber }}, {{ addr.area }}
+                      @if (addr.landmark) { , Near {{ addr.landmark }} }
+                      , {{ addr.city }}{{ addr.state ? ', ' + addr.state : '' }} - {{ addr.pincode }}
+                    </p>
+                    <p class="address-contact">{{ addr.customerName }} | {{ addr.phoneNumber }}</p>
+                    <div class="address-actions">
+                      @if (!addr.isDefault) {
+                        <button class="btn-text" (click)="setDefault(addr.addressId)">
+                          <span class="material-icons">check_circle</span>
+                          Set Default
+                        </button>
+                      }
+                      <button class="btn-text btn-text--danger" (click)="deleteAddress(addr.addressId)">
+                        <span class="material-icons">delete_outline</span>
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
             }
-            @else {
-                Save Profile
+
+            @if (showAddressForm()) {
+              <div class="address-form">
+                <h4>
+                  <span class="material-icons">{{ editingAddressId() ? 'edit_location' : 'add_location' }}</span>
+                  {{ editingAddressId() ? 'Edit Address' : 'New Address' }}
+                </h4>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Label</label>
+                    <select [(ngModel)]="newAddress.addressType">
+                      <option value="Home">Home</option>
+                      <option value="Office">Office</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Pin Code *</label>
+                    <input type="text" [(ngModel)]="newAddress.pincode" placeholder="6-digit pincode" maxlength="6">
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>House / Flat No. *</label>
+                    <input type="text" [(ngModel)]="newAddress.houseNumber" placeholder="House / Flat No.">
+                  </div>
+                  <div class="form-group">
+                    <label>Area / Street *</label>
+                    <input type="text" [(ngModel)]="newAddress.area" placeholder="Area / Street">
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Landmark</label>
+                    <input type="text" [(ngModel)]="newAddress.landmark" placeholder="Landmark (optional)">
+                  </div>
+                  <div class="form-group">
+                    <label>City *</label>
+                    <input type="text" [(ngModel)]="newAddress.city" placeholder="City">
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>State</label>
+                    <input type="text" [(ngModel)]="newAddress.state" placeholder="State">
+                  </div>
+                  <div class="form-group">
+                    <label>Contact Name</label>
+                    <input type="text" [(ngModel)]="newAddress.customerName" placeholder="Contact name">
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Contact Phone</label>
+                    <input type="tel" [(ngModel)]="newAddress.phoneNumber" placeholder="Contact phone" maxlength="10">
+                  </div>
+                  <div class="form-group">
+                    <label class="checkbox-label">
+                      <input type="checkbox" [(ngModel)]="newAddress.isDefault">
+                      Set as default address
+                    </label>
+                  </div>
+                </div>
+                <div class="form-row-actions">
+                  <button class="btn-cancel" (click)="cancelAddressForm()">Cancel</button>
+                  <button class="btn-primary" (click)="saveAddress()" [disabled]="isSavingAddress()">
+                    @if (isSavingAddress()) {
+                      <span class="material-icons spinning">sync</span>
+                      Saving...
+                    } @else {
+                      <span class="material-icons">save</span>
+                      {{ editingAddressId() ? 'Update Address' : 'Save Address' }}
+                    }
+                  </button>
+                </div>
+              </div>
             }
+          </div>
+        </div>
 
-        </button>
+        <!-- My Orders (Recent) -->
+        <div class="detail-card">
+          <div class="detail-card-header">
+            <h3>
+              <span class="material-icons">receipt_long</span>
+              Recent Orders
+            </h3>
+            <a class="btn-link" routerLink="/orders">View All</a>
+          </div>
 
+          <div class="detail-card-body">
+            @if (isLoadingOrders()) {
+              <div class="loading-inline">
+                <span class="material-icons spinning">progress_activity</span>
+                Loading orders...
+              </div>
+            } @else if (recentOrders().length === 0) {
+              <div class="empty-state-small">
+                <span class="material-icons">receipt</span>
+                <p>No orders yet</p>
+                <a routerLink="/restaurants" class="btn-primary">Order Now</a>
+              </div>
+            } @else {
+              <div class="orders-list">
+                @for (order of recentOrders(); track order.id) {
+                  <a class="order-item" [routerLink]="['/orders', order.id]">
+                    <div class="order-item-left">
+                      <span class="order-restaurant">{{ order.restaurantName }}</span>
+                      <span class="order-date">{{ order.createdAt | date:'mediumDate' }}</span>
+                    </div>
+                    <div class="order-item-right">
+                      <span class="order-amount">{{ order.totalAmount | currency:'INR':'symbol':'1.0-0' }}</span>
+                      <span class="order-status" [class]="getOrderStatusClass(order.status)">{{ order.status }}</span>
+                    </div>
+                  </a>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Favorites -->
+        <div class="detail-card">
+          <div class="detail-card-header">
+            <h3>
+              <span class="material-icons">favorite</span>
+              Favorite Restaurants
+            </h3>
+            <a class="btn-link" routerLink="/favorites">View All</a>
+          </div>
+
+          <div class="detail-card-body">
+            @if (isLoadingFavorites()) {
+              <div class="loading-inline">
+                <span class="material-icons spinning">progress_activity</span>
+                Loading favorites...
+              </div>
+            } @else if (favorites().length === 0) {
+              <div class="empty-state-small">
+                <span class="material-icons">favorite_border</span>
+                <p>No favorites yet</p>
+                <a routerLink="/restaurants" class="btn-primary">Browse Restaurants</a>
+              </div>
+            } @else {
+              <div class="favorites-grid">
+                @for (fav of favorites(); track fav.favoriteId) {
+                  <a class="favorite-card" [routerLink]="['/restaurant', fav.restaurantId]">
+                    <div class="favorite-img">
+                      @if (fav.restaurantImage) {
+                        <img [src]="fav.restaurantImage" [alt]="fav.restaurantName">
+                      } @else {
+                        <div class="favorite-img-placeholder">
+                          <span class="material-icons">restaurant</span>
+                        </div>
+                      }
+                    </div>
+                    <div class="favorite-info">
+                      <span class="favorite-name">{{ fav.restaurantName }}</span>
+                      @if (fav.restaurantLocation) {
+                        <span class="favorite-loc">
+                          <span class="material-icons">place</span>
+                          {{ fav.restaurantLocation }}
+                        </span>
+                      }
+                    </div>
+                  </a>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Change Password -->
+        <div class="detail-card">
+          <div class="detail-card-header">
+            <h3>
+              <span class="material-icons">lock_outline</span>
+              Change Password
+            </h3>
+          </div>
+          <div class="detail-card-body">
+            @if (showPasswordSection()) {
+              <div class="password-form">
+                <div class="form-group">
+                  <label>Current Password *</label>
+                  <div class="password-input-wrap">
+                    <input
+                      [type]="showCurrentPassword ? 'text' : 'password'"
+                      [(ngModel)]="currentPassword"
+                      placeholder="Enter current password">
+                    <button type="button" class="password-toggle" (click)="showCurrentPassword = !showCurrentPassword">
+                      <span class="material-icons">{{ showCurrentPassword ? 'visibility_off' : 'visibility' }}</span>
+                    </button>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>New Password *</label>
+                  <div class="password-input-wrap">
+                    <input
+                      [type]="showNewPassword ? 'text' : 'password'"
+                      [(ngModel)]="newPassword"
+                      placeholder="Minimum 6 characters">
+                    <button type="button" class="password-toggle" (click)="showNewPassword = !showNewPassword">
+                      <span class="material-icons">{{ showNewPassword ? 'visibility_off' : 'visibility' }}</span>
+                    </button>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Confirm New Password *</label>
+                  <div class="password-input-wrap">
+                    <input
+                      [type]="showConfirmPassword ? 'text' : 'password'"
+                      [(ngModel)]="confirmPassword"
+                      placeholder="Re-enter new password">
+                    <button type="button" class="password-toggle" (click)="showConfirmPassword = !showConfirmPassword">
+                      <span class="material-icons">{{ showConfirmPassword ? 'visibility_off' : 'visibility' }}</span>
+                    </button>
+                  </div>
+                  @if (confirmPassword && newPassword !== confirmPassword) {
+                    <span class="field-error">Passwords do not match</span>
+                  }
+                </div>
+                <div class="form-row-actions">
+                  <button class="btn-cancel" (click)="showPasswordSection.set(false)">Cancel</button>
+                  <button class="btn-primary" (click)="changePassword()">
+                    <span class="material-icons">lock</span>
+                    Update Password
+                  </button>
+                </div>
+              </div>
+            } @else {
+              <div class="security-note">
+                <span class="material-icons">info_outline</span>
+                <div>
+                  <p>Change your account password regularly to keep your account secure.</p>
+                  <button class="btn-text" (click)="showPasswordSection.set(true)">
+                    <span class="material-icons">edit</span>
+                    Change Password
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+      </main>
     </div>
-
-</div>
+  </div>
+</section>

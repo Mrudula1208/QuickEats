@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using QuickEats.API.Models;
 
@@ -66,6 +66,19 @@ namespace QuickEats.API.Data
                 .WithMany()
                 .HasForeignKey(r => r.OwnerId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // OrderDelivery Relationships
+            modelBuilder.Entity<OrderDelivery>()
+                .HasOne(od => od.DeliveryPartner)
+                .WithMany()
+                .HasForeignKey(od => od.DeliveryPartnerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<OrderDelivery>()
+                .HasOne(od => od.Order)
+                .WithMany()
+                .HasForeignKey(od => od.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Restaurant>()
                 .Property(r => r.DeliveryCharge)

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QuickEats.API.DTos.OrderDelivery;
@@ -18,10 +18,11 @@ namespace QuickEats.API.Controllers
     public class OrderDeliveryController : ControllerBase
     {
         private readonly IOrderDeliveryService _orderDeliveryService;
-        public OrderDeliveryController(IOrderDeliveryService orderDeliveryService)
+        private readonly IOrderService _orderService;
+        public OrderDeliveryController(IOrderDeliveryService orderDeliveryService, IOrderService orderService)
         {
             _orderDeliveryService = orderDeliveryService;
-
+            _orderService = orderService;
         }
         /// <summary>
         /// Gets all deliveries (Admin only).
@@ -37,7 +38,7 @@ namespace QuickEats.API.Controllers
         /// <summary>
         /// Gets the deliveries assigned to the logged in Delivery Partner.
         /// </summary>
-        [Authorize(Roles = "DeliveryPartner")]
+        [Authorize(Roles = "DeliveryPartner,Delivery Partner")]
         [HttpGet("partner")]
         public async Task<IActionResult> GetPartnerDeliveries()
         {
@@ -49,7 +50,7 @@ namespace QuickEats.API.Controllers
         }
 
         /// <summary>
-        /// Gets a single delivery by id.
+        /// Gets a single delivery by id (Admin, Delivery Partner, or Customer who placed the order).
         /// </summary>
         /// <param name="id">Delivery id.</param>
         [HttpGet("{id}")]
@@ -61,17 +62,27 @@ namespace QuickEats.API.Controllers
                 return NotFound("Delivery not found.");
             }
 
+            if (User.IsInRole("Admin"))
+                return Ok(delivery);
+
             var currentUserId = int.Parse(
                 User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
-            if (!User.IsInRole("Admin") && delivery.DeliveryPartnerId != currentUserId)
-                return Forbid();
+            if (delivery.DeliveryPartnerId == currentUserId)
+                return Ok(delivery);
 
-            return Ok(delivery);
+            if (User.IsInRole("Customer"))
+            {
+                var order = await _orderService.GetByIdAsync(delivery.OrderId);
+                if (order != null && order.UserId == currentUserId)
+                    return Ok(delivery);
+            }
+
+            return Forbid();
         }
 
         /// <summary>
-        /// Gets the delivery of one order.
+        /// Gets the delivery of one order (Admin, Delivery Partner, or Customer who placed the order).
         /// </summary>
         /// <param name="orderId">Order id.</param>
         [HttpGet("order/{orderId}")]
@@ -83,13 +94,23 @@ namespace QuickEats.API.Controllers
                 return NotFound("Delivery not found.");
             }
 
+            if (User.IsInRole("Admin"))
+                return Ok(delivery);
+
             var currentUserId = int.Parse(
                 User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
-            if (!User.IsInRole("Admin") && delivery.DeliveryPartnerId != currentUserId)
-                return Forbid();
+            if (delivery.DeliveryPartnerId == currentUserId)
+                return Ok(delivery);
 
-            return Ok(delivery);
+            if (User.IsInRole("Customer"))
+            {
+                var order = await _orderService.GetByIdAsync(orderId);
+                if (order != null && order.UserId == currentUserId)
+                    return Ok(delivery);
+            }
+
+            return Forbid();
         }
 
         /// <summary>
@@ -105,11 +126,11 @@ namespace QuickEats.API.Controllers
         }
 
         /// <summary>
-        /// Updates the delivery status (Delivery Partner only).
+        /// Updates the delivery status (Delivery Partner or Admin).
         /// </summary>
         /// <param name="id">Delivery id.</param>
-        /// <param name="dto">New status (Assigned, Picked Up, Out For Delivery, Delivered).</param>
-        [Authorize(Roles = "DeliveryPartner")]
+        /// <param name="dto">New status (Assigned, Picked Up, Out for Delivery, Delivered).</param>
+        [Authorize(Roles = "DeliveryPartner,Delivery Partner,Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateStatus(int id, UpdateDeliveryStatusDto dto)
         {
@@ -117,11 +138,28 @@ namespace QuickEats.API.Controllers
             if (delivery == null)
                 return NotFound("Delivery not found.");
 
-            var currentUserId = int.Parse(
-                User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            if (!User.IsInRole("Admin"))
+            {
+                var currentUserId = int.Parse(
+                    User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
-            if (delivery.DeliveryPartnerId != currentUserId)
-                return Forbid();
+                if (delivery.DeliveryPartnerId != currentUserId)
+                    return Forbid();
+
+                // Validate transition
+                var allowed = delivery.DeliveryStatus switch
+                {
+                    "Assigned" => new[] { "Picked Up" },
+                    "Picked Up" => new[] { "Out for Delivery" },
+                    "Out for Delivery" => new[] { "Delivered" },
+                    _ => Array.Empty<string>()
+                };
+
+                if (!allowed.Contains(dto.DeliveryStatus))
+                {
+                    return BadRequest($"Cannot change delivery status from \"{delivery.DeliveryStatus}\" to \"{dto.DeliveryStatus}\".");
+                }
+            }
 
             await _orderDeliveryService.UpdateStatusAsync(id, dto);
             return Ok("Delivery updated successfully.");

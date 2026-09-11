@@ -16,7 +16,7 @@ export const deliveryPartnerGuard: CanActivateFn = () => {
   const token = localStorage.getItem('token');
   const role = localStorage.getItem('role');
 
-  if (token && role === 'DeliveryPartner') {
+  if (token && (role === 'DeliveryPartner' || role === 'Delivery Partner')) {
     return true;
   }
 

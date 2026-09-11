@@ -1,57 +1,143 @@
-<div class="login-container">
+<div class="auth-page">
+  <div class="auth-card">
 
-    <h1>Login</h1>
+    <!-- Brand -->
+    <div class="auth-brand">
+      <span class="brand-logo material-icons">fastfood</span>
+      <h1 class="brand-name">QuickEats</h1>
+      <p class="brand-tagline">Delicious food, delivered fast</p>
+    </div>
 
-    <form #loginForm="ngForm" (ngSubmit)="login()">
+    <!-- Login Form -->
+    @if (!forgotMode()) {
+      <form #loginForm="ngForm" (ngSubmit)="login()" class="auth-form">
+        <h2 class="form-title">Welcome Back</h2>
+        <p class="form-subtitle">Sign in to continue to QuickEats</p>
 
-        <input
-            type="email"
-            placeholder="Email"
-            name="email"
-            [(ngModel)]="loginUser.email"
-            required
-            email
-            #email="ngModel">
-
-        @if (email.invalid && email.touched) {
-            <div class="error">
-                @if (email.errors?.['required']) {
-                    Email is required
-                }
-                @else if (email.errors?.['email']) {
-                    Please enter a valid email
-                }
-            </div>
+        <!-- API Error -->
+        @if (apiError()) {
+          <div class="api-error">
+            <span class="material-icons">error_outline</span>
+            {{ apiError() }}
+          </div>
         }
 
-        <input
-            type="password"
-            placeholder="Password"
-            name="password"
-            [(ngModel)]="loginUser.password"
-            required
-            minlength="6"
-            #password="ngModel">
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <div class="input-wrap">
+            <span class="material-icons input-icon">mail_outline</span>
+            <input
+              id="email"
+              type="email"
+              name="email"
+              placeholder="Enter your email"
+              [(ngModel)]="loginUser.email"
+              required
+              email
+              #email="ngModel">
+          </div>
+          @if (email.invalid && email.touched) {
+            <span class="field-error">
+              @if (email.errors?.['required']) {
+                Email is required
+              } @else if (email.errors?.['email']) {
+                Please enter a valid email address
+              }
+            </span>
+          }
+        </div>
 
-        @if (password.invalid && password.touched) {
-            <div class="error">
-                @if (password.errors?.['required']) {
-                    Password is required
-                }
-                @else if (password.errors?.['minlength']) {
-                    Password must be at least 6 characters
-                }
-            </div>
-        }
+        <!-- Password -->
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-wrap">
+            <span class="material-icons input-icon">lock_outline</span>
+            <input
+              id="password"
+              [type]="showPassword() ? 'text' : 'password'"
+              name="password"
+              placeholder="Enter your password"
+              [(ngModel)]="loginUser.password"
+              required
+              #password="ngModel">
+            <button type="button" class="password-toggle" (click)="togglePassword()" [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'">
+              <span class="material-icons">{{ showPassword() ? 'visibility_off' : 'visibility' }}</span>
+            </button>
+          </div>
+          @if (password.invalid && password.touched) {
+            <span class="field-error">
+              @if (password.errors?.['required']) {
+                Password is required
+              }
+            </span>
+          }
+        </div>
 
-        <button
-            type="submit"
-            [disabled]="loginForm.invalid">
+        <!-- Forgot Password -->
+        <div class="form-options">
+          <button type="button" class="forgot-btn" (click)="setForgotMode()">Forgot Password?</button>
+        </div>
 
-            Login
-
+        <!-- Submit -->
+        <button type="submit" class="submit-btn" [disabled]="isLoading() || loginForm.invalid">
+          @if (isLoading()) {
+            <span class="material-icons spinning">sync</span>
+            Signing in...
+          } @else {
+            <span class="material-icons">login</span>
+            Sign In
+          }
         </button>
 
-    </form>
+        <!-- Register Link -->
+        <p class="auth-switch">
+          New to QuickEats?
+          <a routerLink="/register">Create an account</a>
+        </p>
+      </form>
+    }
 
+    <!-- Forgot Password -->
+    @else {
+      <form (ngSubmit)="forgotPassword()" class="auth-form">
+        <h2 class="form-title">Reset Password</h2>
+        <p class="form-subtitle">Enter your email and we'll help you reset your password</p>
+
+        <div class="form-group">
+          <label for="forgotEmail">Email Address</label>
+          <div class="input-wrap">
+            <span class="material-icons input-icon">mail_outline</span>
+            <input
+              id="forgotEmail"
+              type="email"
+              name="forgotEmail"
+              placeholder="Enter your registered email"
+              [(ngModel)]="forgotEmail"
+              required
+              email
+              #resetEmail="ngModel">
+          </div>
+          @if (resetEmail.invalid && resetEmail.touched) {
+            <span class="field-error">Please enter a valid email address</span>
+          }
+        </div>
+
+        <button type="submit" class="submit-btn">
+          <span class="material-icons">send</span>
+          Send Reset Link
+        </button>
+
+        <button type="button" class="back-btn" (click)="backToLogin()">
+          <span class="material-icons">arrow_back</span>
+          Back to Login
+        </button>
+      </form>
+    }
+
+    <!-- Footer note -->
+    <p class="auth-footer-note">
+      By continuing, you agree to QuickEats' Terms and Privacy Policy.
+    </p>
+  </div>
 </div>

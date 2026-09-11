@@ -1,4 +1,4 @@
-﻿using QuickEats.API.DTos.Review;
+using QuickEats.API.DTos.Review;
 // Import Review DTOs.
 // Used to transfer Review data.
 
@@ -226,6 +226,32 @@ namespace QuickEats.API.Services
 
             // STEP 5
             // Return all converted Reviews.
+
+            return response;
+        }
+
+
+        // Get all Reviews of all Restaurants owned by an Owner.
+        public async Task<IEnumerable<ReviewResponseDto>>
+            GetByOwnerIdAsync(int ownerId)
+        {
+            var reviews = await _reviewRepository.GetByOwnerIdAsync(ownerId);
+            var response = new List<ReviewResponseDto>();
+
+            foreach (var review in reviews)
+            {
+                response.Add(new ReviewResponseDto
+                {
+                    Id = review.Id,
+                    CustomerId = review.CustomerId,
+                    RestaurantId = review.RestaurantId,
+                    CustomerName = review.Customer.Name,
+                    RestaurantName = review.Restaurant.Name,
+                    Rating = review.Rating,
+                    Comment = review.Comment,
+                    CreatedAt = review.CreatedAt
+                });
+            }
 
             return response;
         }

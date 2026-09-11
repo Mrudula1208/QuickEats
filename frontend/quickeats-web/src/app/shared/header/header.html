@@ -1,21 +1,80 @@
-<header class="header">
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a routerLink="/" class="navbar-brand">
+      <span class="brand-logo">
+        <span class="brand-icon">Q</span>
+      </span>
+      <span class="brand-text">Quick<span class="brand-accent">Eats</span></span>
+    </a>
 
-    <h2>QuickEats</h2>
+    <div class="navbar-search">
+      <span class="material-icons search-icon">search</span>
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        (keyup.enter)="onSearch()"
+        placeholder="Search restaurants, cuisines or dishes..."
+        class="search-input">
+    </div>
 
-    @if(isLoggedIn){
+    <button class="mobile-toggle" (click)="toggleMobileMenu()">
+      <span class="material-icons">{{ mobileMenuOpen ? 'close' : 'menu' }}</span>
+    </button>
 
-        <a routerLink="/notifications" class="notification-bell">
+    <div class="navbar-menu" [class.open]="mobileMenuOpen">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
+         class="nav-link" (click)="closeMobileMenu()">Home</a>
+      <a routerLink="/restaurants" routerLinkActive="active"
+         class="nav-link" (click)="closeMobileMenu()">Restaurants</a>
+      <a routerLink="/offers" routerLinkActive="active"
+         class="nav-link" (click)="closeMobileMenu()">Offers</a>
 
-            🔔
+      @if (isLoggedIn) {
+        <a routerLink="/orders" routerLinkActive="active"
+           class="nav-link" (click)="closeMobileMenu()">Orders</a>
+        <a routerLink="/favorites" routerLinkActive="active"
+           class="nav-link" (click)="closeMobileMenu()">Favorites</a>
+      }
 
-            @if(unreadCount > 0){
+      <a routerLink="/cart" class="nav-link cart-link" (click)="closeMobileMenu()">
+        <span class="material-icons cart-icon">shopping_bag</span>
+        @if (getCartCount() > 0) {
+          <span class="cart-badge">{{ getCartCount() }}</span>
+        }
+      </a>
 
-                <span class="unread-badge">{{ unreadCount }}</span>
-
-            }
-
+      @if (!isLoggedIn) {
+        <a routerLink="/register" class="nav-link signup-btn" (click)="closeMobileMenu()">
+          Sign Up
         </a>
+        <a routerLink="/login" class="nav-link login-btn" (click)="closeMobileMenu()">
+          Sign In
+        </a>
+      }
 
-    }
-
-</header>
+      @if (isLoggedIn) {
+        <div class="profile-menu">
+          <a routerLink="/profile" class="nav-link profile-link" (click)="closeMobileMenu()">
+            <span class="avatar">
+              @if (userName) {
+                {{ userName.charAt(0).toUpperCase() }}
+              } @else {
+                <span class="material-icons" style="font-size:16px">person</span>
+              }
+            </span>
+            <span class="profile-name">{{ userName || 'Profile' }}</span>
+          </a>
+          <a routerLink="/notifications" class="nav-link notif-link" (click)="closeMobileMenu()">
+            <span class="material-icons">notifications_none</span>
+            @if (unreadCount > 0) {
+              <span class="unread-badge">{{ unreadCount }}</span>
+            }
+          </a>
+          <button class="logout-btn" (click)="logout()">
+            <span class="material-icons">logout</span>
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+</nav>

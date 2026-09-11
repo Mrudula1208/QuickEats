@@ -1,238 +1,95 @@
-<div class="coupons-page">
-
-    <h1>
-
-        🎁 Available Coupons
-
-    </h1>
-
-    <p>
-
-        Apply a coupon and save more on your order.
-
-    </p>
-
-    <!--
-        @if
-        Means:
-        Check whether coupons are available.
-
-        If coupons array is empty,
-        show Empty Message.
-
-        Otherwise,
-        show all coupons.
-    -->
-
-    @if(coupons.length===0){
-
-    <div class="empty-coupon">
-
-        <h2>
-
-            No Coupons Available
-
-        </h2>
-
-        <p>
-
-            Please check again later.
-
-        </p>
-
-    </div>
-
-    }
-
-    @else{
-
-    <div class="coupon-grid">
-
-        <!--
-            @for
-            Means:
-            Repeat this card
-            for every coupon.
-
-            coupons
-
-            ↓
-
-            Coupon 1
-
-            Coupon 2
-
-            Coupon 3
-        -->
-
-        @for(coupon of coupons; track coupon.couponId){
-
-        <div class="coupon-card">
-
-            <!-- Coupon Code -->
-
-            <h2>
-
-                {{coupon.couponCode}}
-
-            </h2>
-
-            <!-- Coupon Description -->
-
-            <p>
-
-                {{coupon.description}}
-
-            </p>
-
-            <!-- Minimum Order -->
-
-            <p>
-
-                Minimum Order :
-
-                ₹{{coupon.minimumOrderAmount}}
-
-            </p>
-
-            <!-- Discount -->
-
-            <h3>
-
-                Save ₹{{coupon.discountAmount}}
-
-            </h3>
-
-            <!-- Expiry Date -->
-
-            <p>
-
-                Valid Till :
-
-                {{coupon.expiryDate | date:'mediumDate'}}
-
-            </p>
-
-            <!-- Coupon Status -->
-
-            @if(coupon.isActive){
-
-            <span class="active">
-
-                Active
-
-            </span>
-
-            }
-
-            @else{
-
-            <span class="expired">
-
-                Expired
-
-            </span>
-
-            }
-
-            <!-- Apply Button -->
-
-            <button
-
-                (click)="applyCoupon(coupon)"
-
-                [disabled]="!coupon.isActive">
-
-                Apply Coupon
-
-            </button>
-
-        </div>
+<section class="page-hero">
+  <div class="container">
+    <a routerLink="/restaurants" class="breadcrumb">
+      <span class="material-icons">arrow_back</span>
+      Back to Restaurants
+    </a>
+    <h1 class="page-title">My Coupons</h1>
+    <p class="page-subtitle">Apply a coupon and save more on your order</p>
+  </div>
+</section>
+
+<section class="coupons-section">
+  <div class="container">
+
+    @if (isLoading) {
+      <div class="loading-state">
+        <span class="material-icons spinning">sync</span>
+        <p>Loading coupons...</p>
+      </div>
+    } @else if (loadError) {
+      <div class="loading-state">
+        <span class="material-icons">error_outline</span>
+        <p>{{ loadError }}</p>
+        <button class="retry-btn" (click)="retry()">
+          <span class="material-icons">refresh</span>
+          Try Again
+        </button>
+      </div>
+    } @else if (coupons.length === 0) {
+      <div class="loading-state">
+        <span class="material-icons">local_offer</span>
+        <p>No coupons available right now. Check back later.</p>
+      </div>
+    } @else {
+
+      <div class="coupon-grid">
+        @for(coupon of coupons; track coupon.couponId) {
+
+          @if (coupon.isActive) {
+            <div class="coupon-card">
+              <div class="coupon-top">
+                <span class="coupon-code">{{ coupon.couponCode }}</span>
+                <span class="coupon-save">SAVE ₹{{ coupon.discountAmount }}</span>
+              </div>
+              <div class="coupon-body">
+                @if (coupon.description) {
+                  <p class="coupon-desc">{{ coupon.description }}</p>
+                }
+                <div class="coupon-meta">
+                  <span class="meta-item">
+                    <span class="material-icons">shopping_cart</span>
+                    Min. order ₹{{ coupon.minimumOrderAmount }}
+                  </span>
+                  <span class="meta-item">
+                    <span class="material-icons">schedule</span>
+                    Valid till {{ coupon.expiryDate | date:'mediumDate' }}
+                  </span>
+                </div>
+                <button class="apply-btn" (click)="applyCoupon(coupon)">
+                  <span class="material-icons">add_shopping_cart</span>
+                  Apply Coupon
+                </button>
+              </div>
+            </div>
+          } @else {
+            <div class="coupon-card coupon-card--expired">
+              <div class="coupon-top">
+                <span class="coupon-code">{{ coupon.couponCode }}</span>
+                <span class="coupon-save coupon-save--expired">EXPIRED</span>
+              </div>
+              <div class="coupon-body">
+                @if (coupon.description) {
+                  <p class="coupon-desc">{{ coupon.description }}</p>
+                }
+                <div class="coupon-meta">
+                  <span class="meta-item">
+                    <span class="material-icons">shopping_cart</span>
+                    Min. order ₹{{ coupon.minimumOrderAmount }}
+                  </span>
+                  <span class="meta-item">
+                    <span class="material-icons">event_busy</span>
+                    No longer available
+                  </span>
+                </div>
+              </div>
+            </div>
+          }
 
         }
-
-    </div>
+      </div>
 
     }
 
-</div>
-
-<!--
-
-=====================================
-
-EXECUTION FLOW
-
-=====================================
-
-1️⃣ Coupons Page Opens
-
-↓
-
-2️⃣ Angular loads coupons.html
-
-↓
-
-3️⃣ @if checks
-
-coupons.length
-
-↓
-
-4️⃣ If Empty
-
-↓
-
-Show
-
-"No Coupons Available"
-
-OR
-
-↓
-
-5️⃣ @for starts looping
-
-↓
-
-Coupon 1
-
-↓
-
-Coupon 2
-
-↓
-
-Coupon 3
-
-↓
-
-6️⃣ One Coupon Card
-
-is created
-
-for every coupon
-
-↓
-
-7️⃣ Customer clicks
-
-Apply Coupon
-
-↓
-
-coupons.ts
-
-↓
-
-applyCoupon(coupon)
-
-↓
-
-Selected Coupon
-
-↓
-
-Checkout Page
-
--->
+  </div>
+</section>

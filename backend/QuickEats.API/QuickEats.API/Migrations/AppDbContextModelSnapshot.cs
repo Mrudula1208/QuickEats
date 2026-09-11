@@ -276,6 +276,9 @@ namespace QuickEats.API.Migrations
                     b.Property<DateTime>("AssignedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("DeliveredAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("DeliveryPartnerId")
                         .HasColumnType("int");
 
@@ -286,7 +289,12 @@ namespace QuickEats.API.Migrations
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("PickedUpAt")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("DeliveryPartnerId");
 
                     b.HasIndex("OrderId");
 
@@ -556,6 +564,9 @@ namespace QuickEats.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -644,11 +655,19 @@ namespace QuickEats.API.Migrations
 
             modelBuilder.Entity("QuickEats.API.Models.OrderDelivery", b =>
                 {
+                    b.HasOne("QuickEats.API.Models.User", "DeliveryPartner")
+                        .WithMany()
+                        .HasForeignKey("DeliveryPartnerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("QuickEats.API.Models.Order", "Order")
                         .WithMany()
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("DeliveryPartner");
 
                     b.Navigation("Order");
                 });

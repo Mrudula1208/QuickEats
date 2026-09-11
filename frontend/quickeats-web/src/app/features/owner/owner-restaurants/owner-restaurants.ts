@@ -1,20 +1,10 @@
-import { Component } from '@angular/core';
-// Controls the Owner's Restaurant list page.
-
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-// Required for @if and @for.
-
 import { RouterLink } from '@angular/router';
-// RouterLink makes buttons navigate.
-
 import { OwnerNavComponent } from '../../../shared/owner-nav/owner-nav';
-// Top navigation bar.
-
 import { RestaurantService } from '../../../core/services/restaurant.service';
-// Loads and deletes restaurants.
-
 import { Restaurant } from '../../../core/models/restaurant.model';
-// Structure of one restaurant.
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-owner-restaurants',
@@ -25,53 +15,48 @@ import { Restaurant } from '../../../core/models/restaurant.model';
 })
 export class OwnerRestaurantsComponent {
 
-  // My restaurants.
-  restaurants: Restaurant[] = [];
+  restaurants = signal<Restaurant[]>([]);
+  isLoading = signal(true);
+  loadError = signal<string | null>(null);
 
   constructor(
-    private restaurantService: RestaurantService
+    private restaurantService: RestaurantService,
+    private toastr: ToastrService
   ) {
-
     this.loadRestaurants();
-
   }
 
-  // Load only my restaurants.
+  // One owner = one restaurant. The primary restaurant is the first one.
+  get restaurant(): Restaurant | undefined {
+    return this.restaurants()[0];
+  }
+
   loadRestaurants(): void {
-
-    this.restaurantService
-      .getMyRestaurants()
-      .subscribe({
-        next: (data) => {
-          this.restaurants = data;
-        },
-        error: () => {}
-      });
-
-  }
-
-  // Delete one of my restaurants.
-  deleteRestaurant(id: number): void {
-
-    this.restaurantService
-      .deleteRestaurant(id)
-      .subscribe({
-        next: () => {
-          this.loadRestaurants();
-        },
-        error: () => {}
-      });
-
-  }
-
-  // Toggle restaurant active status.
-  toggleStatus(id: number): void {
-    this.restaurantService.toggleStatus(id).subscribe({
-      next: () => {
-        this.loadRestaurants();
+    this.isLoading.set(true);
+    this.loadError.set(null);
+    this.restaurantService.getMyRestaurants().subscribe({
+      next: (data) => {
+        this.restaurants.set(data);
+        this.isLoading.set(false);
       },
-      error: () => {}
+      error: () => {
+        this.isLoading.set(false);
+        this.loadError.set('Could not load your restaurant. Please try again.');
+      }
     });
   }
 
+  retry(): void {
+    this.loadRestaurants();
+  }
+
+  toggleStatus(id: number): void {
+    this.restaurantService.toggleStatus(id).subscribe({
+      next: () => {
+        this.toastr.success('Status updated');
+        this.loadRestaurants();
+      },
+      error: () => this.toastr.error('Failed to update status')
+    });
+  }
 }

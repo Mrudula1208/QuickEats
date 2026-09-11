@@ -1,99 +1,102 @@
-import { Component } from '@angular/core';
-// Controls the Owner's Menu list page for one restaurant.
-
+import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-// Required for @if and @for.
-
-import { RouterLink } from '@angular/router';
-// RouterLink makes buttons navigate.
-
-import { ActivatedRoute } from '@angular/router';
-// ActivatedRoute reads the restaurant id from the URL.
-
+import { FormsModule } from '@angular/forms';
+import { RouterLink, ActivatedRoute } from '@angular/router';
 import { OwnerNavComponent } from '../../../shared/owner-nav/owner-nav';
-// Top navigation bar.
-
 import { MenuService } from '../../../core/services/menu.service';
-// Loads and deletes menu items.
-
 import { MenuItem } from '../../../core/models/menu.model';
-// Structure of one menu item.
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-owner-menu',
   standalone: true,
-  imports: [CommonModule, RouterLink, OwnerNavComponent],
+  imports: [CommonModule, FormsModule, RouterLink, OwnerNavComponent],
   templateUrl: './owner-menu.html',
   styleUrl: './owner-menu.scss'
 })
 export class OwnerMenuComponent {
 
-  // The restaurant we are managing.
   restaurantId = 0;
+  menuItems = signal<MenuItem[]>([]);
+  isLoading = signal(true);
+  loadError = signal(false);
+  searchText = '';
+  selectedCategory = signal('All');
 
-  // Menu items of that restaurant.
-  menuItems: MenuItem[] = [];
+  categories = computed(() => {
+    const cats = this.menuItems().map(m => m.category).filter((v, i, a) => a.indexOf(v) === i);
+    return ['All', ...cats];
+  });
+
+  filteredItems = computed(() => {
+    let items = this.menuItems();
+    if (this.searchText) {
+      const s = this.searchText.toLowerCase();
+      items = items.filter(m => m.name.toLowerCase().includes(s) || m.description.toLowerCase().includes(s));
+    }
+    const cat = this.selectedCategory();
+    if (cat !== 'All') {
+      items = items.filter(m => m.category === cat);
+    }
+    return items;
+  });
 
   constructor(
     private route: ActivatedRoute,
-    private menuService: MenuService
+    private menuService: MenuService,
+    private toastr: ToastrService
   ) {
-
-    // Read the restaurant id from the URL.
-    this.restaurantId = Number(
-      this.route.snapshot.paramMap.get('id')
-    );
-
+    this.restaurantId = Number(this.route.snapshot.paramMap.get('id'));
     this.loadMenu();
-
   }
 
-  // Load all menu items of the restaurant.
   loadMenu(): void {
-
-    this.menuService
-      .getMenuByRestaurantId(this.restaurantId)
-      .subscribe({
-        next: (data) => {
-          this.menuItems = data;
-        },
-        error: () => {}
-      });
-
+    this.isLoading.set(true);
+    this.loadError.set(false);
+    this.menuService.getMenuByRestaurantId(this.restaurantId).subscribe({
+      next: (data) => {
+        this.menuItems.set(data);
+        this.isLoading.set(false);
+      },
+      error: () => {
+        this.isLoading.set(false);
+        this.loadError.set(true);
+        this.toastr.error('Failed to load menu items');
+      }
+    });
   }
 
-  // Toggle availability of a menu item (Available / Out of Stock).
+  retry(): void {
+    this.loadMenu();
+  }
+
   toggleAvailability(id: number): void {
-
-    this.menuService
-      .toggleAvailability(id)
-      .subscribe({
-        next: () => {
-          this.loadMenu();
-        },
-        error: () => {}
-      });
-
+    this.menuService.toggleAvailability(id).subscribe({
+      next: () => {
+        this.menuItems.update(list =>
+          list.map(m => m.id === id ? { ...m, isAvailable: !m.isAvailable } : m)
+        );
+        this.toastr.success('Availability updated');
+      },
+      error: () => this.toastr.error('Failed to update availability')
+    });
   }
 
-  // Delete a menu item after confirmation.
   deleteItem(id: number, name: string): void {
-
-    const confirmed = confirm(
-      `Are you sure you want to delete "${name}"?`
-    );
-
-    if (!confirmed) return;
-
-    this.menuService
-      .deleteMenu(id)
-      .subscribe({
-        next: () => {
-          this.loadMenu();
-        },
-        error: () => {}
-      });
-
+    if (!confirm(`Are you sure you want to delete "${name}"?`)) return;
+    this.menuService.deleteMenu(id).subscribe({
+      next: () => {
+        this.menuItems.update(list => list.filter(m => m.id !== id));
+        this.toastr.success(`${name} deleted`);
+      },
+      error: () => this.toastr.error('Failed to delete item')
+    });
   }
 
+  getSalePrice(item: MenuItem): number {
+    if (item.discountPercent > 0) {
+      return item.price - (item.price * item.discountPercent) / 100;
+    }
+    return item.price;
+  }
 }

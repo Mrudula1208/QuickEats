@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace QuickEats.API.Models
 {
@@ -12,6 +12,7 @@ namespace QuickEats.API.Models
         public string PhoneNumber { get; set; } = string.Empty;
         public string Role { get;set; }=string.Empty; // e.g., "Customer", "Admin","Owner","Delivery Partner"
         public string ProfileImageUrl { get; set; } = string.Empty;
+        public bool IsActive { get; set; } = true;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public ICollection<Order> Orders { get; set; } = new List<Order>();

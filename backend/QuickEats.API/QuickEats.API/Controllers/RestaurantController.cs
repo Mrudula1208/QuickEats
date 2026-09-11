@@ -45,9 +45,13 @@ namespace QuickEats.API.Controllers
         [AllowAnonymous]
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(int id)
         {
+            if (User.IsInRole("Owner") && !await IsOwnerOfRestaurant(id))
+                return Forbid();
+
             var restaurant = await _restaurantService.GetByIdAsync(id);
             if (restaurant == null)
                 return NotFound("Restaurant not found.");

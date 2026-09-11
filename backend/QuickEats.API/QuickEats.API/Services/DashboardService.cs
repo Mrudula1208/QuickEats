@@ -32,5 +32,10 @@ namespace QuickEats.API.Services
                 TotalRevenue = dashboard.TotalRevenue
             };
         }
+
+        public async Task<DashboardDto> GetOwnerDashboardAsync(int ownerId)
+        {
+            return await _dashboardRepository.GetOwnerDashboardAsync(ownerId);
+        }
     }
 }

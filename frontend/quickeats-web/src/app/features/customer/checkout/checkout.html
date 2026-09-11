@@ -1,225 +1,335 @@
-<div class="checkout-page">
+<!-- Page Header -->
+<section class="page-hero">
+  <div class="container">
+    <a routerLink="/cart" class="breadcrumb">
+      <span class="material-icons">arrow_back</span>
+      Back to Cart
+    </a>
+    <h1 class="page-title">Checkout</h1>
+    <p class="page-subtitle">Complete your order details</p>
+  </div>
+</section>
 
-    <h1>QuickEats Checkout</h1>
+<section class="checkout-section">
+  <div class="container">
 
-    <div class="checkout-layout">
+    @if (customerCartItems().length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon-wrap">
+          <span class="material-icons">shopping_cart</span>
+        </div>
+        <h2>Your cart is empty</h2>
+        <p>Add some items before checking out</p>
+        <a routerLink="/restaurants" class="browse-btn">
+          <span class="material-icons">restaurant_menu</span>
+          Browse Restaurants
+        </a>
+      </div>
+    } @else {
 
-        <!-- Left Section -->
+      <div class="checkout-layout">
 
-        <div class="checkout-form">
+        <!-- Left: Forms -->
+        <div class="checkout-forms">
 
-            <div class="checkout-card">
+          <!-- Delivery Address -->
+          <div class="form-card">
+            <div class="form-card-header">
+              <span class="material-icons">location_on</span>
+              <h2>Delivery Address</h2>
+            </div>
 
-                <h2>Delivery Address</h2>
-
-                <input
-                    type="text"
-                    placeholder="Enter Delivery Address *"
-                    [(ngModel)]="customerCheckout.deliveryAddress"
-                    [class.input-error]="submitted && errors['deliveryAddress']">
-
-                @if(submitted && errors['deliveryAddress']){
-
-                <span class="error-text">
-
-                    {{errors['deliveryAddress']}}
-
-                </span>
-
+            @if (savedAddresses().length > 0) {
+              <div class="saved-addresses">
+                @for (addr of savedAddresses(); track addr.addressId) {
+                  <div
+                    class="address-option"
+                    [class.selected]="selectedAddressId === addr.addressId"
+                    (click)="selectAddress(addr)">
+                    <div class="address-option-top">
+                      <span class="address-type-badge">
+                        <span class="material-icons">
+                          {{ addr.addressType === 'Home' ? 'home' : addr.addressType === 'Office' ? 'business' : 'location_on' }}
+                        </span>
+                        {{ addr.addressType }}
+                      </span>
+                      @if (addr.isDefault) {
+                        <span class="default-badge">Default</span>
+                      }
+                    </div>
+                    <p class="address-text">{{ addr.houseNumber }}, {{ addr.area }}, {{ addr.city }}, {{ addr.state }} - {{ addr.pincode }}</p>
+                    @if (addr.landmark) {
+                      <p class="address-landmark">Landmark: {{ addr.landmark }}</p>
+                    }
+                  </div>
                 }
+              </div>
+            }
 
-                <input
-                    type="text"
-                    placeholder="Nearby Landmark"
-                    [(ngModel)]="customerCheckout.landmark">
+            <div class="manual-address">
+              <button class="toggle-add-btn" (click)="toggleAddAddress()">
+                <span class="material-icons">{{ showAddAddress ? 'remove' : 'add' }}</span>
+                {{ showAddAddress ? 'Cancel' : (savedAddresses().length > 0 ? 'Add new address' : 'Add delivery address') }}
+              </button>
 
+              @if (showAddAddress) {
+                <div class="add-address-form">
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>Full Name *</label>
+                      <input type="text" placeholder="John Doe" [(ngModel)]="newAddress.customerName">
+                    </div>
+                    <div class="form-group">
+                      <label>Phone *</label>
+                      <input type="text" placeholder="10-digit number" [(ngModel)]="newAddress.phoneNumber">
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>House / Flat *</label>
+                      <input type="text" placeholder="Apt 12, Building A" [(ngModel)]="newAddress.houseNumber">
+                    </div>
+                    <div class="form-group">
+                      <label>Area / Street *</label>
+                      <input type="text" placeholder="Main Street, Sector 5" [(ngModel)]="newAddress.area">
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>Landmark</label>
+                      <input type="text" placeholder="Near park" [(ngModel)]="newAddress.landmark">
+                    </div>
+                    <div class="form-group">
+                      <label>Address Type</label>
+                      <select [(ngModel)]="newAddress.addressType">
+                        <option value="Home">Home</option>
+                        <option value="Office">Office</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>City *</label>
+                      <input type="text" placeholder="Mumbai" [(ngModel)]="newAddress.city">
+                    </div>
+                    <div class="form-group">
+                      <label>State *</label>
+                      <input type="text" placeholder="Maharashtra" [(ngModel)]="newAddress.state">
+                    </div>
+                    <div class="form-group">
+                      <label>Pincode *</label>
+                      <input type="text" placeholder="400001" [(ngModel)]="newAddress.pincode">
+                    </div>
+                  </div>
+                  <button class="save-address-btn" (click)="saveNewAddress()">
+                    <span class="material-icons">save</span>
+                    Save Address
+                  </button>
+                </div>
+              }
+            </div>
+
+            <!-- Manual Address Fields (always visible if no saved addresses) -->
+            <div class="manual-fields">
+              <div class="form-group">
+                <label>Delivery Address *</label>
                 <input
+                  type="text"
+                  placeholder="Enter full delivery address"
+                  [(ngModel)]="customerCheckout.deliveryAddress"
+                  [class.input-error]="submitted && errors['deliveryAddress']">
+                @if (submitted && errors['deliveryAddress']) {
+                  <span class="error-text">{{ errors['deliveryAddress'] }}</span>
+                }
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Landmark</label>
+                  <input type="text" placeholder="Near park, school" [(ngModel)]="customerCheckout.landmark">
+                </div>
+                <div class="form-group">
+                  <label>Mobile Number *</label>
+                  <input
                     type="text"
-                    placeholder="Mobile Number *"
+                    placeholder="10-digit number"
                     [(ngModel)]="customerCheckout.phoneNumber"
                     [class.input-error]="submitted && errors['phoneNumber']">
+                  @if (submitted && errors['phoneNumber']) {
+                    <span class="error-text">{{ errors['phoneNumber'] }}</span>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
 
-                @if(submitted && errors['phoneNumber']){
+          <!-- Delivery Instructions -->
+          <div class="form-card">
+            <div class="form-card-header">
+              <span class="material-icons">edit_note</span>
+              <h2>Delivery Instructions</h2>
+            </div>
+            <textarea
+              rows="3"
+              placeholder="E.g. Leave at the security gate, ring the doorbell..."
+              [(ngModel)]="customerCheckout.deliveryInstruction">
+            </textarea>
+          </div>
 
-                <span class="error-text">
+          <!-- Payment Method -->
+          <div class="form-card">
+            <div class="form-card-header">
+              <span class="material-icons">payment</span>
+              <h2>Payment Method</h2>
+            </div>
 
-                    {{errors['phoneNumber']}}
-
+            <div class="payment-options">
+              <div
+                class="payment-option"
+                [class.selected]="customerCheckout.paymentMethod === 'Cash On Delivery'"
+                (click)="selectPayment('Cash On Delivery')">
+                <span class="material-icons">payments</span>
+                <div class="payment-info">
+                  <span class="payment-name">Cash on Delivery</span>
+                  <span class="payment-desc">Pay when your order arrives</span>
+                </div>
+                <span class="payment-check material-icons">
+                  {{ customerCheckout.paymentMethod === 'Cash On Delivery' ? 'check_circle' : 'radio_button_unchecked' }}
                 </span>
+              </div>
 
-                }
+              <div
+                class="payment-option"
+                [class.selected]="customerCheckout.paymentMethod === 'UPI'"
+                (click)="selectPayment('UPI')">
+                <span class="material-icons">qr_code_2</span>
+                <div class="payment-info">
+                  <span class="payment-name">UPI</span>
+                  <span class="payment-desc">Google Pay, PhonePe, Paytm</span>
+                </div>
+                <span class="payment-check material-icons">
+                  {{ customerCheckout.paymentMethod === 'UPI' ? 'check_circle' : 'radio_button_unchecked' }}
+                </span>
+              </div>
 
+              <div
+                class="payment-option"
+                [class.selected]="customerCheckout.paymentMethod === 'Card'"
+                (click)="selectPayment('Card')">
+                <span class="material-icons">credit_card</span>
+                <div class="payment-info">
+                  <span class="payment-name">Credit / Debit Card</span>
+                  <span class="payment-desc">Visa, Mastercard, RuPay</span>
+                </div>
+                <span class="payment-check material-icons">
+                  {{ customerCheckout.paymentMethod === 'Card' ? 'check_circle' : 'radio_button_unchecked' }}
+                </span>
+              </div>
             </div>
-
-            <div class="checkout-card">
-
-                <h2>Delivery Instructions</h2>
-
-                <textarea
-
-                    rows="4"
-
-                    placeholder="Example : Leave food at the security gate."
-
-                    [(ngModel)]="customerCheckout.deliveryInstruction">
-
-                </textarea>
-
-            </div>
-
-            <div class="checkout-card">
-
-                <h2>Payment Method</h2>
-
-                <!-- Why radio?
-                     Only ONE payment method should be selected.
-                     Radio button allows single selection.
-                -->
-
-                <label>
-
-                    <input
-                        type="radio"
-                        value="Cash On Delivery"
-                        [(ngModel)]="customerCheckout.paymentMethod">
-
-                    Cash On Delivery
-
-                </label>
-
-                <label>
-
-                    <input
-                        type="radio"
-                        value="UPI"
-                        [(ngModel)]="customerCheckout.paymentMethod">
-
-                    UPI
-
-                </label>
-
-                <label>
-
-                    <input
-                        type="radio"
-                        value="Card"
-                        [(ngModel)]="customerCheckout.paymentMethod">
-
-                    Debit / Credit Card
-
-                </label>
-
-            </div>
+          </div>
 
         </div>
 
-        <!-- Right Section -->
+        <!-- Right: Order Summary -->
+        <div class="checkout-summary-col">
+          <div class="summary-card">
+            <h2 class="summary-title">
+              <span class="material-icons">receipt_long</span>
+              Order Summary
+            </h2>
 
-        <div class="bill-summary">
-
-            <div class="checkout-card">
-
-                <h2>Bill Summary</h2>
-
-                <div class="bill-row">
-
-                    <span>Food Total</span>
-
-                    <span>₹{{ customerCheckout.subTotal }}</span>
-
+            <!-- Items Preview -->
+            <div class="order-items">
+              @for (item of customerCartItems(); track item.menu.id) {
+                <div class="order-item">
+                  <span class="item-qty">{{ item.quantity }}x</span>
+                  <span class="item-name">{{ item.menu.name }}</span>
+                  <span class="item-price">
+                    ₹{{ ((item.menu.discountPercent > 0 ? item.menu.price * (1 - item.menu.discountPercent / 100) : item.menu.price) * item.quantity) | number:'1.0-0' }}
+                  </span>
                 </div>
-
-                <div class="bill-row">
-
-                    <span>GST (5%)</span>
-
-                    <span>₹{{ customerCheckout.gstAmount }}</span>
-
-                </div>
-
-                <div class="bill-row">
-
-                    <span>Delivery Charge</span>
-
-                    <span>
-
-                        @if(customerCheckout.deliveryCharge === 0){
-                            FREE
-                        }
-                        @else{
-                            ₹{{ customerCheckout.deliveryCharge }}
-                        }
-
-                    </span>
-
-                </div>
-
-                <div class="bill-row">
-
-                    <span>Platform Fee</span>
-
-                    <span>₹{{ customerCheckout.platformFee }}</span>
-
-                </div>
-
-            @if(customerCheckout.discountAmount > 0){
-
-            <div class="bill-row discount">
-
-                    <span>Coupon Discount</span>
-
-                    <span>- ₹{{ customerCheckout.discountAmount }}</span>
-
-                </div>
-
-                }
-
-                @if(submitted && errors['minimumOrder']){
-
-                <div class="min-order-error">
-
-                    {{ errors['minimumOrder'] }}
-
-                </div>
-
-                }
-
-                <hr>
-
-                <div class="bill-row total">
-
-                    <span>Grand Total</span>
-
-                    <span>₹{{ customerCheckout.grandTotal }}</span>
-
-                </div>
-
+              }
             </div>
 
-            <div class="checkout-card reward-card">
+            <div class="summary-divider"></div>
 
-                <h2>QuickEat Rewards</h2>
+            <!-- Bill Breakdown -->
+            <div class="bill-row">
+              <span class="bill-label">Food Total</span>
+              <span class="bill-value">₹{{ customerCheckout.subTotal | number:'1.0-0' }}</span>
+            </div>
 
-                <h1>+{{ customerCheckout.rewardPoints }}</h1>
+            <div class="bill-row">
+              <span class="bill-label">GST (5%)</span>
+              <span class="bill-value">₹{{ customerCheckout.gstAmount | number:'1.0-0' }}</span>
+            </div>
 
-                <p>You will earn reward points after placing this order.</p>
+            <div class="bill-row">
+              <span class="bill-label">Platform Fee</span>
+              <span class="bill-value">₹{{ customerCheckout.platformFee }}</span>
+            </div>
 
+            <div class="bill-row">
+              <span class="bill-label">Delivery Fee</span>
+              <span class="bill-value">
+                @if (customerCheckout.deliveryCharge === 0) {
+                  <span class="free-delivery">FREE</span>
+                } @else {
+                  ₹{{ customerCheckout.deliveryCharge }}
+                }
+              </span>
+            </div>
+
+            @if (customerCheckout.discountAmount > 0) {
+              <div class="bill-row bill-row--discount">
+                <span class="bill-label">Coupon Discount</span>
+                <span class="bill-value">-₹{{ customerCheckout.discountAmount }}</span>
+              </div>
+            }
+
+            @if (submitted && errors['minimumOrder']) {
+              <div class="min-order-warning">
+                <span class="material-icons">info_outline</span>
+                {{ errors['minimumOrder'] }}
+              </div>
+            }
+
+            <div class="summary-divider"></div>
+
+            <div class="bill-row bill-row--total">
+              <span class="bill-label">Grand Total</span>
+              <span class="bill-value">₹{{ customerCheckout.grandTotal | number:'1.0-0' }}</span>
+            </div>
+
+            <!-- Rewards -->
+            <div class="reward-card">
+              <div class="reward-icon">
+                <span class="material-icons">emoji_events</span>
+              </div>
+              <div>
+                <span class="reward-points">+{{ customerCheckout.rewardPoints }} points</span>
+                <span class="reward-desc">Earned with this order</span>
+              </div>
             </div>
 
             <button
-
-                class="place-order-btn"
-
-                [disabled]="cartService.isBelowMinimumOrder()"
-
-                (click)="placeOrder()">
-
-                Place Order
-
+              class="place-order-btn"
+              [disabled]="cartService.isBelowMinimumOrder() || isPlacing"
+              (click)="placeOrder()">
+              @if (isPlacing) {
+                <span class="material-icons spinning">sync</span>
+                Placing Order...
+              } @else {
+                <span class="material-icons">check_circle</span>
+                Place Order — ₹{{ customerCheckout.grandTotal | number:'1.0-0' }}
+              }
             </button>
 
+          </div>
         </div>
 
-    </div>
+      </div>
+    }
 
-</div>
+  </div>
+</section>

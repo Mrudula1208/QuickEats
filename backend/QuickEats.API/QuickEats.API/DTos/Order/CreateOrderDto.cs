@@ -25,7 +25,8 @@ namespace QuickEats.API.DTos.Order
         public List<OrderItemDto> Items { get; set; } = new();
 
         // Grand total calculated by frontend (food + GST + delivery + platform - coupon).
-        [Range(0.01, 999999, ErrorMessage = "Total amount must be valid")]
+        // When 0, the backend recalculates server-side from menu item prices.
+        [Range(0, 999999, ErrorMessage = "Total amount must be valid")]
         public decimal TotalAmount { get; set; }
     }
 }

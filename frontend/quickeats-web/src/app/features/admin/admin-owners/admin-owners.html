@@ -1,53 +1,103 @@
 <app-admin-nav></app-admin-nav>
 
-<h1>Restaurant Owners</h1>
+<section class="au-hero">
+  <div class="au-hero-inner">
+    <h1>Restaurant Owners Directory</h1>
+    <p>Manage registered restaurant owners and their listed kitchens</p>
+  </div>
+</section>
 
-@if(owners.length===0){
+<section class="au-content">
+  <div class="au-container">
 
-<h2>No Owners Found</h2>
+    @if (isLoading()) {
+      <div class="au-loading">
+        <span class="material-icons spinning">progress_activity</span>
+        <p>Loading owners...</p>
+      </div>
+    } @else {
+      <div class="au-stats">
+        <div class="au-stat">
+          <span class="au-stat-num">{{ owners().length }}</span>
+          <span class="au-stat-label">Total Owners</span>
+        </div>
+      </div>
 
-}
+      <div class="au-toolbar" style="margin-bottom: 20px;">
+        <div class="au-search" style="display:flex;align-items:center;background:#fff;border:1.5px solid #e9ecef;border-radius:10px;padding:8px 14px;max-width:380px;">
+          <span class="material-icons" style="color:#888;margin-right:8px;">search</span>
+          <input 
+            type="text" 
+            placeholder="Search owners by name, email, phone..." 
+            [ngModel]="searchQuery()" 
+            (ngModelChange)="searchQuery.set($event)"
+            style="border:none;outline:none;font-size:14px;width:100%;">
+        </div>
+      </div>
 
-@else{
+      @if (filteredOwners().length === 0) {
+        <div class="au-empty">
+          <span class="material-icons">people</span>
+          <h3>No Owners Found</h3>
+          <p>{{ owners().length === 0 ? 'Restaurant owners will appear here once they register.' : 'No owners match your search.' }}</p>
+        </div>
+      } @else {
+        <div class="au-table-wrap">
+          <table class="au-table">
+            <thead>
+              <tr>
+                <th>Owner Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Role</th>
+                <th>Joined</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (owner of displayedOwners(); track owner.id) {
+                <tr>
+                  <td>
+                    <div class="au-user-cell">
+                      <div class="au-avatar">{{ owner.name.charAt(0) || '?' }}</div>
+                      <span>{{ owner.name }}</span>
+                    </div>
+                  </td>
+                  <td>{{ owner.email }}</td>
+                  <td>{{ owner.phoneNumber || '-' }}</td>
+                  <td>
+                    <span class="status-badge" style="background:#ede7f6;color:#512da8;padding:4px 10px;border-radius:12px;font-weight:700;">
+                      {{ owner.role }}
+                    </span>
+                  </td>
+                  <td>{{ owner.createdAt | date:'mediumDate' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
 
-<table>
+        <!-- Pagination Controls -->
+        @if (filteredOwners().length > 10) {
+          <div class="table-pagination-footer" style="margin-top: 16px; border-radius: 12px; border: 1px solid var(--qe-border);">
+            <span class="pagination-info">
+              Showing <strong>{{ displayedOwners().length }}</strong> of <strong>{{ filteredOwners().length }}</strong> owners
+            </span>
+            <div class="pagination-actions">
+              @if (hasMore()) {
+                <button class="btn-pagination btn-show-more" (click)="showMore()">
+                  <span class="material-icons">expand_more</span>
+                  Show More (+10)
+                </button>
+              }
+              <button class="btn-pagination btn-show-all" (click)="toggleShowAll()">
+                <span class="material-icons">{{ showAll() ? 'unfold_less' : 'unfold_more' }}</span>
+                {{ showAll() ? 'Collapse to 10' : 'Show All (' + filteredOwners().length + ')' }}
+              </button>
+            </div>
+          </div>
+        }
+      }
+    }
 
-<thead>
-
-<tr>
-
-<th>Name</th>
-
-<th>Email</th>
-
-<th>Phone</th>
-
-<th>Joined</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-@for(owner of owners; track owner.id){
-
-<tr>
-
-<td>{{owner.name}}</td>
-
-<td>{{owner.email}}</td>
-
-<td>{{owner.phoneNumber}}</td>
-
-<td>{{owner.createdAt | date:'mediumDate'}}</td>
-
-</tr>
-
-}
-
-</tbody>
-
-</table>
-
-}
+  </div>
+</section>

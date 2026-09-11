@@ -1,10 +1,15 @@
 import { Routes } from '@angular/router';
 import { Home } from './features/customer/home/home';
+import { CustomerLayout } from './layout/customer-layout/customer-layout';
+import { DeliveryLayout } from './layout/delivery-layout/delivery-layout';
+import { RestaurantsComponent } from './features/customer/restaurants/restaurants';
+import { OffersComponent } from './features/customer/offers/offers';
 import { RestaurantDetailsComponent } from './features/customer/restaurant-details/restaurant-details';
 import { CartComponent } from './features/customer/cart/cart';
-import {CheckoutComponent} from './features/customer/checkout/checkout';
+import { CheckoutComponent } from './features/customer/checkout/checkout';
 import { OrderHistoryComponent } from './features/customer/order-history/order-history';
 import { OrderDetailsComponent } from './features/customer/order-details/order-details';
+import { OrderTrackingComponent } from './features/customer/order-tracking/order-tracking';
 import { PaymentComponent } from './features/customer/payment/payment';
 import { PaymentHistoryComponent } from './features/customer/payment-history/payment-history';
 import { DeliveryTrackingComponent } from './features/customer/delivery-tracking/delivery-tracking';
@@ -14,6 +19,7 @@ import { OwnerRestaurantFormComponent } from './features/owner/owner-restaurant-
 import { OwnerMenuComponent } from './features/owner/owner-menu/owner-menu';
 import { OwnerMenuItemFormComponent } from './features/owner/owner-menu-item-form/owner-menu-item-form';
 import { OwnerOrdersComponent } from './features/owner/owner-orders/owner-orders';
+import { OwnerReviewsComponent } from './features/owner/owner-reviews/owner-reviews';
 import { authGuard } from './guards/auth.guard';
 import { adminGuard } from './guards/admin.guard';
 import { ownerGuard } from './guards/owner.guard';
@@ -32,240 +38,383 @@ import { AdminEditMenu } from './features/admin/admin-edit-menu/admin-edit-menu'
 import { AdminOrders } from './features/admin/admin-order/admin-order';
 import { AdminPayment } from './features/admin/admin-payment/admin-payment';
 import { AdminDelivery } from './features/admin/admin-delivery/admin-delivery';
+import { AdminDeliveryPartners } from './features/admin/admin-delivery-partners/admin-delivery-partners';
 import { AdminReviews } from './features/admin/admin-reviews/admin-reviews';
 import { AdminUsers } from './features/admin/admin-users/admin-users';
 import { AdminOwners } from './features/admin/admin-owners/admin-owners';
 import { AdminCategories } from './features/admin/admin-categories/admin-categories';
 import { AdminCoupons } from './features/admin/admin-coupons/admin-coupons';
-import { DeliveryPartnerComponent } from './features/delivery-partner/delivery-partner';
+import { RiderDashboardComponent } from './features/delivery-partner/rider-dashboard/rider-dashboard';
+import { RiderDeliveriesComponent } from './features/delivery-partner/rider-deliveries/rider-deliveries';
+import { RiderDeliveryDetailsComponent } from './features/delivery-partner/rider-delivery-details/rider-delivery-details';
+import { RiderHistoryComponent } from './features/delivery-partner/rider-history/rider-history';
+import { RiderProfileComponent } from './features/delivery-partner/rider-profile/rider-profile';
 import { WishlistComponent } from './features/customer/wishlist/wishlist';
 import { FavoritesComponent } from './features/customer/favorites/favorites';
 import { CouponsComponent } from './features/customer/coupons/coupons';
 import { NotificationsComponent } from './features/customer/notifications/notifications';
 import { SavedAddressComponent } from './features/customer/saved-address/saved-address';
 import { ReviewsComponent } from './features/customer/reviews/reviews';
+import { HelpComponent } from './features/customer/support/help';
+import { AboutComponent, ContactComponent, TermsComponent, PrivacyComponent, RefundPolicyComponent } from './features/customer/support/static-pages';
+
 export const routes: Routes = [
 
-{
-  path: '',
-  component: Home
-},
+  // ==========================================
+  // AUTH (No Navbar/Footer)
+  // ==========================================
+  {
+    path: 'register',
+    component: RegisterComponent
+  },
+  {
+    path: 'login',
+    component: LoginComponent
+  },
 
-{
-  path: 'restaurant/:id',
-  component: RestaurantDetailsComponent
-},
-
-{
-  path: 'cart',
-  component: CartComponent,
-  canActivate: [authGuard]
-},
-
-{
-  path: 'checkout',
-  component: CheckoutComponent,
-  canActivate: [authGuard]
-},
-
-{
-  path: 'orders',
-  component: OrderHistoryComponent,
-  canActivate: [authGuard]
-},
-
-{
-  path: 'orders/:id',
-  component: OrderDetailsComponent,
-  canActivate: [authGuard]
-},
-
-{
-  path: 'payment',
-  component: PaymentComponent,
-  canActivate: [authGuard]
-},
-
-{
-  path: 'payments',
-  component: PaymentHistoryComponent,
-  canActivate: [authGuard]
-},
-
-{
-  path: 'delivery/:orderId',
-  component: DeliveryTrackingComponent,
-  canActivate: [authGuard]
-},
-
-{
-  path: 'register',
-  component: RegisterComponent
-},
-
-{
-  path: 'login',
-  component: LoginComponent
-},
-{
-    path: 'dashboard',
-    loadComponent: () =>
-        import('./features/customer/customer-dashboard/customer-dashboard')
+  // ==========================================
+  // CUSTOMER PAGES (With Navbar + Footer)
+  // ==========================================
+  {
+    path: '',
+    component: CustomerLayout,
+    children: [
+      {
+        path: '',
+        component: Home
+      },
+      {
+        path: 'restaurants',
+        component: RestaurantsComponent
+      },
+      {
+        path: 'restaurant/:id',
+        component: RestaurantDetailsComponent
+      },
+      {
+        path: 'restaurants/:id',
+        component: RestaurantDetailsComponent
+      },
+      {
+        path: 'offers',
+        component: OffersComponent
+      },
+      {
+        path: 'cart',
+        component: CartComponent
+      },
+      {
+        path: 'checkout',
+        component: CheckoutComponent,
+        canActivate: [authGuard]
+      },
+      {
+        path: 'orders',
+        component: OrderHistoryComponent,
+        canActivate: [authGuard]
+      },
+      {
+        path: 'orders/:id',
+        component: OrderDetailsComponent,
+        canActivate: [authGuard]
+      },
+      {
+        path: 'orders/:id/track',
+        component: OrderTrackingComponent,
+        canActivate: [authGuard]
+      },
+      {
+        path: 'payment',
+        component: PaymentComponent,
+        canActivate: [authGuard]
+      },
+      {
+        path: 'payments',
+        component: PaymentHistoryComponent,
+        canActivate: [authGuard]
+      },
+      {
+        path: 'order-tracking/:orderId',
+        component: DeliveryTrackingComponent,
+        canActivate: [authGuard]
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./features/customer/customer-dashboard/customer-dashboard')
             .then(m => m.CustomerDashboardComponent),
-    canActivate: [authGuard]
-},{
-    path: 'profile',
-    loadComponent: () =>
-        import('./features/customer/profile/profile')
-        .then(m => m.ProfileComponent),
-    canActivate: [authGuard]
-},
-{
-    path: 'wishlist',
-    component: WishlistComponent,
-    canActivate: [authGuard]
-},
-{
-    path: 'favorites',
-    component: FavoritesComponent,
-    canActivate: [authGuard]
-},
-{
-    path: 'coupons',
-    component: CouponsComponent,
-    canActivate: [authGuard]
-},
-{
-    path: 'notifications',
-    component: NotificationsComponent,
-    canActivate: [authGuard]
-},
-{
-    path: 'saved-address',
-    component: SavedAddressComponent,
-    canActivate: [authGuard]
-},
-{
-    path: 'reviews',
-    component: ReviewsComponent,
-    canActivate: [authGuard]
-},
-        {
-  path: 'admin/dashboard',
-  component: AdminDashboard,
-  canActivate: [adminGuard]
-},{
-  path: 'admin/users',
-  component: AdminUsers,
-  canActivate: [adminGuard]
-},{
-  path: 'admin/owners',
-  component: AdminOwners,
-  canActivate: [adminGuard]
-},{
-  path: 'admin/categories',
-  component: AdminCategories,
-  canActivate: [adminGuard]
-},{
-  path: 'admin/coupons',
-  component: AdminCoupons,
-  canActivate: [adminGuard]
-},{
-  path: 'admin/restaurants',
-  component: AdminRestaurants,
-  canActivate: [adminGuard]
-},{
-  path: 'admin/add-restaurant',
-  component: AdminAddRestaurant,
-  canActivate: [adminGuard]
-},{
-path:'admin/edit-restaurant/:id',
- component:AdminEditRestaurant,
- canActivate:[adminGuard]
-},{
-  path: 'admin/menu',
-  component: AdminMenu,
-  canActivate: [adminGuard]
-},{
-  path: 'admin/add-menu',
-  component: AdminAddMenu,
-  canActivate: [adminGuard]
-},{
-  path: 'admin/edit-menu/:id',
-  component: AdminEditMenu,
-  canActivate: [adminGuard]
-},{
-  path: 'admin/order',
-  component: AdminOrders,
-  canActivate: [adminGuard]
-},{
-  path: 'admin/order-details/:id',
-  component: AdminOrderDetails,
-  canActivate: [adminGuard]
-},
-{ path: 'admin/payment-details/:id',
+        canActivate: [authGuard]
+      },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('./features/customer/profile/profile')
+            .then(m => m.ProfileComponent),
+        canActivate: [authGuard]
+      },
+      {
+        path: 'wishlist',
+        component: WishlistComponent,
+        canActivate: [authGuard]
+      },
+      {
+        path: 'favorites',
+        component: FavoritesComponent,
+        canActivate: [authGuard]
+      },
+      {
+        path: 'coupons',
+        component: CouponsComponent,
+        canActivate: [authGuard]
+      },
+      {
+        path: 'notifications',
+        component: NotificationsComponent,
+        canActivate: [authGuard]
+      },
+      {
+        path: 'saved-address',
+        component: SavedAddressComponent,
+        canActivate: [authGuard]
+      },
+      {
+        path: 'reviews',
+        component: ReviewsComponent,
+        canActivate: [authGuard]
+      },
+      {
+        path: 'help',
+        component: HelpComponent
+      },
+      {
+        path: 'about',
+        component: AboutComponent
+      },
+      {
+        path: 'contact',
+        component: ContactComponent
+      },
+      {
+        path: 'terms',
+        component: TermsComponent
+      },
+      {
+        path: 'privacy',
+        component: PrivacyComponent
+      },
+      {
+        path: 'refund-policy',
+        component: RefundPolicyComponent
+      }
+    ]
+  },
 
-  // component
-  // Opens AdminPaymentDetails
-  // when this URL is visited.
-  component: AdminPaymentDetails,
-  canActivate: [adminGuard]
-},{
-  path: 'admin/payment',
-  component: AdminPayment,
-  canActivate: [adminGuard]
-},{
-  path: 'admin/delivery',
-  component: AdminDelivery,
-  canActivate: [adminGuard]
-},{
-  path: 'admin/reviews',
-  component: AdminReviews,
-  canActivate: [adminGuard]
-},
-{
-  path: 'owner',
-  component: OwnerDashboardComponent,
-  canActivate: [ownerGuard]
-},
-{
-  path: 'owner/restaurants',
-  component: OwnerRestaurantsComponent,
-  canActivate: [ownerGuard]
-},
-{
-  path: 'owner/restaurants/new',
-  component: OwnerRestaurantFormComponent,
-  canActivate: [ownerGuard]
-},
-{
-  path: 'owner/restaurants/:id/edit',
-  component: OwnerRestaurantFormComponent,
-  canActivate: [ownerGuard]
-},
-{
-  path: 'owner/menu/:id',
-  component: OwnerMenuComponent,
-  canActivate: [ownerGuard]
-},
-{
-  path: 'owner/menu/:restaurantId/new',
-  component: OwnerMenuItemFormComponent,
-  canActivate: [ownerGuard]
-},
-{
-  path: 'owner/menu/:restaurantId/:itemId/edit',
-  component: OwnerMenuItemFormComponent,
-  canActivate: [ownerGuard]
-},
-{
-  path: 'owner/orders',
-  component: OwnerOrdersComponent,
-  canActivate: [ownerGuard]
-},
-{
-  path: 'delivery-partner',
-  component: DeliveryPartnerComponent,
-  canActivate: [deliveryPartnerGuard]
-}
+  // ==========================================
+  // ADMIN PAGES
+  // ==========================================
+  {
+    path: 'admin/dashboard',
+    component: AdminDashboard,
+    canActivate: [adminGuard]
+  },
+  {
+    path: 'admin/users',
+    component: AdminUsers,
+    canActivate: [adminGuard]
+  },
+  {
+    path: 'admin/owners',
+    component: AdminOwners,
+    canActivate: [adminGuard]
+  },
+  {
+    path: 'admin/categories',
+    component: AdminCategories,
+    canActivate: [adminGuard]
+  },
+  {
+    path: 'admin/coupons',
+    component: AdminCoupons,
+    canActivate: [adminGuard]
+  },
+  {
+    path: 'admin/restaurants',
+    component: AdminRestaurants,
+    canActivate: [adminGuard]
+  },
+  {
+    path: 'admin/add-restaurant',
+    component: AdminAddRestaurant,
+    canActivate: [adminGuard]
+  },
+  {
+    path: 'admin/edit-restaurant/:id',
+    component: AdminEditRestaurant,
+    canActivate: [adminGuard]
+  },
+  {
+    path: 'admin/menu',
+    component: AdminMenu,
+    canActivate: [adminGuard]
+  },
+  {
+    path: 'admin/add-menu',
+    component: AdminAddMenu,
+    canActivate: [adminGuard]
+  },
+  {
+    path: 'admin/edit-menu/:id',
+    component: AdminEditMenu,
+    canActivate: [adminGuard]
+  },
+  {
+    path: 'admin/order',
+    component: AdminOrders,
+    canActivate: [adminGuard]
+  },
+  {
+    path: 'admin/orders',
+    component: AdminOrders,
+    canActivate: [adminGuard]
+  },
+  {
+    path: 'admin/order-details/:id',
+    component: AdminOrderDetails,
+    canActivate: [adminGuard]
+  },
+  {
+    path: 'admin/payment-details/:id',
+    component: AdminPaymentDetails,
+    canActivate: [adminGuard]
+  },
+  {
+    path: 'admin/payment',
+    component: AdminPayment,
+    canActivate: [adminGuard]
+  },
+  {
+    path: 'admin/payments',
+    component: AdminPayment,
+    canActivate: [adminGuard]
+  },
+  {
+    path: 'admin/delivery',
+    component: AdminDelivery,
+    canActivate: [adminGuard]
+  },
+  {
+    path: 'admin/deliveries',
+    component: AdminDelivery,
+    canActivate: [adminGuard]
+  },
+  {
+    path: 'admin/delivery-partners',
+    component: AdminDeliveryPartners,
+    canActivate: [adminGuard]
+  },
+  {
+    path: 'admin/riders',
+    component: AdminDeliveryPartners,
+    canActivate: [adminGuard]
+  },
+  {
+    path: 'admin/reviews',
+    component: AdminReviews,
+    canActivate: [adminGuard]
+  },
+
+  // ==========================================
+  // OWNER PAGES
+  // ==========================================
+  {
+    path: 'owner',
+    component: OwnerDashboardComponent,
+    canActivate: [ownerGuard]
+  },
+  {
+    path: 'owner/restaurants',
+    component: OwnerRestaurantsComponent,
+    canActivate: [ownerGuard]
+  },
+  {
+    path: 'owner/restaurants/new',
+    component: OwnerRestaurantFormComponent,
+    canActivate: [ownerGuard]
+  },
+  {
+    path: 'owner/restaurants/:id/edit',
+    component: OwnerRestaurantFormComponent,
+    canActivate: [ownerGuard]
+  },
+  {
+    path: 'owner/menu/:id',
+    component: OwnerMenuComponent,
+    canActivate: [ownerGuard]
+  },
+  {
+    path: 'owner/menu/:restaurantId/new',
+    component: OwnerMenuItemFormComponent,
+    canActivate: [ownerGuard]
+  },
+  {
+    path: 'owner/menu/:restaurantId/:itemId/edit',
+    component: OwnerMenuItemFormComponent,
+    canActivate: [ownerGuard]
+  },
+  {
+    path: 'owner/orders',
+    component: OwnerOrdersComponent,
+    canActivate: [ownerGuard]
+  },
+  {
+    path: 'owner/reviews',
+    component: OwnerReviewsComponent,
+    canActivate: [ownerGuard]
+  },
+
+  // ==========================================
+  // DELIVERY PARTNER (Dedicated Operations Layout)
+  // ==========================================
+  {
+    path: 'delivery',
+    component: DeliveryLayout,
+    canActivate: [deliveryPartnerGuard],
+    children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      },
+      {
+        path: 'dashboard',
+        component: RiderDashboardComponent
+      },
+      {
+        path: 'deliveries',
+        component: RiderDeliveriesComponent
+      },
+      {
+        path: 'deliveries/:id',
+        component: RiderDeliveryDetailsComponent
+      },
+      {
+        path: 'history',
+        component: RiderHistoryComponent
+      },
+      {
+        path: 'profile',
+        component: RiderProfileComponent
+      }
+    ]
+  },
+  {
+    path: 'delivery-partner',
+    redirectTo: 'delivery/dashboard',
+    pathMatch: 'full'
+  },
+  {
+    path: 'rider',
+    redirectTo: 'delivery/dashboard',
+    pathMatch: 'full'
+  }
 ];

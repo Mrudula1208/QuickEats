@@ -288,7 +288,10 @@ namespace QuickEats.API.Services
             {
                 { "Pending",              new[] { "Confirmed", "Cancelled" } },
                 { "Confirmed",            new[] { "Preparing", "Cancelled" } },
-                { "Preparing",            new[] { "Out for Delivery", "Cancelled" } },
+                { "Preparing",            new[] { "Ready for Pickup", "Out for Delivery", "Cancelled" } },
+                { "Ready for Pickup",     new[] { "Assigned", "Picked Up", "Out for Delivery", "Cancelled" } },
+                { "Assigned",             new[] { "Picked Up", "Out for Delivery", "Cancelled" } },
+                { "Picked Up",            new[] { "Out for Delivery", "Delivered" } },
                 { "Out for Delivery",     new[] { "Delivered" } }
             };
 

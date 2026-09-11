@@ -1,0 +1,173 @@
+<!-- Page Header -->
+<section class="page-hero">
+  <div class="container">
+    <a routerLink="/restaurants" class="breadcrumb">
+      <span class="material-icons">arrow_back</span>
+      Back to Restaurants
+    </a>
+    <h1 class="page-title">Offers & Deals</h1>
+    <p class="page-subtitle">Grab exclusive discounts before they expire</p>
+  </div>
+</section>
+
+<section class="offers-section">
+  <div class="container">
+
+    <!-- Loading -->
+    @if (isLoading()) {
+      <div class="loading-state">
+        <span class="material-icons spinning">sync</span>
+        <p>Loading offers...</p>
+      </div>
+
+    <!-- API Error -->
+    } @else if (hasError()) {
+      <div class="error-state">
+        <div class="error-icon-wrap">
+          <span class="material-icons">error_outline</span>
+        </div>
+        <h2>Unable to load offers</h2>
+        <p>Something went wrong while fetching offers. Please try again.</p>
+        <button class="retry-btn" (click)="loadCoupons()">
+          <span class="material-icons">refresh</span>
+          Try Again
+        </button>
+      </div>
+
+    <!-- No Offers -->
+    } @else if (coupons().length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon-wrap">
+          <span class="material-icons">local_offer</span>
+        </div>
+        <h2>No offers available right now</h2>
+        <p>Check back later for exciting deals and discounts</p>
+        <a routerLink="/restaurants" class="browse-btn">
+          <span class="material-icons">restaurant_menu</span>
+          Browse Restaurants
+        </a>
+      </div>
+
+    } @else {
+
+      <!-- Active Offers -->
+      @if (getActiveCoupons().length > 0) {
+        <div class="offers-header">
+          <h2 class="section-title">
+            <span class="material-icons">local_fire_department</span>
+            Active Offers
+          </h2>
+          <span class="count-badge">{{ getActiveCoupons().length }} available</span>
+        </div>
+
+        <div class="offers-grid">
+          @for (coupon of getActiveCoupons(); track coupon.couponId) {
+            <div class="offer-card">
+              <!-- Top accent strip -->
+              <div class="offer-strip">
+                <span class="strip-label">QUICKEATS</span>
+                @if (getDaysRemaining(coupon) <= 3 && getDaysRemaining(coupon) > 0) {
+                  <span class="strip-urgent">{{ getDaysRemaining(coupon) }}d left</span>
+                }
+              </div>
+
+              <!-- Discount hero -->
+              <div class="offer-hero">
+                <span class="offer-discount">₹{{ coupon.discountAmount }}</span>
+                <span class="offer-discount-label">OFF</span>
+              </div>
+
+              <!-- Info -->
+              <div class="offer-body">
+                <div class="offer-code-row">
+                  <span class="offer-code">{{ coupon.couponCode }}</span>
+                  <button
+                    class="copy-btn"
+                    [class.copied]="copiedCode() === coupon.couponCode"
+                    (click)="copyCouponCode(coupon.couponCode)"
+                    [title]="copiedCode() === coupon.couponCode ? 'Copied!' : 'Copy code'">
+                    <span class="material-icons">{{ copiedCode() === coupon.couponCode ? 'check' : 'content_copy' }}</span>
+                  </button>
+                </div>
+
+                @if (coupon.description) {
+                  <p class="offer-desc">{{ coupon.description }}</p>
+                }
+
+                <div class="offer-meta">
+                  <span class="meta-item">
+                    <span class="material-icons">shopping_cart</span>
+                    Min. order ₹{{ coupon.minimumOrderAmount }}
+                  </span>
+                  <span class="meta-item">
+                    <span class="material-icons">schedule</span>
+                    @if (getDaysRemaining(coupon) === 0) {
+                      Expires today
+                    } @else if (getDaysRemaining(coupon) === 1) {
+                      Expires tomorrow
+                    } @else {
+                      {{ getDaysRemaining(coupon) }} days left
+                    }
+                  </span>
+                </div>
+
+                <button class="apply-btn" (click)="applyCoupon(coupon)">
+                  <span class="material-icons">add_shopping_cart</span>
+                  Apply to Cart
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Inactive / Expired Offers -->
+      @if (getExpiredCoupons().length > 0) {
+        <div class="offers-header expired-header">
+          <h2 class="section-title">
+            <span class="material-icons">history</span>
+            Expired / Inactive
+          </h2>
+          <span class="count-badge count-badge--muted">{{ getExpiredCoupons().length }}</span>
+        </div>
+
+        <div class="offers-grid offers-grid--inactive">
+          @for (coupon of getExpiredCoupons(); track coupon.couponId) {
+            <div class="offer-card offer-card--inactive">
+              <div class="offer-strip offer-strip--inactive">
+                <span class="strip-label">EXPIRED</span>
+              </div>
+
+              <div class="offer-hero offer-hero--inactive">
+                <span class="offer-discount">₹{{ coupon.discountAmount }}</span>
+                <span class="offer-discount-label">OFF</span>
+              </div>
+
+              <div class="offer-body">
+                <div class="offer-code-row">
+                  <span class="offer-code offer-code--inactive">{{ coupon.couponCode }}</span>
+                </div>
+
+                @if (coupon.description) {
+                  <p class="offer-desc">{{ coupon.description }}</p>
+                }
+
+                <div class="offer-meta">
+                  <span class="meta-item">
+                    <span class="material-icons">shopping_cart</span>
+                    Min. order ₹{{ coupon.minimumOrderAmount }}
+                  </span>
+                  <span class="meta-item">
+                    <span class="material-icons">event_busy</span>
+                    {{ isExpired(coupon) ? 'Expired' : 'Inactive' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    }
+
+  </div>
+</section>

@@ -35,6 +35,8 @@ export interface OrderModel {
 
   status: string;
 
+  paymentStatus?: string;
+
   createdAt: Date;
 
   items: OrderItemModel[];

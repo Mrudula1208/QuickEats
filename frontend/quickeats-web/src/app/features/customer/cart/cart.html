@@ -1,235 +1,263 @@
-<div class="cart-container">
+<!-- Page Header -->
+<section class="page-hero">
+  <div class="container">
+    <a routerLink="/restaurants" class="breadcrumb">
+      <span class="material-icons">arrow_back</span>
+      Continue Shopping
+    </a>
+    <h1 class="page-title">My Cart</h1>
+    <p class="page-subtitle" *ngIf="cartItems().length > 0">{{ cartItems().length }} {{ cartItems().length === 1 ? 'item' : 'items' }} from {{ restaurantName }}</p>
+  </div>
+</section>
 
-    <h1>My Cart</h1>
+<section class="cart-section">
+  <div class="container">
 
-    @if(cartItems().length === 0){
-
-        <div class="empty-cart">
-
-            <h2>Your Cart is Empty</h2>
-
-            <p>Add some delicious food.</p>
-
+    <!-- Empty Cart -->
+    @if (cartItems().length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon-wrap">
+          <span class="material-icons">shopping_cart</span>
         </div>
+        <h2>Your cart is empty</h2>
+        <p>Looks like you haven't added any delicious food yet</p>
+        <a routerLink="/restaurants" class="browse-btn">
+          <span class="material-icons">restaurant_menu</span>
+          Explore Restaurants
+        </a>
+      </div>
+    } @else {
 
-    }
-    @else{
+      <div class="cart-layout">
 
-        <h2 class="restaurant-name">
+        <!-- Left: Items -->
+        <div class="cart-items-col">
 
-            🏪 {{ restaurantName }}
+          <!-- Restaurant Banner -->
+          <div class="restaurant-banner">
+            @if (isLoadingRestaurant) {
+              <div class="banner-skeleton">
+                <div class="skeleton skeleton-icon"></div>
+                <div class="skeleton skeleton-name"></div>
+              </div>
+            } @else {
+              <span class="material-icons">storefront</span>
+              <span class="restaurant-label">{{ restaurantName }}</span>
+              @if (minimumOrder > 0) {
+                <span class="min-order-chip">Min. order ₹{{ minimumOrder }}</span>
+              }
+            }
+          </div>
 
-        </h2>
+          @if (restaurantLoadError) {
+            <div class="banner-error">
+              <span class="material-icons">warning_amber</span>
+              {{ restaurantLoadError }}
+            </div>
+          }
 
-        @for(item of cartItems(); track item.menu.id){
-
-        <div class="cart-card">
-
-            <img
-                [src]="item.menu.imageUrl"
-                [alt]="item.menu.name">
-
-            <div class="cart-details">
-
-                <h3>{{ item.menu.name }}</h3>
-
-                <p>{{ item.menu.description }}</p>
-
-                @if(item.menu.discountPercent > 0){
-
-                    <h4>₹{{ item.menu.price * (1 - item.menu.discountPercent / 100) }}</h4>
-
-                    <span class="old-price">₹{{ item.menu.price }}</span>
-
+          <!-- Cart Items -->
+          @for (item of cartItems(); track item.menu.id) {
+            <div class="cart-card">
+              <div class="cart-card-img">
+                <img [src]="item.menu.imageUrl" [alt]="item.menu.name" loading="lazy">
+                @if (!item.menu.isAvailable) {
+                  <div class="sold-out-overlay">Sold Out</div>
                 }
-                @else{
-
-                    <h4>₹{{ item.menu.price }}</h4>
-
+                @if (item.menu.isVeg) {
+                  <span class="veg-badge"><span class="veg-dot"></span></span>
+                } @else {
+                  <span class="veg-badge veg-badge--nonveg"><span class="veg-dot"></span></span>
                 }
+              </div>
 
-            </div>
-
-            <div class="quantity-section">
-
-                <button
-                    (click)="decreaseQuantity(item.menu.id)">
-
-                    -
-
-                </button>
-
-                <span>{{ item.quantity }}</span>
-
-                <button
-                    (click)="increaseQuantity(item.menu.id)">
-
-                    +
-
-                </button>
-
-            </div>
-
-            <button
-                class="remove-btn"
-                (click)="removeItem(item.menu.id)">
-
-                Remove
-
-            </button>
-
-        </div>
-
-        }
-
-        <!-- Coupon Section -->
-
-        <div class="coupon-box">
-
-            @if(!getCouponDiscount()){
-
-            <input
-                type="text"
-                placeholder="Enter Coupon Code (SAVE10, FLAT50)"
-                [(ngModel)]="couponInput">
-
-            <button
-                (click)="applyCoupon()">
-
-                Apply
-
-            </button>
-
-            }
-
-            @else{
-
-            <div class="coupon-applied">
-
-                <span class="coupon-code-text">
-
-                    🎉 {{ getCouponCode() }} applied
-
-                    (- ₹{{ getCouponDiscount() }})
-
-                </span>
-
-                <button
-                    class="remove-coupon-btn"
-                    (click)="removeCoupon()">
-
-                    Remove
-
-                </button>
-
-            </div>
-
-            }
-
-            @if(couponMessage){
-
-                <p class="coupon-message">{{ couponMessage }}</p>
-
-            }
-
-        </div>
-
-        <!-- Bill Summary -->
-
-        <div class="bill-summary">
-
-            <div class="bill-row">
-
-                <span>Food Total</span>
-
-                <span>₹{{ getFoodTotal() }}</span>
-
-            </div>
-
-            <div class="bill-row">
-
-                <span>GST (5%)</span>
-
-                <span>₹{{ getGstAmount() }}</span>
-
-            </div>
-
-            <div class="bill-row">
-
-                <span>Platform Fee</span>
-
-                <span>₹{{ getPlatformFee() }}</span>
-
-            </div>
-
-            <div class="bill-row">
-
-                <span>Delivery Fee</span>
-
-                <span>
-
-                    @if(getDeliveryFee() === 0){
-                        FREE
+              <div class="cart-card-body">
+                <div class="cart-card-top">
+                  <div>
+                    <h3 class="item-name">{{ item.menu.name }}</h3>
+                    @if (restaurantName) {
+                      <p class="item-restaurant">
+                        <span class="material-icons">storefront</span>
+                        {{ restaurantName }}
+                      </p>
                     }
-                    @else{
-                        ₹{{ getDeliveryFee() }}
-                    }
-
-                </span>
-
-            </div>
-
-            @if(getCouponDiscount() > 0){
-
-                <div class="bill-row discount">
-
-                    <span>Coupon Discount</span>
-
-                    <span>- ₹{{ getCouponDiscount() }}</span>
-
+                    <p class="item-desc">{{ item.menu.description }}</p>
+                  </div>
+                  <button class="remove-btn" (click)="removeItem(item.menu.id)" title="Remove item">
+                    <span class="material-icons">delete_outline</span>
+                  </button>
                 </div>
 
-            }
+                <div class="cart-card-bottom">
+                  <div class="item-price">
+                    @if (item.menu.discountPercent > 0) {
+                      <span class="price-sale">₹{{ (item.menu.price * (1 - item.menu.discountPercent / 100)) | number:'1.0-0' }}</span>
+                      <span class="price-original">₹{{ item.menu.price | number:'1.0-0' }}</span>
+                      <span class="discount-tag">{{ item.menu.discountPercent }}% off</span>
+                    } @else {
+                      <span class="price-sale">₹{{ item.menu.price | number:'1.0-0' }}</span>
+                    }
+                  </div>
 
-            <hr>
+                  <div class="qty-control">
+                    <button class="qty-btn" (click)="decreaseQuantity(item.menu.id)">
+                      <span class="material-icons">remove</span>
+                    </button>
+                    <span class="qty-value">{{ item.quantity }}</span>
+                    <button class="qty-btn" (click)="increaseQuantity(item.menu.id)">
+                      <span class="material-icons">add</span>
+                    </button>
+                  </div>
+                </div>
 
-            <div class="bill-row total">
+                <div class="item-line-total">
+                  <span class="line-total-label">Item total</span>
+                  <span class="line-total-value">
+                    ₹{{ ((item.menu.discountPercent > 0 ? item.menu.price * (1 - item.menu.discountPercent / 100) : item.menu.price) * item.quantity) | number:'1.0-0' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          }
 
-                <span>Grand Total</span>
+          <!-- Empty Cart Button -->
+          <button class="empty-cart-link" (click)="emptyCart()">
+            <span class="material-icons">remove_shopping_cart</span>
+            Clear entire cart
+          </button>
 
-                <span>₹{{ getGrandTotal() }}</span>
+        </div>
 
+        <!-- Right: Summary -->
+        <div class="cart-summary-col">
+          <div class="summary-card">
+
+            <h2 class="summary-title">
+              <span class="material-icons">receipt_long</span>
+              Bill Summary
+            </h2>
+
+            <!-- Coupon Section -->
+            <div class="coupon-section">
+              @if (!getCouponDiscount()) {
+                <div class="coupon-input-row">
+                  <span class="material-icons coupon-icon">local_offer</span>
+                  <input
+                    type="text"
+                    placeholder="Enter coupon code"
+                    [(ngModel)]="couponInput"
+                    class="coupon-input"
+                    (keyup.enter)="applyCoupon()">
+                  <button class="coupon-apply-btn" (click)="applyCoupon()" [disabled]="isApplyingCoupon">
+                    @if (isApplyingCoupon) {
+                      <span class="coupon-spinner"></span>
+                    } @else {
+                      Apply
+                    }
+                  </button>
+                </div>
+                @if (couponMessage) {
+                  <p class="coupon-error">{{ couponMessage }}</p>
+                }
+              } @else {
+                <div class="coupon-applied-row">
+                  <span class="material-icons coupon-applied-icon">check_circle</span>
+                  <span class="coupon-code-label">{{ getCouponCode() }}</span>
+                  <span class="coupon-saved">-₹{{ getCouponDiscount() }}</span>
+                  <button class="coupon-remove-btn" (click)="removeCoupon()">
+                    <span class="material-icons">close</span>
+                  </button>
+                </div>
+              }
+              <a routerLink="/offers" class="browse-offers-link">
+                <span class="material-icons">sell</span>
+                Browse available offers
+              </a>
             </div>
 
-        </div>
+            <div class="summary-divider"></div>
 
-        <div class="cart-total">
+            <!-- Bill Rows -->
+            <div class="bill-row">
+              <span class="bill-label">Food Total</span>
+              <span class="bill-value">₹{{ getFoodTotal() | number:'1.0-0' }}</span>
+            </div>
 
-            @if(isBelowMinimumOrder()){
-                <p class="min-order-msg">
-                    Minimum order is ₹{{ minimumOrder }}. Add ₹{{ (minimumOrder - getFoodTotal()).toFixed(2) }} more.
-                </p>
+            <div class="bill-row">
+              <span class="bill-label">GST (5%)</span>
+              <span class="bill-value">₹{{ getGstAmount() | number:'1.0-0' }}</span>
+            </div>
+
+            <div class="bill-row">
+              <span class="bill-label">Platform Fee</span>
+              <span class="bill-value">₹{{ getPlatformFee() }}</span>
+            </div>
+
+            <div class="bill-row">
+              <span class="bill-label">Delivery Fee</span>
+              <span class="bill-value">
+                @if (getDeliveryFee() === 0) {
+                  <span class="free-delivery">FREE</span>
+                } @else {
+                  ₹{{ getDeliveryFee() }}
+                }
+              </span>
+            </div>
+
+            @if (getCouponDiscount() > 0) {
+              <div class="bill-row bill-row--discount">
+                <span class="bill-label">Coupon Discount</span>
+                <span class="bill-value">-₹{{ getCouponDiscount() }}</span>
+              </div>
+            }
+
+            <div class="summary-divider"></div>
+
+            <div class="bill-row bill-row--total">
+              <span class="bill-label">Grand Total</span>
+              <span class="bill-value">₹{{ getGrandTotal() | number:'1.0-0' }}</span>
+            </div>
+
+            @if (isBelowMinimumOrder()) {
+              <div class="min-order-warning">
+                <span class="material-icons">info_outline</span>
+                Add ₹{{ (minimumOrder - getFoodTotal()) | number:'1.0-0' }} more to meet minimum order
+              </div>
             }
 
             <button
-                class="empty-cart-btn"
-                (click)="emptyCart()">
-
-                Empty Cart
-
+              class="checkout-btn"
+              [disabled]="isBelowMinimumOrder()"
+              (click)="goToCheckout()">
+              <span class="material-icons">arrow_forward</span>
+              Proceed to Checkout
+              <span class="checkout-total">₹{{ getGrandTotal() | number:'1.0-0' }}</span>
             </button>
 
-            <button
-                class="checkout-btn"
-                [disabled]="isBelowMinimumOrder()"
-                (click)="goToCheckout()">
-
-                Proceed To Checkout
-
-            </button>
-
+          </div>
         </div>
 
+      </div>
     }
 
-</div>
+  </div>
+</section>
+
+<!-- Mobile Sticky Checkout Bar -->
+@if (cartItems().length > 0) {
+  <div class="mobile-cart-bar">
+    <div class="mobile-cart-info">
+      <span class="material-icons">shopping_bag</span>
+      <span class="mobile-cart-count">{{ cartItems().length }} item{{ cartItems().length !== 1 ? 's' : '' }}</span>
+    </div>
+    <span class="mobile-cart-total">₹{{ getGrandTotal() | number:'1.0-0' }}</span>
+    <button
+      class="mobile-cart-btn"
+      [disabled]="isBelowMinimumOrder()"
+      (click)="goToCheckout()">
+      Checkout
+      <span class="material-icons">arrow_forward</span>
+    </button>
+  </div>
+}
+

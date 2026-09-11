@@ -1,106 +1,149 @@
 <app-admin-nav></app-admin-nav>
 
-<h1>Coupon Management</h1>
+<section class="acu-hero">
+  <div class="acu-hero-inner">
+    <h1>Coupon Management</h1>
+    <p>Create and manage discount coupons for customers</p>
+  </div>
+</section>
 
-<h2>Add New Coupon</h2>
+<section class="acu-content">
+  <div class="acu-container">
 
-<div class="coupon-form">
+    @if (isLoading()) {
+      <div class="acu-loading">
+        <span class="material-icons spinning">progress_activity</span>
+        <p>Loading coupons...</p>
+      </div>
+    } @else {
 
-    <label>Coupon Code</label>
-    <input type="text" [(ngModel)]="couponCode" placeholder="e.g. SAVE50" />
+      <div class="acu-stats">
+        <div class="acu-stat">
+          <span class="acu-stat-num">{{ counts().total }}</span>
+          <span class="acu-stat-label">Total</span>
+        </div>
+        <div class="acu-stat active">
+          <span class="acu-stat-num">{{ counts().active }}</span>
+          <span class="acu-stat-label">Active</span>
+        </div>
+        <div class="acu-stat expired">
+          <span class="acu-stat-num">{{ counts().expired }}</span>
+          <span class="acu-stat-label">Expired</span>
+        </div>
+      </div>
 
-    <label>Description</label>
-    <input type="text" [(ngModel)]="description" placeholder="Coupon description" />
+      <div class="acu-toolbar">
+        <div class="acu-search">
+          <span class="material-icons">search</span>
+          <input type="text" placeholder="Search coupons..." [ngModel]="searchText()" (ngModelChange)="searchText.set($event)">
+        </div>
+        <button class="acu-add-btn" (click)="openAddForm()">
+          <span class="material-icons">add</span>
+          Add Coupon
+        </button>
+      </div>
 
-    <label>Minimum Order Amount</label>
-    <input type="number" [(ngModel)]="minimumOrderAmount" />
+      @if (filteredCoupons().length === 0) {
+        <div class="acu-empty">
+          <span class="material-icons">local_offer</span>
+          <h3>{{ coupons().length === 0 ? 'No Coupons Yet' : 'No coupons match your search' }}</h3>
+          <p>{{ coupons().length === 0 ? 'Create your first coupon to get started.' : 'Try a different search term.' }}</p>
+        </div>
+      } @else {
+        <div class="acu-list">
+          @for (coupon of filteredCoupons(); track coupon.couponId) {
+            <div class="acu-card" [class.expired]="isExpired(coupon)">
+              <div class="acu-card-left">
+                <div class="acu-coupon-icon">
+                  <span class="material-icons">local_offer</span>
+                </div>
+                <div class="acu-card-info">
+                  <div class="acu-card-top">
+                    <h3>{{ coupon.couponCode }}</h3>
+                    <span class="acu-status" [class.active]="coupon.isActive && !isExpired(coupon)" [class.expired]="isExpired(coupon)">
+                      {{ isExpired(coupon) ? 'Expired' : 'Active' }}
+                    </span>
+                  </div>
+                  <p class="acu-desc">{{ coupon.description }}</p>
+                  <div class="acu-meta">
+                    <span class="acu-meta-item">
+                      <span class="material-icons">discount</span>
+                      ₹{{ coupon.discountAmount }} off
+                    </span>
+                    <span class="acu-meta-item">
+                      <span class="material-icons">shopping_cart</span>
+                      Min ₹{{ coupon.minimumOrderAmount }}
+                    </span>
+                    <span class="acu-meta-item">
+                      <span class="material-icons">event</span>
+                      Expires {{ coupon.expiryDate | date:'MMM d, yyyy' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="acu-card-actions">
+                <button class="acu-btn edit" (click)="openEditForm(coupon)">
+                  <span class="material-icons">edit</span> Edit
+                </button>
+                <button class="acu-btn delete" (click)="deleteCoupon(coupon)">
+                  <span class="material-icons">delete_outline</span> Delete
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    }
 
-    <label>Discount Amount</label>
-    <input type="number" [(ngModel)]="discountAmount" />
+  </div>
+</section>
 
-    <label>Expiry Date</label>
-    <input type="date" [(ngModel)]="expiryDate" />
-
-    <label>
-        <input type="checkbox" [(ngModel)]="isActive" />
-        Active
-    </label>
-
-    <button (click)="createCoupon()">Create Coupon</button>
-
-</div>
-
-@if(coupons.length===0){
-
-<h2>No Coupons Found</h2>
-
-}
-
-@else{
-
-<table>
-
-<thead>
-
-<tr>
-
-<th>Code</th>
-
-<th>Description</th>
-
-<th>Min Order</th>
-
-<th>Discount</th>
-
-<th>Expiry</th>
-
-<th>Status</th>
-
-<th>Action</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-@for(coupon of coupons; track coupon.couponId){
-
-<tr>
-
-<td>{{coupon.couponCode}}</td>
-
-<td>{{coupon.description}}</td>
-
-<td>₹{{coupon.minimumOrderAmount}}</td>
-
-<td>₹{{coupon.discountAmount}}</td>
-
-<td>{{coupon.expiryDate | date:'mediumDate'}}</td>
-
-<td>
-
-@if(coupon.isActive){
-Active
-}
-@else{
-Expired
-}
-
-</td>
-
-<td>
-
-<button (click)="deleteCoupon(coupon.couponId)">Delete</button>
-
-</td>
-
-</tr>
-
-}
-
-</tbody>
-
-</table>
-
+@if (showForm()) {
+  <div class="acu-overlay" (click)="closeForm()"></div>
+  <div class="acu-form-panel">
+    <div class="acu-form-header">
+      <h3>{{ isEditing() ? 'Edit Coupon' : 'Add New Coupon' }}</h3>
+      <button class="acu-close" (click)="closeForm()">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+    <div class="acu-form-body">
+      <div class="acu-field">
+        <label>Coupon Code *</label>
+        <input type="text" [(ngModel)]="couponCode" placeholder="e.g. SAVE50" maxlength="20"
+          [disabled]="isEditing()">
+      </div>
+      <div class="acu-field">
+        <label>Description *</label>
+        <input type="text" [(ngModel)]="description" placeholder="Describe the offer" maxlength="200">
+      </div>
+      <div class="acu-row">
+        <div class="acu-field">
+          <label>Discount Amount (₹) *</label>
+          <input type="number" [(ngModel)]="discountAmount" min="1">
+        </div>
+        <div class="acu-field">
+          <label>Min Order Amount (₹) *</label>
+          <input type="number" [(ngModel)]="minimumOrderAmount" min="1">
+        </div>
+      </div>
+      <div class="acu-field">
+        <label>Expiry Date *</label>
+        <input type="date" [(ngModel)]="expiryDate">
+      </div>
+      <div class="acu-field">
+        <label class="acu-checkbox-label">
+          <input type="checkbox" [(ngModel)]="isActive">
+          <span>Active</span>
+        </label>
+      </div>
+      <div class="acu-form-actions">
+        <button class="acu-cancel-btn" (click)="closeForm()">Cancel</button>
+        <button class="acu-save-btn" (click)="saveCoupon()">
+          <span class="material-icons">{{ isEditing() ? 'save' : 'add_circle' }}</span>
+          {{ isEditing() ? 'Update Coupon' : 'Create Coupon' }}
+        </button>
+      </div>
+    </div>
+  </div>
 }

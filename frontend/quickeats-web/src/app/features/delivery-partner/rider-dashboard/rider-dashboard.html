@@ -1,0 +1,238 @@
+<div class="rd-container">
+
+  <!-- Operational Greeting Header -->
+  <div class="rd-hero">
+    <div class="rd-hero-left">
+      <div class="rd-greeting-pill">
+        <span class="material-icons">waving_hand</span>
+        <span>Operational Portal</span>
+      </div>
+      <h1 class="rd-title">{{ greeting() }}, {{ riderName() }}</h1>
+      <p class="rd-subtitle">Real-time delivery fulfillment dashboard and active route assignment.</p>
+    </div>
+
+    <div class="rd-hero-right">
+      <div class="rd-status-control" [class.is-online]="isAvailable()" [class.is-offline]="!isAvailable()">
+        <div class="status-indicator">
+          <span class="dot"></span>
+          <span class="status-label">Duty Status: <strong>{{ isAvailable() ? 'Available' : 'Offline' }}</strong></span>
+        </div>
+        <button type="button" class="status-btn" (click)="toggleAvailability()">
+          {{ isAvailable() ? 'Go Offline' : 'Go Online' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="rd-state-card">
+      <span class="material-icons spinning state-icon">progress_activity</span>
+      <h3>Loading dashboard operations...</h3>
+      <p>Fetching your assigned orders from the dispatch server</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @else if (loadError()) {
+    <div class="rd-state-card">
+      <span class="material-icons state-icon text-danger">error_outline</span>
+      <h3>{{ loadError() }}</h3>
+      <p>Could not retrieve operational deliveries.</p>
+      <button class="primary-btn" (click)="retry()">
+        <span class="material-icons">refresh</span> Try Again
+      </button>
+    </div>
+  }
+
+  @else {
+    <!-- Main Operational Summary Numbers -->
+    <section class="rd-summary-section">
+      <h2 class="section-title">Today's Deliveries Summary</h2>
+      
+      <div class="rd-summary-grid">
+        <div class="summary-card total">
+          <div class="summary-icon">
+            <span class="material-icons">assignment</span>
+          </div>
+          <div class="summary-data">
+            <span class="label">Today's Deliveries</span>
+            <span class="val">{{ stats().todayDeliveries }}</span>
+          </div>
+        </div>
+
+        <div class="summary-card assigned">
+          <div class="summary-icon">
+            <span class="material-icons">schedule</span>
+          </div>
+          <div class="summary-data">
+            <span class="label">Assigned</span>
+            <span class="val">{{ stats().assigned }}</span>
+          </div>
+        </div>
+
+        <div class="summary-card picked">
+          <div class="summary-icon">
+            <span class="material-icons">storefront</span>
+          </div>
+          <div class="summary-data">
+            <span class="label">Picked Up</span>
+            <span class="val">{{ stats().pickedUp }}</span>
+          </div>
+        </div>
+
+        <div class="summary-card transit">
+          <div class="summary-icon">
+            <span class="material-icons">two_wheeler</span>
+          </div>
+          <div class="summary-data">
+            <span class="label">Out for Delivery</span>
+            <span class="val">{{ stats().outForDelivery }}</span>
+          </div>
+        </div>
+
+        <div class="summary-card delivered">
+          <div class="summary-icon">
+            <span class="material-icons">check_circle</span>
+          </div>
+          <div class="summary-data">
+            <span class="label">Delivered</span>
+            <span class="val text-success">{{ stats().delivered }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CURRENT ACTIVE DELIVERY (Prominent Section) -->
+    <section class="rd-active-section">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <span class="pulse-dot"></span>
+          <h2 class="section-title">CURRENT DELIVERY</h2>
+        </div>
+        @if (currentActiveDelivery()) {
+          <span class="active-tag">Active Mission</span>
+        }
+      </div>
+
+      @if (currentActiveDelivery()) {
+        <div class="active-delivery-card">
+          
+          <!-- Card Top Bar -->
+          <div class="active-card-header">
+            <div class="order-info">
+              <span class="order-number">Order #{{ currentActiveDelivery()!.orderId }}</span>
+              <span class="delivery-number">Delivery #{{ currentActiveDelivery()!.id }}</span>
+            </div>
+            <span class="status-badge" [ngClass]="getStatusBadgeClass(currentActiveDelivery()!.deliveryStatus)">
+              <span class="material-icons">navigation</span>
+              {{ currentActiveDelivery()!.deliveryStatus }}
+            </span>
+          </div>
+
+          <!-- Restaurant & Destination Details -->
+          <div class="active-card-body">
+            <div class="route-block">
+              <!-- Pickup Point -->
+              <div class="point-item pickup">
+                <div class="point-icon">
+                  <span class="material-icons">storefront</span>
+                </div>
+                <div class="point-details">
+                  <span class="point-label">Pickup Location</span>
+                  <h3 class="point-name">{{ currentActiveDelivery()!.restaurantName || 'Restaurant' }}</h3>
+                  <p class="point-address">{{ currentActiveDelivery()!.restaurantAddress || 'Address on file' }}</p>
+                  @if (currentActiveDelivery()!.restaurantPhone) {
+                    <a [href]="'tel:' + currentActiveDelivery()!.restaurantPhone" class="point-phone">
+                      <span class="material-icons">call</span> {{ currentActiveDelivery()!.restaurantPhone }}
+                    </a>
+                  }
+                </div>
+              </div>
+
+              <!-- Route Divider -->
+              <div class="route-line-divider">
+                <span class="line"></span>
+                <span class="material-icons">arrow_downward</span>
+                <span class="line"></span>
+              </div>
+
+              <!-- Dropoff Point -->
+              <div class="point-item dropoff">
+                <div class="point-icon">
+                  <span class="material-icons">place</span>
+                </div>
+                <div class="point-details">
+                  <span class="point-label">Delivery Destination</span>
+                  <h3 class="point-name">{{ currentActiveDelivery()!.customerName || 'Customer' }}</h3>
+                  <p class="point-address">{{ currentActiveDelivery()!.deliveryAddress || 'Address on file' }}</p>
+                  @if (currentActiveDelivery()!.phoneNumber || currentActiveDelivery()!.customerPhone) {
+                    <a [href]="'tel:' + (currentActiveDelivery()!.phoneNumber || currentActiveDelivery()!.customerPhone)" class="point-phone">
+                      <span class="material-icons">call</span> {{ currentActiveDelivery()!.phoneNumber || currentActiveDelivery()!.customerPhone }}
+                    </a>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <!-- Order Financial & Items Summary -->
+            <div class="order-quick-summary">
+              <div class="quick-item">
+                <span class="q-label">Items</span>
+                <span class="q-val">
+                  {{ (currentActiveDelivery()!.items?.length || currentActiveDelivery()!.orderItems?.length || 1) }} item(s)
+                </span>
+              </div>
+              <div class="quick-item">
+                <span class="q-label">Payment</span>
+                <span class="q-badge">{{ currentActiveDelivery()!.paymentMethod || 'Online / COD' }}</span>
+              </div>
+              <div class="quick-item">
+                <span class="q-label">Total Amount</span>
+                <span class="q-price">₹{{ currentActiveDelivery()!.totalAmount }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Actions (Thumb-Zone Ergonomic) -->
+          <div class="active-card-footer">
+            <button 
+              type="button"
+              class="btn-secondary-action" 
+              (click)="viewDelivery(currentActiveDelivery()!.id)">
+              <span class="material-icons">receipt_long</span>
+              View Delivery Details
+            </button>
+
+            <button 
+              type="button"
+              class="btn-primary-action"
+              [disabled]="isUpdating()"
+              (click)="advanceStatus(currentActiveDelivery()!)">
+              @if (isUpdating()) {
+                <span class="material-icons spinning">progress_activity</span> Updating...
+              } @else {
+                <span class="material-icons">{{ getNextActionIcon(currentActiveDelivery()!.deliveryStatus) }}</span>
+                <span>{{ getNextActionText(currentActiveDelivery()!.deliveryStatus) }}</span>
+              }
+            </button>
+          </div>
+
+        </div>
+      } @else {
+        <!-- Empty State for Active Delivery -->
+        <div class="no-active-card">
+          <div class="no-active-icon">
+            <span class="material-icons">sports_motorsports</span>
+          </div>
+          <h3>No Active Delivery Right Now</h3>
+          <p>You have no deliveries currently in-progress. Keep your status Online to receive newly dispatched orders.</p>
+          <a routerLink="/delivery/deliveries" class="view-all-link">
+            <span class="material-icons">list_alt</span> View Assigned Deliveries List
+          </a>
+        </div>
+      }
+    </section>
+  }
+
+</div>

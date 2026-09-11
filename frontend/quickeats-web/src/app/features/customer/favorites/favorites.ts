@@ -1,93 +1,118 @@
-import { Component } from '@angular/core';
-// Import Component because this file controls the Favorites page.
-
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-// CommonModule is required because HTML uses @for and @if.
-
-import { Router } from '@angular/router';
-// Router is used to open the Restaurant Details page.
-
+import { Router, RouterLink } from '@angular/router';
 import { FavoriteService } from '../../../core/services/favorite.service';
-// FavoriteService stores all favorite restaurants.
-
 import { FavoriteModel } from '../../../core/models/favorite.model';
-// FavoriteModel defines one favorite restaurant.
+import { RestaurantService } from '../../../core/services/restaurant.service';
+import { Restaurant } from '../../../core/models/restaurant.model';
+import { ToastrService } from 'ngx-toastr';
+
+export interface FavoriteWithRestaurant extends FavoriteModel {
+  rating: number;
+  isOpenNow: boolean;
+  openingTime: string;
+  closingTime: string;
+  deliveryCharge: number;
+}
 
 @Component({
   selector: 'app-favorites',
   standalone: true,
-  imports: [
-    CommonModule
-  ],
+  imports: [CommonModule, RouterLink],
   templateUrl: './favorites.html',
   styleUrl: './favorites.scss'
 })
-
 export class FavoritesComponent {
 
-  // Store all favorite restaurants.
-  customerFavorites: FavoriteModel[] = [];
+  favorites = signal<FavoriteWithRestaurant[]>([]);
+  isLoading = signal(true);
+  loadError = signal<string | null>(null);
 
   constructor(
-
-    // Angular automatically creates FavoriteService.
     private favoriteService: FavoriteService,
-
-    // Router is used to open another page.
-    private router: Router
-
+    private restaurantService: RestaurantService,
+    private router: Router,
+    private toastr: ToastrService
   ) {
-
-    // As soon as page opens,
-    // immediately load favorites.
     this.loadFavorites();
-
   }
 
-  // Get all favorite restaurants.
   loadFavorites(): void {
-
+    this.isLoading.set(true);
+    this.loadError.set(null);
     this.favoriteService.getFavorites().subscribe({
-      next: (data: FavoriteModel[]) => {
-        this.customerFavorites = data;
+      next: (favorites) => {
+        this.enrichFavorites(favorites);
       },
-      // Runs if API Fails.
-      error: () => {}
+      error: () => {
+        this.isLoading.set(false);
+        this.loadError.set('Could not load your favorites. Please try again.');
+      }
     });
-
   }
 
-  // Open the Restaurant Details page.
-  openRestaurant(
-    selectedRestaurantId: number
-  ): void {
+  private enrichFavorites(favorites: FavoriteModel[]): void {
+    const enriched: FavoriteWithRestaurant[] = [];
+    let pending = favorites.length;
 
-    this.router.navigate([
+    const finish = () => {
+      this.favorites.set(enriched);
+      this.isLoading.set(false);
+    };
 
-      '/restaurant',
+    if (pending === 0) {
+      finish();
+      return;
+    }
 
-      selectedRestaurantId
-
-    ]);
-
+    favorites.forEach((fav) => {
+      this.restaurantService.getRestaurantById(fav.restaurantId).subscribe({
+        next: (restaurant: Restaurant) => {
+          enriched.push({
+            ...fav,
+            rating: restaurant.rating ?? 0,
+            isOpenNow: restaurant.isOpenNow,
+            openingTime: restaurant.openingTime,
+            closingTime: restaurant.closingTime,
+            deliveryCharge: restaurant.deliveryCharge
+          });
+          pending--;
+          if (pending === 0) finish();
+        },
+        error: () => {
+          enriched.push({
+            ...fav,
+            rating: 0,
+            isOpenNow: false,
+            openingTime: '',
+            closingTime: '',
+            deliveryCharge: 0
+          });
+          pending--;
+          if (pending === 0) finish();
+        }
+      });
+    });
   }
 
+  retry(): void {
+    this.loadFavorites();
+  }
+
+  removeFavorite(fav: FavoriteWithRestaurant, event: Event): void {
+    event.stopPropagation();
+    this.favoriteService.removeFavorite(fav.favoriteId).subscribe({
+      next: () => {
+        this.favorites.update(list => list.filter(f => f.favoriteId !== fav.favoriteId));
+        this.toastr.success(`${fav.restaurantName} removed from favorites`);
+      },
+      error: () => {
+        this.toastr.error('Failed to remove favorite');
+      }
+    });
+  }
+
+  openRestaurant(id: number): void {
+    this.router.navigate(['/restaurants', id]);
+  }
 }
-
-// Backend sends data
-
-// â†“
-
-// next runs
-
-// â†“
-
-// Store data into customerFavorites
-
-// â†“
-
-// Print customerFavorites
-
-
-
-// next: (data) => {

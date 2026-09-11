@@ -55,6 +55,9 @@ export class PaymentComponent {
 
   couponDiscount = 0;
 
+  // Prevents duplicate payment submissions.
+  isProcessing = false;
+
   constructor(
 
     // Reads data entered on Checkout page.
@@ -99,11 +102,15 @@ export class PaymentComponent {
   // Runs when user clicks "Pay Now".
   payNow(): void {
 
+    if (this.isProcessing) return;
+
     // Guard: redirect if no checkout data (direct URL access).
     if (!this.checkoutData.cartItems || this.checkoutData.cartItems.length === 0) {
       this.router.navigate(['/cart']);
       return;
     }
+
+    this.isProcessing = true;
 
     // Take the restaurant id from the first cart item.
     const restaurantId =
@@ -147,7 +154,10 @@ export class PaymentComponent {
         },
 
         // Order creation failed.
-        error: () => {}
+        error: () => {
+          this.isProcessing = false;
+          this.toastr.error('Could not place your order. Please try again.');
+        }
 
       });
 
@@ -175,7 +185,10 @@ export class PaymentComponent {
         },
 
         // Payment failed.
-        error: () => {}
+        error: () => {
+          this.isProcessing = false;
+          this.toastr.error('Payment could not be completed. Please try again.');
+        }
 
       });
 

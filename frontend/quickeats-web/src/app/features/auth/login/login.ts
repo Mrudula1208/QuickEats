@@ -1,174 +1,119 @@
-// Import Component decorator.
-import { Component } from '@angular/core';
-
-// Common Angular directives.
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-// For ngModel.
 import { FormsModule } from '@angular/forms';
-
-// Used to navigate pages.
-import { Router } from '@angular/router';
-
-// Login model.
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { Login } from '../../../core/models/login.model';
-
-// Auth Service.
 import { AuthService } from '../../../core/services/auth.service';
-
-// Toast notifications.
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule
-  ],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './login.html',
-  styleUrl: './login.scss'
+  styleUrl: './login.scss',
 })
-
 export class LoginComponent {
-
-  // Object that stores user input.
   loginUser: Login = {
-
     email: '',
-
-    password: ''
-
+    password: '',
   };
 
+  showPassword = signal(false);
+  isLoading = signal(false);
+  apiError = signal('');
+  forgotMode = signal(false);
+
+  forgotEmail = '';
+
   constructor(
-
-    // Used to call Login API.
     private authService: AuthService,
-
-    // Used to move to another page.
     private router: Router,
+    private route: ActivatedRoute,
+    private toastr: ToastrService,
+  ) {}
 
-    // Toast notifications.
-    private toastr: ToastrService
-
-  ) { }
-
-  // Runs when Login button is clicked.
-  login(): void {
-
-    // Call Backend Login API.
-  this.authService.login(this.loginUser).subscribe({
-  next: (response) => {
-
-    // Save user data
-    localStorage.setItem('token', response.token);
-    localStorage.setItem('userId', String(response.id));
-    localStorage.setItem('name', response.name);
-    localStorage.setItem('email', response.email);
-    localStorage.setItem('role', response.role);
-    localStorage.setItem('profileImageUrl', response.profileImageUrl || '');
-
-    this.toastr.success('Login Successful', 'Welcome Back');
-
-    const role = response.role;
-    if (role === 'Owner') {
-      this.router.navigate(['/owner']);
-    } else if (role === 'Admin') {
-      this.router.navigate(['/admin/dashboard']);
-    } else {
-      this.router.navigate(['/']);
-    }
-  },
-
-  error: () => {
-
-    // Error handled by error interceptor.
+  togglePassword(): void {
+    this.showPassword.update((v) => !v);
   }
-});
 
-}}
+  login(): void {
+    if (!this.loginUser.email || !this.loginUser.password) {
+      this.apiError.set('Please enter both email and password.');
+      return;
+    }
+    if (!this.isValidEmail(this.loginUser.email)) {
+      this.apiError.set('Please enter a valid email address.');
+      return;
+    }
 
-/*
+    this.isLoading.set(true);
+    this.apiError.set('');
 
-EXECUTION FLOW
+    this.authService.login(this.loginUser).subscribe({
+      next: (response) => {
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('userId', String(response.id));
+        localStorage.setItem('name', response.name);
+        localStorage.setItem('email', response.email);
+        localStorage.setItem('role', response.role);
+        localStorage.setItem('profileImageUrl', response.profileImageUrl || '');
 
-1. Angular opens Login Page
+        this.isLoading.set(false);
+        this.toastr.success('Login Successful', 'Welcome Back');
 
-â†“
+        const role = response.role;
 
-2. LoginComponent created
+        // Only customers should be redirected to a protected page they were trying to reach.
+        if (role === 'Customer') {
+          const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+          if (returnUrl && this.isSafeReturnUrl(returnUrl)) {
+            this.router.navigateByUrl(returnUrl);
+            return;
+          }
+        }
 
-â†“
+        if (role === 'Owner') {
+          this.router.navigate(['/owner']);
+        } else if (role === 'Admin') {
+          this.router.navigate(['/admin/dashboard']);
+        } else if (role === 'DeliveryPartner' || role === 'Delivery Partner') {
+          this.router.navigate(['/delivery/dashboard']);
+        } else {
+          this.router.navigate(['/']);
+        }
+      },
+      error: (err) => {
+        this.isLoading.set(false);
+        const message =
+          err?.error && typeof err?.error === 'object' && err.error?.message
+            ? err.error.message
+            : 'Login failed. Please check your credentials and try again.';
+        this.apiError.set(message);
+        if (typeof err === 'string') {
+          this.apiError.set(err);
+        }
+      },
+    });
+  }
 
-3. loginUser object created
+  forgotPassword(): void {
+    this.toastr.info('Password recovery is not currently supported. Please contact support.');
+  }
 
-â†“
+  setForgotMode(): void {
+    this.forgotMode.set(true);
+  }
 
-4. Constructor runs
+  backToLogin(): void {
+    this.forgotMode.set(false);
+  }
 
-â†“
+  private isValidEmail(email: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
 
-5. HTML loads
-
-â†“
-
-6. User enters Email
-
-â†“
-
-loginUser.email updated
-
-â†“
-
-7. User enters Password
-
-â†“
-
-loginUser.password updated
-
-â†“
-
-8. Click Login
-
-â†“
-
-9. login() executes
-
-â†“
-
-10. AuthService.login()
-
-â†“
-
-11. ASP.NET Login API
-
-â†“
-
-12. Database checks Email
-
-â†“
-
-13. Password Verified
-
-â†“
-
-14. JWT Token Generated
-
-â†“
-
-15. Angular receives token
-
-â†“
-
-16. saveToken()
-
-â†“
-
-17. localStorage
-
-â†“
-
-18. Navigate Home Page
-
-*/
+  private isSafeReturnUrl(url: string): boolean {
+    return !url.startsWith('http') && !url.startsWith('//') && url.startsWith('/');
+  }
+}

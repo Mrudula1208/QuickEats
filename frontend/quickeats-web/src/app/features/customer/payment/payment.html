@@ -1,153 +1,136 @@
-<div class="payment-container">
+<div class="payment-page">
 
-    <!-- Page Title -->
+  <section class="page-hero">
+    <div class="container">
+      <a routerLink="/checkout" class="breadcrumb">
+        <span class="material-icons">arrow_back</span>
+        Back to Checkout
+      </a>
+      <h1 class="page-title">Payment</h1>
+      <p class="page-subtitle">Choose your preferred payment method</p>
+    </div>
+  </section>
 
-    <h1>💳 Payment</h1>
+  <section class="payment-content">
+    <div class="container payment-layout">
 
-    <p class="subtitle">
-        Choose your preferred payment method
-    </p>
-
-    <!-- Payment Summary -->
-
-    <div class="summary-box">
-
+      <!-- Payment Summary -->
+      <div class="summary-box">
         <h2>Payment Summary</h2>
 
         <div class="summary-row">
-
-            <span>Food Total</span>
-
-            <strong>₹{{foodTotal}}</strong>
-
+          <span>Food Total</span>
+          <strong>₹{{ foodTotal }}</strong>
         </div>
 
         <div class="summary-row">
-
-            <span>GST (5%)</span>
-
-            <strong>₹{{gstAmount}}</strong>
-
+          <span>GST (5%)</span>
+          <strong>₹{{ gstAmount }}</strong>
         </div>
 
         <div class="summary-row">
-
-            <span>Platform Fee</span>
-
-            <strong>₹{{platformFee}}</strong>
-
+          <span>Platform Fee</span>
+          <strong>₹{{ platformFee }}</strong>
         </div>
 
         <div class="summary-row">
-
-            <span>Delivery Fee</span>
-
-            <strong>
-
-                @if(deliveryFee === 0){
-                    FREE
-                }
-                @else{
-                    ₹{{deliveryFee}}
-                }
-
-            </strong>
-
+          <span>Delivery Fee</span>
+          <strong>
+            @if (deliveryFee === 0) {
+              FREE
+            } @else {
+              ₹{{ deliveryFee }}
+            }
+          </strong>
         </div>
 
-        @if(couponDiscount > 0){
-
-        <div class="summary-row">
-
+        @if (couponDiscount > 0) {
+          <div class="summary-row discount">
             <span>Coupon Discount</span>
-
-            <strong>- ₹{{couponDiscount}}</strong>
-
-        </div>
-
+            <strong>- ₹{{ couponDiscount }}</strong>
+          </div>
         }
 
-        <hr>
+        <div class="summary-divider"></div>
 
         <div class="summary-row total">
-
-            <span>Total</span>
-
-            <strong>₹{{amount}}</strong>
-
+          <span>Total Payable</span>
+          <strong>₹{{ amount }}</strong>
         </div>
+      </div>
 
-    </div>
+      <!-- Payment Method -->
+      <div class="method-box">
+        <h2>Select Payment Method</h2>
 
-    <!-- Payment Method -->
-
-    <h2>Select Payment Method</h2>
-
-    <label class="payment-option">
-
-        <input
-            type="radio"
-            name="payment"
-            value="UPI"
-            [(ngModel)]="paymentMethod">
-
-        📱 UPI
-
-    </label>
-
-    <label class="payment-option">
-
-        <input
-            type="radio"
-            name="payment"
-            value="Credit Card"
-            [(ngModel)]="paymentMethod">
-
-        💳 Credit Card
-
-    </label>
-
-    <label class="payment-option">
-
-        <input
-            type="radio"
-            name="payment"
-            value="Debit Card"
-            [(ngModel)]="paymentMethod">
-
-        💳 Debit Card
-
-    </label>
-
-    <label class="payment-option">
-
-        <input
+        <label class="payment-option" [class.selected]="paymentMethod === 'Cash On Delivery'">
+          <input
             type="radio"
             name="payment"
             value="Cash On Delivery"
             [(ngModel)]="paymentMethod">
+          <span class="option-icon material-icons">payments</span>
+          <span class="option-text">
+            <span class="option-name">Cash on Delivery</span>
+            <span class="option-desc">Pay when your food arrives</span>
+          </span>
+          <span class="option-check material-icons">
+            {{ paymentMethod === 'Cash On Delivery' ? 'radio_button_checked' : 'radio_button_unchecked' }}
+          </span>
+        </label>
 
-        💵 Cash On Delivery
+        <label class="payment-option" [class.selected]="paymentMethod === 'UPI'">
+          <input
+            type="radio"
+            name="payment"
+            value="UPI"
+            [(ngModel)]="paymentMethod">
+          <span class="option-icon material-icons">smartphone</span>
+          <span class="option-text">
+            <span class="option-name">UPI</span>
+            <span class="option-desc">Google Pay, PhonePe, Paytm</span>
+          </span>
+          <span class="option-check material-icons">
+            {{ paymentMethod === 'UPI' ? 'radio_button_checked' : 'radio_button_unchecked' }}
+          </span>
+        </label>
 
-    </label>
+        <label class="payment-option" [class.selected]="paymentMethod === 'Card'">
+          <input
+            type="radio"
+            name="payment"
+            value="Card"
+            [(ngModel)]="paymentMethod">
+          <span class="option-icon material-icons">credit_card</span>
+          <span class="option-text">
+            <span class="option-name">Credit / Debit Card</span>
+            <span class="option-desc">Visa, Mastercard, RuPay</span>
+          </span>
+          <span class="option-check material-icons">
+            {{ paymentMethod === 'Card' ? 'radio_button_checked' : 'radio_button_unchecked' }}
+          </span>
+        </label>
 
-    <!-- Selected Method -->
+        <div class="selected-method">
+          Selected Payment :
+          <strong>{{ paymentMethod }}</strong>
+        </div>
 
-    <div class="selected-method">
-
-        Selected Payment :
-        <strong>{{paymentMethod}}</strong>
+        <button
+          class="pay-btn"
+          (click)="payNow()"
+          [disabled]="isProcessing">
+          @if (isProcessing) {
+            <span class="material-icons spinning">sync</span>
+            Processing...
+          } @else {
+            <span class="material-icons">lock</span>
+            Pay ₹{{ amount }}
+          }
+        </button>
+      </div>
 
     </div>
-
-    <!-- Button -->
-
-    <button
-        class="pay-btn"
-        (click)="payNow()">
-
-        Pay ₹{{amount}}
-
-    </button>
+  </section>
 
 </div>

@@ -1,4 +1,4 @@
-﻿namespace QuickEats.API.Models
+namespace QuickEats.API.Models
 {
     public class OrderDelivery
     {
@@ -11,7 +11,10 @@
         public string DeliveryStatus { get; set; } = "Assigned";
 
         public DateTime AssignedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? PickedUpAt { get; set; }
+        public DateTime? DeliveredAt { get; set; }
 
         public Order? Order { get; set; }
+        public User? DeliveryPartner { get; set; }
     }
 }

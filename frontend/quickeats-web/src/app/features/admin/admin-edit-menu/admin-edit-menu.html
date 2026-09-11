@@ -1,128 +1,368 @@
-<h1>Edit Menu</h1>
+<app-admin-nav></app-admin-nav>
 
-@if(menu){
+<div class="am-form-wrapper">
+  <div class="container">
 
-<form #menuForm="ngForm" (ngSubmit)="updateMenu()">
-
-<input
-type="number"
-name="restaurantId"
-[(ngModel)]="menu.restaurantId"
-disabled>
-
-<input
-type="text"
-name="name"
-[(ngModel)]="menu.name"
-required
-minlength="2"
-maxlength="200"
-#name="ngModel">
-
-@if (name.invalid && name.touched) {
-    <div class="error">
-        @if (name.errors?.['required']) {
-            Item name is required
-        }
-        @else if (name.errors?.['minlength']) {
-            Name must be at least 2 characters
-        }
+    <!-- Header & Breadcrumbs -->
+    <div class="am-form-header">
+      <div class="am-header-left">
+        <div class="am-breadcrumbs">
+          <a routerLink="/admin/menu" class="bc-link">
+            <span class="material-icons">restaurant_menu</span>
+            Menu Management
+          </a>
+          <span class="material-icons bc-sep">chevron_right</span>
+          <span class="active">Edit Item: {{ menu.name || '#' + menuId }}</span>
+        </div>
+        <h1 class="am-form-title">Edit Menu Item</h1>
+        <p class="am-form-subtitle">Update food item details, pricing, and availability</p>
+      </div>
+      <div class="am-header-right">
+        <a routerLink="/admin/menu" class="btn-outline">
+          <span class="material-icons">arrow_back</span>
+          Back to Menu
+        </a>
+      </div>
     </div>
-}
 
-<input
-type="text"
-name="description"
-[(ngModel)]="menu.description"
-maxlength="1000">
+    @if (isLoading()) {
+      <div class="am-skeleton-form">
+        <div class="skeleton-card skeleton-shimmer"></div>
+        <div class="skeleton-card skeleton-shimmer"></div>
+      </div>
+    } @else if (loadError()) {
+      <div class="am-error-card">
+        <span class="material-icons error-icon">cloud_off</span>
+        <h3>Could Not Load Menu Item</h3>
+        <p>{{ loadError() }}</p>
+        <button class="btn-primary" (click)="loadData()">
+          <span class="material-icons">refresh</span>
+          Retry
+        </button>
+      </div>
+    } @else {
+      <!-- Main Form Grid -->
+      <form #menuForm="ngForm" (ngSubmit)="saveMenu(menuForm)" novalidate class="am-grid-form">
+        
+        <!-- LEFT COLUMN: Item Details -->
+        <div class="form-column main-column">
+          <div class="form-card">
+            <h3 class="card-section-title">
+              <span class="material-icons section-icon">info</span>
+              General Information
+            </h3>
 
-<input
-type="number"
-name="price"
-[(ngModel)]="menu.price"
-required
-min="0.01"
-max="999999"
-#price="ngModel">
+            <!-- Food Item Name -->
+            <div class="form-group">
+              <label for="foodName" class="form-label">
+                Food Item Name <span class="required">*</span>
+              </label>
+              <div class="input-with-icon">
+                <span class="material-icons input-icon">fastfood</span>
+                <input
+                  type="text"
+                  id="foodName"
+                  name="name"
+                  [(ngModel)]="menu.name"
+                  required
+                  minlength="2"
+                  maxlength="150"
+                  #foodName="ngModel"
+                  placeholder="e.g. Margherita Pizza, Butter Chicken"
+                  class="form-control"
+                  [class.is-invalid]="foodName.invalid && (foodName.touched || menuForm.submitted)">
+              </div>
+              @if (foodName.invalid && (foodName.touched || menuForm.submitted)) {
+                <div class="field-error">
+                  @if (foodName.errors?.['required']) { Food item name is required. }
+                  @else if (foodName.errors?.['minlength']) { Name must be at least 2 characters. }
+                </div>
+              }
+            </div>
 
-@if (price.invalid && price.touched) {
-    <div class="error">
-        @if (price.errors?.['required']) {
-            Price is required
-        }
-        @else if (price.errors?.['min']) {
-            Price must be at least 0.01
-        }
-    </div>
-}
+            <!-- Restaurant & Category in 2 columns -->
+            <div class="form-row-2">
+              <!-- Restaurant Selector -->
+              <div class="form-group">
+                <label for="restaurantId" class="form-label">
+                  Restaurant <span class="required">*</span>
+                </label>
+                <div class="input-with-icon">
+                  <span class="material-icons input-icon">storefront</span>
+                  <select
+                    id="restaurantId"
+                    name="restaurantId"
+                    [(ngModel)]="menu.restaurantId"
+                    required
+                    #restaurantId="ngModel"
+                    class="form-control"
+                    [class.is-invalid]="restaurantId.invalid && (restaurantId.touched || menuForm.submitted)">
+                    <option [ngValue]="0" disabled>Select Restaurant</option>
+                    @for (r of restaurants(); track r.id) {
+                      <option [ngValue]="r.id">{{ r.name }}</option>
+                    }
+                  </select>
+                </div>
+                @if (restaurantId.invalid && (restaurantId.touched || menuForm.submitted)) {
+                  <div class="field-error">Please select a restaurant.</div>
+                }
+              </div>
 
-<!-- Image Upload -->
-<label>Menu Item Image</label>
+              <!-- Category Selector -->
+              <div class="form-group">
+                <label for="category" class="form-label">
+                  Category <span class="required">*</span>
+                </label>
+                <div class="input-with-icon">
+                  <span class="material-icons input-icon">category</span>
+                  <select
+                    id="category"
+                    name="category"
+                    [(ngModel)]="menu.category"
+                    required
+                    #category="ngModel"
+                    class="form-control"
+                    [class.is-invalid]="category.invalid && (category.touched || menuForm.submitted)">
+                    <option value="" disabled>Select Category</option>
+                    @for (cat of categories(); track cat.id) {
+                      <option [value]="cat.name">{{ cat.name }}</option>
+                    }
+                  </select>
+                </div>
+                @if (category.invalid && (category.touched || menuForm.submitted)) {
+                  <div class="field-error">Please select a category.</div>
+                }
+              </div>
+            </div>
 
-@if (menu.imageUrl && !imagePreview) {
-    <img [src]="menu.imageUrl" class="image-preview" alt="Current">
-}
+            <!-- Description -->
+            <div class="form-group">
+              <label for="description" class="form-label">
+                Description
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                [(ngModel)]="menu.description"
+                rows="4"
+                maxlength="500"
+                placeholder="Describe ingredients, taste profile, portion size..."
+                class="form-control textarea-control"></textarea>
+              <span class="char-counter">{{ menu.description ? menu.description.length : 0 }}/500</span>
+            </div>
 
-<input
-type="file"
-accept="image/jpeg,image/png,image/webp"
-(change)="onFileSelected($event)">
+          </div>
 
-@if (imagePreview) {
-    <img [src]="imagePreview" class="image-preview" alt="New Preview">
-}
+          <!-- Pricing & Attributes Card -->
+          <div class="form-card">
+            <h3 class="card-section-title">
+              <span class="material-icons section-icon">sell</span>
+              Pricing & Attributes
+            </h3>
 
-<select
-name="category"
-[(ngModel)]="menu.category"
-required
-#category="ngModel">
+            <!-- Price & Discount -->
+            <div class="form-row-2">
+              <div class="form-group">
+                <label for="price" class="form-label">
+                  Regular Price (₹) <span class="required">*</span>
+                </label>
+                <div class="input-with-icon">
+                  <span class="material-icons input-icon">currency_rupee</span>
+                  <input
+                    type="number"
+                    id="price"
+                    name="price"
+                    [(ngModel)]="menu.price"
+                    required
+                    min="1"
+                    #price="ngModel"
+                    placeholder="0.00"
+                    class="form-control"
+                    [class.is-invalid]="price.invalid && (price.touched || menuForm.submitted)">
+                </div>
+                @if (price.invalid && (price.touched || menuForm.submitted)) {
+                  <div class="field-error">Valid regular price is required.</div>
+                }
+              </div>
 
-@for(cat of categories; track cat.id){
-    <option [value]="cat.name">{{cat.name}}</option>
-}
+              <div class="form-group">
+                <label for="discountPercent" class="form-label">
+                  Discount Percentage (%)
+                </label>
+                <div class="input-with-icon">
+                  <span class="material-icons input-icon">percent</span>
+                  <input
+                    type="number"
+                    id="discountPercent"
+                    name="discountPercent"
+                    [(ngModel)]="menu.discountPercent"
+                    min="0"
+                    max="100"
+                    placeholder="0"
+                    class="form-control">
+                </div>
+              </div>
+            </div>
 
-</select>
+            @if (menu.discountPercent > 0 && menu.price > 0) {
+              <div class="price-preview-banner">
+                <span class="material-icons">savings</span>
+                <span>Customer pays: <strong>₹{{ finalPrice | number:'1.0-2' }}</strong> (Discount: {{ menu.discountPercent }}% off ₹{{ menu.price }})</span>
+              </div>
+            }
 
-<select
-name="isVeg"
-[(ngModel)]="menu.isVeg">
+            <!-- Food Type Selector -->
+            <div class="form-group type-group">
+              <label class="form-label">Food Type <span class="required">*</span></label>
+              <div class="type-radio-options">
+                <label class="type-radio-card" [class.selected]="menu.isVeg">
+                  <input
+                    type="radio"
+                    name="isVeg"
+                    [value]="true"
+                    [(ngModel)]="menu.isVeg"
+                    hidden>
+                  <span class="veg-badge-symbol">●</span>
+                  <span class="type-name">Vegetarian</span>
+                </label>
 
-<option [ngValue]="true">Veg</option>
-<option [ngValue]="false">Non-Veg</option>
+                <label class="type-radio-card" [class.selected]="!menu.isVeg">
+                  <input
+                    type="radio"
+                    name="isVeg"
+                    [value]="false"
+                    [(ngModel)]="menu.isVeg"
+                    hidden>
+                  <span class="nonveg-badge-symbol">●</span>
+                  <span class="type-name">Non-Vegetarian</span>
+                </label>
+              </div>
+            </div>
 
-</select>
+            <!-- Toggles for Bestseller and Availability -->
+            <div class="toggles-row">
+              <!-- Availability Toggle -->
+              <div class="toggle-card">
+                <div class="tc-info">
+                  <strong>Item Availability</strong>
+                  <span>Available to order immediately</span>
+                </div>
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    name="isAvailable"
+                    [(ngModel)]="menu.isAvailable">
+                  <span class="slider round"></span>
+                </label>
+              </div>
 
-<input
-type="checkbox"
-name="isAvailable"
-[(ngModel)]="menu.isAvailable">
+              <!-- Bestseller Toggle -->
+              <div class="toggle-card">
+                <div class="tc-info">
+                  <strong>Featured / Bestseller</strong>
+                  <span>Highlight on restaurant & home trending list</span>
+                </div>
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    name="isBestseller"
+                    [(ngModel)]="menu.isBestseller">
+                  <span class="slider round"></span>
+                </label>
+              </div>
+            </div>
 
-<input
-type="checkbox"
-name="isBestseller"
-[(ngModel)]="menu.isBestseller">
+          </div>
+        </div>
 
-<input
-type="number"
-name="discountPercent"
-[(ngModel)]="menu.discountPercent"
-min="0"
-max="100">
+        <!-- RIGHT COLUMN: Image Upload Card -->
+        <div class="form-column side-column">
+          <div class="form-card image-card">
+            <h3 class="card-section-title">
+              <span class="material-icons section-icon">image</span>
+              Food Item Image
+            </h3>
 
-<button
-type="submit"
-[disabled]="menuForm.invalid || isUploading">
+            <!-- Drag & Drop / Preview Box -->
+            <div
+              class="image-dropzone"
+              [class.dragging]="isDragging()"
+              [class.has-preview]="imagePreview()"
+              (dragover)="onDragOver($event)"
+              (dragleave)="onDragLeave($event)"
+              (drop)="onDrop($event)">
+              
+              @if (imagePreview()) {
+                <div class="preview-container">
+                  <img [src]="imagePreview()" alt="Menu Preview" class="img-preview">
+                  <div class="preview-actions">
+                    <button type="button" class="btn-change-img" (click)="fileInput.click()">
+                      <span class="material-icons">photo_camera</span>
+                      Replace Image
+                    </button>
+                    <button type="button" class="btn-remove-img" (click)="removeImage()">
+                      <span class="material-icons">delete</span>
+                    </button>
+                  </div>
+                </div>
+              } @else {
+                <div class="dropzone-placeholder" (click)="fileInput.click()">
+                  <div class="dropzone-icon-wrap">
+                    <span class="material-icons">cloud_upload</span>
+                  </div>
+                  <h4>Drag & Drop replacement image</h4>
+                  <p>or <span class="browse-link">browse files</span> from your computer</p>
+                  <span class="upload-specs">Supports JPG, PNG, WebP up to 5 MB</span>
+                </div>
+              }
 
-@if (isUploading) {
-    Uploading...
-}
-@else {
-    Update Menu
-}
+              <input
+                #fileInput
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                (change)="onFileSelected($event)"
+                hidden>
+            </div>
 
-</button>
+            @if (imageError()) {
+              <div class="field-error image-error-msg">
+                <span class="material-icons">error_outline</span>
+                {{ imageError() }}
+              </div>
+            }
 
-</form>
+            <div class="image-tips">
+              <strong>Tips for best results:</strong>
+              <ul>
+                <li>Use high-resolution 1:1 or 4:3 food photos</li>
+                <li>Ensure bright lighting and focused dishes</li>
+              </ul>
+            </div>
+          </div>
 
-}
+          <!-- Bottom Action Buttons -->
+          <div class="form-actions-card">
+            <a routerLink="/admin/menu" class="btn-cancel-action">
+              Cancel
+            </a>
+            <button
+              type="submit"
+              class="btn-submit-action"
+              [disabled]="isSubmitting()">
+              @if (isSubmitting()) {
+                <span class="material-icons spinning">sync</span>
+                {{ isUploadingImage() ? 'Uploading Image...' : 'Saving Changes...' }}
+              } @else {
+                <span class="material-icons">save</span>
+                Save Changes
+              }
+            </button>
+          </div>
+
+        </div>
+
+      </form>
+    }
+
+  </div>
+</div>

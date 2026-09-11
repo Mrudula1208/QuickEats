@@ -1,100 +1,463 @@
+<!-- ============================================
+     HERO SECTION
+     ============================================ -->
 <section class="hero">
-  <div class="overlay">
-    <div class="hero-content">
-      <h1> Delicious Food, <span>Delivered Fast.</span></h1>
-      <p> Order from your favourite restaurants near you. </p>
-      <div class="search-box">
-        <input
-            type="text"
-            placeholder="Search restaurants by name or location..."
-            [(ngModel)]="searchText"
-            (ngModelChange)="onSearch()">
-        <button (click)="onSearch()"> Explore </button>
+  <div class="hero-bg"></div>
+  <div class="hero-content container">
+    <h1 class="hero-title">
+      Crave it?<br>
+      <span class="hero-accent">We deliver it.</span>
+    </h1>
+    <p class="hero-subtitle">
+      From local favourites to premium restaurants — hot, fresh meals at your doorstep in minutes.
+    </p>
+
+    <div class="hero-search">
+      <span class="material-icons hero-search-icon">search</span>
+      <input
+        type="text"
+        placeholder="What are you craving today? (e.g. Pizza, Burger, Biryani...)"
+        [(ngModel)]="searchText"
+        (keyup.enter)="onSearch()"
+        class="hero-search-input">
+      <button class="hero-search-btn" (click)="onSearch()">
+        Search
+      </button>
+    </div>
+
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="hero-stat-number" [class.placeholder]="isLoading()">
+          {{ isLoading() ? '--' : totalRestaurantCount }}
+        </span>
+        <span class="hero-stat-label">Restaurants</span>
+      </div>
+      <div class="hero-stat-divider"></div>
+      <div class="hero-stat">
+        <span class="hero-stat-number" [class.placeholder]="isLoading()">
+          {{ isLoading() ? '--' : openRestaurantCount }}
+        </span>
+        <span class="hero-stat-label">Open Now</span>
+      </div>
+      <div class="hero-stat-divider"></div>
+      <div class="hero-stat">
+        <span class="hero-stat-number" [class.placeholder]="isLoading()">
+          {{ isLoading() ? '--' : (averageRestaurantRating | number:'1.1-1') }}
+        </span>
+        <span class="hero-stat-label">Avg. Rating</span>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Filter Bar -->
-<section class="filter-bar">
-    <div class="filter-group">
-        <span class="filter-label">Filters:</span>
-
-        <button
-            class="filter-chip"
-            [class.active]="showOpenOnly"
-            (click)="toggleOpen()">
-            🟢 Open
-        </button>
-
-        <button
-            class="filter-chip"
-            [class.active]="showClosedOnly"
-            (click)="toggleClosed()">
-            🔴 Closed
-        </button>
-
-        <button
-            class="filter-chip"
-            [class.active]="minRating === 4"
-            (click)="setMinRating(4)">
-            ⭐ 4+ Rating
-        </button>
-
-        <button
-            class="filter-chip"
-            [class.active]="minRating === 3"
-            (click)="setMinRating(3)">
-            ⭐ 3+ Rating
-        </button>
+<!-- ============================================
+     EXPLORE BY CUISINE
+     ============================================ -->
+<section class="section categories-section">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">Explore by Cuisine</h2>
+        <p class="section-subtitle">Find exactly what you're in the mood for</p>
+      </div>
     </div>
-    <p class="result-count">{{ filteredRestaurants().length }} restaurants found</p>
+
+    <div class="categories-grid">
+      @for (cat of cuisineCategories(); track cat.name) {
+        <button
+          class="category-chip"
+          [class.active]="activeCategory() === cat.name"
+          (click)="onCategoryClick(cat.name)">
+          <span class="material-icons category-chip-icon">{{ cat.icon }}</span>
+          <span class="category-chip-label">{{ cat.name }}</span>
+        </button>
+      }
+    </div>
+  </div>
 </section>
 
-<!-- for category section -->
-<section class="categories">
-    <div class="section-title">
-        <h2>Popular Categories</h2>
-        <p>Explore your favourite food categories</p>
-    </div>
-
-    <div class="category-grid">
-        <div class="category-card">
-            <img src="assets/images/categories/pizza.png">
-            <h3>Pizza</h3>
-        </div>
-        <div class="category-card">
-            <img src="assets/images/categories/burger.png">
-            <h3>Burger</h3>
-        </div>
-        <div class="category-card">
-            <img src="assets/images/categories/biryani.png">
-            <h3>Biryani</h3>
-        </div>
-        <div class="category-card">
-            <img src="assets/images/categories/sushi.png">
-            <h3>Sushi</h3>
-        </div>
-        <div class="category-card">
-            <img src="assets/images/categories/dessert.png">
-            <h3>Dessert</h3>
-        </div>
-        <div class="category-card">
-            <img src="assets/images/categories/drink.png">
-            <h3>Drinks</h3>
-        </div>
-    </div>
-</section>
-
+<!-- Loading / Error Global State -->
 @if (isLoading()) {
+  <section class="section">
+    <div class="container">
+      <div class="restaurant-grid">
+        @for (skeleton of [1, 2, 3, 4]; track skeleton) {
+          <div class="restaurant-card skeleton-card">
+            <div class="restaurant-card-img skeleton-block"></div>
+            <div class="restaurant-card-body">
+              <div class="skeleton-block skeleton-line skeleton-line--title"></div>
+              <div class="skeleton-block skeleton-line"></div>
+              <div class="skeleton-block skeleton-line skeleton-line--short"></div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+} @else if (loadError()) {
+  <section class="section">
+    <div class="container">
+      <div class="empty-state">
+        <span class="material-icons empty-icon">cloud_off</span>
+        <h3>Couldn't load platform data</h3>
+        <p>{{ loadError() }}</p>
+        <button class="retry-btn" (click)="retry()">
+          <span class="material-icons">refresh</span>
+          Try Again
+        </button>
+      </div>
+    </div>
+  </section>
+} @else {
 
-<app-loading-spinner message="Loading restaurants..."></app-loading-spinner>
+  <!-- ============================================
+       FEATURED RESTAURANTS (Max 4)
+       ============================================ -->
+  @if (featuredRestaurants().length > 0) {
+    <section class="section restaurants-section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Featured Restaurants</h2>
+            <p class="section-subtitle">Handpicked restaurants loved by our customers</p>
+          </div>
+          <a routerLink="/restaurants" class="view-all-link">
+            View All Restaurants
+            <span class="material-icons">arrow_forward</span>
+          </a>
+        </div>
+
+        <div class="restaurant-grid four-cols">
+          @for (restaurant of featuredRestaurants(); track trackByRestaurantId($index, restaurant)) {
+            <a class="restaurant-card" [routerLink]="['/restaurants', restaurant.id]">
+              <div class="restaurant-card-img">
+                <img [src]="restaurant.imageUrl || 'assets/images/restaurants/dominos.jpg'" [alt]="restaurant.name" loading="lazy">
+                @if (restaurant.isOpenNow) {
+                  <span class="status-badge status-badge--open">
+                    <span class="status-dot"></span>
+                    Open
+                  </span>
+                } @else {
+                  <span class="status-badge status-badge--closed">
+                    <span class="status-dot"></span>
+                    Closed
+                  </span>
+                }
+                @if (restaurant.deliveryCharge === 0) {
+                  <span class="free-delivery-badge">
+                    <span class="material-icons">local_shipping</span>
+                    Free Delivery
+                  </span>
+                }
+                <button
+                  class="home-fav-btn"
+                  [class.active]="isFavorite(restaurant.id)"
+                  (click)="toggleFavorite($event, restaurant)"
+                  [attr.aria-label]="isFavorite(restaurant.id) ? 'Remove from favorites' : 'Add to favorites'">
+                  <span class="material-icons">
+                    {{ isFavorite(restaurant.id) ? 'favorite' : 'favorite_border' }}
+                  </span>
+                </button>
+              </div>
+              <div class="restaurant-card-body">
+                <div class="restaurant-card-top">
+                  <h3 class="restaurant-card-name">{{ restaurant.name }}</h3>
+                  @if (restaurant.rating && restaurant.rating > 0) {
+                    <span class="rating-pill">
+                      <span class="material-icons">star</span>
+                      {{ restaurant.rating | number:'1.1-1' }}
+                    </span>
+                  }
+                </div>
+                <p class="restaurant-card-desc">{{ restaurant.description }}</p>
+                <div class="restaurant-card-meta">
+                  <span class="meta-item">
+                    <span class="material-icons">location_on</span>
+                    {{ restaurant.address }}
+                  </span>
+                  <span class="meta-item">
+                    <span class="material-icons">schedule</span>
+                    {{ restaurant.openingTime }} - {{ restaurant.closingTime }}
+                  </span>
+                </div>
+                <div class="restaurant-card-action">
+                  <span class="view-menu-btn">
+                    View Menu
+                    <span class="material-icons">chevron_right</span>
+                  </span>
+                </div>
+              </div>
+            </a>
+          }
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- ============================================
+       SECTION 1: TRENDING DISHES 🔥 (Max 6)
+       ============================================ -->
+  @if (trendingDishes().length > 0) {
+    <section class="section dishes-section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Trending Dishes 🔥</h2>
+            <p class="section-subtitle">Most popular picks ordered by food lovers</p>
+          </div>
+          <a routerLink="/restaurants" class="view-all-link">
+            View All
+            <span class="material-icons">arrow_forward</span>
+          </a>
+        </div>
+
+        <div class="dishes-grid six-cols">
+          @for (dish of trendingDishes(); track trackByMenuId($index, dish)) {
+            <div class="dish-card">
+              <div class="dish-card-img">
+                <img [src]="dish.imageUrl || 'assets/images/menu/cheese-pizza.png'" [alt]="dish.name" loading="lazy">
+                @if (dish.discountPercent > 0) {
+                  <span class="dish-discount">{{ dish.discountPercent }}% OFF</span>
+                }
+                @if (dish.isVeg) {
+                  <span class="veg-indicator veg-indicator--veg" title="Vegetarian">
+                    <span class="veg-dot"></span>
+                  </span>
+                } @else {
+                  <span class="veg-indicator veg-indicator--nonveg" title="Non-Vegetarian">
+                    <span class="veg-dot"></span>
+                  </span>
+                }
+                <button
+                  class="dish-fav-btn"
+                  [class.active]="isDishWishlisted(dish.id)"
+                  (click)="toggleDishWishlist($event, dish)"
+                  [attr.aria-label]="isDishWishlisted(dish.id) ? 'Remove from wishlist' : 'Add to wishlist'">
+                  <span class="material-icons">
+                    {{ isDishWishlisted(dish.id) ? 'favorite' : 'favorite_border' }}
+                  </span>
+                </button>
+              </div>
+              <div class="dish-card-body">
+                <div class="dish-card-header">
+                  <h4 class="dish-card-name">{{ dish.name }}</h4>
+                  @if (dish.isBestseller) {
+                    <span class="bestseller-tag">
+                      <span class="material-icons">local_fire_department</span>
+                      Bestseller
+                    </span>
+                  }
+                </div>
+                <p class="dish-restaurant-name">
+                  <span class="material-icons">store</span>
+                  {{ getRestaurantName(dish.restaurantId) }}
+                </p>
+                <div class="dish-card-footer">
+                  <div class="dish-price">
+                    @if (dish.discountPercent > 0) {
+                      <span class="dish-price-original">₹{{ dish.price | number:'1.0-0' }}</span>
+                      <span class="dish-price-current">₹{{ getDiscountedPrice(dish) | number:'1.0-0' }}</span>
+                    } @else {
+                      <span class="dish-price-current">₹{{ dish.price | number:'1.0-0' }}</span>
+                    }
+                  </div>
+                  <button class="add-to-cart-btn" (click)="addToCart(dish)">
+                    <span class="material-icons">add_shopping_cart</span>
+                    Add
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- ============================================
+       SECTION 2: TODAY'S BEST OFFERS 🎁 (Max 3)
+       ============================================ -->
+  @if (bestOffers().length > 0) {
+    <section class="section offers-section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Today's Best Deals 🎁</h2>
+            <p class="section-subtitle">Exclusive coupons to save big on your next meal</p>
+          </div>
+          <a routerLink="/offers" class="view-all-link">
+            View All Offers
+            <span class="material-icons">arrow_forward</span>
+          </a>
+        </div>
+
+        <div class="offers-grid three-cols">
+          @for (offer of bestOffers(); track offer.couponId) {
+            <div class="offer-card">
+              <div class="offer-card-left">
+                <span class="offer-amount">₹{{ offer.discountAmount }}</span>
+                <span class="offer-label">OFF</span>
+              </div>
+              <div class="offer-card-divider"></div>
+              <div class="offer-card-right">
+                <div class="offer-card-header">
+                  <span class="offer-code">{{ offer.couponCode }}</span>
+                  @if (offer.expiryDate) {
+                    <span class="offer-validity">
+                      Expires {{ offer.expiryDate | date:'mediumDate' }}
+                    </span>
+                  }
+                </div>
+                <p class="offer-desc">{{ offer.description }}</p>
+                <div class="offer-card-footer">
+                  <span class="offer-min">Min. order ₹{{ offer.minimumOrderAmount }}</span>
+                  <button class="use-offer-btn" (click)="useOffer(offer)">
+                    <span class="material-icons">content_copy</span>
+                    Use Offer
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- ============================================
+       SECTION 3: RESTAURANTS NEAR YOU 📍 (Max 4)
+       ============================================ -->
+  @if (restaurantsNearYou().length > 0) {
+    <section class="section restaurants-section nearby-section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Restaurants Near You 📍</h2>
+            <p class="section-subtitle">Discover top kitchens and eateries delivering to your neighborhood</p>
+          </div>
+          <a routerLink="/restaurants" class="view-all-link">
+            View All Restaurants
+            <span class="material-icons">arrow_forward</span>
+          </a>
+        </div>
+
+        <div class="restaurant-grid four-cols">
+          @for (restaurant of restaurantsNearYou(); track trackByRestaurantId($index, restaurant)) {
+            <a class="restaurant-card" [routerLink]="['/restaurants', restaurant.id]">
+              <div class="restaurant-card-img">
+                <img [src]="restaurant.imageUrl || 'assets/images/restaurants/dominos.jpg'" [alt]="restaurant.name" loading="lazy">
+                @if (restaurant.isOpenNow) {
+                  <span class="status-badge status-badge--open">
+                    <span class="status-dot"></span>
+                    Open
+                  </span>
+                } @else {
+                  <span class="status-badge status-badge--closed">
+                    <span class="status-dot"></span>
+                    Closed
+                  </span>
+                }
+                <button
+                  class="home-fav-btn"
+                  [class.active]="isFavorite(restaurant.id)"
+                  (click)="toggleFavorite($event, restaurant)"
+                  [attr.aria-label]="isFavorite(restaurant.id) ? 'Remove from favorites' : 'Add to favorites'">
+                  <span class="material-icons">
+                    {{ isFavorite(restaurant.id) ? 'favorite' : 'favorite_border' }}
+                  </span>
+                </button>
+              </div>
+              <div class="restaurant-card-body">
+                <div class="restaurant-card-top">
+                  <h3 class="restaurant-card-name">{{ restaurant.name }}</h3>
+                  @if (restaurant.rating && restaurant.rating > 0) {
+                    <span class="rating-pill">
+                      <span class="material-icons">star</span>
+                      {{ restaurant.rating | number:'1.1-1' }}
+                    </span>
+                  }
+                </div>
+                <p class="restaurant-card-desc">{{ restaurant.description }}</p>
+                <div class="restaurant-card-meta">
+                  <span class="meta-item">
+                    <span class="material-icons">place</span>
+                    {{ restaurant.address }}
+                  </span>
+                  <span class="meta-item">
+                    <span class="material-icons">schedule</span>
+                    {{ restaurant.openingTime }} - {{ restaurant.closingTime }}
+                  </span>
+                </div>
+                <div class="restaurant-card-action">
+                  <span class="view-menu-btn">
+                    View Menu
+                    <span class="material-icons">chevron_right</span>
+                  </span>
+                </div>
+              </div>
+            </a>
+          }
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- ============================================
+       WHY CHOOSE QUICKEATS
+       ============================================ -->
+  <section class="section why-section">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Why QuickEats?</h2>
+          <p class="section-subtitle">We deliver culinary delights with speed and safety</p>
+        </div>
+      </div>
+
+      <div class="why-grid">
+        @for (item of whyChooseUs; track item.title) {
+          <div class="why-card">
+            <div class="why-card-icon">
+              <span class="material-icons">{{ item.icon }}</span>
+            </div>
+            <h3 class="why-card-title">{{ item.title }}</h3>
+            <p class="why-card-desc">{{ item.desc }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       FINAL CALL TO ACTION
+       ============================================ -->
+  <section class="section cta-section">
+    <div class="container">
+      <div class="cta-card">
+        <div class="cta-content">
+          <h2 class="cta-title">Hungry? It's time to order.</h2>
+          <p class="cta-subtitle">
+            Order now from top local restaurants and get exclusive deals delivered in minutes.
+          </p>
+          <div class="cta-actions">
+            <a routerLink="/restaurants" class="cta-btn cta-btn--primary">
+              <span class="material-icons">restaurant_menu</span>
+              Order Now
+            </a>
+            <a routerLink="/offers" class="cta-btn cta-btn--secondary">
+              <span class="material-icons">local_offer</span>
+              View Offers
+            </a>
+          </div>
+        </div>
+        <div class="cta-visual">
+          <div class="cta-circle">
+            <span class="material-icons">delivery_dining</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
 }
-@else {
 
-<app-featured-restaurants
-    [restaurants]="filteredRestaurants()">
-</app-featured-restaurants>
-
-}

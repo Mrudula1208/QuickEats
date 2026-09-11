@@ -7,6 +7,7 @@ import { RestaurantService } from '../../../core/services/restaurant.service';
 import { ImageService } from '../../../core/services/image.service';
 import { Restaurant } from '../../../core/models/restaurant.model';
 import { AdminNavComponent } from '../../../shared/admin-nav/admin-nav';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-admin-edit-restaurant',
@@ -32,6 +33,12 @@ export class AdminEditRestaurant {
   // Is file currently uploading.
   isUploading = false;
 
+  // True while the restaurant is loading.
+  isLoading = true;
+
+  // Holds the error message if loading fails.
+  loadError: string | null = null;
+
   constructor(
 
     private route: ActivatedRoute,
@@ -40,9 +47,20 @@ export class AdminEditRestaurant {
 
     private imageService: ImageService,
 
-    private router: Router
+    private router: Router,
+
+    private toastr: ToastrService
 
   ) {
+
+    this.loadRestaurant();
+
+  }
+
+  loadRestaurant(): void {
+
+    this.isLoading = true;
+    this.loadError = null;
 
     const id = Number(
 
@@ -57,13 +75,22 @@ export class AdminEditRestaurant {
         next: (data: Restaurant) => {
 
           this.restaurant = data;
+          this.isLoading = false;
 
         },
 
-        error: () => {}
+        error: () => {
+          this.isLoading = false;
+          this.loadError = 'Failed to load restaurant';
+          this.toastr.error('Failed to load restaurant');
+        }
 
       });
 
+  }
+
+  retry(): void {
+    this.loadRestaurant();
   }
 
   // When user selects a file.
@@ -94,6 +121,7 @@ export class AdminEditRestaurant {
         },
         error: () => {
           this.isUploading = false;
+          this.toastr.error('Failed to upload image');
         }
       });
     } else {
@@ -109,6 +137,7 @@ export class AdminEditRestaurant {
 
         next: () => {
 
+          this.toastr.success('Restaurant updated successfully');
 
           this.router.navigate(
 
@@ -118,7 +147,7 @@ export class AdminEditRestaurant {
 
         },
 
-        error: () => {}
+        error: () => this.toastr.error('Failed to update restaurant')
 
       });
   }

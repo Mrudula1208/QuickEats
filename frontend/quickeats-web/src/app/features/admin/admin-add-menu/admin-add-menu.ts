@@ -1,155 +1,217 @@
-import { Component } from '@angular/core';
-// Controls Add Menu Page.
-
+import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-// Required for Angular directives.
-
-import { FormsModule } from '@angular/forms';
-// Required for [(ngModel)].
-
-import { Router } from '@angular/router';
-// Used for Navigation.
-
+import { FormsModule, NgForm } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { MenuService } from '../../../core/services/menu.service';
+import { RestaurantService } from '../../../core/services/restaurant.service';
 import { CategoryService } from '../../../core/services/category.service';
 import { ImageService } from '../../../core/services/image.service';
 import { MenuItem } from '../../../core/models/menu.model';
+import { Restaurant } from '../../../core/models/restaurant.model';
 import { Category } from '../../../core/models/category.model';
+import { AdminNavComponent } from '../../../shared/admin-nav/admin-nav';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-admin-add-menu',
-
   standalone: true,
-
-  imports: [
-    CommonModule,
-    FormsModule
-  ],
-
+  imports: [CommonModule, FormsModule, RouterLink, AdminNavComponent],
   templateUrl: './admin-add-menu.html',
-
   styleUrl: './admin-add-menu.scss'
 })
-
-export class AdminAddMenu {
-
-  // Store Menu Form.
+export class AdminAddMenu implements OnInit {
   menu: MenuItem = {
-
     id: 0,
-
     restaurantId: 0,
-
     name: '',
-
     description: '',
-
     price: 0,
-
     imageUrl: '',
-
     isAvailable: true,
-
-    category: 'Main Course',
-
+    category: '',
     isVeg: true,
-
     isBestseller: false,
-
     discountPercent: 0
-
   };
 
-  // File selected for upload.
-  selectedFile: File | null = null;
+  restaurants = signal<Restaurant[]>([]);
+  categories = signal<Category[]>([]);
+  isLoading = signal(true);
+  loadError = signal('');
+  isSubmitting = signal(false);
 
-  // Preview URL for selected image.
-  imagePreview: string = '';
-
-  // Is file currently uploading.
-  isUploading = false;
-
-  // Available categories from backend.
-  categories: Category[] = [];
+  // Image Upload state
+  selectedFile = signal<File | null>(null);
+  imagePreview = signal<string>('');
+  isDragging = signal(false);
+  isUploadingImage = signal(false);
+  imageError = signal<string>('');
 
   constructor(
-
-    // Menu API.
     private menuService: MenuService,
-
-    // Category API.
+    private restaurantService: RestaurantService,
     private categoryService: CategoryService,
-
-    // Image upload API.
     private imageService: ImageService,
+    private router: Router,
+    private toastr: ToastrService
+  ) {}
 
-    // Navigation.
-    private router: Router
+  ngOnInit(): void {
+    this.loadDropdownData();
+  }
 
-  ) {
-    // Load categories from backend.
-    this.categoryService.getCategories().subscribe({
-      next: (data) => this.categories = data,
-      error: () => {}
+  loadDropdownData(): void {
+    this.isLoading.set(true);
+    this.loadError.set('');
+
+    forkJoin({
+      restaurants: this.restaurantService.getRestaurants(),
+      categories: this.categoryService.getCategories()
+    }).subscribe({
+      next: ({ restaurants, categories }) => {
+        this.restaurants.set(restaurants || []);
+        this.categories.set(categories || []);
+
+        // Pre-select first restaurant and category if available
+        if (restaurants && restaurants.length > 0) {
+          this.menu.restaurantId = restaurants[0].id;
+        }
+        if (categories && categories.length > 0) {
+          this.menu.category = categories[0].name;
+        }
+
+        this.isLoading.set(false);
+      },
+      error: () => {
+        this.isLoading.set(false);
+        this.loadError.set('Failed to load restaurants or categories. Please check backend connection.');
+        this.toastr.error('Failed to load form options');
+      }
     });
   }
 
-  // When user selects a file.
+  get finalPrice(): number {
+    if (this.menu.price > 0 && this.menu.discountPercent > 0) {
+      return this.menu.price - (this.menu.price * this.menu.discountPercent / 100);
+    }
+    return this.menu.price;
+  }
+
+  // Drag and drop handlers
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging.set(true);
+  }
+
+  onDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging.set(false);
+  }
+
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging.set(false);
+
+    if (event.dataTransfer && event.dataTransfer.files.length > 0) {
+      this.validateAndSetFile(event.dataTransfer.files[0]);
+    }
+  }
+
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
-      this.selectedFile = input.files[0];
-
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.imagePreview = reader.result as string;
-      };
-      reader.readAsDataURL(this.selectedFile);
+      this.validateAndSetFile(input.files[0]);
     }
   }
 
-  // Save Menu.
-  saveMenu(): void {
+  private validateAndSetFile(file: File): void {
+    this.imageError.set('');
 
-    // If a file is selected, upload it first.
-    if (this.selectedFile) {
-      this.isUploading = true;
+    // Check size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      this.imageError.set('File size exceeds 5 MB. Please choose a smaller image.');
+      return;
+    }
 
-      this.imageService.uploadImage(this.selectedFile, 'menu').subscribe({
-        next: (response) => {
-          this.menu.imageUrl = response.imageUrl;
-          this.isUploading = false;
-          this.createMenu();
+    // Check type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowedTypes.includes(file.type.toLowerCase())) {
+      this.imageError.set('Only JPG, PNG, WebP, or GIF image formats are supported.');
+      return;
+    }
+
+    this.selectedFile.set(file);
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.imagePreview.set(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  removeImage(): void {
+    this.selectedFile.set(null);
+    this.imagePreview.set('');
+    this.menu.imageUrl = '';
+    this.imageError.set('');
+  }
+
+  saveMenu(form: NgForm): void {
+    if (form.invalid) {
+      form.control.markAllAsTouched();
+      this.toastr.warning('Please fill in all required fields properly.');
+      return;
+    }
+
+    if (!this.menu.restaurantId || this.menu.restaurantId <= 0) {
+      this.toastr.warning('Please select a valid restaurant.');
+      return;
+    }
+
+    if (this.menu.price <= 0) {
+      this.toastr.warning('Price must be greater than 0.');
+      return;
+    }
+
+    this.isSubmitting.set(true);
+
+    // If an image was selected, upload it first
+    const file = this.selectedFile();
+    if (file) {
+      this.isUploadingImage.set(true);
+      this.imageService.uploadImage(file, 'menu').subscribe({
+        next: (res) => {
+          this.menu.imageUrl = res.imageUrl;
+          this.isUploadingImage.set(false);
+          this.submitCreateMenu();
         },
         error: () => {
-          this.isUploading = false;
+          this.isUploadingImage.set(false);
+          this.isSubmitting.set(false);
+          this.toastr.error('Failed to upload image. Submitting without image...');
+          this.submitCreateMenu();
         }
       });
     } else {
-      this.createMenu();
+      this.submitCreateMenu();
     }
-
   }
 
-  private createMenu(): void {
-    this.menuService
-      .addMenu(this.menu)
-      .subscribe({
-
-        next: () => {
-
-
-          this.router.navigate(
-
-            ['/admin/menu']
-
-          );
-
-        },
-
-        error: () => {}
-
-      });
+  private submitCreateMenu(): void {
+    this.menuService.addMenu(this.menu).subscribe({
+      next: () => {
+        this.isSubmitting.set(false);
+        this.toastr.success(`"${this.menu.name}" added to menu successfully!`);
+        this.router.navigate(['/admin/menu']);
+      },
+      error: () => {
+        this.isSubmitting.set(false);
+        this.toastr.error('Failed to create menu item. Please try again.');
+      }
+    });
   }
-
 }

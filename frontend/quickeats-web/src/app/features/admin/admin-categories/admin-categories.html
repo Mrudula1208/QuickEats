@@ -1,56 +1,83 @@
 <app-admin-nav></app-admin-nav>
 
-<h1>Menu Categories</h1>
+<section class="ac-hero">
+  <div class="ac-hero-inner">
+    <h1>Category Management</h1>
+    <p>Manage menu categories for all restaurants</p>
+  </div>
+</section>
 
-<div class="add-row">
-    <input
-        type="text"
-        placeholder="New category name"
-        [(ngModel)]="newName"
-        (keyup.enter)="addCategory()">
-    <button class="btn-add" (click)="addCategory()" [disabled]="!newName.trim()">Add Category</button>
-</div>
+<section class="ac-content">
+  <div class="ac-container">
 
-@if(categories.length === 0){
-    <p class="empty">No Categories Found</p>
-}
-@else{
-    <table>
-        <thead>
-            <tr>
-                <th>Category</th>
-                <th>Menu Items</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @for(cat of categories; track cat.id){
-                <tr>
-                    <td>
-                        @if(editId === cat.id){
-                            <input
-                                type="text"
-                                [(ngModel)]="editName"
-                                (keyup.enter)="saveEdit()"
-                                (keyup.escape)="cancelEdit()">
-                        }
-                        @else{
-                            {{cat.name}}
-                        }
-                    </td>
-                    <td>{{cat.menuItemCount}}</td>
-                    <td class="actions">
-                        @if(editId === cat.id){
-                            <button class="btn-save" (click)="saveEdit()">Save</button>
-                            <button class="btn-cancel" (click)="cancelEdit()">Cancel</button>
-                        }
-                        @else{
-                            <button class="btn-edit" (click)="startEdit(cat)">Edit</button>
-                            <button class="btn-delete" (click)="deleteCategory(cat.id)">Delete</button>
-                        }
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+    @if (isLoading()) {
+      <div class="ac-loading">
+        <span class="material-icons spinning">progress_activity</span>
+        <p>Loading categories...</p>
+      </div>
+    } @else {
+
+      <div class="ac-toolbar">
+        <div class="ac-add-row">
+          <span class="material-icons">add_circle</span>
+          <input type="text" placeholder="New category name..." [(ngModel)]="newName"
+            (keyup.enter)="addCategory()">
+          <button class="ac-add-btn" (click)="addCategory()" [disabled]="!newName.trim()">
+            Add Category
+          </button>
+        </div>
+        <div class="ac-search">
+          <span class="material-icons">search</span>
+          <input type="text" placeholder="Search categories..." [ngModel]="searchText()" (ngModelChange)="searchText.set($event)">
+        </div>
+      </div>
+
+      @if (filteredCategories().length === 0) {
+        <div class="ac-empty">
+          <span class="material-icons">category</span>
+          <h3>{{ categories().length === 0 ? 'No Categories Yet' : 'No categories match your search' }}</h3>
+          <p>{{ categories().length === 0 ? 'Add your first category to get started.' : 'Try a different search term.' }}</p>
+        </div>
+      } @else {
+        <div class="ac-list">
+          @for (cat of filteredCategories(); track cat.id) {
+            <div class="ac-card">
+              <div class="ac-card-left">
+                <div class="ac-icon">
+                  <span class="material-icons">label</span>
+                </div>
+                <div class="ac-card-info">
+                  @if (editId === cat.id) {
+                    <input type="text" class="ac-edit-input" [(ngModel)]="editName"
+                      (keyup.enter)="saveEdit()" (keyup.escape)="cancelEdit()" autofocus>
+                  } @else {
+                    <h3>{{ cat.name }}</h3>
+                  }
+                  <span class="ac-count">{{ cat.menuItemCount }} menu item(s)</span>
+                </div>
+              </div>
+              <div class="ac-card-actions">
+                @if (editId === cat.id) {
+                  <button class="ac-btn save" (click)="saveEdit()">
+                    <span class="material-icons">check</span> Save
+                  </button>
+                  <button class="ac-btn cancel" (click)="cancelEdit()">
+                    <span class="material-icons">close</span> Cancel
+                  </button>
+                } @else {
+                  <button class="ac-btn edit" (click)="startEdit(cat)">
+                    <span class="material-icons">edit</span> Edit
+                  </button>
+                  <button class="ac-btn delete" (click)="deleteCategory(cat)">
+                    <span class="material-icons">delete_outline</span> Delete
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    }
+
+  </div>
+</section>

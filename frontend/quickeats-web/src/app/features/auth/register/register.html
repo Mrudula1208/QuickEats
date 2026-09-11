@@ -1,125 +1,185 @@
+<div class="auth-page">
+  <div class="auth-card">
 
-<h1>Create Account</h1>
+    <!-- Brand -->
+    <div class="auth-brand">
+      <span class="brand-logo material-icons">fastfood</span>
+      <h1 class="brand-name">QuickEats</h1>
+      <p class="brand-tagline">Delicious food, delivered fast</p>
+    </div>
 
-<p>Please fill your details</p>
+    <!-- Register Form -->
+    <form #registerForm="ngForm" (ngSubmit)="register()" class="auth-form">
+      <h2 class="form-title">Create an Account</h2>
+      <p class="form-subtitle">Join QuickEats to order delicious food in minutes</p>
 
-<form #registerForm="ngForm" (ngSubmit)="register()">
+      <!-- API Error -->
+      @if (apiError()) {
+        <div class="api-error">
+          <span class="material-icons">error_outline</span>
+          {{ apiError() }}
+        </div>
+      }
 
-    <label>Name</label>
-
-    <input
-        type="text"
-        placeholder="Enter Name"
-        name="name"
-        [(ngModel)]="user.name"
-        required
-        minlength="2"
-        maxlength="100"
-        #name="ngModel">
-
-    @if (name.invalid && name.touched) {
-        <div class="error">
+      <!-- Full Name -->
+      <div class="form-group">
+        <label for="name">Full Name</label>
+        <div class="input-wrap">
+          <span class="material-icons input-icon">person_outline</span>
+          <input
+            id="name"
+            type="text"
+            placeholder="Enter your full name"
+            name="name"
+            [(ngModel)]="user.name"
+            required
+            minlength="2"
+            maxlength="100"
+            #name="ngModel">
+        </div>
+        @if (name.invalid && name.touched) {
+          <span class="field-error">
             @if (name.errors?.['required']) {
-                Name is required
+              Name is required
+            } @else if (name.errors?.['minlength']) {
+              Name must be at least 2 characters
             }
-            @else if (name.errors?.['minlength']) {
-                Name must be at least 2 characters
-            }
+          </span>
+        }
+      </div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <div class="input-wrap">
+          <span class="material-icons input-icon">mail_outline</span>
+          <input
+            id="email"
+            type="email"
+            placeholder="Enter your email"
+            name="email"
+            [(ngModel)]="user.email"
+            required
+            email
+            #email="ngModel">
         </div>
-    }
-
-    <label>Email</label>
-
-    <input
-        type="email"
-        placeholder="Enter Email"
-        name="email"
-        [(ngModel)]="user.email"
-        required
-        email
-        #email="ngModel">
-
-    @if (email.invalid && email.touched) {
-        <div class="error">
+        @if (email.invalid && email.touched) {
+          <span class="field-error">
             @if (email.errors?.['required']) {
-                Email is required
+              Email is required
+            } @else if (email.errors?.['email']) {
+              Please enter a valid email address
             }
-            @else if (email.errors?.['email']) {
-                Please enter a valid email
-            }
+          </span>
+        }
+      </div>
+
+      <!-- Phone Number -->
+      <div class="form-group">
+        <label for="phone">Phone Number</label>
+        <div class="input-wrap">
+          <span class="material-icons input-icon">phone</span>
+          <input
+            id="phone"
+            type="tel"
+            placeholder="Enter 10-digit phone number"
+            name="phoneNumber"
+            [(ngModel)]="user.phoneNumber"
+            required
+            pattern="[0-9]{10}"
+            #phone="ngModel">
         </div>
-    }
-
-    <label>Password</label>
-
-    <input
-        type="password"
-        placeholder="Enter Password"
-        name="password"
-        [(ngModel)]="user.password"
-        required
-        minlength="6"
-        #password="ngModel">
-
-    @if (password.invalid && password.touched) {
-        <div class="error">
-            @if (password.errors?.['required']) {
-                Password is required
-            }
-            @else if (password.errors?.['minlength']) {
-                Password must be at least 6 characters
-            }
-        </div>
-    }
-
-    <label>Phone Number</label>
-
-    <input
-        type="tel"
-        placeholder="Enter Phone Number"
-        name="phoneNumber"
-        [(ngModel)]="user.phoneNumber"
-        required
-        pattern="[0-9]{10}"
-        #phone="ngModel">
-
-    @if (phone.invalid && phone.touched) {
-        <div class="error">
+        @if (phone.invalid && phone.touched) {
+          <span class="field-error">
             @if (phone.errors?.['required']) {
-                Phone number is required
+              Phone number is required
+            } @else if (phone.errors?.['pattern']) {
+              Please enter a valid 10-digit phone number
             }
-            @else if (phone.errors?.['pattern']) {
-                Please enter a valid 10-digit phone number
-            }
+          </span>
+        }
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="input-wrap">
+          <span class="material-icons input-icon">lock_outline</span>
+          <input
+            id="password"
+            [type]="showPassword() ? 'text' : 'password'"
+            placeholder="Create a password (min. 6 characters)"
+            name="password"
+            [(ngModel)]="user.password"
+            required
+            minlength="6"
+            #password="ngModel">
+          <button type="button" class="password-toggle" (click)="togglePassword()" [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'">
+            <span class="material-icons">{{ showPassword() ? 'visibility_off' : 'visibility' }}</span>
+          </button>
         </div>
-    }
+        @if (password.invalid && password.touched) {
+          <span class="field-error">
+            @if (password.errors?.['required']) {
+              Password is required
+            } @else if (password.errors?.['minlength']) {
+              Password must be at least 6 characters
+            }
+          </span>
+        }
+      </div>
 
-    <label>Register As</label>
+      <!-- Confirm Password -->
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <div class="input-wrap">
+          <span class="material-icons input-icon">lock</span>
+          <input
+            id="confirmPassword"
+            [type]="showConfirmPassword() ? 'text' : 'password'"
+            placeholder="Re-enter your password"
+            name="confirmPassword"
+            [(ngModel)]="confirmPassword"
+            required
+            #confPass="ngModel">
+          <button type="button" class="password-toggle" (click)="toggleConfirmPassword()" [attr.aria-label]="showConfirmPassword() ? 'Hide password' : 'Show password'">
+            <span class="material-icons">{{ showConfirmPassword() ? 'visibility_off' : 'visibility' }}</span>
+          </button>
+        </div>
+        @if (confPass.touched && user.password && confirmPassword && user.password !== confirmPassword) {
+          <span class="field-error">Passwords do not match</span>
+        }
+      </div>
 
-    <select
-        [(ngModel)]="user.role"
-        name="role">
+      <!-- Terms Acceptance Checkbox -->
+      <div class="terms-group" style="display:flex;align-items:flex-start;gap:8px;margin:12px 0;">
+        <input type="checkbox" id="agreeTerms" name="agreeTerms" [(ngModel)]="agreeTerms" required style="margin-top:4px;">
+        <label for="agreeTerms" style="font-size:13px;color:#5A6B7F;line-height:1.4;cursor:pointer;">
+          I agree to the <a routerLink="/terms" target="_blank" style="color:#E85D3A;text-decoration:underline;">Terms & Conditions</a> and <a routerLink="/privacy" target="_blank" style="color:#E85D3A;text-decoration:underline;">Privacy Policy</a>.
+        </label>
+      </div>
 
-        <option value="Customer">
-            Customer
-        </option>
+      <!-- Submit -->
+      <button type="submit" class="submit-btn" [disabled]="isLoading() || registerForm.invalid || !agreeTerms || user.password !== confirmPassword">
+        @if (isLoading()) {
+          <span class="material-icons spinning">sync</span>
+          Creating Account...
+        } @else {
+          <span class="material-icons">person_add</span>
+          Sign Up
+        }
+      </button>
 
-        <option value="Owner">
-            Restaurant Owner
-        </option>
+      <!-- Sign In Switch -->
+      <p class="auth-switch">
+        Already have an account?
+        <a routerLink="/login">Sign in</a>
+      </p>
+    </form>
 
-        <option value="DeliveryPartner">
-            Delivery Partner
-        </option>
-
-    </select>
-
-    <button
-        type="submit"
-        [disabled]="registerForm.invalid">
-
-        Register
-
-    </button>
-
-</form>
+    <!-- Footer Note -->
+    <p class="auth-footer-note">
+      By creating an account, you agree to QuickEats' Terms and Privacy Policy.
+    </p>
+  </div>
+</div>

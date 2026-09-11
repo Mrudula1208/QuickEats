@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using QuickEats.API.Data;
 using QuickEats.API.Models;
 using QuickEats.API.Repositories.Interfaces;
@@ -15,10 +15,11 @@ namespace QuickEats.API.Repositories
 
         }
 
-        // Always load the full Order along with its details.
+        // Always load the full Order along with its details and DeliveryPartner.
         private IQueryable<OrderDelivery> QueryWithOrder()
         {
             return _context.OrderDeliveries
+                .Include(d => d.DeliveryPartner)
                 .Include(d => d.Order!)
                     .ThenInclude(o => o.User)
                 .Include(d => d.Order!)

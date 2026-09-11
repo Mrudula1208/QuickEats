@@ -1,98 +1,302 @@
 <app-delivery-partner-nav></app-delivery-partner-nav>
 
-<div class="dp-page">
+<div class="dp-wrapper">
+  <div class="dp-container">
 
-    <h1>My Deliveries</h1>
-
-    @if(deliveries.length === 0){
-
-        <div class="empty">
-
-            <h2>No Deliveries Assigned</h2>
-
-            <p>Deliveries assigned to you will appear here.</p>
-
+    <!-- Header Banner -->
+    <div class="dp-header">
+      <div class="dp-header-text">
+        <div class="dp-badge">
+          <span class="material-icons">sports_motorsports</span>
+          <span>Rider Fulfillment Portal</span>
         </div>
+        <h1>Delivery Dashboard</h1>
+        <p>Manage your assigned orders, update real-time fulfillment status, and track completed deliveries.</p>
+      </div>
+      <div class="dp-header-actions">
+        <button class="refresh-btn" (click)="loadDeliveries()">
+          <span class="material-icons">refresh</span>
+          Refresh Tasks
+        </button>
+      </div>
+    </div>
 
+    <!-- KPI Statistics Grid -->
+    <div class="dp-kpi-grid">
+      <div class="kpi-card total">
+        <div class="kpi-icon">
+          <span class="material-icons">assignment</span>
+        </div>
+        <div class="kpi-data">
+          <span class="kpi-label">Assigned Deliveries</span>
+          <span class="kpi-value">{{ stats().total }}</span>
+        </div>
+      </div>
+
+      <div class="kpi-card active">
+        <div class="kpi-icon">
+          <span class="material-icons">two_wheeler</span>
+        </div>
+        <div class="kpi-data">
+          <span class="kpi-label">Active / In-Transit</span>
+          <span class="kpi-value text-active">{{ stats().active }}</span>
+        </div>
+      </div>
+
+      <div class="kpi-card completed">
+        <div class="kpi-icon">
+          <span class="material-icons">check_circle</span>
+        </div>
+        <div class="kpi-data">
+          <span class="kpi-label">Completed Deliveries</span>
+          <span class="kpi-value text-success">{{ stats().completed }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Navigation Tabs -->
+    <div class="dp-tabs">
+      <button
+        class="tab-btn"
+        [class.active]="selectedTab() === 'all'"
+        (click)="selectedTab.set('all')">
+        All Orders ({{ deliveries().length }})
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="selectedTab() === 'assigned'"
+        (click)="selectedTab.set('assigned')">
+        Assigned ({{ getCountForTab('assigned') }})
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="selectedTab() === 'picked-up'"
+        (click)="selectedTab.set('picked-up')">
+        Picked Up ({{ getCountForTab('picked-up') }})
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="selectedTab() === 'out-for-delivery'"
+        (click)="selectedTab.set('out-for-delivery')">
+        Out for Delivery ({{ getCountForTab('out-for-delivery') }})
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="selectedTab() === 'delivered'"
+        (click)="selectedTab.set('delivered')">
+        Delivered ({{ getCountForTab('delivered') }})
+      </button>
+    </div>
+
+    <!-- Loading State -->
+    @if (isLoading()) {
+      <div class="dp-state-card">
+        <span class="material-icons spinning state-icon">progress_activity</span>
+        <h3>Loading your deliveries...</h3>
+        <p>Fetching assigned delivery orders from the server</p>
+      </div>
     }
-    @else{
 
-        <div class="delivery-list">
+    <!-- Error State -->
+    @else if (loadError()) {
+      <div class="dp-state-card">
+        <span class="material-icons state-icon text-danger">error_outline</span>
+        <h3>{{ loadError() }}</h3>
+        <p>Unable to retrieve deliveries. Please check your connection and retry.</p>
+        <button class="primary-btn" (click)="retry()">
+          <span class="material-icons">refresh</span> Retry
+        </button>
+      </div>
+    }
 
-            @for(delivery of deliveries; track delivery.id){
+    <!-- Empty State -->
+    @else if (filteredDeliveries().length === 0) {
+      <div class="dp-state-card">
+        <span class="material-icons state-icon">inbox</span>
+        <h3>No Deliveries in this Tab</h3>
+        <p>You have no delivery tasks under the "{{ selectedTab() }}" status.</p>
+      </div>
+    }
 
-            <div class="delivery-card">
+    <!-- Delivery Cards Grid -->
+    @else {
+      <div class="dp-cards-grid">
+        @for (delivery of filteredDeliveries(); track delivery.id) {
+          <div class="delivery-task-card" [class.delivered]="delivery.deliveryStatus === 'Delivered'">
 
-                <div class="delivery-head">
-
-                    <h2>Delivery #{{ delivery.id }}</h2>
-
-                    <span class="status">{{ delivery.deliveryStatus }}</span>
-
-                </div>
-
-                <p>
-                    Order #{{ delivery.orderId }} •
-                    {{ delivery.restaurantName }}
-                </p>
-
-                <p>
-                    Customer: {{ delivery.customerName }} •
-                    {{ delivery.phoneNumber }}
-                </p>
-
-                <p>
-                    Deliver to: {{ delivery.deliveryAddress }}
-                </p>
-
-                <p>
-                    Order Total: ₹{{ delivery.totalAmount }}
-                </p>
-
-                <div class="items">
-
-                    @for(item of delivery.items; track item.menuItemId){
-
-                        <p>
-                            {{ item.name }}
-                            × {{ item.quantity }}
-                            — ₹{{ item.totalPrice }}
-                        </p>
-
-                    }
-
-                </div>
-
-                <div class="status-row">
-
-                    <label>Update Status</label>
-
-                    <select
-                        [(ngModel)]="delivery.deliveryStatus"
-                        name="delivery-status-{{ delivery.id }}">
-
-                        <option value="Assigned">Assigned</option>
-
-                        <option value="Picked Up">Picked Up</option>
-
-                        <option value="On The Way">On The Way</option>
-
-                        <option value="Delivered">Delivered</option>
-
-                    </select>
-
-                    <button (click)="updateStatus(delivery)">
-                        Update
-                    </button>
-
-                </div>
-
+            <!-- Card Header -->
+            <div class="card-header">
+              <div class="task-id-badge">
+                <span class="delivery-id">Delivery #{{ delivery.id }}</span>
+                <span class="order-id">&bull; Order #{{ delivery.orderId }}</span>
+              </div>
+              <span class="status-badge" [ngClass]="getStatusBadgeClass(delivery.deliveryStatus)">
+                <span class="material-icons">{{ getStatusIcon(delivery.deliveryStatus) }}</span>
+                {{ delivery.deliveryStatus }}
+              </span>
             </div>
 
-            }
+            <!-- Route Info: Restaurant -> Customer -->
+            <div class="card-route">
+              <!-- Pickup -->
+              <div class="route-point pickup">
+                <div class="point-marker">
+                  <span class="material-icons">storefront</span>
+                </div>
+                <div class="point-info">
+                  <span class="point-type">Pickup Location</span>
+                  <h4 class="point-name">{{ delivery.restaurantName || 'Restaurant' }}</h4>
+                  <p class="point-address">{{ delivery.restaurantAddress || 'Address on file' }}</p>
+                  @if (delivery.restaurantPhone) {
+                    <p class="point-contact">
+                      <span class="material-icons">phone</span> {{ delivery.restaurantPhone }}
+                    </p>
+                  }
+                </div>
+              </div>
 
-        </div>
+              <!-- Connecting Line -->
+              <div class="route-divider">
+                <span class="material-icons">arrow_downward</span>
+              </div>
 
+              <!-- Dropoff -->
+              <div class="route-point dropoff">
+                <div class="point-marker">
+                  <span class="material-icons">place</span>
+                </div>
+                <div class="point-info">
+                  <span class="point-type">Delivery Destination</span>
+                  <h4 class="point-name">{{ delivery.customerName || 'Customer' }}</h4>
+                  <p class="point-address">{{ delivery.deliveryAddress || 'Address on file' }}</p>
+                  @if (delivery.phoneNumber || delivery.customerPhone) {
+                    <p class="point-contact">
+                      <span class="material-icons">phone_android</span> {{ delivery.phoneNumber || delivery.customerPhone }}
+                    </p>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <!-- Order Summary Line -->
+            <div class="order-summary-row">
+              <div class="summary-item">
+                <span class="summary-label">Items:</span>
+                <span class="summary-value">{{ delivery.items?.length || delivery.orderItems?.length || 0 }} items</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Payment:</span>
+                <span class="payment-badge">{{ delivery.paymentMethod || 'Cash On Delivery' }}</span>
+              </div>
+              <div class="summary-item total">
+                <span class="summary-label">Total:</span>
+                <span class="total-price">₹{{ delivery.totalAmount }}</span>
+              </div>
+            </div>
+
+            <!-- Action Footer -->
+            <div class="card-footer">
+              <button class="details-link-btn" (click)="viewDetails(delivery)">
+                <span class="material-icons">visibility</span> View Items
+              </button>
+
+              @if (delivery.deliveryStatus !== 'Delivered') {
+                <button
+                  class="action-btn"
+                  [ngClass]="delivery.deliveryStatus.toLowerCase().replace(' ', '-')"
+                  (click)="advanceStatus(delivery)">
+                  <span class="material-icons">{{ getNextActionIcon(delivery.deliveryStatus) }}</span>
+                  <span>{{ getNextActionText(delivery.deliveryStatus) }}</span>
+                </button>
+              } @else {
+                <span class="completed-tag">
+                  <span class="material-icons">task_alt</span> Completed
+                </span>
+              }
+            </div>
+
+          </div>
+        }
+      </div>
     }
 
+  </div>
 </div>
+
+<!-- ========================================================= -->
+<!-- MODAL: ORDER DETAILS                                      -->
+<!-- ========================================================= -->
+@if (isDetailsOpen() && selectedDelivery()) {
+  <div class="modal-backdrop" (click)="closeDetails()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span class="material-icons modal-icon">receipt_long</span>
+          <div>
+            <h3>Delivery Order #{{ selectedDelivery()!.orderId }}</h3>
+            <span class="sub">Delivery ID: #{{ selectedDelivery()!.id }}</span>
+          </div>
+        </div>
+        <button class="close-btn" (click)="closeDetails()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-section">
+          <h4>Order #{{ selectedDelivery()!.orderId }} Items</h4>
+          <div class="item-list">
+            @for (item of (selectedDelivery()!.items || selectedDelivery()!.orderItems || []); track item.menuItemId) {
+              <div class="order-item-row">
+                <div class="item-meta">
+                  <span class="item-qty">{{ item.quantity }}x</span>
+                  <span class="item-name">{{ item.name || item.itemName }}</span>
+                </div>
+                <span class="item-price">₹{{ item.totalPrice || ((item.unitPrice || item.price || 0) * item.quantity) }}</span>
+              </div>
+            }
+          </div>
+          <div class="modal-total-row">
+            <span>Order Total</span>
+            <span class="modal-total-val">₹{{ selectedDelivery()!.totalAmount }}</span>
+          </div>
+        </div>
+
+        <div class="modal-section location-summary">
+          <div class="loc-block">
+            <strong>Pickup Location:</strong>
+            <p>{{ selectedDelivery()!.restaurantName }}</p>
+            <p class="muted-text">{{ selectedDelivery()!.restaurantAddress }}</p>
+          </div>
+          <div class="loc-block">
+            <strong>Delivery Destination:</strong>
+            <p>{{ selectedDelivery()!.customerName }} ({{ selectedDelivery()!.phoneNumber || selectedDelivery()!.customerPhone }})</p>
+            <p class="muted-text">{{ selectedDelivery()!.deliveryAddress }}</p>
+          </div>
+        </div>
+
+        <div class="modal-section timing-info">
+          <p><strong>Assigned At:</strong> {{ selectedDelivery()!.assignedAt | date:'medium' }}</p>
+          @if (selectedDelivery()!.pickedUpAt) {
+            <p><strong>Picked Up At:</strong> {{ selectedDelivery()!.pickedUpAt | date:'medium' }}</p>
+          }
+          @if (selectedDelivery()!.deliveredAt) {
+            <p><strong>Delivered At:</strong> {{ selectedDelivery()!.deliveredAt | date:'medium' }}</p>
+          }
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        @if (selectedDelivery()!.deliveryStatus !== 'Delivered') {
+          <button
+            class="action-btn modal-action"
+            (click)="advanceStatus(selectedDelivery()!)">
+            <span class="material-icons">{{ getNextActionIcon(selectedDelivery()!.deliveryStatus) }}</span>
+            <span>{{ getNextActionText(selectedDelivery()!.deliveryStatus) }}</span>
+          </button>
+        }
+        <button class="secondary-btn" (click)="closeDetails()">Close</button>
+      </div>
+    </div>
+  </div>
+}

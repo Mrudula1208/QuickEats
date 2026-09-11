@@ -47,11 +47,63 @@ namespace QuickEats.API.Controllers
                     PhoneNumber = user.PhoneNumber,
                     Role = user.Role,
                     ProfileImageUrl = user.ProfileImageUrl,
+                    IsActive = user.IsActive,
                     CreatedAt = user.CreatedAt
                 });
             }
 
             return Ok(response);
+        }
+
+        /// <summary>
+        /// Gets all delivery partners with delivery stats (Admin only).
+        /// </summary>
+        [Authorize(Roles = "Admin")]
+        [HttpGet("delivery-partners")]
+        public async Task<IActionResult> GetDeliveryPartners()
+        {
+            var partners = await _userService.GetDeliveryPartnersAsync();
+            return Ok(partners);
+        }
+
+        /// <summary>
+        /// Creates a new delivery partner account (Admin only).
+        /// </summary>
+        [Authorize(Roles = "Admin")]
+        [HttpPost("delivery-partner")]
+        public async Task<IActionResult> CreateDeliveryPartner([FromBody] CreateDeliveryPartnerDto dto)
+        {
+            var id = await _userService.CreateDeliveryPartnerAsync(dto);
+            return Ok(new { message = "Delivery Partner created successfully.", id });
+        }
+
+        /// <summary>
+        /// Toggles active/inactive status for a user or delivery partner (Admin only).
+        /// </summary>
+        [Authorize(Roles = "Admin")]
+        [HttpPatch("{id}/toggle-status")]
+        public async Task<IActionResult> ToggleUserStatus(int id)
+        {
+            var isActive = await _userService.ToggleUserStatusAsync(id);
+            return Ok(new { message = $"User is now {(isActive ? "Active" : "Inactive")}.", isActive });
+        }
+
+        /// <summary>
+        /// Deletes a user by id (Admin only).
+        /// </summary>
+        /// <param name="id">User id.</param>
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var user = await _userRepository.GetByIdAsync(id);
+            if (user == null)
+                return NotFound("User not found.");
+
+            await _userRepository.DeleteAsync(user);
+            await _userRepository.SaveChangesAsync();
+
+            return Ok("User deleted successfully.");
         }
 
         /// <summary>

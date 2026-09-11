@@ -41,6 +41,14 @@ namespace QuickEats.API.Repositories
                     favorite.RestaurantId == restaurantId);
         }
 
+        // Get one Favorite by Id.
+
+        public async Task<Favorite?> GetByIdAsync(int id)
+        {
+            return await _context.Favorites
+                .FirstOrDefaultAsync(favorite => favorite.Id == id);
+        }
+
         // Add new Favorite.
 
         public async Task AddAsync(Favorite favorite)

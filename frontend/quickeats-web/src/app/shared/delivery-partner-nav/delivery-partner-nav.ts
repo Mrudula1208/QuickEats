@@ -1,27 +1,20 @@
 import { Component } from '@angular/core';
-// Controls the Delivery Partner Navigation bar.
-
-import { RouterLink, RouterLinkActive } from '@angular/router';
-// RouterLink makes links navigate.
-// RouterLinkActive highlights the current page link.
-
-import { Router } from '@angular/router';
-// Router moves the Delivery Partner to another page.
+import { RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-delivery-partner-nav',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './delivery-partner-nav.html',
   styleUrl: './delivery-partner-nav.scss'
 })
 export class DeliveryPartnerNavComponent {
+  partnerName = localStorage.getItem('name') || 'Rider';
 
   constructor(private router: Router) { }
 
-  // Log out the Delivery Partner.
   logout(): void {
-
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
     localStorage.removeItem('name');
@@ -31,5 +24,4 @@ export class DeliveryPartnerNavComponent {
 
     this.router.navigate(['/login']);
   }
-
 }

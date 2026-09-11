@@ -1,0 +1,191 @@
+<div class="rdl-container">
+
+  <!-- Header -->
+  <div class="rdl-header">
+    <div class="rdl-header-left">
+      <h1 class="rdl-title">My Assigned Deliveries</h1>
+      <p class="rdl-subtitle">Active fulfillment tasks requiring pickup and dropoff.</p>
+    </div>
+    <div class="rdl-header-right">
+      <button class="refresh-btn" (click)="loadDeliveries()">
+        <span class="material-icons">refresh</span> Refresh Tasks
+      </button>
+    </div>
+  </div>
+
+  <!-- Filter Tabs -->
+  <div class="rdl-tabs">
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="selectedTab() === 'all'"
+      (click)="selectedTab.set('all')">
+      All Active ({{ stats().all }})
+    </button>
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="selectedTab() === 'assigned'"
+      (click)="selectedTab.set('assigned')">
+      Assigned ({{ stats().assigned }})
+    </button>
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="selectedTab() === 'picked-up'"
+      (click)="selectedTab.set('picked-up')">
+      Picked Up ({{ stats().pickedUp }})
+    </button>
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="selectedTab() === 'out-for-delivery'"
+      (click)="selectedTab.set('out-for-delivery')">
+      Out for Delivery ({{ stats().outForDelivery }})
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="rdl-state-card">
+      <span class="material-icons spinning state-icon">progress_activity</span>
+      <h3>Loading delivery tasks...</h3>
+      <p>Retrieving your active delivery assignments</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @else if (loadError()) {
+    <div class="rdl-state-card">
+      <span class="material-icons state-icon text-danger">error_outline</span>
+      <h3>{{ loadError() }}</h3>
+      <p>Failed to load assigned deliveries.</p>
+      <button class="primary-btn" (click)="retry()">
+        <span class="material-icons">refresh</span> Try Again
+      </button>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @else if (filteredDeliveries().length === 0) {
+    <div class="rdl-state-card">
+      <span class="material-icons state-icon">inbox</span>
+      <h3>No deliveries assigned right now</h3>
+      <p>You currently have no tasks in the "{{ selectedTab() }}" queue. New orders assigned by the dispatcher will appear here in real time.</p>
+      @if (selectedTab() !== 'all') {
+        <button class="secondary-btn" (click)="selectedTab.set('all')">
+          View All Active
+        </button>
+      }
+    </div>
+  }
+
+  <!-- Deliveries Grid -->
+  @else {
+    <div class="rdl-grid">
+      @for (delivery of filteredDeliveries(); track delivery.id) {
+        <div class="delivery-card" (click)="viewDelivery(delivery.id)">
+
+          <!-- Card Top Bar -->
+          <div class="card-head">
+            <div class="head-left">
+              <span class="order-num">Order #{{ delivery.orderId }}</span>
+              <span class="assigned-time">
+                <span class="material-icons">schedule</span>
+                Assigned: {{ delivery.assignedAt | date:'shortTime' }}
+              </span>
+            </div>
+            <span class="status-badge" [ngClass]="getStatusBadgeClass(delivery.deliveryStatus)">
+              <span class="material-icons">navigation</span>
+              {{ delivery.deliveryStatus }}
+            </span>
+          </div>
+
+          <!-- Pickup & Dropoff Route -->
+          <div class="card-route">
+            <!-- Pickup Item -->
+            <div class="route-item pickup">
+              <div class="icon-wrap">
+                <span class="material-icons">storefront</span>
+              </div>
+              <div class="info-wrap">
+                <span class="type-label">Pickup Location</span>
+                <h4 class="name">{{ delivery.restaurantName || 'Restaurant' }}</h4>
+                <p class="address">{{ delivery.restaurantAddress || 'Address on file' }}</p>
+                @if (delivery.restaurantPhone) {
+                  <span class="phone-chip">
+                    <span class="material-icons">call</span> {{ delivery.restaurantPhone }}
+                  </span>
+                }
+              </div>
+            </div>
+
+            <!-- Arrow Divider -->
+            <div class="route-arrow">
+              <span class="material-icons">arrow_downward</span>
+            </div>
+
+            <!-- Dropoff Item -->
+            <div class="route-item dropoff">
+              <div class="icon-wrap">
+                <span class="material-icons">place</span>
+              </div>
+              <div class="info-wrap">
+                <span class="type-label">Delivery Destination</span>
+                <h4 class="name">{{ delivery.customerName || 'Customer' }}</h4>
+                <p class="address">{{ delivery.deliveryAddress || 'Address on file' }}</p>
+                @if (delivery.phoneNumber || delivery.customerPhone) {
+                  <span class="phone-chip">
+                    <span class="material-icons">call</span> {{ delivery.phoneNumber || delivery.customerPhone }}
+                  </span>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Summary Strip -->
+          <div class="card-summary">
+            <div class="summary-col">
+              <span class="label">Amount</span>
+              <span class="amount">₹{{ delivery.totalAmount }}</span>
+            </div>
+            <div class="summary-col">
+              <span class="label">Payment</span>
+              <span class="badge">{{ delivery.paymentMethod || 'Paid / COD' }}</span>
+            </div>
+            <div class="summary-col">
+              <span class="label">Items</span>
+              <span class="count">{{ (delivery.items?.length || delivery.orderItems?.length || 1) }} item(s)</span>
+            </div>
+          </div>
+
+          <!-- Action Footer -->
+          <div class="card-actions">
+            <button 
+              type="button" 
+              class="details-btn" 
+              (click)="viewDelivery(delivery.id); $event.stopPropagation()">
+              <span class="material-icons">receipt_long</span>
+              View Details
+            </button>
+
+            <button 
+              type="button" 
+              class="action-btn"
+              [disabled]="isUpdating() === delivery.id"
+              (click)="advanceStatus(delivery, $event)">
+              @if (isUpdating() === delivery.id) {
+                <span class="material-icons spinning">progress_activity</span> Updating...
+              } @else {
+                <span class="material-icons">{{ getNextActionIcon(delivery.deliveryStatus) }}</span>
+                <span>{{ getNextActionText(delivery.deliveryStatus) }}</span>
+              }
+            </button>
+          </div>
+
+        </div>
+      }
+    </div>
+  }
+
+</div>

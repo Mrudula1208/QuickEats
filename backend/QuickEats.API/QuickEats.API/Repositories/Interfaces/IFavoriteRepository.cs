@@ -21,6 +21,10 @@ namespace QuickEats.API.Repositories.Interfaces
 
         Task AddAsync(Favorite favorite);
 
+        // Get one Favorite by Id.
+
+        Task<Favorite?> GetByIdAsync(int id);
+
         // Delete an existing Favorite.
 
         void Delete(Favorite favorite);

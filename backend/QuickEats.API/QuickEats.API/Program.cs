@@ -115,18 +115,21 @@ namespace QuickEats.API
             builder.Services.AddScoped<IJwtService, JwtService>();
 
             // Fail fast if the JWT secret is missing or too weak.
-            var jwtConfig = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
-            if (jwtConfig == null || string.IsNullOrWhiteSpace(jwtConfig.Key))
-            {
-                throw new InvalidOperationException(
-                    "JWT Key is missing. Set it with 'dotnet user-secrets set \"Jwt:Key\" \"<your-key>\"' (Development) " +
-                    "or the 'Jwt__Key' environment variable (Production).");
-            }
-            if (jwtConfig.Key.Length < 32)
-            {
-                throw new InvalidOperationException("JWT Key must be at least 32 characters long.");
-            }
+           var jwtConfig = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
 
+if (jwtConfig == null || string.IsNullOrWhiteSpace(jwtConfig.Key))
+{
+    throw new InvalidOperationException(
+        "JWT Key is missing..."
+    );
+}
+
+if (jwtConfig.Key.Length < 32)
+{
+    throw new InvalidOperationException(
+        "JWT Key must be at least 32 characters long."
+    );
+}
             builder.Services.AddScoped< IReviewRepository,ReviewRepository>();
             builder.Services.AddScoped< IReviewService,  ReviewService>();
             builder.Services.AddScoped<IWishlistRepository, WishlistRepository>();
@@ -155,52 +158,69 @@ namespace QuickEats.API
     Encoding.UTF8.GetBytes(jwtConfig.Key))
                 };
             });
-            builder.Services.AddAuthorization();
+                      builder.Services.AddAuthorization();
            
-            // Allowed browser origins come from configuration so production
-            // can override them with the 'Cors__AllowedOrigins__N' environment
-            // variables instead of a code change.
             var allowedOrigins = builder.Configuration
                 .GetSection("Cors:AllowedOrigins")
                 .Get<string[]>() ?? new[] { "http://localhost:4200" };
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAngular",
-        policy =>
-        {
-            policy.WithOrigins(allowedOrigins)
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
-        });
-});
             var app = builder.Build();
 
-            app.UseMiddleware<ExceptionMiddleware>();
+            // 1. FORCE THE ERROR PAGE TO SHOW IN PRODUCTION FOR TROUBLESHOOTING
+            app.UseDeveloperExceptionPage();
 
-            // Serve uploaded images from wwwroot/uploads
-            app.UseStaticFiles();
-
-            app.UseCors("AllowAngular");
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+            // 2. EXPOSE SWAGGER EVEN IN PRODUCTION MODE FOR SOMEE
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "QuickEats API v1");
+                c.RoutePrefix = "swagger"; // Exposes the page at your /swagger URL path
+            });
 
             app.UseHttpsRedirection();
-
-            if (!app.Environment.IsDevelopment())
-            {
-                app.UseHsts();
-            }
-
+            
+            // Standard middleware setup
+            app.UseRouting();
+            app.UseCors(policy => policy.WithOrigins(allowedOrigins).AllowAnyMethod().AllowAnyHeader());
             app.UseAuthentication();
             app.UseAuthorization();
 
-
             app.MapControllers();
+
+            // Ensure demo delivery partner account with known password exists
+            using (var scope = app.Services.CreateScope())
+            {
+                try
+                {
+                    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                    var rider = db.Users.FirstOrDefault(u => u.Email == "rider@gmail.com");
+                    if (rider == null)
+                    {
+                        db.Users.Add(new QuickEats.API.Models.User
+                        {
+                            Name = "Alex Rider",
+                            Email = "rider@gmail.com",
+                            PhoneNumber = "9876543210",
+                            PasswordHash = QuickEats.API.Helpers.PasswordHasher.Hash("Password@123"),
+                            Role = "DeliveryPartner",
+                            IsActive = true,
+                            CreatedAt = DateTime.UtcNow
+                        });
+                        db.SaveChanges();
+                    }
+                    else
+                    {
+                        rider.PasswordHash = QuickEats.API.Helpers.PasswordHasher.Hash("Password@123");
+                        rider.IsActive = true;
+                        rider.Role = "DeliveryPartner";
+                        db.SaveChanges();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[Startup] Warning: Could not seed rider account: {ex.Message}");
+                }
+            }
 
             app.Run();
         }

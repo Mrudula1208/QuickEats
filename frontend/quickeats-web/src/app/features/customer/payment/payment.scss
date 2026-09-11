@@ -1,213 +1,226 @@
-/* =====================================
-   Payment Page
-===================================== */
+$primary: #E85D3A;
+$primary-dark: #D14A2A;
+$primary-light: #F28C72;
+$primary-bg: #FEF0EC;
+$secondary: #2D6A4F;
+$secondary-light: #52B788;
+$accent: #F4A261;
+$dark: #1B2838;
+$dark-600: #2B3A4E;
+$dark-400: #5A6B7F;
+$dark-300: #8494A7;
+$light-bg: #F7F8FC;
+$white: #FFFFFF;
+$border: #E8ECF1;
 
-.payment-container{
+.page-hero {
+  background: linear-gradient(135deg, $secondary 0%, $secondary-light 60%, $primary-light 100%);
+  padding: 48px 20px 40px;
 
-    max-width:600px;
+  .breadcrumb {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    margin-bottom: 14px;
 
-    margin:40px auto;
+    &:hover { color: #fff; }
+  }
 
-    background:white;
+  .page-title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 6px;
+  }
 
-    padding:35px;
-
-    border-radius:15px;
-
-    box-shadow:0 10px 30px rgba(0,0,0,.12);
-
+  .page-subtitle {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+  }
 }
 
-/* =====================================
-   Heading
-===================================== */
-
-h1{
-
-    text-align:center;
-
-    color:#ff5a5f;
-
-    margin-bottom:5px;
-
+.payment-content {
+  background: $light-bg;
+  min-height: 60vh;
+  padding: 32px 0 60px;
 }
 
-.subtitle{
-
-    text-align:center;
-
-    color:#777;
-
-    margin-bottom:30px;
-
+.payment-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  align-items: start;
 }
 
-/* =====================================
-   Summary Box
-===================================== */
+.summary-box {
+  background: $white;
+  border: 1px solid $border;
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
 
-.summary-box{
-
-    background:#fff4f4;
-
-    padding:20px;
-
-    border-radius:12px;
-
-    margin-bottom:30px;
-
+  h2 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: $dark;
+    margin: 0 0 18px;
+  }
 }
 
-.summary-box h2{
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px 0;
+  font-size: 15px;
+  color: $dark-600;
 
-    margin-bottom:20px;
+  strong { color: $dark; }
 
-    color:#333;
+  &.discount strong { color: $secondary; }
 
+  &.total {
+    font-size: 19px;
+    font-weight: 700;
+    color: $dark;
+    margin-top: 4px;
+
+    strong { color: $primary; }
+  }
 }
 
-.summary-row{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    margin:12px 0;
-
-    font-size:17px;
-
+.summary-divider {
+  height: 1px;
+  background: $border;
+  margin: 14px 0;
 }
 
-.total{
+.method-box {
+  background: $white;
+  border: 1px solid $border;
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
 
-    font-size:22px;
-
-    font-weight:bold;
-
-    color:#ff5a5f;
-
+  h2 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: $dark;
+    margin: 0 0 18px;
+  }
 }
 
-/* =====================================
-   Payment Options
-===================================== */
+.payment-option {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 2px solid $border;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: border-color 0.3s, background 0.3s;
 
-.payment-option{
+  input { display: none; }
 
-    display:flex;
+  .option-icon {
+    font-size: 24px;
+    color: $dark-400;
+  }
 
-    align-items:center;
+  .option-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
 
-    gap:15px;
+  .option-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: $dark;
+  }
 
-    padding:16px;
+  .option-desc {
+    font-size: 12px;
+    color: $dark-300;
+    margin-top: 2px;
+  }
 
-    border:1px solid #ddd;
+  .option-check {
+    font-size: 22px;
+    color: $dark-300;
+  }
 
-    border-radius:10px;
+  &:hover {
+    border-color: $primary-light;
+    background: $primary-bg;
+  }
 
-    margin-bottom:15px;
+  &.selected {
+    border-color: $primary;
+    background: $primary-bg;
 
-    cursor:pointer;
-
-    transition:.3s;
-
-    font-size:17px;
-
+    .option-icon,
+    .option-check { color: $primary; }
+  }
 }
 
-.payment-option:hover{
+.selected-method {
+  margin: 22px 0;
+  font-size: 15px;
+  text-align: center;
+  color: $dark-400;
 
-    border-color:#ff5a5f;
-
-    background:#fff6f6;
-
+  strong { color: $primary; }
 }
 
-.payment-option input{
+.pay-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 15px 16px;
+  border: none;
+  border-radius: 12px;
+  background: $primary;
+  color: $white;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
 
-    transform:scale(1.3);
+  .material-icons { font-size: 20px; }
 
+  &:hover {
+    background: $primary-dark;
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    background: $dark-300;
+    cursor: not-allowed;
+    transform: none;
+  }
 }
 
-/* =====================================
-   Selected Method
-===================================== */
+.spinning { animation: paySpin 1s linear infinite; }
 
-.selected-method{
-
-    margin:30px 0;
-
-    font-size:18px;
-
-    text-align:center;
-
+@keyframes paySpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-.selected-method strong{
-
-    color:#ff5a5f;
-
-}
-
-/* =====================================
-   Button
-===================================== */
-
-.pay-btn{
-
-    width:100%;
-
-    padding:16px;
-
-    border:none;
-
-    border-radius:10px;
-
-    background:#ff5a5f;
-
-    color:white;
-
-    font-size:20px;
-
-    cursor:pointer;
-
-    transition:.3s;
-
-}
-
-.pay-btn:hover{
-
-    background:#e74c3c;
-
-    transform:translateY(-2px);
-
-}
-
-/* =====================================
-   Mobile
-===================================== */
-
-@media(max-width:600px){
-
-.payment-container{
-
-margin:15px;
-
-padding:20px;
-
-}
-
-.summary-row{
-
-font-size:15px;
-
-}
-
-.pay-btn{
-
-font-size:18px;
-
-}
-
+@media (max-width: 860px) {
+  .page-hero { padding: 36px 16px 32px; .page-title { font-size: 24px; } }
+  .payment-layout { grid-template-columns: 1fr; }
+  .payment-content { padding: 24px 0 48px; }
 }

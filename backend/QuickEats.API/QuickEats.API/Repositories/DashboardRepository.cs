@@ -48,5 +48,30 @@ namespace QuickEats.API.Repositories
 
         }
 
+        public async Task<DashboardDto> GetOwnerDashboardAsync(int ownerId)
+        {
+            var ownerRestaurantIds = await _context.Restaurants
+                .Where(r => r.OwnerId == ownerId)
+                .Select(r => r.Id)
+                .ToListAsync();
+
+            return new DashboardDto
+            {
+                TotalRestaurants = ownerRestaurantIds.Count,
+
+                TotalMenus = await _context.MenuItems
+                    .CountAsync(m => ownerRestaurantIds.Contains(m.RestaurantId)),
+
+                TotalOrders = await _context.Orders
+                    .CountAsync(o => ownerRestaurantIds.Contains(o.RestaurantId)),
+
+                TotalUsers = 0,
+
+                TotalRevenue = await _context.Orders
+                    .Where(o => ownerRestaurantIds.Contains(o.RestaurantId))
+                    .SumAsync(o => o.TotalAmount)
+            };
+        }
+
     }
 }

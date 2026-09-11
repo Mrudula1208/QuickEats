@@ -83,5 +83,20 @@ namespace QuickEats.API.Services
             await _favoriteRepository.AddAsync(favorite);
             await _favoriteRepository.SaveChangesAsync();
         }
+
+        // Remove a Restaurant from Favorites.
+
+        public async Task DeleteAsync(int userId, int favoriteId)
+        {
+            var favorite = await _favoriteRepository.GetByIdAsync(favoriteId);
+
+            if (favorite == null || favorite.UserId != userId)
+            {
+                throw new NotFoundException("Favorite not found.");
+            }
+
+            _favoriteRepository.Delete(favorite);
+            await _favoriteRepository.SaveChangesAsync();
+        }
     }
 }

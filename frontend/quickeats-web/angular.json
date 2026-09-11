@@ -28,12 +28,12 @@
     "glob": "**/*",
     "input": "src/assets",
     "output": "assets"
-  }
+  },
+  "src/_redirects"
 
             ],
             "styles": [
-                "@fortawesome/fontawesome-free/css/all.min.css",
-                "node_modules/ngx-toastr/toastr.css",
+              "node_modules/ngx-toastr/toastr.css",
               "src/styles.scss"
             ]
            
@@ -43,13 +43,13 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "3MB",
+                  "maximumError": "5MB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumWarning": "32kB",
+                  "maximumError": "64kB"
                 }
               ],
               "outputHashing": "all",
@@ -63,10 +63,10 @@
             "development": {
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true
+              "sourceMap": false
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "development"
         },
         "serve": {
           "builder": "@angular/build:dev-server",

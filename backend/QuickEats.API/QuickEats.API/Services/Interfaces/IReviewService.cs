@@ -1,4 +1,4 @@
-﻿using QuickEats.API.DTos.Review;
+using QuickEats.API.DTos.Review;
 // Import Review DTOs.
 // DTOs carry Review data between
 // Controller and Service.
@@ -46,6 +46,11 @@ namespace QuickEats.API.Services.Interfaces
 
         Task<IEnumerable<ReviewResponseDto>> GetByRestaurantIdAsync(
             int restaurantId
+        );
+
+        // Get all Reviews of all Restaurants owned by an Owner.
+        Task<IEnumerable<ReviewResponseDto>> GetByOwnerIdAsync(
+            int ownerId
         );
 
 

@@ -1,0 +1,250 @@
+<section class="track-hero">
+  <div class="container">
+    <a routerLink="/orders" class="breadcrumb">
+      <span class="material-icons">arrow_back</span>
+      Back to Orders
+    </a>
+    <h1 class="page-title">Track Your Order</h1>
+    @if (order()) {
+      <p class="page-subtitle">
+        Order <span class="order-id-pill">#{{ order()!.id }}</span>
+        &middot; {{ order()!.restaurantName }}
+        &middot; {{ order()!.createdAt | date:'mediumDate' }}
+      </p>
+    }
+  </div>
+</section>
+
+<section class="track-section">
+  <div class="container">
+
+    <!-- Loading -->
+    @if (isLoading()) {
+      <div class="state-card">
+        <div class="spinner-wrap">
+          <span class="material-icons spinning">sync</span>
+        </div>
+        <p>Loading tracking information...</p>
+      </div>
+    }
+
+    <!-- Error -->
+    @else if (loadError()) {
+      <div class="state-card">
+        <div class="state-icon error">
+          <span class="material-icons">error_outline</span>
+        </div>
+        <h2>Unable to load this order</h2>
+        <p>{{ loadError() }}</p>
+        <div class="state-actions">
+          <button class="btn btn--primary" (click)="retry()">
+            <span class="material-icons">refresh</span>
+            Try Again
+          </button>
+          <a routerLink="/orders" class="btn btn--ghost">Back to Orders</a>
+        </div>
+      </div>
+    }
+
+    <!-- Order not found -->
+    @else if (!order()) {
+      <div class="state-card">
+        <div class="state-icon">
+          <span class="material-icons">search_off</span>
+        </div>
+        <h2>Order not found</h2>
+        <p>We couldn't find tracking information for this order.</p>
+        <a routerLink="/orders" class="btn btn--primary">Back to Orders</a>
+      </div>
+    }
+
+    @else {
+      <div class="track-layout">
+
+        <!-- Main column -->
+        <div class="track-main">
+
+          <!-- Status overview banner -->
+          <div class="card status-banner">
+            <div class="status-icon-wrap" [ngClass]="getStatusClass(order()!.status)">
+              <span class="material-icons">{{ getStatusIcon(order()!.status) }}</span>
+            </div>
+            <div class="status-text">
+              <h2 class="status-title">
+                @if (isDelivered()) { Order Delivered }
+                @else if (isCancelled()) { Order Cancelled }
+                @else { {{ normalizedStatus(order()!.status) }} }
+              </h2>
+              <p class="status-sub">
+                @if (isDelivered()) { Enjoy your meal! Your order has been delivered. }
+                @else if (isCancelled()) { This order has been cancelled and will not be delivered. }
+                @else {
+                  Your order is currently <strong>{{ normalizedStatus(order()!.status) | lowercase }}</strong>. We'll keep this page updated.
+                }
+              </p>
+            </div>
+          </div>
+
+          <!-- Timeline -->
+          <div class="card">
+            <h3 class="card-title">
+              <span class="material-icons">timeline</span>
+              Order Progress
+            </h3>
+
+            @if (!isCancelled()) {
+              <div class="timeline">
+                @for (step of steps; track step; let i = $index) {
+                  <div class="timeline-step"
+                    [class.completed]="isStepCompleted(i)"
+                    [class.active]="isStepActive(i)">
+                    <div class="step-circle">
+                      <span class="material-icons">{{ stepIcon(i) }}</span>
+                    </div>
+                    <span class="step-label">{{ step }}</span>
+                  </div>
+                  @if (i < steps.length - 1) {
+                    <div class="step-line"
+                      [class.completed]="(!isCancelled() && isStepActive(i)) || isStepCompleted(i + 1)"></div>
+                  }
+                }
+              </div>
+            } @else {
+              <div class="cancelled-note">
+                <span class="material-icons">cancel</span>
+                <div>
+                  <h3>Order Cancelled</h3>
+                  <p>Sorry, this order was cancelled. You can reorder from the restaurant's menu.</p>
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- Delivery partner info -->
+          @if (delivery()) {
+            <div class="card">
+              <h3 class="card-title">
+                <span class="material-icons">local_shipping</span>
+                Delivery Partner
+              </h3>
+              <div class="delivery-grid">
+                <div class="delivery-item">
+                  <span class="material-icons">badge</span>
+                  <div>
+                    <span class="delivery-label">Partner ID</span>
+                    <span class="delivery-value">#{{ delivery()!.deliveryPartnerId }}</span>
+                  </div>
+                </div>
+                <div class="delivery-item">
+                  <span class="material-icons">info</span>
+                  <div>
+                    <span class="delivery-label">Delivery Status</span>
+                    <span class="delivery-value status-badge-sm" [ngClass]="deliveryStatusClass(delivery()!.deliveryStatus)">
+                      {{ delivery()!.deliveryStatus }}
+                    </span>
+                  </div>
+                </div>
+                <div class="delivery-item">
+                  <span class="material-icons">schedule</span>
+                  <div>
+                    <span class="delivery-label">Assigned At</span>
+                    <span class="delivery-value">{{ delivery()!.assignedAt | date:'medium' }}</span>
+                  </div>
+                </div>
+              </div>
+              @if (isDeliveryInTransit()) {
+                <div class="delivery-note">
+                  <span class="material-icons">schedule</span>
+                  Your delivery partner is on their way. Track updates may refresh automatically.
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Ordered items -->
+          @if (order()!.items.length > 0) {
+            <div class="card">
+              <h3 class="card-title">
+                <span class="material-icons">restaurant_menu</span>
+                Ordered Items
+              </h3>
+              <div class="items-list">
+                @for (item of order()!.items; track item.menuItemId) {
+                  <div class="item-row">
+                    <span class="item-qty">{{ item.quantity }}x</span>
+                    <span class="item-name">{{ item.name }}</span>
+                    <span class="item-price">₹{{ item.totalPrice | number:'1.0-0' }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+        </div>
+
+        <!-- Sidebar -->
+        <div class="track-sidebar">
+          <div class="card summary-card">
+            <h3 class="card-title">
+              <span class="material-icons">receipt</span>
+              Order Summary
+            </h3>
+
+            <div class="summary-row">
+              <span class="summary-label">Restaurant</span>
+              <span class="summary-value">{{ order()!.restaurantName }}</span>
+            </div>
+
+            <div class="summary-row">
+              <span class="summary-label">Order ID</span>
+              <span class="summary-value">#{{ order()!.id }}</span>
+            </div>
+
+            <div class="summary-row">
+              <span class="summary-label">Order Date</span>
+              <span class="summary-value">{{ order()!.createdAt | date:'medium' }}</span>
+            </div>
+
+            <div class="summary-row">
+              <span class="summary-label">Payment</span>
+              <span class="summary-value">{{ order()!.paymentMethod }}</span>
+            </div>
+
+            <div class="summary-row">
+              <span class="summary-label">Status</span>
+              <span class="summary-value">
+                <span class="status-badge" [ngClass]="getStatusClass(order()!.status)">
+                  {{ normalizedStatus(order()!.status) }}
+                </span>
+              </span>
+            </div>
+
+            <div class="summary-row">
+              <span class="summary-label">Total</span>
+              <span class="summary-value summary-total">₹{{ order()!.totalAmount | number:'1.0-0' }}</span>
+            </div>
+
+            <div class="summary-row">
+              <span class="summary-label">Deliver to</span>
+              <span class="summary-value summary-address">{{ order()!.deliveryAddress }}</span>
+            </div>
+
+            @if (order()!.phoneNumber) {
+              <div class="summary-row">
+                <span class="summary-label">Contact</span>
+                <span class="summary-value">{{ order()!.phoneNumber }}</span>
+              </div>
+            }
+
+            <a [routerLink]="['/orders', order()!.id]" class="details-link">
+              <span class="material-icons">visibility</span>
+              View Full Details
+            </a>
+          </div>
+        </div>
+
+      </div>
+    }
+
+  </div>
+</section>

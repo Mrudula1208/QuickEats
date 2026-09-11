@@ -10,7 +10,8 @@
 
         <a
             routerLink="/owner"
-            routerLinkActive="active">
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }">
 
             Dashboard
 
@@ -29,6 +30,14 @@
             routerLinkActive="active">
 
             Orders
+
+        </a>
+
+        <a
+            routerLink="/owner/reviews"
+            routerLinkActive="active">
+
+            Reviews
 
         </a>
 

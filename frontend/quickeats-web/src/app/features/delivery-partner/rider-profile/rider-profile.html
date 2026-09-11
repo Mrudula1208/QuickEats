@@ -1,0 +1,103 @@
+<div class="rp-container">
+
+  <!-- Profile Card -->
+  <div class="profile-hero-card">
+    <div class="avatar-large">
+      <span class="material-icons">sports_motorsports</span>
+    </div>
+
+    <div class="hero-info">
+      <div class="role-badge">
+        <span class="material-icons">verified</span>
+        <span>{{ riderRole() }}</span>
+      </div>
+      <h1 class="rider-name">{{ riderName() }}</h1>
+      <p class="rider-email">{{ riderEmail() }}</p>
+    </div>
+
+    <div class="hero-actions">
+      <button 
+        type="button" 
+        class="availability-toggle-btn"
+        [class.online]="isAvailable()"
+        [class.offline]="!isAvailable()"
+        (click)="toggleAvailability()">
+        <span class="dot"></span>
+        <span>{{ isAvailable() ? 'Status: Online' : 'Status: Offline' }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Performance Stats -->
+  <div class="stats-section">
+    <h2 class="section-title">Lifetime Fulfillment Metrics</h2>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="icon-box completed">
+          <span class="material-icons">task_alt</span>
+        </div>
+        <div class="stat-meta">
+          <span class="label">Completed Deliveries</span>
+          <span class="val text-success">{{ stats().completedCount }}</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="icon-box active">
+          <span class="material-icons">two_wheeler</span>
+        </div>
+        <div class="stat-meta">
+          <span class="label">Active Missions</span>
+          <span class="val text-active">{{ stats().activeCount }}</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="icon-box total">
+          <span class="material-icons">receipt_long</span>
+        </div>
+        <div class="stat-meta">
+          <span class="label">Total Assigned Tasks</span>
+          <span class="val">{{ stats().totalTasks }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Account Information -->
+  <div class="info-card">
+    <div class="card-head">
+      <span class="material-icons">badge</span>
+      <h3>Account Information</h3>
+    </div>
+
+    <div class="info-rows">
+      <div class="info-row">
+        <span class="label">Full Name:</span>
+        <span class="value">{{ riderName() }}</span>
+      </div>
+      <div class="info-row">
+        <span class="label">Email Address:</span>
+        <span class="value">{{ riderEmail() }}</span>
+      </div>
+      <div class="info-row">
+        <span class="label">Platform Role:</span>
+        <span class="value badge-role">Delivery Partner</span>
+      </div>
+      <div class="info-row">
+        <span class="label">Account Status:</span>
+        <span class="value badge-status">Active &amp; Verified</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Logout Action -->
+  <div class="logout-section">
+    <button type="button" class="logout-btn" (click)="logout()">
+      <span class="material-icons">logout</span>
+      <span>Log Out of Delivery Portal</span>
+    </button>
+  </div>
+
+</div>

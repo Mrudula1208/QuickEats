@@ -53,7 +53,7 @@ namespace QuickEats.API.Repositories
         public async Task AddAsync(User user)
         {
             _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            await Task.CompletedTask;
         }
 
         public async Task <User ?> GetByIdAsync(int id)
@@ -63,13 +63,13 @@ namespace QuickEats.API.Repositories
         public async Task UpdateAsync(User user)
         {
             _context.Users.Update(user);
-            await _context.SaveChangesAsync();
+            await Task.CompletedTask;
         }
 
         public async Task DeleteAsync(User user)
         {
             _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
+            await Task.CompletedTask;
         }
         public async Task SaveChangesAsync()
         {

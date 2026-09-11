@@ -18,6 +18,10 @@ import { SavedAddressModel } from '../../../core/models/saved-address.model';
 // SavedAddressModel.
 // Defines one Address.
 
+import { ToastrService } from 'ngx-toastr';
+// ToastrService.
+// Shows feedback messages.
+
 @Component({
 
   selector: 'app-saved-address',
@@ -38,6 +42,12 @@ export class SavedAddressComponent {
 
   // Store Addresses.
   customerAddresses: SavedAddressModel[] = [];
+
+  // Loading state.
+  isLoading = true;
+
+  // Error state.
+  loadError = '';
 
   // Track if user clicked Add Address.
   submitted = false;
@@ -75,7 +85,10 @@ export class SavedAddressComponent {
   constructor(
 
     // Address Service.
-    private savedAddressService: SavedAddressService
+    private savedAddressService: SavedAddressService,
+
+    // Toast messages.
+    private toastr: ToastrService
 
   ) {
 
@@ -187,30 +200,29 @@ export class SavedAddressComponent {
   // Returns Nothing.
   loadAddresses(): void {
 
+    this.isLoading = true;
+    this.loadError = '';
+
     this.savedAddressService
       .getAddresses()
       .subscribe({
 
-        // next
-        // Runs if API Success.
         next: (data: SavedAddressModel[]) => {
-
-          // this
-          // Current Component.
-          //
-          // customerAddresses
-          // Store Addresses.
           this.customerAddresses = data;
-
-
+          this.isLoading = false;
         },
 
-        // error
-        // Runs if API Fails.
-        error: () => {}
+        error: () => {
+          this.isLoading = false;
+          this.loadError = 'Could not load saved addresses. Please try again.';
+        }
 
       });
 
+  }
+
+  retry(): void {
+    this.loadAddresses();
   }
 
   // ==========================================
@@ -238,8 +250,6 @@ export class SavedAddressComponent {
       .addAddress(this.newAddress)
       .subscribe({
 
-        // next
-        // Runs if API Success.
         next: () => {
 
           // Reload Addresses.
@@ -250,6 +260,8 @@ export class SavedAddressComponent {
 
           // Clear errors.
           this.errors = {};
+
+          this.toastr.success('Address added successfully');
 
           // Clear Form.
           this.newAddress = {
@@ -280,9 +292,9 @@ export class SavedAddressComponent {
 
         },
 
-        // error
-        // Runs if API Fails.
-        error: () => {}
+        error: () => {
+          this.toastr.error('Failed to add address. Please try again.');
+        }
 
       });
 
@@ -303,22 +315,25 @@ export class SavedAddressComponent {
 
   ): void {
 
+    // Confirmation before deleting.
+    if (!confirm('Are you sure you want to delete this address?')) return;
+
     this.savedAddressService
       .deleteAddress(selectedAddressId)
       .subscribe({
 
-        // next
-        // Runs if API Success.
         next: () => {
 
           // Reload Addresses.
           this.loadAddresses();
 
+          this.toastr.success('Address deleted successfully');
+
         },
 
-        // error
-        // Runs if API Fails.
-        error: () => {}
+        error: () => {
+          this.toastr.error('Failed to delete address. Please try again.');
+        }
 
       });
 
@@ -343,18 +358,18 @@ export class SavedAddressComponent {
       .setDefaultAddress(selectedAddressId)
       .subscribe({
 
-        // next
-        // Runs if API Success.
         next: () => {
 
           // Reload Addresses.
           this.loadAddresses();
 
+          this.toastr.success('Default address updated');
+
         },
 
-        // error
-        // Runs if API Fails.
-        error: () => {}
+        error: () => {
+          this.toastr.error('Failed to set default address. Please try again.');
+        }
 
       });
 

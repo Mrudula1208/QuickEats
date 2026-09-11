@@ -1,133 +1,404 @@
 <app-admin-nav></app-admin-nav>
 
-<h1>Menu Management</h1>
+<div class="am-wrapper">
+  <div class="container">
 
-<button
-(click)="addMenu()">
+    <!-- Header Section -->
+    <header class="am-header">
+      <div class="am-header-left">
+        <div class="am-breadcrumbs">
+          <span class="material-icons">admin_panel_settings</span>
+          <span>Admin Portal</span>
+          <span class="material-icons">chevron_right</span>
+          <span class="active">Menu Management</span>
+        </div>
+        <h1 class="am-title">Menu Management</h1>
+        <p class="am-subtitle">Manage, monitor, and organize food catalog across all restaurants</p>
+      </div>
+      <div class="am-header-right">
+        <a routerLink="/admin/add-menu" class="btn-primary">
+          <span class="material-icons">add_circle</span>
+          Add Menu Item
+        </a>
+      </div>
+    </header>
 
-Add Menu
+    <!-- Dynamic Statistics Cards -->
+    <div class="am-stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon stat-icon--total">
+          <span class="material-icons">restaurant_menu</span>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Total Items</span>
+          <h3 class="stat-val">{{ stats().total }}</h3>
+        </div>
+      </div>
 
-</button>
+      <div class="stat-card">
+        <div class="stat-icon stat-icon--available">
+          <span class="material-icons">check_circle</span>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Available Now</span>
+          <h3 class="stat-val text-success">{{ stats().available }}</h3>
+        </div>
+      </div>
 
-@if(menus.length===0){
+      <div class="stat-card">
+        <div class="stat-icon stat-icon--unavailable">
+          <span class="material-icons">cancel</span>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Unavailable</span>
+          <h3 class="stat-val text-danger">{{ stats().unavailable }}</h3>
+        </div>
+      </div>
 
-<h2>No Menu Found</h2>
+      <div class="stat-card">
+        <div class="stat-icon stat-icon--cat">
+          <span class="material-icons">category</span>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Categories</span>
+          <h3 class="stat-val">{{ stats().uniqueCategories }}</h3>
+        </div>
+      </div>
 
-}
+      <div class="stat-card">
+        <div class="stat-icon stat-icon--price">
+          <span class="material-icons">payments</span>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Avg. Price</span>
+          <h3 class="stat-val">₹{{ stats().avgPrice }}</h3>
+        </div>
+      </div>
+    </div>
 
-@else{
+    <!-- Search & Filters Toolbar -->
+    <div class="am-toolbar">
+      <div class="am-search-box">
+        <span class="material-icons search-icon">search</span>
+        <input
+          type="text"
+          placeholder="Search items by name, category, or restaurant..."
+          [ngModel]="searchText()"
+          (ngModelChange)="searchText.set($event)"
+          class="search-input">
+        @if (searchText()) {
+          <button class="clear-btn" (click)="searchText.set('')">
+            <span class="material-icons">close</span>
+          </button>
+        }
+      </div>
 
-<table>
+      <div class="am-filters-group">
+        <!-- Status Filter Tabs -->
+        <div class="status-tabs">
+          <button
+            class="tab-btn"
+            [class.active]="selectedStatus() === 'all'"
+            (click)="selectedStatus.set('all')">
+            All ({{ menus().length }})
+          </button>
+          <button
+            class="tab-btn"
+            [class.active]="selectedStatus() === 'available'"
+            (click)="selectedStatus.set('available')">
+            Available ({{ stats().available }})
+          </button>
+          <button
+            class="tab-btn"
+            [class.active]="selectedStatus() === 'unavailable'"
+            (click)="selectedStatus.set('unavailable')">
+            Unavailable ({{ stats().unavailable }})
+          </button>
+        </div>
 
-<thead>
+        <!-- Restaurant Dropdown Filter -->
+        <div class="filter-select-wrap">
+          <span class="material-icons filter-icon">storefront</span>
+          <select
+            class="filter-select"
+            [ngModel]="selectedRestaurantId()"
+            (ngModelChange)="selectedRestaurantId.set($event)">
+            <option value="all">All Restaurants</option>
+            @for (r of restaurants(); track r.id) {
+              <option [value]="r.id">{{ r.name }}</option>
+            }
+          </select>
+        </div>
 
-<tr>
+        <!-- Category Dropdown Filter -->
+        <div class="filter-select-wrap">
+          <span class="material-icons filter-icon">category</span>
+          <select
+            class="filter-select"
+            [ngModel]="selectedCategory()"
+            (ngModelChange)="selectedCategory.set($event)">
+            <option value="all">All Categories</option>
+            @for (cat of categories(); track cat.id) {
+              <option [value]="cat.name">{{ cat.name }}</option>
+            }
+          </select>
+        </div>
 
-<th>Name</th>
+        <!-- Food Type Filter -->
+        <div class="filter-select-wrap">
+          <span class="material-icons filter-icon">eco</span>
+          <select
+            class="filter-select"
+            [ngModel]="selectedType()"
+            (ngModelChange)="selectedType.set($event)">
+            <option value="all">All Food Types</option>
+            <option value="veg">Veg Only</option>
+            <option value="non-veg">Non-Veg Only</option>
+          </select>
+        </div>
 
-<th>Category</th>
+        @if (hasActiveFilters()) {
+          <button class="btn-reset" (click)="resetFilters()">
+            <span class="material-icons">restart_alt</span>
+            Reset
+          </button>
+        }
+      </div>
+    </div>
 
-<th>Type</th>
+    <!-- Main Content Area -->
+    @if (isLoading()) {
+      <div class="am-skeleton-list">
+        <div class="skeleton-row skeleton-shimmer"></div>
+        <div class="skeleton-row skeleton-shimmer"></div>
+        <div class="skeleton-row skeleton-shimmer"></div>
+        <div class="skeleton-row skeleton-shimmer"></div>
+      </div>
+    } @else if (loadError()) {
+      <div class="am-state-card error-card">
+        <span class="material-icons state-icon">cloud_off</span>
+        <h3>Failed to Load Menu Catalog</h3>
+        <p>{{ loadError() }}</p>
+        <button class="btn-primary retry-btn" (click)="loadAllData()">
+          <span class="material-icons">refresh</span>
+          Retry Loading
+        </button>
+      </div>
+    } @else if (filteredMenus().length === 0) {
+      <div class="am-state-card empty-card">
+        <span class="material-icons state-icon">restaurant</span>
+        <h3>No Menu Items Found</h3>
+        <p>{{ hasActiveFilters() ? 'No items match your active filters.' : 'Your menu catalog is currently empty.' }}</p>
+        @if (hasActiveFilters()) {
+          <button class="btn-secondary" (click)="resetFilters()">Clear Filters</button>
+        } @else {
+          <a routerLink="/admin/add-menu" class="btn-primary">
+            <span class="material-icons">add</span>
+            Add First Item
+          </a>
+        }
+      </div>
+    } @else {
+      <!-- Results Table -->
+      <div class="am-table-card">
+        <div class="table-header-meta">
+          <span>Showing <strong>{{ displayedMenus().length }}</strong> of <strong>{{ filteredMenus().length }}</strong> items</span>
+        </div>
+        <div class="table-responsive">
+          <table class="am-table">
+            <thead>
+              <tr>
+                <th>Item Details</th>
+                <th>Restaurant</th>
+                <th>Category</th>
+                <th>Type</th>
+                <th>Price</th>
+                <th>Availability</th>
+                <th class="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (menu of displayedMenus(); track menu.id) {
+                <tr [class.row-unavailable]="!menu.isAvailable">
+                  <!-- Item Details (Image + Name + Desc) -->
+                  <td>
+                    <div class="menu-item-cell">
+                      <div class="item-thumb-wrap">
+                        @if (menu.imageUrl) {
+                          <img [src]="menu.imageUrl" [alt]="menu.name" class="item-thumb">
+                        } @else {
+                          <div class="item-thumb-placeholder">
+                            <span class="material-icons">fastfood</span>
+                          </div>
+                        }
+                        @if (menu.isBestseller) {
+                          <span class="badge-bestseller" title="Bestseller item">★</span>
+                        }
+                      </div>
+                      <div class="item-meta">
+                        <div class="item-name-row">
+                          <strong class="item-title">{{ menu.name }}</strong>
+                          @if (menu.isBestseller) {
+                            <span class="tag-bestseller">Bestseller</span>
+                          }
+                        </div>
+                        @if (menu.description) {
+                          <p class="item-desc">{{ menu.description }}</p>
+                        }
+                      </div>
+                    </div>
+                  </td>
 
-<th>Price</th>
+                  <!-- Restaurant -->
+                  <td>
+                    <span class="restaurant-name-pill">
+                      <span class="material-icons">storefront</span>
+                      {{ getRestaurantName(menu.restaurantId) }}
+                    </span>
+                  </td>
 
-<th>Discount</th>
+                  <!-- Category -->
+                  <td>
+                    <span class="category-pill">{{ menu.category || 'General' }}</span>
+                  </td>
 
-<th>Bestseller</th>
+                  <!-- Type (Veg / Non-Veg) -->
+                  <td>
+                    @if (menu.isVeg) {
+                      <span class="type-badge type-badge--veg">
+                        <span class="type-dot veg-dot"></span>
+                        Veg
+                      </span>
+                    } @else {
+                      <span class="type-badge type-badge--nonveg">
+                        <span class="type-dot nonveg-dot"></span>
+                        Non-Veg
+                      </span>
+                    }
+                  </td>
 
-<th>Status</th>
+                  <!-- Price & Discount -->
+                  <td>
+                    <div class="price-cell">
+                      <strong class="current-price">₹{{ getFinalPrice(menu) | number:'1.0-2' }}</strong>
+                      @if (menu.discountPercent && menu.discountPercent > 0) {
+                        <div class="discount-meta">
+                          <span class="original-price">₹{{ menu.price }}</span>
+                          <span class="discount-pill">-{{ menu.discountPercent }}%</span>
+                        </div>
+                      }
+                    </div>
+                  </td>
 
-<th>Restaurant</th>
+                  <!-- Availability Toggle -->
+                  <td>
+                    <div class="toggle-wrap">
+                      <label class="switch" (click)="$event.stopPropagation()">
+                        <input
+                          type="checkbox"
+                          [checked]="menu.isAvailable"
+                          [disabled]="togglingId() === menu.id"
+                          (change)="toggleAvailability(menu, $event)">
+                        <span class="slider round"></span>
+                      </label>
+                      <span class="status-label" [class.is-active]="menu.isAvailable">
+                        {{ menu.isAvailable ? 'Available' : 'Out of Stock' }}
+                      </span>
+                    </div>
+                  </td>
 
-<th>Action</th>
+                  <!-- Actions -->
+                  <td class="text-right">
+                    <div class="actions-group">
+                      <a [routerLink]="['/admin/edit-menu', menu.id]" class="action-btn edit-btn" title="Edit Item">
+                        <span class="material-icons">edit</span>
+                      </a>
+                      <button (click)="openDeleteModal(menu, $event)" class="action-btn delete-btn" title="Delete Item">
+                        <span class="material-icons">delete_outline</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
 
-</tr>
+        <!-- Pagination Controls -->
+        @if (filteredMenus().length > 10) {
+          <div class="table-pagination-footer">
+            <span class="pagination-info">
+              Showing <strong>{{ displayedMenus().length }}</strong> of <strong>{{ filteredMenus().length }}</strong> items
+            </span>
+            <div class="pagination-actions">
+              @if (hasMore()) {
+                <button class="btn-pagination btn-show-more" (click)="showMore()">
+                  <span class="material-icons">expand_more</span>
+                  Show More (+10)
+                </button>
+              }
+              <button class="btn-pagination btn-show-all" (click)="toggleShowAll()">
+                <span class="material-icons">{{ showAll() ? 'unfold_less' : 'unfold_more' }}</span>
+                {{ showAll() ? 'Collapse to 10' : 'Show All (' + filteredMenus().length + ')' }}
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
 
-</thead>
+  </div>
+</div>
 
-<tbody>
+<!-- Delete Confirmation Modal -->
+@if (itemToDelete()) {
+  <div class="modal-backdrop" (click)="closeDeleteModal()">
+    <div class="modal-dialog" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-icon-danger">
+          <span class="material-icons">warning</span>
+        </div>
+        <h3 class="modal-title">Delete Menu Item?</h3>
+        <button class="modal-close" (click)="closeDeleteModal()" [disabled]="isDeleting()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
 
-@for(menu of menus; track menu.id){
+      <div class="modal-body">
+        <p>Are you sure you want to delete <strong>"{{ itemToDelete()?.name }}"</strong>?</p>
+        <div class="delete-preview-card">
+          <div class="dp-thumb">
+            @if (itemToDelete()?.imageUrl) {
+              <img [src]="itemToDelete()?.imageUrl" [alt]="itemToDelete()?.name">
+            } @else {
+              <span class="material-icons">fastfood</span>
+            }
+          </div>
+          <div class="dp-info">
+            <h4>{{ itemToDelete()?.name }}</h4>
+            <span>{{ getRestaurantName(itemToDelete()!.restaurantId) }} &middot; ₹{{ itemToDelete()?.price }}</span>
+          </div>
+        </div>
+        <div class="warning-callout">
+          <span class="material-icons">info</span>
+          <span>This action cannot be undone. Customers will no longer be able to view or order this item.</span>
+        </div>
+      </div>
 
-<tr>
-
-<td>{{menu.name}}</td>
-
-<td>{{menu.category}}</td>
-
-<td>
-
-@if(menu.isVeg){
-Veg
-}
-@else{
-Non-Veg
-}
-
-</td>
-
-<td>₹{{menu.price}}</td>
-
-<td>
-
-@if(menu.discountPercent > 0){
-{{menu.discountPercent}}%
-}
-@else{
--
-}
-
-</td>
-
-<td>
-
-@if(menu.isBestseller){
-✅
-}
-@else{
--
-}
-
-</td>
-
-<td>
-
-@if(menu.isAvailable){
-Available
-}
-@else{
-Out of Stock
-}
-
-</td>
-
-<td>{{menu.restaurantId}}</td>
-
-<td>
-
-<button
-(click)="editMenu(menu)">
-
-Edit
-
-</button>
-
-<button
-
-(click)="deleteMenu(menu.id)">
-
-Delete
-
-</button>
-
-</td>
-
-</tr>
-
-}
-
-</tbody>
-
-</table>
-
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeDeleteModal()" [disabled]="isDeleting()">
+          Cancel
+        </button>
+        <button class="btn-danger-submit" (click)="confirmDelete()" [disabled]="isDeleting()">
+          @if (isDeleting()) {
+            <span class="material-icons spinning">sync</span>
+            Deleting...
+          } @else {
+            <span class="material-icons">delete</span>
+            Delete Item
+          }
+        </button>
+      </div>
+    </div>
+  </div>
 }

@@ -18,13 +18,9 @@ import { OwnerNavComponent } from '../../../shared/owner-nav/owner-nav';
 // Top navigation bar.
 
 import { RestaurantService } from '../../../core/services/restaurant.service';
-// Saves the restaurant.
-
 import { ImageService } from '../../../core/services/image.service';
-// Handles image upload.
-
 import { Restaurant } from '../../../core/models/restaurant.model';
-// Structure of one restaurant.
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-owner-restaurant-form',
@@ -68,7 +64,8 @@ export class OwnerRestaurantFormComponent {
     private route: ActivatedRoute,
     private router: Router,
     private restaurantService: RestaurantService,
-    private imageService: ImageService
+    private imageService: ImageService,
+    private toastr: ToastrService
   ) {
 
     // Check the URL to decide Add or Edit.
@@ -86,7 +83,7 @@ export class OwnerRestaurantFormComponent {
           next: (data) => {
             this.restaurant = data;
           },
-          error: () => {}
+          error: () => this.toastr.error('Failed to load restaurant')
         });
 
     }
@@ -122,6 +119,7 @@ export class OwnerRestaurantFormComponent {
         },
         error: () => {
           this.isUploading = false;
+          this.toastr.error('Failed to upload image');
         }
       });
     } else {
@@ -138,9 +136,10 @@ export class OwnerRestaurantFormComponent {
         .updateRestaurant(this.restaurant)
         .subscribe({
           next: () => {
+            this.toastr.success('Restaurant updated');
             this.router.navigate(['/owner/restaurants']);
           },
-          error: () => {}
+          error: () => this.toastr.error('Failed to update restaurant')
         });
 
     }
@@ -151,9 +150,10 @@ export class OwnerRestaurantFormComponent {
         .addRestaurant(this.restaurant)
         .subscribe({
           next: () => {
+            this.toastr.success('Restaurant created');
             this.router.navigate(['/owner/restaurants']);
           },
-          error: () => {}
+          error: () => this.toastr.error('Failed to create restaurant')
         });
 
     }

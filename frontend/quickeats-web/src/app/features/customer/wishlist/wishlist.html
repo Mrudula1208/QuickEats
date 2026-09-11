@@ -1,243 +1,77 @@
-<div class="wishlist-page">
+<!-- Page Header -->
+<section class="page-hero">
+  <div class="container">
+    <h1 class="page-title">My Wishlist</h1>
+    <p class="page-subtitle">Your saved favourite food items</p>
+  </div>
+</section>
 
-    <h1>
+<section class="wishlist-section">
+  <div class="container">
 
-        ❤️ My Wishlist
+    @if (isLoading()) {
+      <div class="loading-state">
+        <span class="material-icons spinning">sync</span>
+        <p>Loading wishlist...</p>
+      </div>
+    } @else if (wishlistItems().length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon-wrap">
+          <span class="material-icons">favorite_border</span>
+        </div>
+        <h2>Your wishlist is empty</h2>
+        <p>Browse restaurants and save your favourite items</p>
+        <a routerLink="/restaurants" class="browse-btn">
+          <span class="material-icons">restaurant_menu</span>
+          Browse Restaurants
+        </a>
+      </div>
+    } @else {
 
-    </h1>
+      <div class="wishlist-header">
+        <span class="item-count">{{ wishlistItems().length }} {{ wishlistItems().length === 1 ? 'item' : 'items' }} saved</span>
+      </div>
 
-    <p>
+      <div class="wishlist-grid">
+        @for (item of wishlistItems(); track item.wishlistId) {
+          <div class="wishlist-card">
 
-        Save your favourite food items here.
-
-    </p>
-
-    <!--
-        @if
-        Means:
-        Check condition.
-
-        If Wishlist is empty,
-        show "No Wishlist Items".
-
-        Otherwise,
-        show Wishlist Cards.
-    -->
-
-    @if(wishlistItems.length===0){
-
-    <div class="empty-wishlist">
-
-        <h2>
-
-            Wishlist is Empty
-
-        </h2>
-
-        <p>
-
-            Add your favourite food items.
-
-        </p>
-
-    </div>
-
-    }
-
-    @else{
-
-    <div class="wishlist-grid">
-
-        <!--
-            @for
-            Means:
-            Repeat this card
-            for every Wishlist Item.
-
-            wishlistItems
-            ↓
-            Item 1
-            Item 2
-            Item 3
-            ...
-        -->
-
-        @for(item of wishlistItems; track item.wishlistId){
-
-        <div class="wishlist-card">
-
-            <!-- Food Image -->
-
-            <img
-
-                [src]="item.imageUrl"
-
-                [alt]="item.foodName">
-
-            <!-- Restaurant Name -->
-
-            <h2>
-
-                {{item.restaurantName}}
-
-            </h2>
-
-            <!-- Food Name -->
-
-            <h3>
-
-                {{item.foodName}}
-
-            </h3>
-
-            <!-- Food Category -->
-
-            <p>
-
-                {{item.category}}
-
-            </p>
-
-            <!-- Food Price -->
-
-            <h4>
-
-                ₹{{item.price}}
-
-            </h4>
-
-            <div class="button-group">
-
-                <!--
-                    Open Restaurant Page
-                -->
-
-                <button
-
-                    (click)="openRestaurant(item.restaurantId)">
-
-                    View Restaurant
-
-                </button>
-
-                <!--
-                    Remove Item
-
-                    Pass Menu Id
-                    to removeWishlistItem()
-                -->
-
-                <button
-
-                    (click)="removeWishlistItem(item.menuId)">
-
-                    Remove
-
-                </button>
-
+            <!-- Image -->
+            <div class="card-img">
+              <img [src]="item.imageUrl" [alt]="item.foodName" loading="lazy">
+              <button class="remove-btn" (click)="removeItem(item.menuId)" title="Remove from wishlist">
+                <span class="material-icons">favorite</span>
+              </button>
+              <span class="category-badge">{{ item.category }}</span>
             </div>
 
-        </div>
+            <!-- Body -->
+            <div class="card-body">
+              <span class="restaurant-name">{{ item.restaurantName }}</span>
+              <h3 class="food-name">{{ item.foodName }}</h3>
 
+              <div class="card-footer">
+                <span class="price">₹{{ item.price | number:'1.0-0' }}</span>
+
+                <div class="card-actions">
+                  <a [routerLink]="['/restaurant', item.restaurantId]" class="action-btn action-btn--view" title="View restaurant">
+                    <span class="material-icons">visibility</span>
+                  </a>
+                  <button class="action-btn action-btn--cart" (click)="addToCart(item)" title="Add to cart">
+                    <span class="material-icons">shopping_bag</span>
+                  </button>
+                  <button class="action-btn action-btn--remove" (click)="removeItem(item.menuId)" title="Remove">
+                    <span class="material-icons">delete_outline</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
         }
-
-    </div>
+      </div>
 
     }
 
-</div>
-
-<!--
-
-=========================
-EXECUTION FLOW
-=========================
-
-1️⃣ Wishlist Page Opens
-
-↓
-
-2️⃣ Angular loads wishlist.html
-
-↓
-
-3️⃣ @if checks
-
-wishlistItems.length
-
-↓
-
-4️⃣ If Empty
-
-↓
-
-Show Empty Message
-
-OR
-
-↓
-
-5️⃣ @for starts looping
-
-↓
-
-Item 1
-
-↓
-
-Item 2
-
-↓
-
-Item 3
-
-↓
-
-6️⃣ Create one Card
-for every Wishlist Item
-
-↓
-
-7️⃣ Customer clicks
-
-View Restaurant
-
-↓
-
-wishlist.ts
-
-↓
-
-openRestaurant()
-
-↓
-
-Restaurant Details Page
-
-OR
-
-↓
-
-Customer clicks Remove
-
-↓
-
-wishlist.ts
-
-↓
-
-removeWishlistItem()
-
-↓
-
-WishlistService
-
-↓
-
-Signal Updates
-
-↓
-
-HTML Refreshes Automatically
-
--->
+  </div>
+</section>

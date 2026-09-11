@@ -1,467 +1,499 @@
- 
 @if (isLoadingRestaurant) {
-
-<app-loading-spinner message="Loading restaurant..."></app-loading-spinner>
-
-}
-
-@else if (restaurant) {
-
-<div class="restaurant-banner">
-
-    <img
-        [src]="restaurant.imageUrl"
-        [alt]="restaurant.name">
-
-</div>
-
-<div class="restaurant-details">
-
-    <h1>{{ restaurant.name }}</h1>
-
-    <p>{{ restaurant.description }}</p>
-
-    <p>📍 {{ restaurant.address }}</p>
-
-    <p>📞 {{ restaurant.phoneNumber }}</p>
-
-    <p>🕐 {{ restaurant.openingTime }} - {{ restaurant.closingTime }}</p>
-
-    @if(restaurant.isOpenNow){
-
-        <span class="status open">
-
-            🟢 Open Now
-
-        </span>
-
+  <app-loading-spinner message="Loading restaurant..."></app-loading-spinner>
+} @else if (restaurantError) {
+  <div class="container error-state">
+    <span class="material-icons error-icon">
+      {{ restaurantError === 'restaurant-not-found' ? 'search_off' : 'cloud_off' }}
+    </span>
+    @if (restaurantError === 'restaurant-not-found') {
+      <h3>Restaurant not found</h3>
+      <p>The restaurant you're looking for may have been removed or the link is incorrect.</p>
+      <a routerLink="/restaurants" class="not-found-link">Browse Restaurants</a>
+    } @else {
+      <h3>Couldn't load this restaurant</h3>
+      <p>{{ restaurantError }}</p>
+      <button class="retry-btn" (click)="retryRestaurant()">
+        <span class="material-icons">refresh</span>
+        Try Again
+      </button>
     }
+  </div>
+} @else if (restaurant) {
 
-    @else{
+<!-- Cover Image -->
+<section class="cover-section">
+  <img class="cover-img" [src]="restaurant.imageUrl || 'assets/images/restaurants/dominos.jpg'" [alt]="restaurant.name">
+  <div class="cover-overlay"></div>
+  <div class="cover-content container">
+    <a routerLink="/restaurants" class="back-link">
+      <span class="material-icons">arrow_back</span>
+      All Restaurants
+    </a>
+  </div>
+</section>
 
-        <span class="status closed">
+<!-- Restaurant Info Bar -->
+<section class="info-section">
+  <div class="container">
+    <div class="info-card">
+      <div class="info-main">
+        <div class="info-left">
+          <h1 class="info-name">{{ restaurant.name }}</h1>
+          <p class="info-desc">{{ restaurant.description }}</p>
 
-            🔴 Closed
+          <div class="info-tags">
+            @if (restaurant.rating && restaurant.rating > 0) {
+              <span class="info-tag info-tag--rating">
+                <span class="material-icons">star</span>
+                {{ restaurant.rating | number:'1.1-1' }}
+                <span class="tag-sep">({{ reviewCount }} reviews)</span>
+              </span>
+            }
+            <span class="info-tag">
+              <span class="material-icons">location_on</span>
+              {{ restaurant.address }}
+            </span>
+            <span class="info-tag">
+              <span class="material-icons">schedule</span>
+              {{ restaurant.openingTime }} - {{ restaurant.closingTime }}
+            </span>
+            <span class="info-tag">
+              <span class="material-icons">phone</span>
+              {{ restaurant.phoneNumber }}
+            </span>
+          </div>
+        </div>
 
-        </span>
+        <div class="info-right">
+          @if (restaurant.isOpenNow) {
+            <span class="status-pill status-pill--open">
+              <span class="status-dot"></span>
+              Open Now
+            </span>
+          } @else {
+            <span class="status-pill status-pill--closed">
+              <span class="status-dot"></span>
+              Closed
+            </span>
+          }
 
-    }
+          <button
+            class="detail-fav-btn"
+            [class.active]="isFavorite(restaurant.id)"
+            (click)="toggleFavorite($event)"
+            [attr.aria-label]="isFavorite(restaurant.id) ? 'Remove from favorites' : 'Add to favorites'">
+            <span class="material-icons">
+              {{ isFavorite(restaurant.id) ? 'favorite' : 'favorite_border' }}
+            </span>
+            {{ isFavorite(restaurant.id) ? 'Favorited' : 'Save Restaurant' }}
+          </button>
 
-</div>
+          <div class="delivery-info">
+            @if (restaurant.deliveryCharge === 0) {
+              <span class="delivery-badge-free">
+                <span class="material-icons">local_shipping</span>
+                Free Delivery
+              </span>
+            } @else {
+              <span class="delivery-badge">
+                <span class="material-icons">delivery_dining</span>
+                ₹{{ restaurant.deliveryCharge }} delivery
+              </span>
+            }
+            @if (restaurant.minimumOrder > 0) {
+              <span class="min-order">Min. order ₹{{ restaurant.minimumOrder }}</span>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-<div class="menu-toolbar">
+<!-- Tab Navigation -->
+<section class="tabs-section">
+  <div class="container">
+    <div class="tabs-bar">
+      <button class="tab-btn" [class.active]="activeMenuTab() === 'menu'" (click)="activeMenuTab.set('menu')">
+        <span class="material-icons">restaurant_menu</span>
+        Menu
+      </button>
+      <button class="tab-btn" [class.active]="activeMenuTab() === 'reviews'" (click)="activeMenuTab.set('reviews')">
+        <span class="material-icons">rate_review</span>
+        Reviews ({{ reviewCount }})
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Menu Section -->
+@if (activeMenuTab() === 'menu') {
+<section class="menu-section">
+  <div class="container">
 
     @if (!restaurant.isOpenNow) {
-        <div class="closed-banner">
-            <p>🔴 This restaurant is currently closed. Ordering is disabled.</p>
-        </div>
+      <div class="closed-notice">
+        <span class="material-icons">info</span>
+        This restaurant is currently closed. Ordering is disabled.
+      </div>
     }
 
-    <!-- Search Menu -->
+    <!-- Sticky Category Navigation -->
+    @if (categories.length > 0) {
+      <nav class="category-nav" aria-label="Menu categories">
+        @for (category of categories; track category) {
+          <button class="category-nav-btn" (click)="scrollToCategory(category)">
+            {{ category }}
+          </button>
+        }
+      </nav>
+    }
 
-    <input
-        class="search-box"
-        type="text"
-        placeholder="Search menu items..."
-        [(ngModel)]="searchText"
-        (ngModelChange)="applyFilters()">
-
-    <!-- Veg Only Toggle -->
-
-    <label class="veg-toggle">
-
+    <!-- Menu Toolbar -->
+    <div class="menu-toolbar">
+      <div class="toolbar-search">
+        <span class="material-icons">search</span>
         <input
-            type="checkbox"
-            [(ngModel)]="vegOnly"
-            (ngModelChange)="applyFilters()">
+          type="text"
+          placeholder="Search menu items..."
+          [(ngModel)]="searchText"
+          (ngModelChange)="applyFilters()">
+      </div>
 
-        Veg Only
-
-    </label>
-
-    <!-- Price Filter -->
-
-    <div class="price-filter">
-
-        <label>Price:</label>
-
-        <input
-            type="number"
-            class="price-input"
-            placeholder="Min"
-            [(ngModel)]="minPrice"
-            (ngModelChange)="applyFilters()">
-
-        <span>-</span>
-
-        <input
-            type="number"
-            class="price-input"
-            placeholder="Max"
-            [(ngModel)]="maxPrice"
-            (ngModelChange)="applyFilters()">
-
+      <div class="toolbar-filters">
+        <label class="veg-toggle">
+          <input type="checkbox" [(ngModel)]="vegOnly" (ngModelChange)="applyFilters()">
+          <span class="veg-toggle-track">
+            <span class="veg-toggle-thumb"></span>
+          </span>
+          <span class="veg-toggle-label">
+            <span class="veg-dot-sm"></span>
+            Veg Only
+          </span>
+        </label>
+      </div>
     </div>
 
-    <!-- Category Filter -->
-
-    <div class="category-chips">
-
-        <button
-            class="chip"
-            [class.active]="selectedCategory === 'All'"
-            (click)="selectCategory('All')">
-
-            All
-
+    <!-- Category Chips -->
+    @if (categories.length > 0) {
+      <div class="category-chips">
+        <button class="chip" [class.active]="selectedCategory === 'All'" (click)="selectCategory('All')">
+          <span class="material-icons">grid_view</span>
+          All
         </button>
-
-        @for(category of categories; track category){
-
-            <button
-                class="chip"
-                [class.active]="selectedCategory === category"
-                (click)="selectCategory(category)">
-
-                {{ category }}
-
-            </button>
-
+        @for (category of categories; track category) {
+          <button class="chip" [class.active]="selectedCategory === category" (click)="selectCategory(category)">
+            {{ category }}
+          </button>
         }
+      </div>
+    }
 
-    </div>
-
-</div>
-
-<div class="menu-title">
-
-    <h2>Our Menu</h2>
-
-</div>
-
-<div class="menu-grid">
-
-    @for(menu of filteredMenus; track menu.id){
-
-    <div class="menu-card">
-
-        <!-- Menu Image -->
-
-        <div class="menu-image">
-
-            <img
-                [src]="menu.imageUrl"
-                [alt]="menu.name">
-
-            <!-- Veg / Non-Veg Badge -->
-
-            <span class="veg-badge"
-                [class.nonveg]="!menu.isVeg">
-
-                @if(menu.isVeg){V}@else{NV}
-
-            </span>
-
-            <!-- Bestseller Badge -->
-
-            @if(menu.isBestseller){
-
-                <span class="bestseller-badge">
-
-                    🔥 Bestseller
-
-                </span>
-
-            }
-
-            <!-- Discount Badge -->
-
-            @if(menu.discountPercent > 0){
-
-                <span class="discount-badge">
-
-                    {{ menu.discountPercent }}% OFF
-
-                </span>
-
-            }
-
-        </div>
-
-        <h3>{{ menu.name }}</h3>
-
-        <p>{{ menu.description }}</p>
-
-        <p class="category-tag">{{ menu.category }}</p>
-
-        <div class="price-row">
-
-            <h4>₹{{ getSalePrice(menu) }}</h4>
-
-            @if(menu.discountPercent > 0){
-
-                <span class="old-price">
-
-                    ₹{{ menu.price }}
-
-                </span>
-
-            }
-
-        </div>
-
-        @if(menu.isAvailable){
-
-            <span class="available">
-
-                ✅ Available
-
-            </span>
-
-            <div class="quantity-row">
-
-                <button
-                    (click)="decreaseQuantity(menu.id)">
-
-                    -
-
-                </button>
-
-                <span>{{ getQuantity(menu.id) }}</span>
-
-                <button
-                    (click)="increaseQuantity(menu.id)">
-
-                    +
-
-                </button>
-
+    <!-- Loading Menu -->
+    @if (isLoadingMenu) {
+      <div class="menu-skeleton-list" aria-label="Loading menu">
+        @for (card of skeletonMenuCards; track $index) {
+          <div class="skeleton skeleton-block">
+            <div class="skeleton skeleton-line title"></div>
+            <div class="skeleton-list-row">
+              <div class="skeleton skeleton-block-row"></div>
+              <div class="skeleton-line short"></div>
             </div>
-
-            <button
-                class="add-btn"
-                [disabled]="!restaurant.isOpenNow"
-                (click)="addToCart(menu)">
-
-                Add To Cart
-
-            </button>
-
-            <button
-                class="wishlist-btn"
-                [disabled]="!restaurant.isOpenNow"
-                (click)="addToWishlist(menu)">
-
-                Add To Wishlist
-
-            </button>
-
+          </div>
         }
-
-        @else{
-
-            <span class="unavailable">
-
-                ❌ Out of Stock
-
-            </span>
-
-        }
-
-    </div>
-
-    }
-
-</div>
-
-@if(filteredMenus.length === 0){
-
-    <div class="no-results">
-
-        <h3>No Menu Items Found</h3>
-
-        <p>Try a different search or filter.</p>
-
-    </div>
-
-}
-
-<div class="reviews-section">
-
-    <div class="reviews-header">
-
-        <h2>Reviews &amp; Ratings</h2>
-
-        <div class="average-rating">
-
-            <span class="big-star">⭐</span>
-
-            <span class="rating-value">
-
-                {{ averageRating | number:'1.1-1' }}
-
-            </span>
-
-            <div class="rating-stars">
-
-                @for(star of stars; track star){
-
-                    <span
-                        class="star"
-                        [class.filled]="isStarFilled(star, averageRating)">
-
-                        ★
-
-                    </span>
-
-                }
-
-            </div>
-
-            <span class="rating-count">
-
-                ({{ reviewCount }} Reviews)
-
-            </span>
-
-        </div>
-
-    </div>
-
-    @if(isLoggedIn){
-
-        <div class="review-form">
-
-            <h3>Write a Review</h3>
-
-            <div class="star-selector">
-
-                @for(star of stars; track star){
-
-                    <button
-                        type="button"
-                        class="star-btn"
-                        [class.active]="star <= newRating"
-                        (click)="setRating(star)">
-
-                        ★
-
-                    </button>
-
-                }
-
-                <span>{{ newRating }} / 5</span>
-
-            </div>
-
-            <textarea
-                rows="4"
-                placeholder="Share your experience..."
-                [(ngModel)]="newComment"
-                (ngModelChange)="validateComment()">
-            </textarea>
-
-            @if(commentError){
-
-                <p class="review-error">{{ commentError }}</p>
-
-            }
-
-            @if(reviewSuccess){
-
-                <p class="review-success">Review submitted successfully!</p>
-
-            }
-
-            <button
-                class="submit-review-btn"
-                [disabled]="!canSubmitReview()"
-                (click)="submitReview()">
-
-                Submit Review
-
-            </button>
-
-        </div>
-
-    }
-
-    @else {
-
-        <p class="login-hint">
-
-            <a routerLink="/login">Log in</a>
-
-            to write a review.
-
-        </p>
-
-    }
-
-    @if(reviews.length === 0){
-
-        <div class="no-reviews">
-
-            <h3>No Reviews Yet</h3>
-
-            <p>Be the first one to review this restaurant.</p>
-
-        </div>
-
-    }
-
-    @else {
-
-        <div class="review-list">
-
-            @for(review of reviews; track review.id){
-
-                <div class="review-card">
-
-                    <div class="review-top">
-
-                        <h4>{{ review.customerName }}</h4>
-
-                        <div class="rating-stars">
-
-                            @for(star of stars; track star){
-
-                                <span
-                                    class="star"
-                                    [class.filled]="isStarFilled(star, review.rating)">
-
-                                    ★
-
-                                </span>
-
-                            }
-
+      </div>
+    } @else if (menuError) {
+      <div class="empty-state">
+        <span class="material-icons empty-icon">cloud_off</span>
+        <h3>Couldn't load the menu</h3>
+        <p>{{ menuError }}</p>
+      </div>
+    } @else if (menus.length === 0) {
+      <div class="empty-state">
+        <span class="material-icons empty-icon">menu_book</span>
+        <h3>No menu available</h3>
+        <p>This restaurant hasn't added any items to its menu yet.</p>
+      </div>
+    } @else if (filteredMenus.length === 0) {
+      <div class="empty-state">
+        <span class="material-icons empty-icon">search_off</span>
+        <h3>No items found</h3>
+        <p>Try a different search or filter</p>
+      </div>
+    } @else {
+
+      <!-- Popular Items -->
+      @if (getPopularItems().length > 0) {
+        <section class="popular-section">
+          <div class="popular-header">
+            <h2 class="popular-title">
+              <span class="material-icons">local_fire_department</span>
+              Popular
+            </h2>
+            <span class="popular-sub">Most loved by customers</span>
+          </div>
+          <div class="popular-list">
+            @for (item of getPopularItems(); track item.id) {
+              <div class="menu-item" [class.menu-item--unavailable]="!item.isAvailable">
+                <div class="menu-item-img">
+                  <img [src]="item.imageUrl || 'assets/images/menu/cheese-pizza.png'" [alt]="item.name" loading="lazy">
+                  @if (!item.isAvailable) {
+                    <div class="sold-out-overlay">Sold Out</div>
+                  }
+                  @if (item.isVeg) {
+                    <span class="veg-badge"><span class="veg-badge-dot"></span></span>
+                  } @else {
+                    <span class="veg-badge veg-badge--nonveg"><span class="veg-badge-dot"></span></span>
+                  }
+                  <span class="bestseller-chip">
+                    <span class="material-icons">local_fire_department</span>
+                    Bestseller
+                  </span>
+                </div>
+                <div class="menu-item-info">
+                  <div class="menu-item-header">
+                    <h3 class="menu-item-name">{{ item.name }}</h3>
+                    @if (item.discountPercent > 0) {
+                      <span class="discount-chip">{{ item.discountPercent }}% OFF</span>
+                    }
+                  </div>
+                  <p class="menu-item-desc">{{ item.description }}</p>
+                  <div class="menu-item-price">
+                    @if (item.discountPercent > 0) {
+                      <span class="price-original">₹{{ item.price | number:'1.0-0' }}</span>
+                    }
+                    <span class="price-current">₹{{ getSalePrice(item) | number:'1.0-0' }}</span>
+                  </div>
+                  <div class="menu-item-actions">
+                    @if (item.isAvailable && restaurant.isOpenNow) {
+                      @if (cartQuantityInCart(item.id) > 0) {
+                        <div class="card-qty-control">
+                          <button class="card-qty-btn" (click)="cartDecrease(item.id)">
+                            <span class="material-icons">remove</span>
+                          </button>
+                          <span class="card-qty-value">{{ cartQuantityInCart(item.id) }}</span>
+                          <button class="card-qty-btn" (click)="cartIncrease(item.id)">
+                            <span class="material-icons">add</span>
+                          </button>
                         </div>
+                      } @else {
+                        <button class="add-cart-btn" (click)="addToCart(item)">
+                          <span class="material-icons">shopping_bag</span>
+                          Add
+                        </button>
+                      }
+                    } @else {
+                      <span class="unavailable-label">
+                        <span class="material-icons">block</span>
+                        Currently unavailable
+                      </span>
+                    }
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+      }
 
-                    </div>
+      <!-- Menu grouped by category -->
+      @for (category of getDistinctFilteredCategories(); track category) {
+        <div class="menu-category-block" [id]="'category-' + category.replace(/\s+/g, '-')">
+          <div class="menu-category-header">
+            <h2 class="menu-category-title">{{ category }}</h2>
+            <span class="menu-category-count">{{ getMenuItemsByCategory(category).length }} items</span>
+          </div>
 
-                    <p>{{ review.comment }}</p>
-
-                    <small>
-
-                        {{ review.createdAt | date:'mediumDate' }}
-
-                    </small>
-
+          <div class="menu-list">
+            @for (item of getMenuItemsByCategory(category); track item.id) {
+              <div class="menu-item" [class.menu-item--unavailable]="!item.isAvailable">
+                <!-- Image -->
+                <div class="menu-item-img">
+                  <img [src]="item.imageUrl || 'assets/images/menu/cheese-pizza.png'" [alt]="item.name" loading="lazy">
+                  @if (!item.isAvailable) {
+                    <div class="sold-out-overlay">Sold Out</div>
+                  }
+                  <!-- Veg indicator -->
+                  @if (item.isVeg) {
+                    <span class="veg-badge">
+                      <span class="veg-badge-dot"></span>
+                    </span>
+                  } @else {
+                    <span class="veg-badge veg-badge--nonveg">
+                      <span class="veg-badge-dot"></span>
+                    </span>
+                  }
+                  @if (item.isBestseller) {
+                    <span class="bestseller-chip">
+                      <span class="material-icons">local_fire_department</span>
+                      Bestseller
+                    </span>
+                  }
                 </div>
 
+                <!-- Info -->
+                <div class="menu-item-info">
+                  <div class="menu-item-header">
+                    <h3 class="menu-item-name">{{ item.name }}</h3>
+                    @if (item.discountPercent > 0) {
+                      <span class="discount-chip">{{ item.discountPercent }}% OFF</span>
+                    }
+                  </div>
+                  <p class="menu-item-desc">{{ item.description }}</p>
+
+                  <div class="menu-item-price">
+                    @if (item.discountPercent > 0) {
+                      <span class="price-original">₹{{ item.price | number:'1.0-0' }}</span>
+                    }
+                    <span class="price-current">₹{{ getSalePrice(item) | number:'1.0-0' }}</span>
+                  </div>
+
+                  <div class="menu-item-actions">
+                    @if (item.isAvailable && restaurant.isOpenNow) {
+                      @if (cartQuantityInCart(item.id) > 0) {
+                        <!-- In cart: show quantity stepper -->
+                        <div class="card-qty-control">
+                          <button class="card-qty-btn" (click)="cartDecrease(item.id)">
+                            <span class="material-icons">remove</span>
+                          </button>
+                          <span class="card-qty-value">{{ cartQuantityInCart(item.id) }}</span>
+                          <button class="card-qty-btn" (click)="cartIncrease(item.id)">
+                            <span class="material-icons">add</span>
+                          </button>
+                        </div>
+                      } @else {
+                        <!-- Not in cart: show Add button -->
+                        <button class="add-cart-btn" (click)="addToCart(item)">
+                          <span class="material-icons">shopping_bag</span>
+                          Add
+                        </button>
+                      }
+                      <button class="wish-btn" (click)="addToWishlist(item)" title="Add to wishlist">
+                        <span class="material-icons">bookmark_border</span>
+                      </button>
+                    } @else {
+                      <span class="unavailable-label">
+                        <span class="material-icons">block</span>
+                        Currently unavailable
+                      </span>
+                    }
+                  </div>
+                </div>
+              </div>
             }
-
+          </div>
         </div>
-
+      }
     }
+  </div>
+</section>
 
-</div>
-
+<!-- Mobile Sticky Cart Bar -->
+@if (hasCartItems()) {
+  <div class="mobile-cart-bar">
+    <span class="material-icons">shopping_bag</span>
+    <span class="mobile-cart-count">{{ getCartCount() }} item{{ getCartCount() !== 1 ? 's' : '' }}</span>
+    <span class="mobile-cart-total">₹{{ getCartTotal() | number:'1.0-0' }}</span>
+    <a routerLink="/cart" class="mobile-cart-btn">
+      View Cart
+      <span class="material-icons">arrow_forward</span>
+    </a>
+  </div>
+}
 }
 
-@else {
+<!-- Reviews Section -->
+@if (activeMenuTab() === 'reviews') {
+<section class="reviews-section">
+  <div class="container">
+    <div class="reviews-layout">
 
-<h2>Loading Restaurant...</h2>
+      <!-- Rating Summary -->
+      <div class="rating-summary">
+        <div class="rating-big">
+          <span class="rating-big-number">{{ averageRating | number:'1.1-1' }}</span>
+          <div class="rating-big-stars">
+            @for (star of stars; track star) {
+              <span class="material-icons star-icon" [class.star-icon--filled]="isStarFilled(star, averageRating)">
+                {{ isStarFilled(star, averageRating) ? 'star' : 'star_border' }}
+              </span>
+            }
+          </div>
+          <span class="rating-big-count">{{ reviewCount }} reviews</span>
+        </div>
+      </div>
 
+      <!-- Review Form -->
+      @if (isLoggedIn) {
+        <div class="review-form">
+          <h3 class="review-form-title">Write a Review</h3>
+          <div class="star-selector">
+            @for (star of stars; track star) {
+              <button class="star-select-btn" [class.active]="star <= newRating" (click)="setRating(star)">
+                <span class="material-icons">{{ star <= newRating ? 'star' : 'star_border' }}</span>
+              </button>
+            }
+            <span class="star-label">{{ newRating }} / 5</span>
+          </div>
+          <textarea
+            rows="3"
+            placeholder="Share your experience with this restaurant..."
+            [(ngModel)]="newComment"
+            (ngModelChange)="validateComment()">
+          </textarea>
+          @if (commentError) {
+            <p class="review-error">{{ commentError }}</p>
+          }
+          @if (reviewSuccess) {
+            <p class="review-success">Review submitted successfully!</p>
+          }
+          <button class="submit-btn" [disabled]="!canSubmitReview()" (click)="submitReview()">
+            <span class="material-icons">send</span>
+            Submit Review
+          </button>
+        </div>
+      } @else {
+        <div class="login-prompt">
+          <span class="material-icons">login</span>
+          <p><a routerLink="/login">Sign in</a> to write a review</p>
+        </div>
+      }
+
+      <!-- Review List -->
+      @if (reviews.length === 0) {
+        <div class="empty-state">
+          <span class="material-icons empty-icon">chat_bubble_outline</span>
+          <h3>No reviews yet</h3>
+          <p>Be the first one to review this restaurant</p>
+        </div>
+      } @else {
+        <div class="review-list">
+          @for (review of reviews; track review.id) {
+            <div class="review-card">
+              <div class="review-card-header">
+                <div class="review-avatar">
+                  {{ review.customerName ? review.customerName.charAt(0).toUpperCase() : 'A' }}
+                </div>
+                <div>
+                  <h4 class="review-name">{{ review.customerName }}</h4>
+                  <span class="review-date">{{ review.createdAt | date:'mediumDate' }}</span>
+                </div>
+                <div class="review-stars">
+                  @for (star of stars; track star) {
+                    <span class="material-icons review-star-icon" [class.filled]="isStarFilled(star, review.rating)">
+                      {{ isStarFilled(star, review.rating) ? 'star' : 'star_border' }}
+                    </span>
+                  }
+                </div>
+              </div>
+              <p class="review-text">{{ review.comment }}</p>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+  </section>
 }
+}
+

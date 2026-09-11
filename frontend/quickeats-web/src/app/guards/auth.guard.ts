@@ -2,7 +2,7 @@ import { inject, PLATFORM_ID } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 
-export const authGuard: CanActivateFn = () => {
+export const authGuard: CanActivateFn = (route, state) => {
 
   const router = inject(Router);
   const platformId = inject(PLATFORM_ID);
@@ -17,7 +17,8 @@ export const authGuard: CanActivateFn = () => {
     return true;
   }
 
-  router.navigate(['/login']);
+  // Remember where the user wanted to go so we can return after login.
+  router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
   return false;
 };
 // What does this file contain? (Simple)

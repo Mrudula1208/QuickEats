@@ -65,7 +65,7 @@ namespace QuickEats.API.Controllers
             if (User.IsInRole("Owner") && !await IsOrderOfOwner(id))
                 return Forbid();
 
-            if (User.IsInRole("DeliveryPartner"))
+            if (User.IsInRole("DeliveryPartner") || User.IsInRole("Delivery Partner"))
             {
                 var delivery = await _orderDeliveryService.GetByOrderidAsync(id);
                 if (delivery == null || delivery.DeliveryPartnerId != currentUserId)
@@ -137,16 +137,24 @@ namespace QuickEats.API.Controllers
         /// Updates the status of an order (Admin, or Owner of the order's restaurant).
         /// </summary>
         /// <param name="id">Order id.</param>
-        /// <param name="dto">New status (Pending, Confirmed, Preparing, Out for Delivery, Delivered, Cancelled).</param>
+        /// <param name="dto">New status (Pending, Confirmed, Preparing, Ready for Pickup, Out for Delivery, Delivered, Cancelled).</param>
         [Authorize(Roles = "Admin,Owner")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateStatus(int id, UpdateOrderStatusDto dto)
         {
             // An Owner can update only orders of their own restaurant.
-            if (User.IsInRole("Owner") &&
-                !await IsOrderOfOwner(id))
+            if (User.IsInRole("Owner"))
             {
-                return Forbid();
+                if (!await IsOrderOfOwner(id))
+                {
+                    return Forbid();
+                }
+
+                var allowedOwnerStatuses = new[] { "Confirmed", "Preparing", "Ready for Pickup", "Cancelled" };
+                if (!allowedOwnerStatuses.Contains(dto.Status))
+                {
+                    return BadRequest("Owners can only update order status to Confirmed, Preparing, Ready for Pickup, or Cancelled.");
+                }
             }
 
             await _orderService.UpdateStatusAsync(id, dto);

@@ -1,91 +1,168 @@
-h1{
-
-    margin-bottom:10px;
-
+.acu-hero {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  padding: 48px 20px 40px;
+  text-align: center;
+  .acu-hero-inner { max-width: 600px; margin: 0 auto; }
+  h1 { font-family: 'DM Sans', sans-serif; font-size: 32px; font-weight: 700; color: #fff; margin: 0 0 6px; }
+  p { font-size: 15px; color: rgba(255,255,255,0.7); margin: 0; }
 }
 
-h2{
+.acu-content { padding: 32px 20px 60px; background: #f8f9fa; min-height: 60vh; }
+.acu-container { max-width: 1400px; width: 94%; margin: 0 auto; box-sizing: border-box; }
 
-    margin-top:20px;
-
+.acu-loading {
+  display: flex; flex-direction: column; align-items: center; padding: 80px 20px;
+  .material-icons { font-size: 48px; color: #1a1a2e; }
+  p { margin-top: 16px; font-size: 16px; color: #666; }
 }
 
-.coupon-form{
+.spinning { animation: acuSpin 1s linear infinite; }
+@keyframes acuSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-    display:flex;
+.acu-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+.acu-stat {
+  background: #fff; border-radius: 12px; padding: 16px; text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-left: 3px solid #1a1a2e;
+  &.active { border-left-color: #2d6a4f; }
+  &.expired { border-left-color: #e85d3a; }
+}
+.acu-stat-num { display: block; font-family: 'DM Sans', sans-serif; font-size: 24px; font-weight: 800; color: #222; }
+.acu-stat-label { font-size: 12px; color: #888; }
 
-    flex-direction:column;
+.acu-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
 
-    gap:10px;
-
-    max-width:400px;
-
-    margin-bottom:30px;
-
+.acu-search {
+  display: flex; align-items: center; gap: 10px; background: #fff; border: 2px solid #e9ecef;
+  border-radius: 12px; padding: 10px 16px; flex: 1; max-width: 400px; transition: border-color 0.3s;
+  .material-icons { font-size: 20px; color: #888; }
+  input { border: none; outline: none; font-size: 14px; color: #333; width: 100%; font-family: 'Inter', sans-serif; }
+  &:focus-within { border-color: #1a1a2e; }
 }
 
-.coupon-form label{
-
-    font-weight:bold;
-
+.acu-add-btn {
+  display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px;
+  background: linear-gradient(135deg, #e85d3a, #d14a2a); color: #fff; border-radius: 12px;
+  font-size: 14px; font-weight: 700; cursor: pointer; border: none; transition: all 0.3s; white-space: nowrap;
+  .material-icons { font-size: 20px; }
+  &:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(232,93,58,0.35); }
 }
 
-.coupon-form input{
-
-    padding:8px;
-
-    border:1px solid #ddd;
-
-    border-radius:4px;
-
+.acu-empty {
+  display: flex; flex-direction: column; align-items: center; padding: 80px 20px; text-align: center;
+  .material-icons { font-size: 64px; color: #ddd; margin-bottom: 16px; }
+  h3 { font-family: 'DM Sans', sans-serif; font-size: 20px; font-weight: 700; color: #333; margin: 0 0 8px; }
+  p { font-size: 14px; color: #888; margin: 0; }
 }
 
-.coupon-form button{
+.acu-list { display: flex; flex-direction: column; gap: 12px; }
 
-    padding:10px;
-
-    background:#1976d2;
-
-    color:white;
-
-    border:none;
-
-    border-radius:4px;
-
-    cursor:pointer;
-
+.acu-card {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  background: #fff; border-radius: 14px; padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: box-shadow 0.3s;
+  &:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+  &.expired { opacity: 0.6; }
 }
 
-table{
+.acu-card-left { display: flex; align-items: flex-start; gap: 14px; flex: 1; }
 
-    width:100%;
-
-    border-collapse:collapse;
-
+.acu-coupon-icon {
+  width: 44px; height: 44px; border-radius: 10px;
+  background: linear-gradient(135deg, #f4a261, #e8953a); color: #fff;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  .material-icons { font-size: 22px; }
 }
 
-th{
+.acu-card-info { flex: 1; }
 
-    background:#1976d2;
+.acu-card-top { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.acu-card-top h3 { font-family: 'DM Sans', sans-serif; font-size: 17px; font-weight: 800; color: #222; margin: 0; letter-spacing: 0.5px; }
 
-    color:white;
-
-    padding:12px;
-
+.acu-status {
+  padding: 2px 10px; border-radius: 8px; font-size: 11px; font-weight: 700;
+  &.active { background: #d4edda; color: #155724; }
+  &.expired { background: #ffebee; color: #c62828; }
 }
 
-td{
+.acu-desc { font-size: 13px; color: #666; margin: 0 0 8px; }
 
-    border:1px solid #ddd;
-
-    padding:10px;
-
+.acu-meta { display: flex; flex-wrap: wrap; gap: 12px; }
+.acu-meta-item {
+  display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: #888;
+  .material-icons { font-size: 14px; color: #2d6a4f; }
 }
 
-td button{
+.acu-card-actions { display: flex; gap: 8px; flex-shrink: 0; }
 
-    padding:6px 12px;
+.acu-btn {
+  display: inline-flex; align-items: center; gap: 4px; padding: 7px 12px; border-radius: 8px;
+  font-size: 12px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s;
+  .material-icons { font-size: 16px; }
+  &.edit { background: #e3f2fd; color: #1565c0; &:hover { background: #bbdefb; } }
+  &.delete { background: #ffebee; color: #c62828; &:hover { background: #ffcdd2; } }
+}
 
-    cursor:pointer;
+/* Form Panel */
+.acu-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 999; }
 
+.acu-form-panel {
+  position: fixed; top: 0; right: 0; width: 440px; max-width: 90vw; height: 100vh;
+  background: #fff; box-shadow: -4px 0 20px rgba(0,0,0,0.15); z-index: 1000; overflow-y: auto;
+}
+
+.acu-form-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px; border-bottom: 1px solid #f0f0f0;
+  h3 { font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 700; color: #222; margin: 0; }
+}
+
+.acu-close {
+  width: 36px; height: 36px; border: none; border-radius: 50%; background: #f0f0f0;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  .material-icons { font-size: 20px; color: #666; }
+  &:hover { background: #e0e0e0; }
+}
+
+.acu-form-body { padding: 24px; }
+
+.acu-field { margin-bottom: 18px; }
+.acu-field label { display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px; }
+.acu-field input {
+  width: 100%; padding: 10px 14px; border: 2px solid #e9ecef; border-radius: 10px;
+  font-size: 14px; font-family: 'Inter', sans-serif; color: #333; outline: none; transition: border-color 0.3s; box-sizing: border-box;
+  &:focus { border-color: #1a1a2e; }
+  &:disabled { background: #f5f5f5; }
+}
+
+.acu-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.acu-checkbox-label {
+  display: flex !important; align-items: center; gap: 10px; cursor: pointer;
+  input { width: auto !important; }
+  span { font-size: 14px; font-weight: 600; color: #444; }
+}
+
+.acu-form-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; }
+
+.acu-cancel-btn {
+  padding: 10px 20px; border: 2px solid #e9ecef; border-radius: 10px; color: #666;
+  font-size: 14px; font-weight: 600; cursor: pointer; background: #fff;
+  &:hover { border-color: #ccc; background: #f8f8f8; }
+}
+
+.acu-save-btn {
+  display: inline-flex; align-items: center; gap: 8px; padding: 10px 24px;
+  background: linear-gradient(135deg, #2d6a4f, #1b4332); color: #fff; border: none;
+  border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.3s;
+  .material-icons { font-size: 18px; }
+  &:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(45,106,79,0.3); }
+}
+
+@media (max-width: 768px) {
+  .acu-hero { padding: 36px 16px 32px; h1 { font-size: 24px; } }
+  .acu-stats { grid-template-columns: 1fr 1fr; }
+  .acu-toolbar { flex-direction: column; align-items: stretch; }
+  .acu-search { max-width: 100%; }
+  .acu-card { flex-direction: column; align-items: flex-start; }
+  .acu-row { grid-template-columns: 1fr; }
 }

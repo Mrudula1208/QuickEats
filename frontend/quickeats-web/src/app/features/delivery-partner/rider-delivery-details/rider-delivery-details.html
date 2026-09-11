@@ -1,0 +1,307 @@
+<div class="rdd-container">
+
+  <!-- Breadcrumbs & Back Bar -->
+  <div class="rdd-top-bar">
+    <button class="back-link-btn" (click)="backToDeliveries()">
+      <span class="material-icons">arrow_back</span>
+      <span>Back to My Deliveries</span>
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="rdd-state-card">
+      <span class="material-icons spinning state-icon">progress_activity</span>
+      <h3>Loading delivery information...</h3>
+      <p>Fetching full order and route data from dispatch</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @else if (loadError()) {
+    <div class="rdd-state-card">
+      <span class="material-icons state-icon text-danger">error_outline</span>
+      <h3>{{ loadError() }}</h3>
+      <p>Could not load the specified delivery task.</p>
+      <div class="state-actions">
+        <button class="primary-btn" (click)="retry()">
+          <span class="material-icons">refresh</span> Try Again
+        </button>
+        <button class="secondary-btn" (click)="backToDeliveries()">
+          Back to List
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Delivery Details View -->
+  @else if (delivery()) {
+    <div class="rdd-content">
+
+      <!-- Header Card -->
+      <div class="rdd-header-card">
+        <div class="header-left">
+          <div class="order-title-wrap">
+            <span class="order-id">Order #{{ delivery()!.orderId }}</span>
+            <span class="delivery-id">&bull; Delivery Task #{{ delivery()!.id }}</span>
+          </div>
+          <span class="assigned-time">
+            Assigned: {{ delivery()!.assignedAt | date:'medium' }}
+          </span>
+        </div>
+
+        <div class="header-right">
+          <span class="status-badge" [ngClass]="getStatusBadgeClass(delivery()!.deliveryStatus)">
+            <span class="material-icons">navigation</span>
+            {{ delivery()!.deliveryStatus }}
+          </span>
+        </div>
+      </div>
+
+      <!-- DELIVERY STATUS STEPPER PROGRESS BAR -->
+      <div class="rdd-stepper-card">
+        <div class="stepper-title">
+          <span class="material-icons">timeline</span>
+          <span>Delivery Progress Workflow</span>
+        </div>
+
+        <div class="stepper-track">
+          @for (step of steps; track step; let idx = $index) {
+            <div 
+              class="step-node" 
+              [class.completed]="idx < currentStepIndex()"
+              [class.active]="idx === currentStepIndex()">
+              
+              <div class="node-circle">
+                @if (idx < currentStepIndex()) {
+                  <span class="material-icons">check</span>
+                } @else {
+                  <span>{{ idx + 1 }}</span>
+                }
+              </div>
+
+              <span class="node-label">{{ step }}</span>
+
+              @if (idx < steps.length - 1) {
+                <div class="node-line" [class.filled]="idx < currentStepIndex()"></div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Two-Column Operational Details Grid -->
+      <div class="rdd-details-grid">
+
+        <!-- LEFT: Order Items & Financial Details -->
+        <div class="grid-left">
+          
+          <!-- Order Information Card -->
+          <div class="section-card">
+            <div class="section-head">
+              <span class="material-icons">receipt</span>
+              <h3>Order Information</h3>
+            </div>
+
+            <div class="order-meta-rows">
+              <div class="meta-row">
+                <span class="meta-label">Order Number:</span>
+                <span class="meta-val">#{{ delivery()!.orderId }}</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Order Date:</span>
+                <span class="meta-val">{{ delivery()!.orderCreatedAt | date:'medium' }}</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Payment Method:</span>
+                <span class="meta-badge">{{ delivery()!.paymentMethod || 'Online / Cash' }}</span>
+              </div>
+            </div>
+
+            <!-- Itemized Receipt -->
+            <div class="items-table-wrap">
+              <h4 class="items-table-title">Ordered Items</h4>
+              <table class="items-table">
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                    <th class="text-right">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of (delivery()!.items || delivery()!.orderItems || []); track item.menuItemId) {
+                    <tr>
+                      <td class="item-name">{{ item.name || item.itemName }}</td>
+                      <td class="item-qty">x{{ item.quantity }}</td>
+                      <td class="item-unit">₹{{ (item.unitPrice || item.price || 0) | number:'1.2-2' }}</td>
+                      <td class="item-total text-right">₹{{ (item.totalPrice || ((item.unitPrice || item.price || 0) * item.quantity)) | number:'1.2-2' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+
+              <!-- Financial Summary Total -->
+              <div class="bill-summary">
+                <div class="bill-row total-row">
+                  <span>Grand Total to Collect / Verify:</span>
+                  <span class="total-amount">₹{{ delivery()!.totalAmount | number:'1.2-2' }}</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- RIGHT: Route Coordinates & Milestones -->
+        <div class="grid-right">
+
+          <!-- PICKUP CARD -->
+          <div class="section-card pickup-card">
+            <div class="section-head pickup-head">
+              <div class="head-title">
+                <span class="material-icons">storefront</span>
+                <h3>Pickup (Restaurant)</h3>
+              </div>
+            </div>
+
+            <div class="location-body">
+              <h4 class="loc-name">{{ delivery()!.restaurantName || 'Restaurant' }}</h4>
+              <p class="loc-address">{{ delivery()!.restaurantAddress || 'Address on file' }}</p>
+
+              <div class="location-actions">
+                <button 
+                  type="button" 
+                  class="action-pill-btn" 
+                  (click)="copyAddress(delivery()!.restaurantAddress, 'Restaurant Address')">
+                  <span class="material-icons">content_copy</span> Copy Address
+                </button>
+
+                @if (delivery()!.restaurantPhone) {
+                  <a [href]="'tel:' + delivery()!.restaurantPhone" class="action-pill-btn call-btn">
+                    <span class="material-icons">call</span> Call Restaurant
+                  </a>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- DELIVERY DESTINATION CARD -->
+          <div class="section-card delivery-card">
+            <div class="section-head delivery-head">
+              <div class="head-title">
+                <span class="material-icons">place</span>
+                <h3>Delivery (Customer)</h3>
+              </div>
+            </div>
+
+            <div class="location-body">
+              <h4 class="loc-name">{{ delivery()!.customerName || 'Customer' }}</h4>
+              <p class="loc-address">{{ delivery()!.deliveryAddress || 'Address on file' }}</p>
+
+              <div class="location-actions">
+                <button 
+                  type="button" 
+                  class="action-pill-btn" 
+                  (click)="copyAddress(delivery()!.deliveryAddress, 'Customer Address')">
+                  <span class="material-icons">content_copy</span> Copy Address
+                </button>
+
+                @if (delivery()!.phoneNumber || delivery()!.customerPhone) {
+                  <a [href]="'tel:' + (delivery()!.phoneNumber || delivery()!.customerPhone)" class="action-pill-btn call-btn">
+                    <span class="material-icons">call</span> Call Customer
+                  </a>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- TIMESTAMPS MILESTONES CARD -->
+          <div class="section-card timing-card">
+            <div class="section-head">
+              <span class="material-icons">schedule</span>
+              <h3>Timeline Milestones</h3>
+            </div>
+
+            <div class="timing-list">
+              <div class="time-row">
+                <span class="time-label">Assigned At:</span>
+                <span class="time-val">{{ delivery()!.assignedAt | date:'medium' }}</span>
+              </div>
+              <div class="time-row">
+                <span class="time-label">Picked Up At:</span>
+                <span class="time-val" [class.pending-text]="!delivery()!.pickedUpAt">
+                  {{ (delivery()!.pickedUpAt | date:'medium') || 'Not yet picked up' }}
+                </span>
+              </div>
+              <div class="time-row">
+                <span class="time-label">Delivered At:</span>
+                <span class="time-val" [class.pending-text]="!delivery()!.deliveredAt">
+                  {{ (delivery()!.deliveredAt | date:'medium') || 'In progress' }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- BOTTOM STICKY ACTION BAR -->
+      <div class="rdd-action-bar">
+        <div class="action-bar-inner">
+          <div class="bar-status-info">
+            <span class="current-label">Current Stage:</span>
+            <span class="current-stage">{{ delivery()!.deliveryStatus }}</span>
+          </div>
+
+          @if (delivery()!.deliveryStatus !== 'Delivered') {
+            <button 
+              type="button" 
+              class="primary-flow-btn"
+              [disabled]="isUpdating()"
+              (click)="requestAdvanceStatus()">
+              @if (isUpdating()) {
+                <span class="material-icons spinning">progress_activity</span> Updating Status...
+              } @else {
+                <span class="material-icons">{{ getNextActionIcon(delivery()!.deliveryStatus) }}</span>
+                <span>{{ getNextActionText(delivery()!.deliveryStatus) }}</span>
+              }
+            </button>
+          } @else {
+            <div class="completed-banner">
+              <span class="material-icons">task_alt</span>
+              <span>This order has been successfully delivered and closed.</span>
+            </div>
+          }
+        </div>
+      </div>
+
+    </div>
+  }
+
+</div>
+
+<!-- CONFIRMATION MODAL FOR 'DELIVERED' -->
+@if (showConfirmModal()) {
+  <div class="modal-backdrop" (click)="cancelConfirmModal()">
+    <div class="modal-dialog" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-icon-wrap">
+          <span class="material-icons">check_circle</span>
+        </div>
+        <h3>Confirm Order Delivery</h3>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you have handed over <strong>Order #{{ delivery()?.orderId }}</strong> to <strong>{{ delivery()?.customerName }}</strong> at the delivery address?</p>
+        <p class="sub-alert">This action will mark the delivery as completed and notify the customer.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="cancel-modal-btn" (click)="cancelConfirmModal()">Cancel</button>
+        <button type="button" class="confirm-modal-btn" (click)="confirmDelivered()">Yes, Mark as Delivered</button>
+      </div>
+    </div>
+  </div>
+}

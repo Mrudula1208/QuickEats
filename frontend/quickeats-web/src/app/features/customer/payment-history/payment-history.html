@@ -1,65 +1,73 @@
-<div class="payment-page">
+<section class="page-hero">
+  <div class="container">
+    <a routerLink="/orders" class="breadcrumb">
+      <span class="material-icons">arrow_back</span>
+      Back to Orders
+    </a>
+    <h1 class="page-title">Payment History</h1>
+    <p class="page-subtitle">View all completed payments</p>
+  </div>
+</section>
 
-    <div class="page-title">
+<section class="ph-content">
+  <div class="container">
 
-        <h1>💳 Payment History</h1>
+    @if (isLoading) {
+      <div class="ph-state">
+        <span class="material-icons spinning">sync</span>
+        <p>Loading payments...</p>
+      </div>
+    } @else if (loadError) {
+      <div class="ph-state">
+        <span class="material-icons">error_outline</span>
+        <p>{{ loadError }}</p>
+        <button class="ph-retry" (click)="retry()">
+          <span class="material-icons">refresh</span>
+          Try Again
+        </button>
+      </div>
+    } @else if (payments.length === 0) {
+      <div class="ph-state">
+        <span class="material-icons">account_balance_wallet</span>
+        <h2>No Payments Yet</h2>
+        <p>Your payment history will appear here after your first order.</p>
+      </div>
+    } @else {
+      <div class="payment-grid">
+        @for (payment of payments; track payment.id) {
+          <div class="payment-card">
+            <div class="payment-head">
+              <h3>Payment #{{ payment.id }}</h3>
+              <span class="payment-status" [class.completed]="payment.paymentStatus === 'Completed'">
+                {{ payment.paymentStatus }}
+              </span>
+            </div>
 
-        <p>View all completed payments</p>
+            <div class="payment-row">
+              <span class="material-icons">receipt_long</span>
+              <span>Order ID</span>
+              <strong>#{{ payment.orderId }}</strong>
+            </div>
 
-    </div>
+            <div class="payment-row">
+              <span class="material-icons">credit_card</span>
+              <span>Method</span>
+              <strong>{{ payment.paymentMethod }}</strong>
+            </div>
 
-    @if (payments.length === 0) {
+            <div class="payment-row">
+              <span class="material-icons">schedule</span>
+              <span>Date</span>
+              <strong>{{ payment.paidAt | date:'medium' }}</strong>
+            </div>
 
-        <div class="empty">
-
-            <h2>No Payments Yet</h2>
-
-        </div>
-
+            <div class="payment-amount">
+              ₹{{ payment.amount }}
+            </div>
+          </div>
+        }
+      </div>
     }
 
-    @else {
-
-        <div class="payment-grid">
-
-            @for (payment of payments; track payment.id) {
-
-                <div class="payment-card">
-
-                    <h3>Payment #{{payment.id}}</h3>
-
-                    <hr>
-
-                    <p>
-                        📦 Order ID :
-                        {{payment.orderId}}
-                    </p>
-
-                    <p>
-                        💳 Method :
-                        {{payment.paymentMethod}}
-                    </p>
-
-                    <p>
-                        📅 Date :
-                        {{payment.paidAt | date:'medium'}}
-                    </p>
-
-                    <p>
-                        ✅ Status :
-                        {{payment.paymentStatus}}
-                    </p>
-
-                    <h2>
-                        ₹{{payment.amount}}
-                    </h2>
-
-                </div>
-
-            }
-
-        </div>
-
-    }
-
-</div>
+  </div>
+</section>

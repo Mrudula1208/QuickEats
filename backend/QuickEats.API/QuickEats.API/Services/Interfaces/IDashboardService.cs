@@ -8,5 +8,8 @@ namespace QuickEats.API.Services.Interfaces
         // Read Dashboard.
         Task<DashboardDto> GetDashboardAsync();
 
+        // Read Owner Dashboard (filtered to owner's restaurants only).
+        Task<DashboardDto> GetOwnerDashboardAsync(int ownerId);
+
     }
 }

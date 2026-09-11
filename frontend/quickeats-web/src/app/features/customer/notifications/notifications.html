@@ -1,141 +1,88 @@
-<div class="notifications-page">
+<section class="notif-hero">
+  <div class="notif-hero-inner">
+    <span class="material-icons notif-hero-icon">notifications</span>
+    <h1>Notifications</h1>
+    <p>Stay updated on your orders and offers</p>
+  </div>
+</section>
 
-    <div class="notifications-header">
+<section class="notif-content">
+  <div class="notif-container">
 
-        <div class="header-left">
-
-            <h1>Notifications</h1>
-
-            @if(unreadCount > 0) {
-
-                <span class="unread-badge">{{ unreadCount }} unread</span>
-
-            }
-
+    @if (isLoading()) {
+      <div class="notif-loading">
+        <span class="material-icons spinning">progress_activity</span>
+        <p>Loading notifications...</p>
+      </div>
+    } @else if (notifications().length === 0) {
+      <div class="notif-empty">
+        <span class="material-icons notif-empty-icon">notifications_none</span>
+        <h2>No Notifications</h2>
+        <p>You're all caught up! We'll notify you when something happens.</p>
+        <a routerLink="/orders" class="notif-browse-btn">
+          <span class="material-icons">receipt_long</span>
+          View Orders
+        </a>
+      </div>
+    } @else {
+      <!-- Header Actions -->
+      <div class="notif-header">
+        <div class="notif-header-left">
+          <h3>All Notifications</h3>
+          @if (unreadCount() > 0) {
+            <span class="notif-unread-badge">{{ unreadCount() }} unread</span>
+          }
         </div>
+        <div class="notif-header-actions">
+          @if (unreadCount() > 0) {
+            <button class="notif-action-btn mark-all" (click)="markAllAsRead()">
+              <span class="material-icons">done_all</span>
+              Mark All Read
+            </button>
+          }
+          <button class="notif-action-btn clear" (click)="clearAll()">
+            <span class="material-icons">delete_sweep</span>
+            Clear All
+          </button>
+        </div>
+      </div>
 
-        <div class="header-actions">
-
-            @if(unreadCount > 0) {
-
-                <button
-
-                    class="mark-all-btn"
-
-                    (click)="markAllAsRead()">
-
-                    Mark All Read
-
+      <!-- Notification List -->
+      <div class="notif-list">
+        @for (notif of notifications(); track notif.notificationId) {
+          <div class="notif-card" [class.unread]="!notif.isRead">
+            <div class="notif-icon-wrap" [class]="getIconClass(notif)">
+              <span class="material-icons">{{ getNotificationIcon(notif) }}</span>
+            </div>
+            <div class="notif-body">
+              <div class="notif-body-top">
+                <h4>{{ notif.title }}</h4>
+                @if (!notif.isRead) {
+                  <span class="notif-dot"></span>
+                }
+              </div>
+              <p class="notif-message">{{ notif.message }}</p>
+              <span class="notif-time">
+                <span class="material-icons">schedule</span>
+                {{ getTimeAgo(notif.notificationDate) }}
+                &middot;
+                {{ notif.notificationDate | date:'medium' }}
+              </span>
+            </div>
+            <div class="notif-actions">
+              @if (!notif.isRead) {
+                <button class="notif-card-btn read" (click)="markAsRead(notif.notificationId)" title="Mark as read">
+                  <span class="material-icons">mark_email_read</span>
                 </button>
-
-            }
-
-            @if(notifications.length > 0) {
-
-                <button
-
-                    class="clear-btn"
-
-                    (click)="clearAll()">
-
-                    Clear All
-
-                </button>
-
-            }
-
-        </div>
-
-    </div>
-
-    <p>Your latest updates</p>
-
-    @if(notifications.length === 0) {
-
-        <div class="empty-notification">
-
-            <span class="empty-icon">🔔</span>
-
-            <h2>No Notifications</h2>
-
-            <p>You're all caught up.</p>
-
-        </div>
-
+              }
+              <button class="notif-card-btn delete" (click)="deleteNotification(notif.notificationId)" title="Delete">
+                <span class="material-icons">delete_outline</span>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
     }
 
-    @else {
-
-        <div class="notification-list">
-
-            @for(notification of notifications; track notification.notificationId) {
-
-                <div
-
-                    class="notification-card"
-
-                    [class.unread]="!notification.isRead">
-
-                    <span class="notification-icon">
-
-                        {{ getNotificationIcon(notification) }}
-
-                    </span>
-
-                    <div class="notification-content">
-
-                        <h2>{{ notification.title }}</h2>
-
-                        <p>{{ notification.message }}</p>
-
-                        <small>
-
-                            {{ notification.notificationDate | date:'medium' }}
-
-                        </small>
-
-                    </div>
-
-                    <div class="notification-actions">
-
-                        @if(!notification.isRead) {
-
-                            <button
-
-                                class="read-btn"
-
-                                (click)="markAsRead(notification.notificationId)">
-
-                                Mark Read
-
-                            </button>
-
-                        }
-
-                        @else {
-
-                            <span class="read-label">Read</span>
-
-                        }
-
-                        <button
-
-                            class="delete-btn"
-
-                            (click)="deleteNotification(notification.notificationId)">
-
-                            Delete
-
-                        </button>
-
-                    </div>
-
-                </div>
-
-            }
-
-        </div>
-
-    }
-
-</div>
+  </div>
+</section>

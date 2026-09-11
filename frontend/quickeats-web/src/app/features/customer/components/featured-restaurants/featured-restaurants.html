@@ -1,95 +1,61 @@
- Section Title
+<!-- Section Title -->
 <div class="section-title">
-    <h2>
-        <i class="fa-solid fa-utensils"></i>
-        Featured Restaurants
-    </h2>
-
-    <p>Discover restaurants near you</p>
+  <h2>
+    <span class="material-icons">restaurant</span>
+    Featured Restaurants
+  </h2>
+  <p>Discover restaurants near you</p>
 </div>
 
 <!-- No Results -->
 @if (restaurants().length === 0) {
-<div class="no-results">
+  <div class="no-results">
     <h3>No Restaurants Found</h3>
     <p>Try a different search or filter.</p>
-</div>
+  </div>
 }
 
 <!-- Restaurant Grid -->
 <div class="restaurant-grid">
+  @for (restaurant of restaurants(); track restaurant.id) {
+    <div class="restaurant-card" [routerLink]="['/restaurants', restaurant.id]">
+      <!-- Restaurant Image -->
+      <div class="image-container">
+        <img [src]="restaurant.imageUrl" [alt]="restaurant.name" loading="lazy">
 
-    @for (restaurant of restaurants(); track restaurant.id) {
+        @if (restaurant.isOpenNow) {
+          <span class="discount-badge">
+            <span class="material-icons" style="font-size: 12px;">circle</span> Open
+          </span>
+        } @else {
+          <span class="discount-badge closed-badge">
+            <span class="material-icons" style="font-size: 12px;">circle</span> Closed
+          </span>
+        }
 
-    <!-- Restaurant Card-->
-    <div
-        class="restaurant-card"
-        [routerLink]="['/restaurant', restaurant.id]">
+        <!-- Favourite Button -->
+        <button class="favorite-btn" (click)="$event.stopPropagation()">
+          <span class="material-icons">favorite_border</span>
+        </button>
+      </div>
 
-        <!-- Restaurant Image -->
-        <div class="image-container">
+      <!-- Restaurant Details -->
+      <div class="restaurant-info">
+        <h3>{{ restaurant.name }}</h3>
 
-            <img
-                [src]="restaurant.imageUrl"
-                [alt]="restaurant.name">
+        @if (restaurant.rating && restaurant.rating > 0) {
+          <div class="restaurant-meta">
+            <span class="rating-badge">
+              <span class="material-icons" style="font-size: 14px;">star</span> {{ restaurant.rating | number:'1.1-1' }}
+            </span>
+          </div>
+        }
 
-            <!-- Restaurant Status -->
-            @if (restaurant.isOpenNow) {
-                <span class="discount-badge">
-                    🟢 Open
-                </span>
-            }
-            @else {
-                <span class="discount-badge closed-badge">
-                    🔴 Closed
-                </span>
-            }
-
-            <!-- Favourite Button -->
-            <button
-                class="favorite-btn"
-                (click)="$event.stopPropagation()">
-
-                <i class="fa-regular fa-heart"></i>
-
-            </button>
-
-        </div>
-
-        <!-- Restaurant Details -->
-        <div class="restaurant-info">
-
-            <h3>{{ restaurant.name }}</h3>
-
-            <!-- Rating -->
-            @if (restaurant.rating && restaurant.rating > 0) {
-            <div class="restaurant-meta">
-                <span class="rating-badge">
-                    ⭐ {{ restaurant.rating | number:'1.1-1' }}
-                </span>
-            </div>
-            }
-
-            <p class="description">
-                {{ restaurant.description }}
-            </p>
-
-            <p>
-                📍 {{ restaurant.address }}
-            </p>
-
-            <p>
-                📞 {{ restaurant.phoneNumber }}
-            </p>
-
-            <p>
-                🕐 {{ restaurant.openingTime }} - {{ restaurant.closingTime }}
-            </p>
-
-        </div>
-
+        <p class="description">{{ restaurant.description }}</p>
+        <p><span class="material-icons" style="font-size: 14px;">location_on</span> {{ restaurant.address }}</p>
+        <p><span class="material-icons" style="font-size: 14px;">phone</span> {{ restaurant.phoneNumber }}</p>
+        <p><span class="material-icons" style="font-size: 14px;">schedule</span> {{ restaurant.openingTime }} - {{ restaurant.closingTime }}</p>
+      </div>
     </div>
-
-    }
-
+  }
 </div>

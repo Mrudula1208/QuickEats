@@ -1,6 +1,6 @@
 {
   "/uploads": {
-    "target": "https://localhost:7278",
+    "target": "http://localhost:5243",
     "secure": false
   }
 }

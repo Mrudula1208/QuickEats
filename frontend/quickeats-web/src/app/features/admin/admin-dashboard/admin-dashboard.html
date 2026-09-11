@@ -1,47 +1,198 @@
 <app-admin-nav></app-admin-nav>
 
-<h1>Admin Dashboard</h1>
+<section class="ad-hero">
+  <div class="ad-hero-inner">
+    <h1>Admin Dashboard</h1>
+    <p>Real-time platform overview and system management</p>
+  </div>
+</section>
 
-@if(dashboard){
+<section class="ad-content">
+  <div class="ad-container">
 
-<div class="card">
+    @if (isLoading()) {
+      <div class="ad-loading">
+        <span class="material-icons spinning">progress_activity</span>
+        <p>Loading dashboard metrics...</p>
+      </div>
+    } @else if (dashboard()) {
+      <!-- 6 Key Statistics Cards -->
+      <div class="ad-stats">
+        <div class="ad-stat-card stat-restaurants">
+          <div class="ad-stat-icon">
+            <span class="material-icons">store</span>
+          </div>
+          <div class="ad-stat-info">
+            <span class="ad-stat-value">{{ dashboard()!.totalRestaurants }}</span>
+            <span class="ad-stat-label">Restaurants</span>
+          </div>
+        </div>
+        <div class="ad-stat-card stat-menus">
+          <div class="ad-stat-icon">
+            <span class="material-icons">restaurant_menu</span>
+          </div>
+          <div class="ad-stat-info">
+            <span class="ad-stat-value">{{ dashboard()!.totalMenus }}</span>
+            <span class="ad-stat-label">Menu Items</span>
+          </div>
+        </div>
+        <div class="ad-stat-card stat-orders">
+          <div class="ad-stat-icon">
+            <span class="material-icons">receipt_long</span>
+          </div>
+          <div class="ad-stat-info">
+            <span class="ad-stat-value">{{ dashboard()!.totalOrders }}</span>
+            <span class="ad-stat-label">Orders</span>
+          </div>
+        </div>
+        <div class="ad-stat-card stat-users">
+          <div class="ad-stat-icon">
+            <span class="material-icons">people</span>
+          </div>
+          <div class="ad-stat-info">
+            <span class="ad-stat-value">{{ dashboard()!.totalUsers }}</span>
+            <span class="ad-stat-label">Customers</span>
+          </div>
+        </div>
+        <div class="ad-stat-card stat-owners">
+          <div class="ad-stat-icon">
+            <span class="material-icons">supervisor_account</span>
+          </div>
+          <div class="ad-stat-info">
+            <span class="ad-stat-value">{{ totalOwners() }}</span>
+            <span class="ad-stat-label">Restaurant Owners</span>
+          </div>
+        </div>
+        <div class="ad-stat-card stat-revenue">
+          <div class="ad-stat-icon">
+            <span class="material-icons">paid</span>
+          </div>
+          <div class="ad-stat-info">
+            <span class="ad-stat-value">₹{{ dashboard()!.totalRevenue | number:'1.0-0' }}</span>
+            <span class="ad-stat-label">Total Revenue</span>
+          </div>
+        </div>
+      </div>
 
-<h2>Total Restaurants</h2>
+      <!-- Quick Actions Bar -->
+      <div class="ad-quick-links">
+        <h3>Quick Actions</h3>
+        <div class="ad-links-row">
+          <a routerLink="/admin/add-restaurant" class="ad-link-card">
+            <span class="material-icons">add_business</span>
+            Add Restaurant
+          </a>
+          <a routerLink="/admin/restaurants" class="ad-link-card">
+            <span class="material-icons">storefront</span>
+            Manage Restaurants
+          </a>
+          <a routerLink="/admin/orders" class="ad-link-card">
+            <span class="material-icons">receipt_long</span>
+            Manage Orders
+          </a>
+          <a routerLink="/admin/users" class="ad-link-card">
+            <span class="material-icons">people</span>
+            Manage Users
+          </a>
+          <a routerLink="/admin/owners" class="ad-link-card">
+            <span class="material-icons">badge</span>
+            Manage Owners
+          </a>
+          <a routerLink="/admin/categories" class="ad-link-card">
+            <span class="material-icons">category</span>
+            Categories
+          </a>
+          <a routerLink="/admin/coupons" class="ad-link-card">
+            <span class="material-icons">local_offer</span>
+            Coupons
+          </a>
+          <a routerLink="/admin/payments" class="ad-link-card">
+            <span class="material-icons">payments</span>
+            Payments
+          </a>
+          <a routerLink="/admin/deliveries" class="ad-link-card">
+            <span class="material-icons">local_shipping</span>
+            Deliveries
+          </a>
+        </div>
+      </div>
 
-<h1>{{dashboard.totalRestaurants}}</h1>
+      <!-- Overview Tables -->
+      <div class="ad-overview-grid">
+        <!-- Recent Orders -->
+        <div class="ad-overview-card">
+          <div class="ad-overview-header">
+            <h3><span class="material-icons">receipt</span> Recent Orders</h3>
+            <a routerLink="/admin/orders" class="ad-view-all">View All Orders →</a>
+          </div>
+          <div class="ad-table-wrap">
+            <table class="ad-mini-table">
+              <thead>
+                <tr>
+                  <th>Order #</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (o of recentOrders(); track o.id) {
+                  <tr>
+                    <td><strong>#{{ o.id }}</strong></td>
+                    <td>₹{{ o.totalAmount | number:'1.0-0' }}</td>
+                    <td>
+                      <span class="status-badge" [ngClass]="getStatusClass(o.status)">
+                        {{ o.status }}
+                      </span>
+                    </td>
+                    <td>{{ o.createdAt | date:'shortDate' }}</td>
+                  </tr>
+                } @empty {
+                  <tr><td colspan="4" class="empty-cell">No recent orders.</td></tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
 
-</div>
+        <!-- Recent Restaurants -->
+        <div class="ad-overview-card">
+          <div class="ad-overview-header">
+            <h3><span class="material-icons">storefront</span> Recent Restaurants</h3>
+            <a routerLink="/admin/restaurants" class="ad-view-all">View All Restaurants →</a>
+          </div>
+          <div class="ad-table-wrap">
+            <table class="ad-mini-table">
+              <thead>
+                <tr>
+                  <th>Restaurant</th>
+                  <th>Location</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (r of recentRestaurants(); track r.id) {
+                  <tr>
+                    <td class="r-cell">
+                      <img [src]="r.imageUrl" [alt]="r.name" class="r-thumb">
+                      <span>{{ r.name }}</span>
+                    </td>
+                    <td>{{ r.address }}</td>
+                    <td>
+                      <span class="status-badge" [ngClass]="r.isActive ? 'status-badge--success' : 'status-badge--danger'">
+                        {{ r.isActive ? 'Active' : 'Inactive' }}
+                      </span>
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr><td colspan="3" class="empty-cell">No restaurants listed yet.</td></tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    }
 
-<div class="card">
-
-<h2>Total Menus</h2>
-
-<h1>{{dashboard.totalMenus}}</h1>
-
-</div>
-
-<div class="card">
-
-<h2>Total Orders</h2>
-
-<h1>{{dashboard.totalOrders}}</h1>
-
-</div>
-
-<div class="card">
-
-<h2>Total Users</h2>
-
-<h1>{{dashboard.totalUsers}}</h1>
-
-</div>
-
-<div class="card">
-
-<h2>Total Revenue</h2>
-
-<h1>₹{{dashboard.totalRevenue}}</h1>
-
-</div>
-
-}
+  </div>
+</section>

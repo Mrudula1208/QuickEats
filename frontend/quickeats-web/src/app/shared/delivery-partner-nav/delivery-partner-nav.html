@@ -1,29 +1,26 @@
-<div class="dp-nav">
-
+<nav class="dp-nav">
+  <div class="dp-nav-container">
     <div class="brand">
-
-        Delivery Partner
-
+      <span class="material-icons brand-icon">electric_moped</span>
+      <span class="brand-text">QuickEats <span class="rider-tag">Rider</span></span>
     </div>
 
-    <div class="links">
-
-        <a
-            routerLink="/delivery-partner"
-            routerLinkActive="active">
-
-            My Deliveries
-
-        </a>
-
+    <div class="nav-links">
+      <a routerLink="/delivery-partner" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}">
+        <span class="material-icons">assignment</span>
+        <span>My Deliveries</span>
+      </a>
     </div>
 
-    <button
-        class="logout-btn"
-        (click)="logout()">
-
-        Logout
-
-    </button>
-
-</div>
+    <div class="nav-user-area">
+      <div class="user-chip">
+        <span class="user-avatar">{{ partnerName.charAt(0).toUpperCase() }}</span>
+        <span class="user-name">{{ partnerName }}</span>
+      </div>
+      <button class="logout-btn" (click)="logout()" title="Logout">
+        <span class="material-icons">logout</span>
+        <span>Logout</span>
+      </button>
+    </div>
+  </div>
+</nav>

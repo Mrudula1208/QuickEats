@@ -1,51 +1,86 @@
-<div class="favorites-page">
-
+<section class="fav-hero">
+  <div class="fav-hero-inner">
+    <span class="material-icons fav-hero-icon">favorite</span>
     <h1>My Favorite Restaurants</h1>
+    <p>Your saved restaurants in one place</p>
+  </div>
+</section>
 
-    <p>Your saved restaurants</p>
+<section class="fav-content">
+  <div class="fav-container">
 
-    @if(customerFavorites.length===0){
+    @if (isLoading()) {
+      <div class="fav-loading">
+        <span class="material-icons spinning">progress_activity</span>
+        <p>Loading favorites...</p>
+      </div>
+    } @else if (loadError()) {
+      <div class="fav-empty">
+        <span class="material-icons fav-empty-icon">cloud_off</span>
+        <h2>Couldn't load favorites</h2>
+        <p>{{ loadError() }}</p>
+        <button class="fav-browse-btn" (click)="retry()">
+          <span class="material-icons">refresh</span>
+          Try Again
+        </button>
+      </div>
+    } @else if (favorites().length === 0) {
+      <div class="fav-empty">
+        <span class="material-icons fav-empty-icon">favorite_border</span>
+        <h2>Your favorites are waiting &#10084;&#65039;</h2>
+        <p>Save restaurants you love and find them here.</p>
+        <a routerLink="/restaurants" class="fav-browse-btn">
+          <span class="material-icons">explore</span>
+          Explore Restaurants
+        </a>
+      </div>
+    } @else {
+      <div class="fav-count">
+        <span class="material-icons">bookmark</span>
+        {{ favorites().length }} {{ favorites().length === 1 ? 'restaurant' : 'restaurants' }} saved
+      </div>
 
-    <div class="empty-favorite">
-
-        <h2>No Favorites Found</h2>
-
-        <p>You haven't added any restaurants yet.</p>
-
-    </div>
-
-    }
-
-    @else{
-
-    <div class="favorite-grid">
-
-        @for(favorite of customerFavorites; track favorite.favoriteId){
-
-        <div class="favorite-card">
-
-            <img
-
-                [src]="favorite.restaurantImage"
-
-                alt="Restaurant Image">
-
-            <h2>{{favorite.restaurantName}}</h2>
-
-            <p>{{favorite.restaurantLocation}}</p>
-
-            <button (click)="openRestaurant(favorite.restaurantId)">
-
-                View Restaurant
-
-            </button>
-
-        </div>
-
+      <div class="fav-grid">
+        @for (fav of favorites(); track fav.favoriteId) {
+          <div class="fav-card" (click)="openRestaurant(fav.restaurantId)">
+            <div class="fav-card-img">
+              <img [src]="fav.restaurantImage" [alt]="fav.restaurantName">
+              <button class="fav-remove-btn" (click)="removeFavorite(fav, $event)" title="Remove from favorites">
+                <span class="material-icons">favorite</span>
+              </button>
+              <span class="fav-status" [class.open]="fav.isOpenNow">
+                <span class="material-icons">{{ fav.isOpenNow ? 'schedule' : 'schedule' }}</span>
+                {{ fav.isOpenNow ? 'Open' : 'Closed' }}
+              </span>
+            </div>
+            <div class="fav-card-body">
+              <h3 class="fav-card-name">{{ fav.restaurantName }}</h3>
+              <div class="fav-card-meta">
+                <span class="fav-rating">
+                  <span class="material-icons">star</span>
+                  {{ fav.rating > 0 ? fav.rating.toFixed(1) : 'New' }}
+                </span>
+                <span class="fav-hours">{{ fav.openingTime }} – {{ fav.closingTime }}</span>
+              </div>
+              <div class="fav-card-location">
+                <span class="material-icons">location_on</span>
+                {{ fav.restaurantLocation }}
+              </div>
+              <div class="fav-card-footer">
+                <span class="fav-delivery">
+                  <span class="material-icons">delivery_dining</span>
+                  {{ fav.deliveryCharge === 0 ? 'Free delivery' : '₹' + fav.deliveryCharge + ' delivery' }}
+                </span>
+                <button class="fav-view-btn" (click)="openRestaurant(fav.restaurantId)">
+                  <span class="material-icons">restaurant</span>
+                  View Menu
+                </button>
+              </div>
+            </div>
+          </div>
         }
-
-    </div>
-
+      </div>
     }
 
-</div>
+  </div>
+</section>

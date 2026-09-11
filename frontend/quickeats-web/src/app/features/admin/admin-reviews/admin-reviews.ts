@@ -17,6 +17,9 @@ import { Review } from '../../../core/models/review.model';
 import { AdminNavComponent } from '../../../shared/admin-nav/admin-nav';
 // Top navigation bar for the Admin Panel.
 
+import { ToastrService } from 'ngx-toastr';
+// Displays success/error toast notifications.
+
 
 @Component({
 
@@ -60,6 +63,12 @@ export class AdminReviews {
 
   reviews: Review[] = [];
 
+  // Page loading state.
+  isLoading = true;
+
+  // Error message when reviews fail to load.
+  loadError = '';
+
 
   constructor(
 
@@ -75,7 +84,8 @@ export class AdminReviews {
     // ReviewService
     // Type of the injected Service.
 
-    private reviewService: ReviewService
+    private reviewService: ReviewService,
+    private toastr: ToastrService
 
   ) {
 
@@ -91,6 +101,10 @@ export class AdminReviews {
 
   // Load all Reviews.
   loadReviews(): void {
+
+    // Start loading reviews.
+    this.isLoading = true;
+    this.loadError = '';
 
     // STEP 1
     // Call ReviewService.
@@ -116,15 +130,27 @@ export class AdminReviews {
 
           this.reviews = data;
 
+          this.isLoading = false;
+
         },
 
 
         // Backend/API request failed.
 
-        error: () => {}
+        error: () => {
+          this.isLoading = false;
+          this.loadError = 'Could not load reviews. Please try again.';
+          this.toastr.error('Could not load reviews. Please try again.');
+        }
 
       });
 
+  }
+
+
+  // Retry loading reviews.
+  retry(): void {
+    this.loadReviews();
   }
 
 
@@ -135,6 +161,9 @@ export class AdminReviews {
     reviewId: number
 
   ): void {
+
+    // Ask for confirmation before deleting.
+    if (!confirm('Delete this review? This cannot be undone.')) return;
 
     // STEP 1
     // Call ReviewService.
@@ -155,6 +184,9 @@ export class AdminReviews {
         next: () => {
 
           // STEP 3
+          // Show success message.
+          this.toastr.success('Review deleted');
+
           // Load the latest reviews
           // from Backend.
 
@@ -165,7 +197,7 @@ export class AdminReviews {
 
         // Backend/API error.
 
-        error: () => {}
+        error: () => this.toastr.error('Failed to delete review')
 
       });
 

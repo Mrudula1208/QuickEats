@@ -24,6 +24,10 @@ import { Payment } from '../../../core/models/payment.model';
 // Payment
 // Defines the structure of one payment object.
 
+import { AdminNavComponent } from '../../../shared/admin-nav/admin-nav';
+
+import { ToastrService } from 'ngx-toastr';
+
 
 @Component({
 
@@ -38,7 +42,8 @@ import { Payment } from '../../../core/models/payment.model';
   // imports
   // Lists modules required by this Component.
   imports: [
-    CommonModule
+    CommonModule,
+    AdminNavComponent
   ],
 
   // Connects this TypeScript file
@@ -67,6 +72,12 @@ export class AdminPaymentDetails {
   // but it will be assigned later."
   payment!: Payment;
 
+  // True while the payment is being fetched.
+  isLoading = true;
+
+  // Holds the error message if loading fails.
+  loadError: string | null = null;
+
 
   constructor(
 
@@ -84,9 +95,22 @@ export class AdminPaymentDetails {
 
     // paymentService
     // Variable name used to access PaymentService.
-    private paymentService: PaymentService
+    private paymentService: PaymentService,
+
+    // ToastrService
+    // Shows toast notifications.
+    private toastr: ToastrService
 
   ) {
+
+    this.loadPayment();
+
+  }
+
+  loadPayment(): void {
+
+    this.isLoading = true;
+    this.loadError = null;
 
     // STEP 1
     // Get the Payment ID from the URL.
@@ -139,13 +163,23 @@ export class AdminPaymentDetails {
                 payment.id === id
             )!;
 
+          this.isLoading = false;
+
         },
 
         // API Failed.
-        error: () => {}
+        error: () => {
+          this.isLoading = false;
+          this.loadError = 'Failed to load payment details';
+          this.toastr.error('Failed to load payment details');
+        }
 
       });
 
+  }
+
+  retry(): void {
+    this.loadPayment();
   }
 
 }

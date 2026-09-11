@@ -1,153 +1,164 @@
-import { Component } from '@angular/core';
-import {Router} from '@angular/router';
-// Controls the Admin Orders Page.
-
-import { CommonModule } from '@angular/common';import { FormsModule } from '@angular/forms';
-// Required for @for and @if in the HTML.
-
+import { Component, signal, computed, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { OrderService } from '../../../core/services/order';
-// Calls Order APIs from the Backend.
-
 import { OrderModel } from '../../../core/models/order.model';
-// Defines the structure of one Order.
-
 import { AdminNavComponent } from '../../../shared/admin-nav/admin-nav';
-// Top navigation bar for the Admin Panel.
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
-
   selector: 'app-admin-orders',
-
   standalone: true,
-
-  imports: [
-    CommonModule,FormsModule,AdminNavComponent
-  ],
-
+  imports: [CommonModule, FormsModule, AdminNavComponent],
   templateUrl: './admin-order.html',
-
   styleUrl: './admin-order.scss'
-
 })
-export class AdminOrders {
+export class AdminOrders implements OnInit {
+  orders = signal<OrderModel[]>([]);
+  isLoading = signal(true);
+  loadError = signal('');
+  searchText = signal('');
+  selectedStatus = signal('all');
 
-  // Store multiple orders.
-  //
-  // Order
-  // Means one Order object.
-  //
-  // []
-  // Means multiple Order objects.
-  //
-  // = []
-  // Initially the list is empty.
-  orders: OrderModel[] = [];
+  statusList = [
+    'Pending',
+    'Confirmed',
+    'Preparing',
+    'Ready',
+    'OutForDelivery',
+    'Delivered',
+    'Cancelled'
+  ];
 
+  filteredOrders = computed(() => {
+    let list = this.orders();
+    const query = this.searchText().toLowerCase().trim();
+    const status = this.selectedStatus();
 
-  constructor(
+    if (query) {
+      list = list.filter(o =>
+        o.id.toString().includes(query) ||
+        o.customerName.toLowerCase().includes(query) ||
+        (o.restaurantName && o.restaurantName.toLowerCase().includes(query)) ||
+        (o.phoneNumber && o.phoneNumber.includes(query)) ||
+        (o.deliveryAddress && o.deliveryAddress.toLowerCase().includes(query))
+      );
+    }
 
-    // Order API Service.
-    //
-    // Angular automatically creates
-    // the OrderService object and gives it here.
-    private orderService: OrderService,
-    private router: Router
+    if (status !== 'all') {
+      list = list.filter(o => o.status.toLowerCase() === status.toLowerCase());
+    }
 
-  ) {
+    return list;
+  });
 
-    // Constructor runs automatically
-    // when Admin Orders page opens.
-    //
-    // Load all orders from Backend.
-    this.loadOrders();
+  // Pagination / Limit State
+  pageSize = 10;
+  visibleLimit = signal(10);
+  showAll = signal(false);
 
+  displayedOrders = computed(() => {
+    if (this.showAll()) {
+      return this.filteredOrders();
+    }
+    return this.filteredOrders().slice(0, this.visibleLimit());
+  });
+
+  hasMore = computed(() => {
+    return !this.showAll() && this.visibleLimit() < this.filteredOrders().length;
+  });
+
+  showMore(): void {
+    this.visibleLimit.update(v => v + this.pageSize);
   }
 
+  toggleShowAll(): void {
+    if (this.showAll()) {
+      this.showAll.set(false);
+      this.visibleLimit.set(this.pageSize);
+    } else {
+      this.showAll.set(true);
+    }
+  }
 
- // Load all orders from the Backend.
-loadOrders(): void {
+  stats = computed(() => {
+    const list = this.orders();
+    const total = list.length;
+    const pending = list.filter(o => ['pending', 'confirmed', 'preparing'].includes(o.status.toLowerCase())).length;
+    const delivered = list.filter(o => o.status.toLowerCase() === 'delivered').length;
+    const revenue = list
+      .filter(o => o.status.toLowerCase() !== 'cancelled')
+      .reduce((sum, o) => sum + (o.totalAmount || 0), 0);
 
-  // The Backend returns an Observable,
-  // so we use subscribe().
-  this.orderService
-    .getAllOrdersApi()
-    .subscribe({
+    return { total, pending, delivered, revenue };
+  });
 
+  constructor(
+    private orderService: OrderService,
+    private router: Router,
+    private toastr: ToastrService
+  ) {}
+
+  ngOnInit(): void {
+    this.loadOrders();
+  }
+
+  loadOrders(): void {
+    this.isLoading.set(true);
+    this.loadError.set('');
+
+    this.orderService.getAllOrdersApi().subscribe({
       next: (data) => {
-
-        // Store all orders inside the orders array.
-        this.orders = data;
-
-
+        this.orders.set(data || []);
+        this.isLoading.set(false);
       },
-
-      error: () => {}
-
+      error: () => {
+        this.isLoading.set(false);
+        this.loadError.set('Could not load orders from backend.');
+        this.toastr.error('Failed to load orders');
+      }
     });
+  }
 
-}
-
-// Update selected order status on the Backend.
-updateStatus(
-
-  orderId: number,
-
-  status: string
-
-): void {
-
-  // orderId
-  // ID of the selected order.
-
-  // status
-  // New status selected from dropdown.
-
-  this.orderService
-    .updateOrderStatusApi(orderId, status)
-    .subscribe({
-
+  updateStatus(orderId: number, status: string): void {
+    this.orderService.updateOrderStatusApi(orderId, status).subscribe({
       next: () => {
-
-        // Reload orders after updating.
-        this.loadOrders();
-
+        this.orders.update(list =>
+          list.map(o => o.id === orderId ? { ...o, status } : o)
+        );
+        this.toastr.success(`Order #${orderId} status updated to ${status}`);
       },
-
-      error: () => {}
-
+      error: () => this.toastr.error('Failed to update order status')
     });
+  }
 
-}
-viewOrder(orderId: number): void {
+  viewOrder(orderId: number): void {
+    this.router.navigate(['/admin/order-details', orderId]);
+  }
 
-  // Navigate to the order details page.
-  this.router.navigate(['/admin/order-details', orderId]);
-}
-// Delete selected order from the Backend.
-deleteOrder(
+  deleteOrder(orderId: number): void {
+    if (!confirm(`Delete Order #${orderId}? This action cannot be undone.`)) return;
 
-  // orderId
-  // ID of the order we want to delete.
-  orderId: number
-
-): void {
-
-  // Send the Order ID to OrderService.
-  this.orderService
-    .deleteOrderApi(orderId)
-    .subscribe({
-
+    this.orderService.deleteOrderApi(orderId).subscribe({
       next: () => {
-
-        // Reload the order list
-        // after deletion.
-        this.loadOrders();
-
+        this.orders.update(list => list.filter(o => o.id !== orderId));
+        this.toastr.success(`Order #${orderId} deleted`);
       },
-
-      error: () => {}
-
+      error: () => this.toastr.error('Failed to delete order')
     });
+  }
 
-}
+  getStatusClass(status: string): string {
+    switch (status.toLowerCase()) {
+      case 'delivered': return 'status-delivered';
+      case 'outfordelivery': return 'status-out';
+      case 'preparing':
+      case 'ready': return 'status-preparing';
+      case 'confirmed':
+      case 'pending': return 'status-pending';
+      case 'cancelled': return 'status-cancelled';
+      default: return '';
+    }
+  }
 }

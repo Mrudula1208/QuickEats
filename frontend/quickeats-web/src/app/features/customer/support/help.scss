@@ -1,0 +1,301 @@
+$primary: #E85D3A;
+$primary-dark: #D14A2A;
+$primary-light: #F28C72;
+$primary-bg: #FEF0EC;
+$dark: #1B2838;
+$dark-500: #3D4F63;
+$dark-400: #5A6B7F;
+$dark-300: #8494A7;
+$border: #E8ECF1;
+$white: #FFFFFF;
+$radius-md: 12px;
+$radius-lg: 16px;
+$font-heading: 'DM Sans', sans-serif;
+$font-body: 'Inter', sans-serif;
+$transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+.help-page {
+  max-width: 1400px;
+  width: 94%;
+  margin: 40px auto;
+  padding: 0 16px;
+  box-sizing: border-box;
+
+  .page-header {
+    text-align: center;
+    margin-bottom: 40px;
+
+    h1 {
+      font-family: $font-heading;
+      font-size: 32px;
+      font-weight: 800;
+      color: $dark;
+      margin-bottom: 8px;
+    }
+
+    p {
+      font-size: 16px;
+      color: $dark-400;
+    }
+  }
+}
+
+.help-container {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 36px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.faq-section {
+  h2 {
+    font-family: $font-heading;
+    font-size: 22px;
+    color: $dark;
+    margin-bottom: 16px;
+  }
+
+  .faq-search-box {
+    display: flex;
+    align-items: center;
+    background: $white;
+    border: 1.5px solid $border;
+    border-radius: $radius-md;
+    padding: 8px 14px;
+    margin-bottom: 14px;
+    transition: all $transition;
+
+    .material-icons {
+      color: $dark-300;
+      margin-right: 8px;
+      font-size: 20px;
+    }
+
+    input {
+      border: none;
+      outline: none;
+      font-family: $font-body;
+      font-size: 14px;
+      width: 100%;
+      color: $dark;
+
+      &::placeholder {
+        color: $dark-300;
+      }
+    }
+
+    &:focus-within {
+      border-color: $primary;
+      box-shadow: 0 0 0 3px rgba($primary, 0.08);
+    }
+  }
+
+  .faq-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+
+    .cat-chip {
+      background: $white;
+      border: 1px solid $border;
+      padding: 6px 14px;
+      border-radius: $radius-md;
+      font-size: 12px;
+      font-weight: 600;
+      color: $dark-400;
+      cursor: pointer;
+      transition: all $transition;
+
+      &:hover {
+        border-color: $primary-light;
+        color: $primary;
+      }
+
+      &.active {
+        background: $primary;
+        color: $white;
+        border-color: $primary;
+      }
+    }
+  }
+
+  .no-faqs {
+    text-align: center;
+    padding: 30px 10px;
+    color: $dark-300;
+
+    .material-icons {
+      font-size: 40px;
+      margin-bottom: 8px;
+    }
+
+    p {
+      font-size: 14px;
+      margin: 0;
+    }
+  }
+
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .faq-item {
+    background: $white;
+    border-radius: $radius-md;
+    border: 1px solid $border;
+    box-shadow: 0 2px 8px rgba(27, 40, 56, 0.04);
+    overflow: hidden;
+    transition: all $transition;
+
+    &.open {
+      border-color: $primary-light;
+
+      .faq-question {
+        color: $primary;
+      }
+    }
+  }
+
+  .faq-question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 20px;
+    font-weight: 600;
+    color: $dark;
+    cursor: pointer;
+    transition: color $transition;
+
+    &:hover {
+      color: $primary;
+    }
+
+    .faq-title {
+      font-size: 15px;
+      line-height: 1.4;
+    }
+
+    .faq-arrow {
+      font-size: 20px;
+      color: $dark-300;
+      transition: transform $transition;
+    }
+  }
+
+  .faq-answer {
+    padding: 0 20px 18px;
+    color: $dark-400;
+    line-height: 1.6;
+    font-size: 14px;
+
+    p {
+      margin: 0;
+    }
+  }
+}
+
+.contact-section {
+  background: $white;
+  padding: 28px;
+  border-radius: $radius-lg;
+  border: 1px solid $border;
+  box-shadow: 0 4px 16px rgba(27, 40, 56, 0.06);
+  height: fit-content;
+
+  h2 {
+    font-family: $font-heading;
+    font-size: 22px;
+    color: $dark;
+    margin-bottom: 6px;
+  }
+
+  .contact-subtitle {
+    font-size: 13px;
+    color: $dark-300;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  .form-group {
+    margin-bottom: 16px;
+    text-align: left;
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: $dark-500;
+      margin-bottom: 6px;
+
+      .optional {
+        font-weight: normal;
+        color: $dark-300;
+        font-size: 11px;
+      }
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid $border;
+      border-radius: 8px;
+      outline: none;
+      font-family: $font-body;
+      font-size: 14px;
+      color: $dark;
+      box-sizing: border-box;
+      transition: border-color $transition;
+
+      &:focus {
+        border-color: $primary;
+        box-shadow: 0 0 0 3px rgba($primary, 0.08);
+      }
+    }
+
+    .form-error {
+      display: block;
+      color: #e53935;
+      font-size: 11px;
+      margin-top: 4px;
+    }
+  }
+
+  .submit-ticket-btn {
+    width: 100%;
+    padding: 13px;
+    background: linear-gradient(135deg, $primary, $primary-dark);
+    color: $white;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all $transition;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba($primary, 0.3);
+    }
+
+    &:disabled {
+      background: $border;
+      color: $dark-300;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    .material-icons {
+      font-size: 18px;
+    }
+  }
+}

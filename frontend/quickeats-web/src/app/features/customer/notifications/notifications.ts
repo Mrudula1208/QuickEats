@@ -1,205 +1,130 @@
-import { Component } from '@angular/core';
-// Import Component because this is an Angular Component.
-
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-// Import CommonModule because HTML uses @if and @for.
-
+import { RouterLink } from '@angular/router';
 import { NotificationService } from '../../../core/services/notification.service';
-// Used to call Notification APIs.
-
 import { NotificationModel } from '../../../core/models/notification.model';
-// NotificationModel stores one notification.
-
 import { ToastrService } from 'ngx-toastr';
-// Used to show success/error notifications.
 
 @Component({
   selector: 'app-notifications',
   standalone: true,
-  imports: [
-    CommonModule
-  ],
+  imports: [CommonModule, RouterLink],
   templateUrl: './notifications.html',
   styleUrl: './notifications.scss'
 })
-
 export class NotificationsComponent {
 
-  // Store all Notifications.
-  notifications: NotificationModel[] = [];
-
-  // Number of unread Notifications.
-  unreadCount = 0;
+  notifications = signal<NotificationModel[]>([]);
+  unreadCount = signal(0);
+  isLoading = signal(true);
 
   constructor(
-
     private notificationService: NotificationService,
-
     private toastr: ToastrService
-
   ) {
-
     this.loadNotifications();
-
     this.loadUnreadCount();
-
   }
 
-  // Load all Notifications.
   loadNotifications(): void {
-
-    this.notificationService
-      .getNotifications()
-      .subscribe({
-
-        // API Success.
-        next: (data: NotificationModel[]) => {
-
-          this.notifications = data;
-
-        },
-
-        // API Failed.
-        error: () => {}
-
-      });
-
+    this.isLoading.set(true);
+    this.notificationService.getNotifications().subscribe({
+      next: (data) => {
+        this.notifications.set(data);
+        this.isLoading.set(false);
+      },
+      error: () => {
+        this.isLoading.set(false);
+        this.toastr.error('Failed to load notifications');
+      }
+    });
   }
 
-  // Load unread Notification count.
   loadUnreadCount(): void {
-
-    this.notificationService
-      .getUnreadCount()
-      .subscribe({
-
-        // API Success.
-        next: (count: number) => {
-
-          this.unreadCount = count;
-
-        },
-
-        // API Failed.
-        error: () => {}
-
-      });
-
+    this.notificationService.getUnreadCount().subscribe({
+      next: (count) => this.unreadCount.set(count),
+      error: () => {}
+    });
   }
 
-  // Mark one Notification as Read.
   markAsRead(notificationId: number): void {
-
-    this.notificationService
-      .markAsRead(notificationId)
-      .subscribe({
-
-        // API Success.
-        next: () => {
-
-          this.loadNotifications();
-          this.loadUnreadCount();
-          this.toastr.success('Marked as read');
-
-        },
-
-        // API Failed.
-        error: () => {}
-
-      });
-
+    this.notificationService.markAsRead(notificationId).subscribe({
+      next: () => {
+        this.notifications.update(list =>
+          list.map(n => n.notificationId === notificationId ? { ...n, isRead: true } : n)
+        );
+        this.unreadCount.update(c => Math.max(0, c - 1));
+        this.toastr.success('Marked as read');
+      },
+      error: () => {}
+    });
   }
 
-  // Mark all Notifications as Read.
   markAllAsRead(): void {
-
-    this.notificationService
-      .markAllAsRead()
-      .subscribe({
-
-        // API Success.
-        next: () => {
-
-          this.loadNotifications();
-          this.loadUnreadCount();
-          this.toastr.success('All marked as read');
-
-        },
-
-        // API Failed.
-        error: () => {}
-
-      });
-
+    this.notificationService.markAllAsRead().subscribe({
+      next: () => {
+        this.notifications.update(list => list.map(n => ({ ...n, isRead: true })));
+        this.unreadCount.set(0);
+        this.toastr.success('All notifications marked as read');
+      },
+      error: () => {}
+    });
   }
 
-  // Delete one Notification.
   deleteNotification(notificationId: number): void {
-
-    this.notificationService
-      .deleteNotification(notificationId)
-      .subscribe({
-
-        // API Success.
-        next: () => {
-
-          this.loadNotifications();
-          this.loadUnreadCount();
-          this.toastr.success('Notification deleted');
-
-        },
-
-        // API Failed.
-        error: () => {}
-
-      });
-
+    this.notificationService.deleteNotification(notificationId).subscribe({
+      next: () => {
+        const wasUnread = this.notifications().find(n => n.notificationId === notificationId && !n.isRead);
+        this.notifications.update(list => list.filter(n => n.notificationId !== notificationId));
+        if (wasUnread) this.unreadCount.update(c => Math.max(0, c - 1));
+        this.toastr.success('Notification deleted');
+      },
+      error: () => {}
+    });
   }
 
-  // Clear all Notifications.
   clearAll(): void {
-
-    this.notificationService
-      .clearAll()
-      .subscribe({
-
-        // API Success.
-        next: () => {
-
-          this.notifications = [];
-          this.unreadCount = 0;
-          this.toastr.success('All notifications cleared');
-
-        },
-
-        // API Failed.
-        error: () => {}
-
-      });
-
+    this.notificationService.clearAll().subscribe({
+      next: () => {
+        this.notifications.set([]);
+        this.unreadCount.set(0);
+        this.toastr.success('All notifications cleared');
+      },
+      error: () => {}
+    });
   }
 
-  // Return icon based on Notification title.
-  // Order notifications get a package icon.
-  // Other notifications get a bell icon.
   getNotificationIcon(notification: NotificationModel): string {
-
     const title = notification.title.toLowerCase();
-
-    if (title.includes('order')) {
-
-      return 'ðŸ“¦';
-
-    }
-
-    if (title.includes('cancelled')) {
-
-      return 'âŒ';
-
-    }
-
-    return 'ðŸ””';
-
+    if (title.includes('cancel')) return 'cancel';
+    if (title.includes('deliver')) return 'local_shipping';
+    if (title.includes('order')) return 'receipt_long';
+    if (title.includes('payment')) return 'payment';
+    if (title.includes('promo') || title.includes('offer')) return 'local_offer';
+    return 'notifications';
   }
 
+  getIconClass(notification: NotificationModel): string {
+    const title = notification.title.toLowerCase();
+    if (title.includes('cancel')) return 'icon-cancel';
+    if (title.includes('deliver')) return 'icon-delivery';
+    if (title.includes('order')) return 'icon-order';
+    if (title.includes('payment')) return 'icon-payment';
+    if (title.includes('promo') || title.includes('offer')) return 'icon-promo';
+    return 'icon-default';
+  }
+
+  getTimeAgo(date: Date): string {
+    const now = new Date();
+    const d = new Date(date);
+    const diffMs = now.getTime() - d.getTime();
+    const diffMin = Math.floor(diffMs / 60000);
+    if (diffMin < 1) return 'Just now';
+    if (diffMin < 60) return `${diffMin}m ago`;
+    const diffHr = Math.floor(diffMin / 60);
+    if (diffHr < 24) return `${diffHr}h ago`;
+    const diffDay = Math.floor(diffHr / 24);
+    if (diffDay < 7) return `${diffDay}d ago`;
+    return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+  }
 }

@@ -1,207 +1,314 @@
-.wishlist-page{
+$primary: #E85D3A;
+$primary-dark: #D14A2A;
+$primary-light: #F28C72;
+$primary-bg: #FEF0EC;
+$secondary: #2D6A4F;
+$secondary-light: #52B788;
+$accent: #F4A261;
+$dark: #1B2838;
+$dark-600: #2B3A4E;
+$dark-500: #3D4F63;
+$dark-400: #5A6B7F;
+$dark-300: #8494A7;
+$light-bg: #F7F8FC;
+$white: #FFFFFF;
+$border: #E8ECF1;
+$shadow-sm: 0 1px 3px rgba(27, 40, 56, 0.06);
+$shadow-md: 0 4px 16px rgba(27, 40, 56, 0.08);
+$shadow-lg: 0 12px 40px rgba(27, 40, 56, 0.12);
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 16px;
+$radius-xl: 24px;
+$radius-full: 9999px;
+$font-heading: 'DM Sans', sans-serif;
+$font-body: 'Inter', sans-serif;
+$transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
-    max-width:1200px;
+/* ============================================
+   PAGE HERO
+   ============================================ */
 
-    margin:40px auto;
-
-    padding:20px;
-
+.page-hero {
+  background: linear-gradient(135deg, $primary-dark 0%, $primary 50%, $accent 100%);
+  padding: 32px 0 40px;
 }
 
-.wishlist-page h1{
-
-    text-align:center;
-
-    color:#fc8019;
-
-    font-size:36px;
-
-    margin-bottom:10px;
-
+.page-title {
+  font-family: $font-heading;
+  font-size: 32px;
+  font-weight: 800;
+  color: $white;
+  margin-bottom: 4px;
 }
 
-.wishlist-page p{
-
-    text-align:center;
-
-    color:#666;
-
-    margin-bottom:35px;
-
+.page-subtitle {
+  font-size: 14px;
+  color: rgba($white, 0.7);
 }
 
-.empty-wishlist{
-
-    background:white;
-
-    padding:60px;
-
-    border-radius:18px;
-
-    text-align:center;
-
-    box-shadow:0 10px 25px rgba(0,0,0,.08);
-
+.wishlist-section {
+  background: $light-bg;
+  padding: 32px 0 60px;
+  min-height: 50vh;
 }
 
-.empty-wishlist h2{
+/* ============================================
+   LOADING & EMPTY
+   ============================================ */
 
-    color:#fc8019;
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80px 20px;
+  color: $dark-300;
+  gap: 12px;
 
-    margin-bottom:15px;
-
+  .material-icons { font-size: 32px; color: $primary; }
+  p { font-size: 14px; }
 }
 
-.wishlist-grid{
+.spinning { animation: spin 1s linear infinite; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-    display:grid;
-
-    grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-
-    gap:30px;
-
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  background: $white;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-sm;
 }
 
-.wishlist-card{
+.empty-icon-wrap {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: $primary-bg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
 
-    background:white;
-
-    border-radius:20px;
-
-    overflow:hidden;
-
-    box-shadow:0 10px 25px rgba(0,0,0,.08);
-
-    transition:.3s;
-
+  .material-icons { font-size: 40px; color: $primary; }
 }
 
-.wishlist-card:hover{
-
-    transform:translateY(-8px);
-
-    box-shadow:0 15px 35px rgba(0,0,0,.15);
-
+.empty-state h2 {
+  font-family: $font-heading;
+  font-size: 22px;
+  font-weight: 700;
+  color: $dark;
+  margin-bottom: 8px;
 }
 
-.wishlist-card img{
-
-    width:100%;
-
-    height:220px;
-
-    object-fit:cover;
-
+.empty-state p {
+  font-size: 15px;
+  color: $dark-300;
+  margin-bottom: 24px;
 }
 
-.wishlist-card h2{
+.browse-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  background: linear-gradient(135deg, $primary, $primary-dark);
+  color: $white;
+  border-radius: $radius-full;
+  font-family: $font-body;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: $transition;
 
-    color:#fc8019;
+  .material-icons { font-size: 18px; }
 
-    margin:18px 20px 8px;
-
-    font-size:24px;
-
+  &:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba($primary, 0.35); }
 }
 
-.wishlist-card h3{
+/* ============================================
+   WISHLIST HEADER
+   ============================================ */
 
-    margin:0 20px;
-
-    color:#333;
-
-    font-size:20px;
-
+.wishlist-header {
+  margin-bottom: 20px;
 }
 
-.wishlist-card p{
-
-    margin:10px 20px;
-
-    text-align:left;
-
-    color:#666;
-
+.item-count {
+  font-size: 14px;
+  font-weight: 600;
+  color: $dark-300;
 }
 
-.wishlist-card h4{
+/* ============================================
+   WISHLIST GRID
+   ============================================ */
 
-    margin:15px 20px;
-
-    color:#2e7d32;
-
-    font-size:22px;
-
+.wishlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
 }
 
-.button-group{
+/* ============================================
+   WISHLIST CARD
+   ============================================ */
 
-    display:flex;
+.wishlist-card {
+  background: $white;
+  border-radius: $radius-xl;
+  overflow: hidden;
+  box-shadow: $shadow-sm;
+  border: 1px solid $border;
+  transition: $transition;
 
-    gap:12px;
-
-    padding:20px;
-
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-lg;
+    border-color: transparent;
+  }
 }
 
-.button-group button{
+.card-img {
+  position: relative;
+  height: 180px;
+  overflow: hidden;
 
-    flex:1;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
 
-    border:none;
-
-    border-radius:10px;
-
-    padding:13px;
-
-    cursor:pointer;
-
-    font-size:15px;
-
-    transition:.3s;
-
+  &:hover img {
+    transform: scale(1.05);
+  }
 }
 
-.button-group button:first-child{
+.remove-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: $transition;
+  backdrop-filter: blur(4px);
 
-    background:#fc8019;
+  .material-icons {
+    font-size: 18px;
+    color: $primary;
+  }
 
-    color:white;
+  &:hover {
+    background: $primary;
 
+    .material-icons { color: $white; }
+  }
 }
 
-.button-group button:first-child:hover{
-
-    background:#e66f00;
-
+.category-badge {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  padding: 4px 12px;
+  background: rgba(0, 0, 0, 0.6);
+  color: $white;
+  border-radius: $radius-full;
+  font-size: 11px;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
 }
 
-.button-group button:last-child{
-
-    background:#ef5350;
-
-    color:white;
-
+.card-body {
+  padding: 16px;
 }
 
-.button-group button:last-child:hover{
-
-    background:#d32f2f;
-
+.restaurant-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: $primary;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-@media(max-width:768px){
+.food-name {
+  font-family: $font-heading;
+  font-size: 17px;
+  font-weight: 700;
+  color: $dark;
+  margin: 4px 0 12px;
+  line-height: 1.3;
+}
 
-    .wishlist-page{
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-        padding:15px;
+.price {
+  font-family: $font-heading;
+  font-size: 20px;
+  font-weight: 800;
+  color: $dark;
+}
 
+.card-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.action-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid $border;
+  background: $white;
+  cursor: pointer;
+  transition: $transition;
+
+  .material-icons { font-size: 16px; color: $dark-400; }
+
+  &--view:hover {
+    border-color: $secondary;
+    background: rgba($secondary, 0.06);
+    .material-icons { color: $secondary; }
+  }
+
+  &--cart {
+    border-color: $primary;
+    background: $primary-bg;
+    .material-icons { color: $primary; }
+
+    &:hover {
+      background: $primary;
+      .material-icons { color: $white; }
     }
+  }
 
-    .wishlist-card img{
+  &--remove:hover {
+    border-color: rgba(#d32f2f, 0.4);
+    background: rgba(#d32f2f, 0.06);
+    .material-icons { color: #d32f2f; }
+  }
+}
 
-        height:180px;
+/* ============================================
+   RESPONSIVE
+   ============================================ */
 
-    }
-
+@media (max-width: 600px) {
+  .page-title { font-size: 24px; }
+  .wishlist-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
 }

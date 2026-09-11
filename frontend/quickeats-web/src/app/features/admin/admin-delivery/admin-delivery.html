@@ -1,159 +1,550 @@
 <app-admin-nav></app-admin-nav>
 
-<h1>
-  Admin Delivery Management
-</h1>
-
-
-<!--
-  @if
-
-  Checks whether there are no deliveries.
-
-  deliveries.length
-  Gives the number of deliveries.
-
-  ===
-  Means strictly equal to.
-
-  0
-  Means no deliveries exist.
--->
-
-@if (deliveries.length === 0) {
-
-  <h2>
-    No Deliveries Found
-  </h2>
-
-}
-
-
-@else {
-
-  <!--
-    @for
-
-    Repeats the HTML for every delivery.
-
-    delivery
-    Represents the current delivery.
-
-    deliveries
-    Is the complete deliveries array.
-
-    track delivery.id
-    Gives Angular a unique ID
-    for every delivery.
-  -->
-
-  @for (
-    delivery of deliveries;
-    track delivery.id
-  ) {
-
-    <div class="delivery-card">
-
-
-      <!-- Delivery ID -->
-
-      <h2>
-
-        Delivery #{{ delivery.id }}
-
-      </h2>
-
-
-      <!-- Order ID -->
-
-      <p>
-
-        <strong>
-          Order ID:
-        </strong>
-
-        {{ delivery.orderId }}
-
-      </p>
-
-
-      <!-- Delivery Partner ID -->
-
-      <p>
-
-        <strong>
-          Delivery Partner:
-        </strong>
-
-        {{ delivery.deliveryPartnerId }}
-
-      </p>
-
-
-      <!-- Delivery Status -->
-
-      <p>
-
-        <strong>
-          Status:
-        </strong>
-
-        {{ delivery.deliveryStatus }}
-
-      </p>
-
-
-      <!-- Assigned Date -->
-
-      <p>
-
-        <strong>
-          Assigned At:
-        </strong>
-
-        {{ delivery.assignedAt | date:'medium' }}
-
-      </p>
-
-      <!-- Delivery Status Dropdown -->
-
-      <select
-        [value]="delivery.deliveryStatus"
-        (change)="updateDeliveryStatus(
-          delivery.id,
-          $any($event.target).value
-        )"
-      >
-
-        <option value="Assigned">
-          Assigned
-        </option>
-
-        <option value="Picked Up">
-          Picked Up
-        </option>
-
-        <option value="Out For Delivery">
-          Out For Delivery
-        </option>
-
-        <option value="Delivered">
-          Delivered
-        </option>
-
-      </select>
-
-      <!--
-        Delete Delivery Button.
-      -->
-
-      <button
-        (click)="deleteDelivery(delivery.id)"
-      >
-        Delete
-      </button>
-
+<div class="ad-wrapper">
+  <div class="ad-container">
+    
+    <!-- Header -->
+    <div class="ad-header">
+      <div class="ad-header-left">
+        <div class="ad-breadcrumbs">
+          <span>Admin</span>
+          <span class="material-icons">chevron_right</span>
+          <span class="active">Delivery Management</span>
+        </div>
+        <h1 class="ad-title">Delivery Operations</h1>
+        <p class="ad-subtitle">Monitor live orders, assign delivery riders, and track fulfillment status.</p>
+      </div>
+      <div class="ad-header-actions">
+        <button class="btn-primary" (click)="openNewAssignModal()">
+          <span class="material-icons">person_add_alt</span>
+          Assign Order to Partner
+        </button>
+      </div>
     </div>
 
-  }
+    <!-- Stats Grid -->
+    <div class="ad-stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon stat-icon--total">
+          <span class="material-icons">two_wheeler</span>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Total Deliveries</span>
+          <h3>{{ stats().total }}</h3>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon stat-icon--active">
+          <span class="material-icons">directions_bike</span>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Active In-Transit</span>
+          <h3 class="text-warning">{{ stats().active }}</h3>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon stat-icon--delivered">
+          <span class="material-icons">check_circle</span>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Delivered Orders</span>
+          <h3 class="text-success">{{ stats().completed }}</h3>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon stat-icon--riders">
+          <span class="material-icons">badge</span>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Active Riders</span>
+          <h3 class="text-info">{{ stats().activePartnersCount }}</h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="ad-toolbar">
+      <div class="ad-search-box">
+        <span class="material-icons search-icon">search</span>
+        <input 
+          type="text" 
+          placeholder="Search by Order ID, Partner, Customer, Restaurant..." 
+          [value]="searchText()"
+          (input)="searchText.set($any($event.target).value)"
+          class="search-input"
+        />
+        @if (searchText()) {
+          <button class="clear-btn" (click)="searchText.set('')">
+            <span class="material-icons">close</span>
+          </button>
+        }
+      </div>
+
+      <div class="ad-status-tabs">
+        <button 
+          class="tab-btn" 
+          [class.active]="selectedStatus() === 'all'"
+          (click)="selectedStatus.set('all')">
+          All Deliveries ({{ deliveries().length }})
+        </button>
+        @for (status of statusList; track status) {
+          <button 
+            class="tab-btn" 
+            [class.active]="selectedStatus().toLowerCase() === status.toLowerCase()"
+            (click)="selectedStatus.set(status)">
+            {{ status }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    @if (isLoading()) {
+      <div class="ad-state-card">
+        <span class="material-icons spinning state-icon">progress_activity</span>
+        <p>Loading delivery records...</p>
+      </div>
+    }
+
+    <!-- Error State -->
+    @else if (loadError()) {
+      <div class="ad-state-card">
+        <span class="material-icons text-danger state-icon">error_outline</span>
+        <h3>{{ loadError() }}</h3>
+        <p>Failed to retrieve delivery information from backend.</p>
+        <button class="btn-primary" (click)="retry()">
+          <span class="material-icons">refresh</span> Try Again
+        </button>
+      </div>
+    }
+
+    <!-- Empty State -->
+    @else if (filteredDeliveries().length === 0) {
+      <div class="ad-state-card">
+        <span class="material-icons state-icon">local_shipping</span>
+        <h3>No Deliveries Found</h3>
+        <p>There are no deliveries matching your selected criteria.</p>
+        @if (searchText() || selectedStatus() !== 'all') {
+          <button class="btn-secondary" (click)="searchText.set(''); selectedStatus.set('all')">
+            Clear Filters
+          </button>
+        }
+      </div>
+    }
+
+    <!-- Deliveries Table -->
+    @else {
+      <div class="ad-table-card">
+        <div class="table-responsive">
+          <table class="ad-table">
+            <thead>
+              <tr>
+                <th>Delivery ID</th>
+                <th>Order</th>
+                <th>Delivery Partner</th>
+                <th>Customer & Drop</th>
+                <th>Restaurant & Pickup</th>
+                <th>Status</th>
+                <th>Timeline</th>
+                <th class="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (delivery of filteredDeliveries(); track delivery.id) {
+                <tr>
+                  <!-- Delivery ID -->
+                  <td>
+                    <span class="delivery-id-badge">#{{ delivery.id }}</span>
+                  </td>
+
+                  <!-- Order ID & Total -->
+                  <td>
+                    <div class="order-cell">
+                      <span class="order-id">Order #{{ delivery.orderId }}</span>
+                      @if (delivery.totalAmount) {
+                        <span class="order-amount">₹{{ delivery.totalAmount | number:'1.2-2' }}</span>
+                      }
+                      @if (delivery.paymentMethod) {
+                        <span class="payment-tag">{{ delivery.paymentMethod }}</span>
+                      }
+                    </div>
+                  </td>
+
+                  <!-- Delivery Partner -->
+                  <td>
+                    <div class="partner-cell">
+                      <div class="partner-avatar">
+                        <span class="material-icons">sports_motorsports</span>
+                      </div>
+                      <div class="partner-details">
+                        <strong class="partner-name">
+                          {{ delivery.deliveryPartnerName || 'Partner #' + delivery.deliveryPartnerId }}
+                        </strong>
+                        @if (delivery.deliveryPartnerPhone) {
+                          <span class="partner-phone">
+                            <span class="material-icons">phone</span> {{ delivery.deliveryPartnerPhone }}
+                          </span>
+                        }
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- Customer & Destination -->
+                  <td>
+                    <div class="customer-cell">
+                      <strong class="customer-name">{{ delivery.customerName || 'Customer' }}</strong>
+                      @if (delivery.phoneNumber || delivery.customerPhone) {
+                        <span class="customer-phone">{{ delivery.phoneNumber || delivery.customerPhone }}</span>
+                      }
+                      <span class="address-text" title="{{ delivery.deliveryAddress }}">
+                        <span class="material-icons">place</span>
+                        {{ delivery.deliveryAddress || 'Address not specified' }}
+                      </span>
+                    </div>
+                  </td>
+
+                  <!-- Restaurant & Pickup -->
+                  <td>
+                    <div class="restaurant-cell">
+                      <strong class="restaurant-name">{{ delivery.restaurantName || 'Restaurant' }}</strong>
+                      @if (delivery.restaurantPhone) {
+                        <span class="restaurant-phone">{{ delivery.restaurantPhone }}</span>
+                      }
+                      <span class="address-text" title="{{ delivery.restaurantAddress }}">
+                        <span class="material-icons">storefront</span>
+                        {{ delivery.restaurantAddress || 'Restaurant Address' }}
+                      </span>
+                    </div>
+                  </td>
+
+                  <!-- Status with Dropdown -->
+                  <td>
+                    <div class="status-cell">
+                      <select
+                        class="status-select-badge"
+                        [ngClass]="getStatusClass(delivery.deliveryStatus)"
+                        [value]="delivery.deliveryStatus"
+                        (change)="updateDeliveryStatus(delivery.id, $any($event.target).value)"
+                      >
+                        <option value="Assigned">Assigned</option>
+                        <option value="Picked Up">Picked Up</option>
+                        <option value="Out for Delivery">Out for Delivery</option>
+                        <option value="Delivered">Delivered</option>
+                      </select>
+                    </div>
+                  </td>
+
+                  <!-- Timeline -->
+                  <td>
+                    <div class="timeline-cell">
+                      <div class="time-item" title="Assigned Time">
+                        <span class="time-label">Assigned:</span>
+                        <span class="time-value">{{ delivery.assignedAt | date:'shortTime' }}</span>
+                      </div>
+                      @if (delivery.pickedUpAt) {
+                        <div class="time-item" title="Pickup Time">
+                          <span class="time-label">Picked:</span>
+                          <span class="time-value text-warning">{{ delivery.pickedUpAt | date:'shortTime' }}</span>
+                        </div>
+                      }
+                      @if (delivery.deliveredAt) {
+                        <div class="time-item" title="Delivered Time">
+                          <span class="time-label">Delivered:</span>
+                          <span class="time-value text-success">{{ delivery.deliveredAt | date:'shortTime' }}</span>
+                        </div>
+                      }
+                    </div>
+                  </td>
+
+                  <!-- Actions -->
+                  <td class="text-right">
+                    <div class="actions-group">
+                      <button 
+                        class="action-btn reassign-btn" 
+                        title="Reassign Partner"
+                        (click)="openReassignModal(delivery)">
+                        <span class="material-icons">swap_horiz</span>
+                      </button>
+                      
+                      <button 
+                        class="action-btn view-btn" 
+                        title="View Details"
+                        (click)="viewDetails(delivery)">
+                        <span class="material-icons">visibility</span>
+                      </button>
+
+                      <button 
+                        class="action-btn delete-btn" 
+                        title="Delete Record"
+                        (click)="deleteDelivery(delivery.id)">
+                        <span class="material-icons">delete_outline</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- ========================================================= -->
+<!-- MODAL: REASSIGN DELIVERY PARTNER                         -->
+<!-- ========================================================= -->
+@if (isAssignModalOpen() && selectedDelivery()) {
+  <div class="modal-backdrop" (click)="closeAssignModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="material-icons modal-icon">swap_horiz</span>
+          <div>
+            <h3>Reassign Delivery Partner</h3>
+            <p>Order #{{ selectedDelivery()?.orderId }} &bull; Delivery #{{ selectedDelivery()?.id }}</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" (click)="closeAssignModal()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="info-banner">
+          <div class="info-row">
+            <span class="label">Current Status:</span>
+            <span class="badge" [ngClass]="getStatusClass(selectedDelivery()!.deliveryStatus)">
+              {{ selectedDelivery()!.deliveryStatus }}
+            </span>
+          </div>
+          <div class="info-row">
+            <span class="label">Current Partner:</span>
+            <span class="val">{{ selectedDelivery()!.deliveryPartnerName || 'ID #' + selectedDelivery()!.deliveryPartnerId }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Customer:</span>
+            <span class="val">{{ selectedDelivery()!.customerName }} ({{ selectedDelivery()!.deliveryAddress }})</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="partnerSelect">Select New Delivery Partner</label>
+          <select 
+            id="partnerSelect"
+            class="form-control"
+            [value]="targetPartnerId() || ''"
+            (change)="targetPartnerId.set(+$any($event.target).value)"
+          >
+            <option value="" disabled>-- Choose an active delivery rider --</option>
+            @for (partner of activePartners(); track partner.id) {
+              <option [value]="partner.id">
+                {{ partner.name }} ({{ partner.phoneNumber || partner.phone || partner.email }}) — Active Deliveries: {{ partner.activeDeliveriesCount }}
+              </option>
+            }
+          </select>
+          @if (activePartners().length === 0) {
+            <p class="form-help text-danger">No active delivery partners found. Please add or activate partners in Delivery Partners management.</p>
+          }
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeAssignModal()" [disabled]="isSubmitting()">Cancel</button>
+        <button class="btn-primary" (click)="submitReassignment()" [disabled]="isSubmitting() || !targetPartnerId()">
+          @if (isSubmitting()) {
+            <span class="material-icons spinning">progress_activity</span> Assigning...
+          } @else {
+            <span class="material-icons">check</span> Confirm Reassignment
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ========================================================= -->
+<!-- MODAL: ASSIGN ORDER TO PARTNER (NEW DELIVERY)             -->
+<!-- ========================================================= -->
+@if (isNewAssignModalOpen()) {
+  <div class="modal-backdrop" (click)="closeNewAssignModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="material-icons modal-icon">person_add_alt</span>
+          <div>
+            <h3>Assign Order to Partner</h3>
+            <p>Select a pending/ready order and dispatch it to a rider</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" (click)="closeNewAssignModal()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="orderSelect">Select Order to Assign</label>
+          <select 
+            id="orderSelect"
+            class="form-control"
+            [value]="newAssignmentOrderId() || ''"
+            (change)="newAssignmentOrderId.set(+$any($event.target).value)"
+          >
+            <option value="" disabled>-- Choose an order --</option>
+            @for (order of readyOrders(); track order.id) {
+              <option [value]="order.id">
+                Order #{{ order.id }} &bull; {{ order.customerName }} &bull; {{ order.restaurantName }} (Status: {{ order.status }})
+              </option>
+            }
+          </select>
+          @if (readyOrders().length === 0) {
+            <p class="form-help">No ready/confirmed orders waiting for assignment. You can manually enter an Order ID if needed.</p>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="newPartnerSelect">Assign to Delivery Partner</label>
+          <select 
+            id="newPartnerSelect"
+            class="form-control"
+            [value]="newAssignmentPartnerId() || ''"
+            (change)="newAssignmentPartnerId.set(+$any($event.target).value)"
+          >
+            <option value="" disabled>-- Choose an active delivery rider --</option>
+            @for (partner of activePartners(); track partner.id) {
+              <option [value]="partner.id">
+                {{ partner.name }} ({{ partner.phoneNumber || partner.phone || partner.email }}) — Active Deliveries: {{ partner.activeDeliveriesCount }}
+              </option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeNewAssignModal()" [disabled]="isSubmitting()">Cancel</button>
+        <button 
+          class="btn-primary" 
+          (click)="submitNewAssignment()" 
+          [disabled]="isSubmitting() || !newAssignmentOrderId() || !newAssignmentPartnerId()">
+          @if (isSubmitting()) {
+            <span class="material-icons spinning">progress_activity</span> Assigning...
+          } @else {
+            <span class="material-icons">send</span> Dispatch Order
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ========================================================= -->
+<!-- MODAL: VIEW DELIVERY DETAILS                             -->
+<!-- ========================================================= -->
+@if (isDetailsModalOpen() && selectedDelivery()) {
+  <div class="modal-backdrop" (click)="closeDetailsModal()">
+    <div class="modal-card modal-card--lg" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="material-icons modal-icon">receipt_long</span>
+          <div>
+            <h3>Delivery Details &bull; #{{ selectedDelivery()?.id }}</h3>
+            <p>Order #{{ selectedDelivery()?.orderId }} &bull; Status: {{ selectedDelivery()?.deliveryStatus }}</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" (click)="closeDetailsModal()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="details-grid">
+          <!-- Restaurant Card -->
+          <div class="detail-box">
+            <div class="box-title">
+              <span class="material-icons">storefront</span> Pickup From (Restaurant)
+            </div>
+            <h4>{{ selectedDelivery()?.restaurantName || 'Restaurant' }}</h4>
+            <p><span class="material-icons">place</span> {{ selectedDelivery()?.restaurantAddress || 'No address provided' }}</p>
+            @if (selectedDelivery()?.restaurantPhone) {
+              <p><span class="material-icons">phone</span> {{ selectedDelivery()?.restaurantPhone }}</p>
+            }
+          </div>
+
+          <!-- Customer Card -->
+          <div class="detail-box">
+            <div class="box-title">
+              <span class="material-icons">person</span> Deliver To (Customer)
+            </div>
+            <h4>{{ selectedDelivery()?.customerName || 'Customer' }}</h4>
+            <p><span class="material-icons">place</span> {{ selectedDelivery()?.deliveryAddress || 'No address provided' }}</p>
+            @if (selectedDelivery()?.phoneNumber || selectedDelivery()?.customerPhone) {
+              <p><span class="material-icons">phone</span> {{ selectedDelivery()?.phoneNumber || selectedDelivery()?.customerPhone }}</p>
+            }
+          </div>
+
+          <!-- Rider Card -->
+          <div class="detail-box">
+            <div class="box-title">
+              <span class="material-icons">sports_motorsports</span> Assigned Rider
+            </div>
+            <h4>{{ selectedDelivery()?.deliveryPartnerName || 'Rider #' + selectedDelivery()?.deliveryPartnerId }}</h4>
+            @if (selectedDelivery()?.deliveryPartnerEmail) {
+              <p><span class="material-icons">mail</span> {{ selectedDelivery()?.deliveryPartnerEmail }}</p>
+            }
+            @if (selectedDelivery()?.deliveryPartnerPhone) {
+              <p><span class="material-icons">phone</span> {{ selectedDelivery()?.deliveryPartnerPhone }}</p>
+            }
+          </div>
+
+          <!-- Order & Timestamps Card -->
+          <div class="detail-box">
+            <div class="box-title">
+              <span class="material-icons">schedule</span> Milestones
+            </div>
+            <p><strong>Assigned:</strong> {{ selectedDelivery()?.assignedAt | date:'medium' }}</p>
+            <p><strong>Picked Up:</strong> {{ (selectedDelivery()?.pickedUpAt | date:'medium') || 'Not yet picked up' }}</p>
+            <p><strong>Delivered:</strong> {{ (selectedDelivery()?.deliveredAt | date:'medium') || 'In progress' }}</p>
+            @if (selectedDelivery()?.totalAmount) {
+              <p><strong>Total Amount:</strong> ₹{{ selectedDelivery()?.totalAmount | number:'1.2-2' }} ({{ selectedDelivery()?.paymentMethod }})</p>
+            }
+          </div>
+        </div>
+
+        <!-- Ordered Items Table -->
+        @if ((selectedDelivery()?.items && selectedDelivery()!.items!.length > 0) || (selectedDelivery()?.orderItems && selectedDelivery()!.orderItems!.length > 0)) {
+          <div class="items-section">
+            <h4>Ordered Items</h4>
+            <table class="items-table">
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Quantity</th>
+                  <th>Price</th>
+                  <th class="text-right">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of (selectedDelivery()?.items || selectedDelivery()?.orderItems || []); track item.menuItemId) {
+                  <tr>
+                    <td>{{ item.name || item.itemName }}</td>
+                    <td>x{{ item.quantity }}</td>
+                    <td>₹{{ (item.unitPrice || item.price || 0) | number:'1.2-2' }}</td>
+                    <td class="text-right">₹{{ (item.totalPrice || ((item.unitPrice || item.price || 0) * item.quantity)) | number:'1.2-2' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeDetailsModal()">Close</button>
+      </div>
+    </div>
+  </div>
 }

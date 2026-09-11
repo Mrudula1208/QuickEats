@@ -18,14 +18,17 @@ namespace QuickEats.API.Controllers
     public class RestaurantRatingController : ControllerBase
     {
         private readonly IRestaurantRatingService _restaurantRatingService;
-        public RestaurantRatingController(IRestaurantRatingService restaurantRatingService)
+        private readonly IRestaurantService _restaurantService;
+        public RestaurantRatingController(IRestaurantRatingService restaurantRatingService, IRestaurantService restaurantService)
         {
             _restaurantRatingService = restaurantRatingService;
+            _restaurantService = restaurantService;
         }
 
         /// <summary>
-        /// Gets all restaurant ratings.
+        /// Gets all restaurant ratings (Admin only).
         /// </summary>
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -56,11 +59,17 @@ namespace QuickEats.API.Controllers
         /// </summary>
         /// <param name="restaurantId">Restaurant id.</param>
         [HttpGet("restaurant/{restaurantId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
 
         public async Task <IActionResult> GetByRestaurantId(int restaurantId)
         {
+            // Owner can only see ratings of their own restaurants.
+            if (User.IsInRole("Owner") && !await IsOwnerOfRestaurant(restaurantId))
+                return Forbid();
+
             var rating = await _restaurantRatingService.GetByRestaurantIdAsync(restaurantId);
-return Ok(rating);
+            return Ok(rating);
         }
 
         /// <summary>
@@ -101,6 +110,16 @@ return Ok(rating);
             return Ok("Restaurant Rating deleted successfully.");
         }
 
+        // Check whether the logged in Owner owns this restaurant.
+        private async Task<bool> IsOwnerOfRestaurant(int restaurantId)
+        {
+            var ownerId = int.Parse(
+                User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            var restaurants = await _restaurantService.GetByOwnerIdAsync(ownerId);
+
+            return restaurants.Any(r => r.Id == restaurantId);
+        }
 
     }
 }

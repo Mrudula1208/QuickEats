@@ -1,216 +1,280 @@
-import { Component } from '@angular/core';
-// Component
-// Tells Angular that this file controls the Admin Delivery page.
-
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-// CommonModule
-// Required for Angular features such as @if and @for.
-
+import { FormsModule } from '@angular/forms';
 import { DeliveryService } from '../../../core/services/delivery.service';
-// DeliveryService
-// Used to call Delivery APIs.
-
-import { OrderDeliveryResponse } from '../../../core/models/delivery.model';
-// OrderDeliveryResponse
-// Defines the structure of delivery data coming from Backend.
-
+import { OrderService } from '../../../core/services/order';
+import { OrderDeliveryResponse, DeliveryPartnerSummary } from '../../../core/models/delivery.model';
+import { OrderModel } from '../../../core/models/order.model';
 import { AdminNavComponent } from '../../../shared/admin-nav/admin-nav';
-// Top navigation bar for the Admin Panel.
-
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
-
   selector: 'app-admin-delivery',
-  // selector
-  // Name used by Angular to identify this Component.
-
   standalone: true,
-  // standalone
-  // Means this Component works independently.
-
-  imports: [
-    CommonModule,
-    AdminNavComponent
-  ],
-  // imports
-  // Lists modules required by this Component.
-
+  imports: [CommonModule, FormsModule, AdminNavComponent],
   templateUrl: './admin-delivery.html',
-  // Connects this TypeScript file to the HTML file.
-
   styleUrl: './admin-delivery.scss'
-  // Connects the SCSS file.
-  // We are not working on SCSS now.
-
 })
+export class AdminDelivery implements OnInit {
+  deliveries = signal<OrderDeliveryResponse[]>([]);
+  deliveryPartners = signal<DeliveryPartnerSummary[]>([]);
+  readyOrders = signal<OrderModel[]>([]);
+  
+  isLoading = signal(true);
+  loadError = signal('');
+  searchText = signal('');
+  selectedStatus = signal('all');
 
+  // Modals state
+  isAssignModalOpen = signal(false);
+  isNewAssignModalOpen = signal(false);
+  isDetailsModalOpen = signal(false);
+  isSubmitting = signal(false);
 
-export class AdminDelivery {
+  selectedDelivery = signal<OrderDeliveryResponse | null>(null);
+  targetPartnerId = signal<number | null>(null);
+  
+  // New assignment form state
+  newAssignmentOrderId = signal<number | null>(null);
+  newAssignmentPartnerId = signal<number | null>(null);
 
-  // Store all deliveries.
-  //
-  // OrderDeliveryResponse
-  // Means one delivery follows this structure.
-  //
-  // []
-  // Means multiple deliveries.
-  //
-  // =
-  // Starts with an empty array.
+  // Status list for filter
+  statusList = [
+    'Assigned',
+    'Picked Up',
+    'Out for Delivery',
+    'Delivered'
+  ];
 
-  deliveries: OrderDeliveryResponse[] = [];
+  filteredDeliveries = computed(() => {
+    let list = this.deliveries();
+    const query = this.searchText().toLowerCase().trim();
+    const status = this.selectedStatus().toLowerCase();
 
+    if (query) {
+      list = list.filter(d =>
+        d.id.toString().includes(query) ||
+        d.orderId.toString().includes(query) ||
+        (d.deliveryPartnerName && d.deliveryPartnerName.toLowerCase().includes(query)) ||
+        (d.customerName && d.customerName.toLowerCase().includes(query)) ||
+        (d.restaurantName && d.restaurantName.toLowerCase().includes(query)) ||
+        (d.deliveryAddress && d.deliveryAddress.toLowerCase().includes(query))
+      );
+    }
+
+    if (status !== 'all') {
+      list = list.filter(d => d.deliveryStatus.toLowerCase().replace(/\s+/g, '') === status.replace(/\s+/g, ''));
+    }
+
+    return list;
+  });
+
+  // KPI Statistics
+  stats = computed(() => {
+    const list = this.deliveries();
+    const total = list.length;
+    const active = list.filter(d => 
+      ['assigned', 'picked up', 'out for delivery'].includes(d.deliveryStatus.toLowerCase())
+    ).length;
+    const completed = list.filter(d => d.deliveryStatus.toLowerCase() === 'delivered').length;
+    const activePartnersCount = this.deliveryPartners().filter(p => p.isActive).length;
+
+    return { total, active, completed, activePartnersCount };
+  });
+
+  // Active delivery partners only
+  activePartners = computed(() => {
+    return this.deliveryPartners().filter(p => p.isActive);
+  });
 
   constructor(
+    private deliveryService: DeliveryService,
+    private orderService: OrderService,
+    private toastr: ToastrService
+  ) {}
 
-    // deliveryService
-    // Variable used to access DeliveryService.
-    //
-    // private
-    // Can be used only inside this Component.
-    //
-    // :
-    // Separates variable name from its type.
-    //
-    // DeliveryService
-    // Type of the injected Service.
-
-    private deliveryService: DeliveryService
-
-  ) {
-
-    // Constructor runs automatically
-    // when Admin Delivery page opens.
-    //
-    // Load all deliveries immediately.
-
-    this.loadDeliveries();
-
+  ngOnInit(): void {
+    this.loadAllData();
   }
 
+  loadAllData(): void {
+    this.isLoading.set(true);
+    this.loadError.set('');
 
-  // Load all deliveries.
-  loadDeliveries(): void {
+    this.deliveryService.getDeliveries().subscribe({
+      next: (deliveries) => {
+        this.deliveries.set(deliveries || []);
+        this.isLoading.set(false);
+      },
+      error: () => {
+        this.isLoading.set(false);
+        this.loadError.set('Could not load deliveries. Please try again.');
+        this.toastr.error('Failed to load deliveries');
+      }
+    });
 
-    // STEP 1
-    // Call DeliveryService.
-    //
-    // getDeliveries()
-    // Sends GET request to Backend.
-
-    this.deliveryService
-      .getDeliveries()
-
-      // STEP 2
-      // subscribe()
-      // Waits for Backend response.
-
-      .subscribe({
-
-        // Backend successfully returned data.
-
-        next: (data: OrderDeliveryResponse[]) => {
-
-          // Store Backend data
-          // inside deliveries array.
-
-          this.deliveries = data;
-
-        },
-
-
-        // Backend/API request failed.
-
-        error: () => {}
-
-      });
-
+    this.loadDeliveryPartners();
+    this.loadReadyOrders();
   }
-// Update Delivery Status.
-updateDeliveryStatus(
 
-  // ID of the delivery we want to update.
-  deliveryId: number,
-
-  // New status we want to give the delivery.
-  newStatus: string
-
-): void {
-
-  // STEP 1
-  // Call DeliveryService.
-  //
-  // updateDeliveryStatus()
-  // Sends PUT request to Backend.
-
-  this.deliveryService
-    .updateDeliveryStatus(
-      deliveryId,
-      newStatus
-    )
-
-    // STEP 2
-    // Wait for Backend response.
-
-    .subscribe({
-
-      // Backend successfully updated delivery.
-
-      next: () => {
-
-        // STEP 3
-        // Load latest delivery data
-        // from Backend.
-
-        this.loadDeliveries();
-
+  loadDeliveryPartners(): void {
+    this.deliveryService.getDeliveryPartners().subscribe({
+      next: (partners) => {
+        this.deliveryPartners.set(partners || []);
       },
-
-      // Backend/API error.
-
-      error: () => {}
-
+      error: (err: any) => console.error('Failed to load delivery partners', err)
     });
+  }
 
-}// Delete Delivery.
-deleteDelivery(
-
-  // ID of the delivery we want to delete.
-  deliveryId: number
-
-): void {
-
-  // STEP 1
-  // Call DeliveryService.
-  //
-  // deleteDelivery()
-  // Sends DELETE request to Backend.
-
-  this.deliveryService
-    .deleteDelivery(deliveryId)
-
-    // STEP 2
-    // Wait for Backend response.
-
-    .subscribe({
-
-      // Backend successfully deleted delivery.
-
-      next: () => {
-
-        // STEP 3
-        // Load the latest delivery list
-        // from Backend.
-
-        this.loadDeliveries();
-
+  loadReadyOrders(): void {
+    this.orderService.getAllOrdersApi().subscribe({
+      next: (orders) => {
+        // Orders that are Ready for Pickup, Confirmed, or Preparing and not already delivered/assigned
+        const ready = (orders || []).filter(o => 
+          ['ready for pickup', 'ready', 'confirmed', 'preparing'].includes(o.status.toLowerCase())
+        );
+        this.readyOrders.set(ready);
       },
-
-      // Backend/API error.
-
-      error: () => {}
-
+      error: (err: any) => console.error('Failed to load ready orders', err)
     });
+  }
 
-}
+  retry(): void {
+    this.loadAllData();
+  }
+
+  // Open modal to reassign partner for an existing delivery
+  openReassignModal(delivery: OrderDeliveryResponse): void {
+    this.selectedDelivery.set(delivery);
+    this.targetPartnerId.set(delivery.deliveryPartnerId);
+    this.isAssignModalOpen.set(true);
+  }
+
+  closeAssignModal(): void {
+    this.isAssignModalOpen.set(false);
+    this.selectedDelivery.set(null);
+    this.targetPartnerId.set(null);
+  }
+
+  // Submit Reassignment
+  submitReassignment(): void {
+    const delivery = this.selectedDelivery();
+    const partnerId = this.targetPartnerId();
+
+    if (!delivery || !partnerId) {
+      this.toastr.warning('Please select a delivery partner');
+      return;
+    }
+
+    this.isSubmitting.set(true);
+    this.deliveryService.assignDeliveryPartner(delivery.orderId, partnerId).subscribe({
+      next: () => {
+        this.toastr.success(`Delivery Partner reassigned for Order #${delivery.orderId}`);
+        this.isSubmitting.set(false);
+        this.closeAssignModal();
+        this.loadAllData();
+      },
+      error: (err: any) => {
+        this.isSubmitting.set(false);
+        const msg = err.error?.message || 'Failed to reassign delivery partner';
+        this.toastr.error(msg);
+      }
+    });
+  }
+
+  // Open New Assignment Modal
+  openNewAssignModal(): void {
+    this.newAssignmentOrderId.set(null);
+    this.newAssignmentPartnerId.set(null);
+    this.loadReadyOrders();
+    this.isNewAssignModalOpen.set(true);
+  }
+
+  closeNewAssignModal(): void {
+    this.isNewAssignModalOpen.set(false);
+    this.newAssignmentOrderId.set(null);
+    this.newAssignmentPartnerId.set(null);
+  }
+
+  // Submit New Assignment
+  submitNewAssignment(): void {
+    const orderId = this.newAssignmentOrderId();
+    const partnerId = this.newAssignmentPartnerId();
+
+    if (!orderId) {
+      this.toastr.warning('Please select an order to assign');
+      return;
+    }
+    if (!partnerId) {
+      this.toastr.warning('Please select a delivery partner');
+      return;
+    }
+
+    this.isSubmitting.set(true);
+    this.deliveryService.createDelivery({
+      orderId: Number(orderId),
+      deliveryPartnerId: Number(partnerId)
+    }).subscribe({
+      next: () => {
+        this.toastr.success(`Order #${orderId} assigned to delivery partner successfully`);
+        this.isSubmitting.set(false);
+        this.closeNewAssignModal();
+        this.loadAllData();
+      },
+      error: (err: any) => {
+        this.isSubmitting.set(false);
+        const msg = err.error?.message || 'Failed to assign order';
+        this.toastr.error(msg);
+      }
+    });
+  }
+
+  // View Details Modal
+  viewDetails(delivery: OrderDeliveryResponse): void {
+    this.selectedDelivery.set(delivery);
+    this.isDetailsModalOpen.set(true);
+  }
+
+  closeDetailsModal(): void {
+    this.isDetailsModalOpen.set(false);
+    this.selectedDelivery.set(null);
+  }
+
+  // Update Status
+  updateDeliveryStatus(deliveryId: number, newStatus: string): void {
+    this.deliveryService.updateDeliveryStatus(deliveryId, newStatus).subscribe({
+      next: () => {
+        this.toastr.success(`Delivery status updated to ${newStatus}`);
+        this.loadAllData();
+      },
+      error: (err: any) => {
+        const msg = err.error?.message || 'Failed to update delivery status';
+        this.toastr.error(msg);
+      }
+    });
+  }
+
+  // Delete Delivery
+  deleteDelivery(deliveryId: number): void {
+    if (!confirm('Are you sure you want to delete this delivery record? This cannot be undone.')) return;
+
+    this.deliveryService.deleteDelivery(deliveryId).subscribe({
+      next: () => {
+        this.toastr.success('Delivery record deleted');
+        this.deliveries.update(list => list.filter(d => d.id !== deliveryId));
+      },
+      error: () => this.toastr.error('Failed to delete delivery')
+    });
+  }
+
+  getStatusClass(status: string): string {
+    const s = (status || '').toLowerCase().replace(/\s+/g, '');
+    switch (s) {
+      case 'delivered': return 'status-delivered';
+      case 'outfordelivery': return 'status-out';
+      case 'pickedup': return 'status-picked';
+      case 'assigned': return 'status-assigned';
+      default: return 'status-pending';
+    }
+  }
 }

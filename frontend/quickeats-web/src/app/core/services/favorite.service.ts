@@ -51,4 +51,9 @@ favorite:FavoriteModel):Observable<FavoriteModel> {
 
   }
 
+// Remove restaurant from favorites.
+removeFavorite(favoriteId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${favoriteId}`);
+  }
+
 }

@@ -1,76 +1,100 @@
-import { Component } from '@angular/core';
-// Import Component because this is an Angular Component.
-
+import { Component, signal, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-// Import CommonModule because HTML uses @if.
-
-import { RouterLink } from '@angular/router';
-// RouterLink makes routerLink work in HTML.
-
-import { NotificationService } from '../../core/services/notification.service';
-// Used to load unread count.
-
+import { RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
-// Used to check whether the Customer is logged in.
+import { CartService } from '../../core/services/cart.service';
+import { NotificationService } from '../../core/services/notification.service';
+import { Subscription, filter } from 'rxjs';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterLink
-  ],
+  imports: [CommonModule, RouterLink, RouterLinkActive, FormsModule],
   templateUrl: './header.html',
   styleUrl: './header.scss',
 })
+export class HeaderComponent implements OnInit, OnDestroy {
 
-export class HeaderComponent {
-
-  // Number of unread Notifications.
-  unreadCount = 0;
-
-  // true = Customer is logged in.
   isLoggedIn = false;
+  userName = '';
+  mobileMenuOpen = false;
+  cartCount = 0;
+  unreadCount = 0;
+  isHomePage = false;
+  searchQuery = '';
+
+  private routerSub?: Subscription;
 
   constructor(
-
+    private authService: AuthService,
+    private cartService: CartService,
     private notificationService: NotificationService,
-
-    private authService: AuthService
-
+    private router: Router
   ) {
-
-    // Check login status.
-    this.isLoggedIn = this.authService.isLoggedIn();
-
-    // Load unread count if logged in.
-    if (this.isLoggedIn) {
-
-      this.loadUnreadCount();
-
-    }
-
+    this.checkAuth();
+    this.checkRoute();
   }
 
-  // Load unread Notification count.
-  loadUnreadCount(): void {
+  ngOnInit(): void {
+    this.cartCount = this.cartService.cartItems().length;
 
-    this.notificationService
-      .getUnreadCount()
-      .subscribe({
-
-        // API Success.
-        next: (count: number) => {
-
-          this.unreadCount = count;
-
-        },
-
-        // API Failed.
-        error: () => {}
-
+    this.routerSub = this.router.events
+      .pipe(filter(e => e instanceof NavigationEnd))
+      .subscribe(() => {
+        this.checkRoute();
+        this.checkAuth();
       });
-
   }
 
+  ngOnDestroy(): void {
+    this.routerSub?.unsubscribe();
+  }
+
+  private checkAuth(): void {
+    this.isLoggedIn = this.authService.isLoggedIn();
+    if (this.isLoggedIn) {
+      this.userName = localStorage.getItem('name') || '';
+      this.loadUnreadCount();
+    }
+  }
+
+  private checkRoute(): void {
+    this.isHomePage = this.router.url === '/' || this.router.url === '/landing/page';
+  }
+
+  loadUnreadCount(): void {
+    this.notificationService.getUnreadCount().subscribe({
+      next: (count: number) => { this.unreadCount = count; },
+      error: () => {}
+    });
+  }
+
+  getCartCount(): number {
+    return this.cartService.cartItems().length;
+  }
+
+  toggleMobileMenu(): void {
+    this.mobileMenuOpen = !this.mobileMenuOpen;
+  }
+
+  closeMobileMenu(): void {
+    this.mobileMenuOpen = false;
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.isLoggedIn = false;
+    this.userName = '';
+    this.closeMobileMenu();
+    this.router.navigate(['/']);
+  }
+
+  onSearch(): void {
+    if (this.searchQuery.trim()) {
+      this.router.navigate(['/restaurants'], { queryParams: { search: this.searchQuery } });
+      this.searchQuery = '';
+      this.closeMobileMenu();
+    }
+  }
 }

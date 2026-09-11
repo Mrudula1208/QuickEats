@@ -1,4 +1,4 @@
-﻿using QuickEats.API.Models;
+using QuickEats.API.Models;
 // Import Review model.
 // Repository will work with Review database objects.
 
@@ -34,6 +34,11 @@ namespace QuickEats.API.Repositories.Interfaces
 
         Task<IEnumerable<Reviews>> GetByRestaurantIdAsync(
             int restaurantId
+        );
+
+        // Get all Reviews of all Restaurants owned by an Owner.
+        Task<IEnumerable<Reviews>> GetByOwnerIdAsync(
+            int ownerId
         );
 
 

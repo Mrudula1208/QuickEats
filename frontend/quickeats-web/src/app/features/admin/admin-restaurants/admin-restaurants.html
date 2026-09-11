@@ -1,45 +1,146 @@
 <app-admin-nav></app-admin-nav>
 
-<div class="admin-restaurants-page">
-  <div class="page-header">
-    <h1>Admin Restaurants</h1>
-    <button (click)="addRestaurant()" class="btn-add">Add Restaurant</button>
+<section class="ar-hero">
+  <div class="ar-hero-inner">
+    <h1>Restaurant Management</h1>
+    <p>Manage all restaurants on the platform</p>
   </div>
+</section>
 
-  @if (restaurants.length === 0) {
-    <h2>No Restaurants Found</h2>
-  } @else {
-    <div class="restaurants-grid">
-      @for (restaurant of restaurants; track restaurant.id) {
-        <div class="restaurant-card">
-          <img [src]="restaurant.imageUrl" [alt]="restaurant.name" class="restaurant-image">
-          <div class="restaurant-info">
-            <h2>{{ restaurant.name }}</h2>
-            <p class="description">{{ restaurant.description }}</p>
-            <p class="detail">📍 {{ restaurant.address }}</p>
-            <p class="detail">📞 {{ restaurant.phoneNumber }}</p>
-            <p class="detail">🕐 {{ restaurant.openingTime }} - {{ restaurant.closingTime }}</p>
-            <p class="status-detail">
-              @if (restaurant.isOpenNow) {
-                <span class="status-open">🟢 Open Now</span>
-              } @else {
-                <span class="status-closed">🔴 Closed</span>
+<section class="ar-content">
+  <div class="ar-container">
+
+    @if (isLoading()) {
+      <div class="ar-loading">
+        <span class="material-icons spinning">progress_activity</span>
+        <p>Loading restaurants...</p>
+      </div>
+    } @else {
+
+      <div class="ar-stats">
+        <div class="ar-stat">
+          <span class="ar-stat-num">{{ counts().total }}</span>
+          <span class="ar-stat-label">Total</span>
+        </div>
+        <div class="ar-stat active">
+          <span class="ar-stat-num">{{ counts().active }}</span>
+          <span class="ar-stat-label">Active</span>
+        </div>
+        <div class="ar-stat inactive">
+          <span class="ar-stat-num">{{ counts().inactive }}</span>
+          <span class="ar-stat-label">Inactive</span>
+        </div>
+      </div>
+
+      <div class="ar-toolbar">
+        <div class="ar-search">
+          <span class="material-icons">search</span>
+          <input type="text" placeholder="Search restaurants..." [ngModel]="searchText()" (ngModelChange)="searchText.set($event)">
+        </div>
+        <button class="ar-add-btn" (click)="addRestaurant()">
+          <span class="material-icons">add</span>
+          Add Restaurant
+        </button>
+      </div>
+
+      <div class="ar-filters">
+        @for (tab of statusTabs; track tab) {
+          <button class="ar-filter-chip" [class.active]="selectedStatus() === tab" (click)="selectedStatus.set(tab)">
+            {{ tab }}
+          </button>
+        }
+      </div>
+
+      @if (filteredRestaurants().length === 0) {
+        <div class="ar-empty">
+          <span class="material-icons">storefront</span>
+          <h3>{{ restaurants().length === 0 ? 'No Restaurants Yet' : 'No restaurants match your search' }}</h3>
+          <p>{{ restaurants().length === 0 ? 'Add your first restaurant to get started.' : 'Try a different search term.' }}</p>
+          @if (restaurants().length === 0) {
+            <button class="ar-add-first" (click)="addRestaurant()">
+              <span class="material-icons">add</span>
+              Add Restaurant
+            </button>
+          }
+        </div>
+      } @else {
+        <div class="ar-grid">
+          @for (r of displayedRestaurants(); track r.id) {
+            <div class="ar-card" [class.inactive-card]="!r.isActive">
+              <div class="ar-card-img">
+                <img [src]="r.imageUrl || ''" [alt]="r.name" (error)="$any($event.target).src='assets/images/no-image.svg'">
+                <div class="ar-card-badges">
+                  <span class="ar-badge" [class.open]="r.isOpenNow" [class.closed]="!r.isOpenNow">
+                    {{ r.isOpenNow ? 'Open Now' : 'Closed' }}
+                  </span>
+                  <span class="ar-badge" [class.active]="r.isActive" [class.inactive]="!r.isActive">
+                    {{ r.isActive ? 'Active' : 'Inactive' }}
+                  </span>
+                </div>
+              </div>
+              <div class="ar-card-body">
+                <h3>{{ r.name }}</h3>
+                <p class="ar-desc">{{ r.description || 'No description' }}</p>
+                <div class="ar-info-rows">
+                  <div class="ar-info-row">
+                    <span class="material-icons">location_on</span>
+                    <span>{{ r.address }}</span>
+                  </div>
+                  <div class="ar-info-row">
+                    <span class="material-icons">phone</span>
+                    <span>{{ r.phoneNumber }}</span>
+                  </div>
+                  <div class="ar-info-row">
+                    <span class="material-icons">schedule</span>
+                    <span>{{ r.openingTime }} - {{ r.closingTime }}</span>
+                  </div>
+                  <div class="ar-info-row">
+                    <span class="material-icons">delivery_dining</span>
+                    <span>₹{{ r.deliveryCharge }} delivery · ₹{{ r.minimumOrder }} min order</span>
+                  </div>
+                </div>
+                <div class="ar-card-actions">
+                  <a class="ar-btn view" [routerLink]="['/restaurants', r.id]" target="_blank">
+                    <span class="material-icons">visibility</span> View
+                  </a>
+                  <button class="ar-btn edit" (click)="editRestaurant(r)">
+                    <span class="material-icons">edit</span> Edit
+                  </button>
+                  <button class="ar-btn toggle" [class.deactivate]="r.isActive" (click)="toggleStatus(r.id)">
+                    <span class="material-icons">{{ r.isActive ? 'block' : 'check_circle' }}</span>
+                    {{ r.isActive ? 'Deactivate' : 'Activate' }}
+                  </button>
+                  <button class="ar-btn delete" (click)="deleteRestaurant(r)">
+                    <span class="material-icons">delete_outline</span> Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Pagination Controls -->
+        @if (filteredRestaurants().length > 10) {
+          <div class="table-pagination-footer" style="margin-top: 24px; border-radius: 12px; border: 1px solid var(--qe-border);">
+            <span class="pagination-info">
+              Showing <strong>{{ displayedRestaurants().length }}</strong> of <strong>{{ filteredRestaurants().length }}</strong> restaurants
+            </span>
+            <div class="pagination-actions">
+              @if (hasMore()) {
+                <button class="btn-pagination btn-show-more" (click)="showMore()">
+                  <span class="material-icons">expand_more</span>
+                  Show More (+10)
+                </button>
               }
-              ·
-              <span [class.active]="restaurant.isActive" [class.inactive]="!restaurant.isActive">
-                {{ restaurant.isActive ? 'Active' : 'Inactive' }}
-              </span>
-            </p>
-            <div class="card-actions">
-              <button (click)="editRestaurant(restaurant)" class="btn-edit">Edit</button>
-              <button (click)="toggleStatus(restaurant.id)" class="btn-toggle">
-                {{ restaurant.isActive ? 'Deactivate' : 'Activate' }}
+              <button class="btn-pagination btn-show-all" (click)="toggleShowAll()">
+                <span class="material-icons">{{ showAll() ? 'unfold_less' : 'unfold_more' }}</span>
+                {{ showAll() ? 'Collapse to 10' : 'Show All (' + filteredRestaurants().length + ')' }}
               </button>
-              <button (click)="deleteRestaurant(restaurant.id)" class="btn-delete">Delete</button>
             </div>
           </div>
-        </div>
+        }
       }
-    </div>
-  }
-</div>
+    }
+
+  </div>
+</section>

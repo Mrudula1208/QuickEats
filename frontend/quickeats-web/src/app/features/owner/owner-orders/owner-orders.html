@@ -1,122 +1,222 @@
 <app-owner-nav></app-owner-nav>
 
-<div class="owner-page">
+<section class="oo-hero">
+  <div class="oo-hero-inner">
+    <h1>Orders & Kitchen Workflow</h1>
+    <p>Manage incoming orders, prepare meals, and mark orders ready for delivery pickup.</p>
+  </div>
+</section>
 
-    <h1>Orders</h1>
+<section class="oo-content">
+  <div class="oo-container">
 
-    @if(orders.length === 0){
-
-        <div class="empty">
-
-            <h2>No Orders Yet</h2>
-
-            <p>Orders from your restaurants will appear here.</p>
-
+    @if (isLoading()) {
+      <div class="oo-loading">
+        <span class="material-icons spinning">progress_activity</span>
+        <p>Loading restaurant orders...</p>
+      </div>
+    } @else if (loadError()) {
+      <div class="oo-empty">
+        <span class="material-icons text-danger">error_outline</span>
+        <h3>Something went wrong</h3>
+        <p>{{ loadError() }}</p>
+        <button class="oo-retry-btn" (click)="retry()">
+          <span class="material-icons">refresh</span>
+          Try Again
+        </button>
+      </div>
+    } @else if (orders().length === 0) {
+      <div class="oo-empty">
+        <span class="material-icons">receipt_long</span>
+        <h3>No Orders Received Yet</h3>
+        <p>Orders placed for your restaurants will appear here in real-time.</p>
+      </div>
+    } @else {
+      <!-- Summary Counters -->
+      <div class="oo-stats">
+        <div class="oo-stat">
+          <span class="oo-stat-num">{{ counts().total }}</span>
+          <span class="oo-stat-label">Total Orders</span>
         </div>
+        <div class="oo-stat pending">
+          <span class="oo-stat-num">{{ counts().pending }}</span>
+          <span class="oo-stat-label">Pending</span>
+        </div>
+        <div class="oo-stat active">
+          <span class="oo-stat-num">{{ counts().confirmed + counts().preparing }}</span>
+          <span class="oo-stat-label">In Kitchen</span>
+        </div>
+        <div class="oo-stat ready">
+          <span class="oo-stat-num">{{ counts().ready }}</span>
+          <span class="oo-stat-label">Ready for Pickup</span>
+        </div>
+        <div class="oo-stat out">
+          <span class="oo-stat-num">{{ counts().out }}</span>
+          <span class="oo-stat-label">Rider In-Transit</span>
+        </div>
+        <div class="oo-stat delivered">
+          <span class="oo-stat-num">{{ counts().delivered }}</span>
+          <span class="oo-stat-label">Completed</span>
+        </div>
+      </div>
 
-    }
-    @else{
+      <!-- Filter Tabs -->
+      <div class="oo-filters">
+        @for (tab of filterTabs; track tab) {
+          <button class="oo-filter-chip" [class.active]="selectedFilter() === tab" (click)="selectedFilter.set(tab)">
+            {{ tab }}
+          </button>
+        }
+      </div>
 
-        <div class="order-list">
-
-            @for(order of orders; track order.id){
-
-            <div class="order-card" [class.order-pending]="order.status === 'Pending'">
-
-                <div class="order-head">
-
-                    <h2>Order #{{ order.id }}</h2>
-
-                    <span class="status" [ngClass]="getStatusClass(order.status)">
-                        {{ order.status }}
-                    </span>
-
+      <!-- Order List -->
+      @if (filteredOrders().length === 0) {
+        <div class="oo-empty-inline">
+          <span class="material-icons">filter_list_off</span>
+          <p>No orders with status "{{ selectedFilter() }}"</p>
+        </div>
+      } @else {
+        <div class="oo-list">
+          @for (order of filteredOrders(); track order.id) {
+            <div class="oo-card" [class.oo-pending-border]="order.status.toLowerCase() === 'pending'">
+              <div class="oo-card-head">
+                <div class="oo-card-head-left">
+                  <h3>Order #{{ order.id }}</h3>
+                  <span class="oo-status-badge" [ngClass]="getStatusClass(order.status)">
+                    <span class="material-icons">{{ getStatusIcon(order.status) }}</span>
+                    {{ order.status }}
+                  </span>
                 </div>
+                <span class="oo-time">{{ order.createdAt | date:'MMM d, h:mm a' }}</span>
+              </div>
 
-                <p>
-                    Restaurant: <strong>{{ order.restaurantName }}</strong>
-                </p>
-
-                <p>
-                    Customer: {{ order.customerName }} •
-                    {{ order.phoneNumber }}
-                </p>
-
-                <p>
-                    Delivery to: {{ order.deliveryAddress }}
-                </p>
-
-                <p>
-                    Payment: {{ order.paymentMethod }} •
-                    ₹{{ order.totalAmount }}
-                </p>
-
-                <p class="order-time">
-                    {{ order.createdAt | date:'medium' }}
-                </p>
-
-                <div class="items">
-
-                    @for(item of order.items; track item.menuItemId){
-
-                        <p>
-                            {{ item.name }}
-                            × {{ item.quantity }}
-                            — ₹{{ item.totalPrice }}
-                        </p>
-
-                    }
-
-                </div>
-
-                <!-- Quick advance button (when next status exists) -->
-                @if (getNextStatus(order.status)) {
-                    <div class="quick-actions">
-                        <button
-                            class="btn-advance"
-                            (click)="advanceStatus(order)">
-
-                            {{ getNextStatusLabel(order.status) }}
-
-                        </button>
+              <div class="oo-card-body">
+                <div class="oo-info-grid">
+                  <div class="oo-info-item">
+                    <span class="material-icons">storefront</span>
+                    <div>
+                      <span class="oo-info-label">Restaurant</span>
+                      <span class="oo-info-value">{{ order.restaurantName }}</span>
                     </div>
-                }
-
-                <!-- Manual status dropdown -->
-                <div class="status-row">
-
-                    <label>Change Status</label>
-
-                    <select
-                        [(ngModel)]="order.status"
-                        name="status-{{ order.id }}">
-
-                        <option value="Pending">Pending</option>
-
-                        <option value="Confirmed">Confirmed</option>
-
-                        <option value="Preparing">Preparing</option>
-
-                        <option value="Out for Delivery">Out for Delivery</option>
-
-                        <option value="Delivered">Delivered</option>
-
-                        <option value="Cancelled">Cancelled</option>
-
-                    </select>
-
-                    <button (click)="updateStatus(order)">
-                        Update
-                    </button>
-
+                  </div>
+                  <div class="oo-info-item">
+                    <span class="material-icons">person</span>
+                    <div>
+                      <span class="oo-info-label">Customer</span>
+                      <span class="oo-info-value">{{ order.customerName }}</span>
+                    </div>
+                  </div>
+                  <div class="oo-info-item">
+                    <span class="material-icons">phone</span>
+                    <div>
+                      <span class="oo-info-label">Customer Phone</span>
+                      <span class="oo-info-value">{{ order.phoneNumber || 'Not provided' }}</span>
+                    </div>
+                  </div>
+                  <div class="oo-info-item">
+                    <span class="material-icons">place</span>
+                    <div>
+                      <span class="oo-info-label">Delivery Destination</span>
+                      <span class="oo-info-value">{{ order.deliveryAddress }}</span>
+                    </div>
+                  </div>
                 </div>
 
+                <!-- Ordered Items -->
+                <div class="oo-items-strip">
+                  @for (item of order.items; track item.menuItemId) {
+                    <span class="oo-item-chip">
+                      <strong class="qty">{{ item.quantity }}x</strong> {{ item.name }}
+                      @if (item.unitPrice) {
+                        <span class="price">(₹{{ item.unitPrice }})</span>
+                      }
+                    </span>
+                  }
+                  <span class="oo-items-total">{{ getTotalItems(order) }} item(s)</span>
+                </div>
+              </div>
+
+              <!-- Footer with Sequential Actions -->
+              <div class="oo-card-footer">
+                <div class="oo-pay">
+                  <span class="oo-amount">₹{{ order.totalAmount | number:'1.2-2' }}</span>
+                  <span class="oo-pay-method">{{ order.paymentMethod || 'Paid' }}</span>
+                </div>
+
+                <div class="oo-actions">
+                  <!-- PENDING -> CONFIRM -->
+                  @if (order.status.toLowerCase() === 'pending') {
+                    <button class="oo-btn btn-confirm" (click)="confirmOrder(order)">
+                      <span class="material-icons">check_circle</span> Confirm Order
+                    </button>
+                    <button class="oo-btn btn-cancel" (click)="cancelOrder(order)">
+                      <span class="material-icons">close</span> Reject
+                    </button>
+                  }
+
+                  <!-- CONFIRMED -> START PREPARING -->
+                  @else if (order.status.toLowerCase() === 'confirmed') {
+                    <button class="oo-btn btn-prepare" (click)="startPreparing(order)">
+                      <span class="material-icons">outdoor_grill</span> Start Preparing
+                    </button>
+                    <button class="oo-btn btn-cancel" (click)="cancelOrder(order)">
+                      <span class="material-icons">close</span> Cancel
+                    </button>
+                  }
+
+                  <!-- PREPARING -> READY FOR PICKUP -->
+                  @else if (order.status.toLowerCase() === 'preparing') {
+                    <button class="oo-btn btn-ready" (click)="markReadyForPickup(order)">
+                      <span class="material-icons">inventory_2</span> Mark Ready for Pickup
+                    </button>
+                  }
+
+                  <!-- READY FOR PICKUP -->
+                  @else if (order.status.toLowerCase() === 'ready for pickup' || order.status.toLowerCase() === 'ready') {
+                    <div class="oo-partner-status ready-badge">
+                      <span class="material-icons">schedule</span>
+                      <span>Order Ready &bull; Waiting for Rider Pickup</span>
+                    </div>
+                  }
+
+                  <!-- ASSIGNED -->
+                  @else if (order.status.toLowerCase() === 'assigned') {
+                    <div class="oo-partner-status assigned-badge">
+                      <span class="material-icons">sports_motorsports</span>
+                      <span>Delivery Partner Assigned & En Route to Store</span>
+                    </div>
+                  }
+
+                  <!-- PICKED UP / OUT FOR DELIVERY -->
+                  @else if (order.status.toLowerCase() === 'picked up' || order.status.toLowerCase() === 'out for delivery' || order.status.toLowerCase() === 'outfordelivery') {
+                    <div class="oo-partner-status transit-badge">
+                      <span class="material-icons">two_wheeler</span>
+                      <span>Picked Up & In-Transit to Customer</span>
+                    </div>
+                  }
+
+                  <!-- DELIVERED -->
+                  @else if (order.status.toLowerCase() === 'delivered') {
+                    <div class="oo-partner-status delivered-badge">
+                      <span class="material-icons">done_all</span>
+                      <span>Order Delivered Successfully</span>
+                    </div>
+                  }
+
+                  <!-- CANCELLED -->
+                  @else if (order.status.toLowerCase() === 'cancelled') {
+                    <div class="oo-partner-status cancelled-badge">
+                      <span class="material-icons">cancel</span>
+                      <span>Order Cancelled</span>
+                    </div>
+                  }
+                </div>
+              </div>
             </div>
-
-            }
-
+          }
         </div>
-
+      }
     }
 
-</div>
+  </div>
+</section>

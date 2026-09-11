@@ -1,0 +1,123 @@
+<div class="rh-container">
+
+  <!-- Header -->
+  <div class="rh-header">
+    <div class="rh-header-left">
+      <h1 class="rh-title">Delivery History</h1>
+      <p class="rh-subtitle">Review your past completed orders and fulfillment records.</p>
+    </div>
+    <div class="rh-header-right">
+      <div class="history-stats-pill">
+        <span class="material-icons">task_alt</span>
+        <span>{{ stats().totalCount }} Orders Completed</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search & Filter Bar -->
+  <div class="rh-toolbar">
+    <div class="search-box">
+      <span class="material-icons search-icon">search</span>
+      <input
+        type="text"
+        placeholder="Search by Order #, restaurant, or customer..."
+        [value]="searchText()"
+        (input)="searchText.set($any($event.target).value)"
+        class="search-input"
+      />
+      @if (searchText()) {
+        <button class="clear-btn" (click)="searchText.set('')">
+          <span class="material-icons">close</span>
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="rh-state-card">
+      <span class="material-icons spinning state-icon">progress_activity</span>
+      <h3>Loading delivery history...</h3>
+      <p>Fetching your completed delivery records</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @else if (loadError()) {
+    <div class="rh-state-card">
+      <span class="material-icons state-icon text-danger">error_outline</span>
+      <h3>{{ loadError() }}</h3>
+      <p>Could not retrieve your history.</p>
+      <button class="primary-btn" (click)="retry()">
+        <span class="material-icons">refresh</span> Try Again
+      </button>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @else if (completedDeliveries().length === 0) {
+    <div class="rh-state-card">
+      <span class="material-icons state-icon">history_toggle_off</span>
+      <h3>No Completed Deliveries Yet</h3>
+      <p>Deliveries marked as "Delivered" will appear here for your historical records.</p>
+      @if (searchText()) {
+        <button class="secondary-btn" (click)="searchText.set('')">
+          Clear Search Filter
+        </button>
+      }
+    </div>
+  }
+
+  <!-- History Table / Cards -->
+  @else {
+    <div class="rh-list">
+      @for (delivery of completedDeliveries(); track delivery.id) {
+        <div class="history-item-card" (click)="viewDelivery(delivery.id)">
+          
+          <div class="item-left">
+            <div class="success-icon-wrap">
+              <span class="material-icons">task_alt</span>
+            </div>
+            
+            <div class="item-meta">
+              <div class="title-row">
+                <span class="order-id">Order #{{ delivery.orderId }}</span>
+                <span class="dot">&bull;</span>
+                <span class="restaurant-name">{{ delivery.restaurantName || 'Restaurant' }}</span>
+              </div>
+              
+              <div class="customer-row">
+                <span class="material-icons">person</span>
+                <span>{{ delivery.customerName }}</span>
+                <span class="dot">&bull;</span>
+                <span class="address-text">{{ delivery.deliveryAddress }}</span>
+              </div>
+
+              <div class="time-row">
+                <span class="material-icons">event_available</span>
+                <span>Delivered on: {{ (delivery.deliveredAt || delivery.assignedAt) | date:'medium' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="item-right">
+            <div class="amount-wrap">
+              <span class="amount">₹{{ delivery.totalAmount }}</span>
+              <span class="pay-method">{{ delivery.paymentMethod || 'Paid' }}</span>
+            </div>
+
+            <button 
+              type="button" 
+              class="view-btn" 
+              (click)="viewDelivery(delivery.id); $event.stopPropagation()">
+              <span class="material-icons">receipt_long</span>
+              View
+            </button>
+          </div>
+
+        </div>
+      }
+    </div>
+  }
+
+</div>

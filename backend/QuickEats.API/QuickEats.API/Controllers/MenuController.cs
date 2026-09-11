@@ -73,8 +73,13 @@ namespace QuickEats.API.Controllers
         /// <param name="restaurantId">Restaurant id.</param>
         [AllowAnonymous]
         [HttpGet("restaurant/{restaurantId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task <IActionResult> GetByRestaurantId(int restaurantId)
         {
+            if (User.IsInRole("Owner") && !await IsOwnerOfRestaurant(restaurantId))
+                return Forbid();
+
             var menuItems = await _menuService.GetByRestaurantIdAsync(restaurantId);
             return Ok(menuItems);
         }

@@ -1,101 +1,199 @@
-<div class="orders-page">
+<!-- Page Header -->
+<section class="page-hero">
+  <div class="container">
+    <h1 class="page-title">My Orders</h1>
+    <p class="page-subtitle">Track and manage your food orders</p>
+  </div>
+</section>
 
-    <div class="page-header">
+<section class="orders-section">
+  <div class="container">
 
-        <div class="page-title">
+    <!-- Filter Tabs -->
+    <div class="filter-bar">
+      <button class="filter-tab" [class.active]="activeFilter() === 'all'" (click)="applyFilter('all')">
+        <span class="material-icons">receipt_long</span>
+        All
+        <span class="count">{{ orders().length }}</span>
+      </button>
+      <button class="filter-tab" [class.active]="activeFilter() === 'active'" (click)="applyFilter('active')">
+        <span class="material-icons">pending_actions</span>
+        Active
+        <span class="count">{{ orders().filter(o => ['Pending','Confirmed','Preparing','Out for Delivery'].includes(o.status)).length }}</span>
+      </button>
+      <button class="filter-tab" [class.active]="activeFilter() === 'delivered'" (click)="applyFilter('delivered')">
+        <span class="material-icons">check_circle</span>
+        Delivered
+        <span class="count">{{ orders().filter(o => o.status === 'Delivered').length }}</span>
+      </button>
+      <button class="filter-tab" [class.active]="activeFilter() === 'cancelled'" (click)="applyFilter('cancelled')">
+        <span class="material-icons">cancel</span>
+        Cancelled
+        <span class="count">{{ orders().filter(o => o.status === 'Cancelled').length }}</span>
+      </button>
+      <button class="refresh-tab" (click)="loadOrders()" title="Refresh orders">
+        <span class="material-icons">refresh</span>
+      </button>
+    </div>
 
-            <h1>🛍 My Orders</h1>
-
-            <p>Track all your previous orders</p>
-
+    @if (isLoading()) {
+      <div class="orders-list skeleton-list">
+        @for (s of [1,2,3]; track s) {
+          <div class="skeleton-card">
+            <div class="skeleton skeleton-circle"></div>
+            <div class="skeleton-body">
+              <div class="skeleton skeleton-line w40"></div>
+              <div class="skeleton skeleton-line w20"></div>
+              <div class="skeleton skeleton-line w70"></div>
+            </div>
+            <div class="skeleton-right">
+              <div class="skeleton skeleton-line w30"></div>
+              <div class="skeleton skeleton-btn"></div>
+            </div>
+          </div>
+        }
+      </div>
+    } @else if (loadError()) {
+      <div class="error-state">
+        <div class="empty-icon-wrap">
+          <span class="material-icons">cloud_off</span>
         </div>
-
-        <button class="refresh-btn" (click)="refreshOrders()">
-
-            ↻ Refresh
-
+        <h2>Couldn't load your orders</h2>
+        <p>{{ loadError() }}</p>
+        <button class="retry-btn" (click)="retry()">
+          <span class="material-icons">refresh</span>
+          Try Again
         </button>
+      </div>
+    } @else if (filteredOrders().length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon-wrap">
+          <span class="material-icons">receipt_long</span>
+        </div>
+        <h2>
+          @if (activeFilter() === 'all') { No orders yet }
+          @else if (activeFilter() === 'active') { No active orders }
+          @else if (activeFilter() === 'delivered') { No delivered orders }
+          @else { No cancelled orders }
+        </h2>
+        <p>
+          @if (activeFilter() === 'all') { Place your first order and it will appear here }
+          @else { Try a different filter }
+        </p>
+        @if (activeFilter() === 'all') {
+          <a routerLink="/restaurants" class="browse-btn">
+            <span class="material-icons">restaurant_menu</span>
+            Browse Restaurants
+          </a>
+        }
+      </div>
+    } @else {
 
-    </div>
+      <div class="orders-list">
+        @for (order of filteredOrders(); track order.id) {
+          <div class="order-card" [class.order-card--cancelled]="order.status === 'Cancelled'">
 
-    @if (orders.length === 0) {
-
-    <div class="empty-orders">
-
-        <h2>No Orders Yet 🍕</h2>
-
-        <p>Looks like you haven't placed any order.</p>
-
-    </div>
-
-    }
-
-    @else {
-
-    <div class="orders-grid">
-
-        @for(order of orders; track order.id){
-
-        <div class="order-card">
-
-            <div class="order-header">
-
-                <h3>Order #{{order.id}}</h3>
-
-                <span class="status" [ngClass]="getStatusClass(order.status)">
-
-                    {{ order.status }}
-
-                </span>
-
+            <!-- Left: Status Icon -->
+            <div class="order-status-icon" [ngClass]="getStatusClass(order.status)">
+              <span class="material-icons">{{ getStatusIcon(order.status) }}</span>
             </div>
 
-            <h2 class="restaurant-name">
+            <!-- Center: Order Info -->
+            <div class="order-info">
+              <div class="order-info-top">
+                <div class="order-title-group">
+                  <div class="restaurant-thumb">
+                    @if (getRestaurantImage(order.restaurantId)) {
+                      <img [src]="getRestaurantImage(order.restaurantId)" [alt]="order.restaurantName" loading="lazy">
+                    } @else {
+                      <span class="material-icons">storefront</span>
+                    }
+                  </div>
+                  <div>
+                    <h3 class="order-restaurant">{{ order.restaurantName }}</h3>
+                    <span class="order-id">Order #{{ order.id }}</span>
+                  </div>
+                </div>
+                <span class="status-badge" [ngClass]="getStatusClass(order.status)">
+                  {{ order.status }}
+                </span>
+              </div>
 
-                {{ order.restaurantName }}
+              <div class="order-meta">
+                <span class="meta-item">
+                  <span class="material-icons">calendar_today</span>
+                  {{ order.createdAt | date:'mediumDate' }}
+                </span>
+                <span class="meta-item">
+                  <span class="material-icons">schedule</span>
+                  {{ order.createdAt | date:'shortTime' }}
+                </span>
+                <span class="meta-item">
+                  <span class="material-icons">payments</span>
+                  {{ order.paymentMethod }}
+                </span>
+                <span class="meta-item">
+                  <span class="material-icons">shopping_bag</span>
+                  {{ order.items.length }} {{ order.items.length === 1 ? 'item' : 'items' }}
+                </span>
+              </div>
 
-            </h2>
+              <!-- Items Preview -->
+              <div class="order-items-preview">
+                @for (item of order.items.slice(0, 3); track item.menuItemId) {
+                  <span class="item-chip">
+                    {{ item.quantity }}x {{ item.name }}
+                  </span>
+                }
+                @if (order.items.length > 3) {
+                  <span class="item-chip item-chip--more">+{{ order.items.length - 3 }} more</span>
+                }
+              </div>
+            </div>
 
-            <hr>
+            <!-- Right: Amount + Actions -->
+            <div class="order-right">
+              <span class="order-amount">₹{{ order.totalAmount | number:'1.0-0' }}</span>
 
-            <p>
+              <div class="order-actions">
+                <a [routerLink]="['/orders', order.id]" class="action-btn action-btn--view">
+                  <span class="material-icons">visibility</span>
+                  Details
+                </a>
+                @if (order.status !== 'Cancelled' && order.status !== 'Delivered') {
+                  <a [routerLink]="['/orders', order.id, 'track']" class="action-btn action-btn--track">
+                    <span class="material-icons">route</span>
+                    Track
+                  </a>
+                }
+                @if (canCancel(order.status)) {
+                  <button class="action-btn action-btn--cancel" (click)="cancelOrder(order.id); $event.stopPropagation()">
+                    <span class="material-icons">close</span>
+                    Cancel
+                  </button>
+                }
+                @if (order.status !== 'Cancelled') {
+                  <button
+                    class="action-btn action-btn--reorder"
+                    [disabled]="reorderingId() !== null"
+                    (click)="reorder(order); $event.stopPropagation()">
+                    @if (reorderingId() === order.id) {
+                      <span class="material-icons spinning">sync</span>
+                      Adding...
+                    } @else {
+                      <span class="material-icons">replay</span>
+                      Reorder
+                    }
+                  </button>
+                }
+              </div>
+            </div>
 
-                📅 {{ order.createdAt | date:'mediumDate' }}
-
-            </p>
-
-            <h2>
-
-                ₹{{ order.totalAmount }}
-
-            </h2>
-
-            <button
-
-                class="details-btn"
-
-                [routerLink]="['/orders', order.id]">
-
-                View Details →
-
-            </button>
-
-            @if (canCancel(order.status)) {
-                <button
-                    class="cancel-btn"
-                    (click)="cancelOrder(order.id)">
-
-                    Cancel Order
-
-                </button>
-            }
-
-        </div>
-
+          </div>
         }
-
-    </div>
+      </div>
 
     }
 
-</div>
+  </div>
+</section>

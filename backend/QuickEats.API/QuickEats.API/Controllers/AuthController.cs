@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using QuickEats.API.DTos.Auth;
@@ -16,7 +16,7 @@ namespace QuickEats.API.Controllers
     {
         private readonly IUserService _userService;
 
-        private static readonly string[] AllowedRoles = { "Customer", "Owner" };
+        private static readonly string[] AllowedRoles = { "Customer", "Owner", "DeliveryPartner", "Delivery Partner" };
 
         public AuthController(IUserService userService)
         {
@@ -24,10 +24,9 @@ namespace QuickEats.API.Controllers
         }
 
         /// <summary>
-        /// Registers a new Customer or Owner account.
+        /// Registers a new Customer, Owner, or Delivery Partner account.
         /// </summary>
         /// <remarks>
-        /// Only the roles "Customer" and "Owner" are accepted; any other value falls back to "Customer".
         /// Passwords are stored as BCrypt hashes.
         /// </remarks>
         /// <param name="request">Registration details (name, email, phone, password, role).</param>
@@ -42,6 +41,10 @@ namespace QuickEats.API.Controllers
             if (!AllowedRoles.Contains(request.Role))
             {
                 request.Role = "Customer";
+            }
+            else if (request.Role == "Delivery Partner")
+            {
+                request.Role = "DeliveryPartner";
             }
 
             await _userService.RegisterAsync(request);

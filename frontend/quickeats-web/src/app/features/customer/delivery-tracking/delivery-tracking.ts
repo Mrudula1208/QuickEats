@@ -1,120 +1,128 @@
-import { Component } from '@angular/core';
-// 1ï¸âƒ£ Executes First.
-// Import Component because this file controls the Delivery Tracking page.
-// Every Angular page starts with a Component.
-
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-// 2ï¸âƒ£ Executes Second.
-// Import CommonModule because HTML uses Angular features like @if and @for.
-
-import { Router, ActivatedRoute } from '@angular/router';
-// 3ï¸âƒ£ Executes Third.
-// Router helps move the user to another page.
-
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { DeliveryService } from '../../../core/services/delivery.service';
-// 4ï¸âƒ£ Executes Fourth.
-// Import DeliveryService because it stores current delivery information.
-
+import { OrderService } from '../../../core/services/order';
 import { Delivery } from '../../../core/models/delivery.model';
-// 5ï¸âƒ£ Executes Fifth.
-// Import Delivery model because it defines the structure of delivery data.
+import { OrderModel } from '../../../core/models/order.model';
 
 @Component({
   selector: 'app-delivery-tracking',
-  // Angular uses this selector when rendering this component.
-
   standalone: true,
-  // Means this component works independently.
-  // No need to declare it inside AppModule.
-
-  imports: [CommonModule],
-  // CommonModule is required because HTML uses Angular directives.
-
+  imports: [CommonModule, RouterLink],
   templateUrl: './delivery-tracking.html',
-  // Connect this TS file with delivery-tracking.html.
-
   styleUrl: './delivery-tracking.scss'
-  // Connect this TS file with delivery-tracking.scss.
 })
-
 export class DeliveryTrackingComponent {
 
-  // ==========================================================
-  // EXECUTION FLOW
-  // ==========================================================
-  //
-  // 1ï¸âƒ£ Angular creates DeliveryTrackingComponent.
-  // 2ï¸âƒ£ Variables are created.
-  // 3ï¸âƒ£ Constructor runs automatically.
-  // 4ï¸âƒ£ Delivery information is loaded.
-  // 5ï¸âƒ£ HTML automatically shows delivery details.
-  // 6ï¸âƒ£ User clicks Back button.
-  // 7ï¸âƒ£ Router opens Orders page.
-  //
-  // ==========================================================
+  currentDelivery = signal<Delivery | null>(null);
+  order = signal<OrderModel | null>(null);
+  isLoading = signal(true);
+  loadError = signal<string | null>(null);
 
-  currentDelivery: Delivery | null = null;
-  // 6ï¸âƒ£ Executes Sixth.
-  //
-  // Delivery | null
-  // Means:
-  // This variable can store either:
-  // â€¢ Delivery object
-  // â€¢ null
-  //
-  // Initially no value is loaded.
+  orderSteps = ['Pending', 'Confirmed', 'Preparing', 'Ready for Pickup', 'Out for Delivery', 'Delivered'];
+  deliverySteps = ['Assigned', 'Picked Up', 'Out for Delivery', 'Delivered'];
 
   constructor(
-
     private deliveryService: DeliveryService,
-    // 7ï¸âƒ£ Angular automatically injects DeliveryService.
-    // We never create it using new DeliveryService().
-
+    private orderService: OrderService,
     private router: Router,
-    // 8ï¸âƒ£ Angular injects Router.
-    // Router helps move between pages.
-
     private route: ActivatedRoute
-    // 8ï¸âƒ£ Angular injects ActivatedRoute.
-    // ActivatedRoute helps read URL parameters.
-
   ) {
-
-    // 9ï¸âƒ£ Constructor executes automatically.
-    // Load current delivery immediately.
-
-    this.loadCurrentDelivery();
-
+    this.loadData();
   }
 
-  loadCurrentDelivery(): void {
+  loadData(): void {
+    this.isLoading.set(true);
+    this.loadError.set(null);
     const orderId = Number(this.route.snapshot.paramMap.get('orderId'));
+
     if (!orderId) {
-      console.error("No orderId parameter in URL");
+      this.isLoading.set(false);
+      this.loadError.set('Invalid order id. Please select a valid order.');
       return;
     }
 
-    this.deliveryService.getDeliveryByOrderId(orderId).subscribe({
+    this.orderService.getOrderById(orderId).subscribe({
       next: (data) => {
-        this.currentDelivery = data;
+        this.order.set(data);
+        this.loadDelivery(orderId);
       },
       error: (err) => {
-        console.error("Failed to load delivery info", err);
+        this.isLoading.set(false);
+        this.loadError.set(
+          err.status === 403
+            ? 'You are not authorized to view this order.'
+            : 'Could not load tracking information. Please try again.'
+        );
       }
     });
+  }
 
+  loadDelivery(orderId: number): void {
+    this.deliveryService.getDeliveryByOrderId(orderId).subscribe({
+      next: (data) => {
+        this.currentDelivery.set(data);
+        this.isLoading.set(false);
+      },
+      error: () => { this.isLoading.set(false); }
+    });
+  }
+
+  retry(): void {
+    this.currentDelivery.set(null);
+    this.order.set(null);
+    this.loadData();
+  }
+
+  getOrderStepIndex(status: string): number {
+    const s = (status || '').toLowerCase().replace(/\s+/g, '');
+    const map: Record<string, number> = {
+      'pending': 0,
+      'confirmed': 1,
+      'preparing': 2,
+      'readyforpickup': 3,
+      'ready': 3,
+      'assigned': 3,
+      'pickedup': 4,
+      'outfordelivery': 4,
+      'delivered': 5
+    };
+    return map[s] ?? -1;
+  }
+
+  isOrderStepCompleted(stepIndex: number): boolean {
+    const order = this.order();
+    if (!order || order.status === 'Cancelled') return false;
+    return this.getOrderStepIndex(order.status) >= stepIndex;
+  }
+
+  isOrderStepActive(stepIndex: number): boolean {
+    const order = this.order();
+    if (!order || order.status === 'Cancelled') return false;
+    return this.getOrderStepIndex(order.status) === stepIndex;
+  }
+
+  getOrderIcon(status: string): string {
+    const s = status.toLowerCase();
+    if (s.includes('pending')) return 'hourglass_empty';
+    if (s.includes('confirmed')) return 'check_circle';
+    if (s.includes('preparing')) return 'outdoor_grill';
+    if (s.includes('ready')) return 'inventory_2';
+    if (s.includes('out') || s.includes('picked')) return 'two_wheeler';
+    if (s.includes('delivered')) return 'verified';
+    return 'info';
+  }
+
+  getDeliveryStatusClass(status: string): string {
+    const s = (status || '').toLowerCase();
+    if (s.includes('delivered')) return 'status-delivered';
+    if (s.includes('on the way') || s.includes('out')) return 'status-transit';
+    if (s.includes('picked')) return 'status-picked';
+    return 'status-assigned';
   }
 
   backToOrders(): void {
-  // Executes only when user clicks
-  // "Back To Orders" button.
-
-    this.router.navigate([
-      '/orders'
-    ]);
-
-    // Router opens Orders page.
-
+    this.router.navigate(['/orders']);
   }
-
 }

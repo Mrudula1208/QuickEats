@@ -19,6 +19,9 @@ import { Payment } from '../../../core/models/payment.model';
 import { AdminNavComponent } from '../../../shared/admin-nav/admin-nav';
 // Top navigation bar for the Admin Panel.
 
+import { ToastrService } from 'ngx-toastr';
+// Displays success/error toast notifications.
+
 
 @Component({
 
@@ -63,6 +66,12 @@ export class AdminPayment {
   // Assigns an empty array initially.
   payments: Payment[] = [];
 
+  // Page loading state.
+  isLoading = true;
+
+  // Error message when payments fail to load.
+  loadError = '';
+
 
   constructor(
 
@@ -78,7 +87,8 @@ export class AdminPayment {
     // private
     // This variable can be used only inside
     // this AdminPayment component.
-    private paymentService: PaymentService
+    private paymentService: PaymentService,
+    private toastr: ToastrService
 
   ) {
 
@@ -92,6 +102,10 @@ export class AdminPayment {
   // Load all payments.
   // Load all payments from Backend.
 loadPayments(): void {
+
+  // Start loading payments.
+  this.isLoading = true;
+  this.loadError = '';
 
   // STEP 1
   // Call PaymentService.
@@ -114,13 +128,24 @@ loadPayments(): void {
         // inside the Component variable.
         this.payments = data;
 
+        this.isLoading = false;
+
       },
 
       // Backend/API request failed.
-      error: () => {}
+      error: () => {
+        this.isLoading = false;
+        this.loadError = 'Could not load payments. Please try again.';
+        this.toastr.error('Could not load payments. Please try again.');
+      }
 
     });
 
+}
+
+// Retry loading payments.
+retry(): void {
+  this.loadPayments();
 }
 // Update Payment Status.
 // Update Payment Status.
@@ -180,6 +205,9 @@ updatePaymentStatus(
       next: () => {
 
         // STEP 3
+        // Show success message.
+        this.toastr.success('Payment status updated');
+
         // Load payments again.
         //
         // This gets the latest data
@@ -192,7 +220,7 @@ updatePaymentStatus(
       // error
       // Runs when the Backend request fails.
 
-      error: () => {}
+      error: () => this.toastr.error('Failed to update payment status')
 
     });
 
@@ -203,6 +231,9 @@ deletePayment(
   paymentId: number
 
 ): void {
+
+  // Ask for confirmation before deleting.
+  if (!confirm('Delete this payment? This cannot be undone.')) return;
 
   // STEP 1
   // Call PaymentService.
@@ -220,13 +251,16 @@ deletePayment(
       next: () => {
 
         // STEP 3
+        // Show success message.
+        this.toastr.success('Payment deleted');
+
         // Reload payments from Backend.
         this.loadPayments();
 
       },
 
       // Backend/API error.
-      error: () => {}
+      error: () => this.toastr.error('Failed to delete payment')
 
     });
 

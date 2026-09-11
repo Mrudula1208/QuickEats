@@ -215,6 +215,34 @@
 
     <div class="address-list">
 
+        @if (isLoading) {
+
+            <div class="state-box">
+                <span class="material-icons spinning">sync</span>
+                <p>Loading addresses...</p>
+            </div>
+
+        } @else if (loadError) {
+
+            <div class="state-box">
+                <span class="material-icons">error_outline</span>
+                <p>{{ loadError }}</p>
+                <button class="state-btn" (click)="retry()">
+                    <span class="material-icons">refresh</span>
+                    Try Again
+                </button>
+            </div>
+
+        } @else if (customerAddresses.length === 0) {
+
+            <div class="state-box">
+                <span class="material-icons">location_on</span>
+                <h3>No Saved Addresses</h3>
+                <p>Add an address above to start receiving deliveries.</p>
+            </div>
+
+        } @else {
+
         @for(address of customerAddresses; track address.addressId){
 
         <div class="address-card">
@@ -259,9 +287,10 @@
 
             @if(address.isDefault){
 
-            <span>
+            <span class="default-badge">
 
-                ⭐ Default Address
+                <span class="material-icons">star</span>
+                Default Address
 
             </span>
 
@@ -279,6 +308,8 @@
 
                 <button
 
+                    class="delete-btn"
+
                     (click)="deleteAddress(address.addressId)">
 
                     Delete
@@ -288,6 +319,8 @@
             </div>
 
         </div>
+
+        }
 
         }
 
