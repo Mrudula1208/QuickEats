@@ -48,13 +48,11 @@ The API seeds a set of demo users automatically when it starts (take a look at `
 
 ## Screenshots
 
-| Customer Storefront | Owner Kitchen Orders |
-| :---: | :---: |
-| ![Customer Storefront](./screenshots/01_customer_home.png) | ![Owner Orders](./screenshots/03_owner_kitchen_orders.png) |
-
-| Delivery Partner Portal | Admin Dispatch & Analytics |
-| :---: | :---: |
-| ![Delivery Partner Dashboard](./screenshots/05_delivery_partner_dashboard.png) | ![Admin Delivery](./screenshots/07_admin_delivery_management.png) |
+| Customer | Owner | Delivery Partner | Admin |
+| :---: | :---: | :---: | :---: |
+| ![Customer Homepage](./screenshots/Homepage%20with%20Featured%20Restaurants.png) | ![Owner Dashboard](./screenshots/Owner-Dashboard.png) | ![Rider Deliveries](./screenshots/My%20Assigned%20Deliveries.png) | ![Admin Dashboard](./screenshots/Admin-Dashboard.png) |
+| ![Trending Dishes & Reviews](./screenshots/Trending%20Dishes%20%2B%20Deals%20%2B%20Reviews.png) | ![Orders & Kitchen Workflow](./screenshots/Orders%20%26%20Kitchen%20Workflow.png) | — | ![Admin Order Management](./screenshots/Admin%20Order%20Management%20table.png) |
+| ![Dish Browsing with Filters](./screenshots/Restaurant/Dish%20Browsing%20with%20Filters.png) | | | |
 
 ---
 
