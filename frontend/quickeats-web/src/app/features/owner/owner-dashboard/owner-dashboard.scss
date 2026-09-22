@@ -471,6 +471,9 @@
   &.status-pending { background: #fff3cd; color: #856404; }
   &.status-confirmed { background: #d1ecf1; color: #0c5460; }
   &.status-preparing { background: #fff3cd; color: #856404; }
+  &.status-ready { background: #d1ecf1; color: #0c5460; }
+  &.status-assigned { background: #cce5ff; color: #004085; }
+  &.status-picked { background: #cce5ff; color: #004085; }
   &.status-out { background: #cce5ff; color: #004085; }
   &.status-delivered { background: #d4edda; color: #155724; }
   &.status-cancelled { background: #f8d7da; color: #721c24; }

@@ -75,9 +75,36 @@ export class RegisterComponent {
 
     this.authService.register(this.user).subscribe({
       next: () => {
-        this.isLoading.set(false);
-        this.toastr.success('Account created successfully! Please sign in.', 'Welcome to QuickEats');
-        this.router.navigate(['/login']);
+        // Auto-login upon successful registration
+        this.authService.login({ email: this.user.email, password: this.user.password }).subscribe({
+          next: (response) => {
+            localStorage.setItem('token', response.token);
+            localStorage.setItem('userId', String(response.id));
+            localStorage.setItem('name', response.name);
+            localStorage.setItem('email', response.email);
+            localStorage.setItem('role', response.role);
+            localStorage.setItem('profileImageUrl', response.profileImageUrl || '');
+
+            this.isLoading.set(false);
+            this.toastr.success(`Account created successfully! Welcome, ${response.name}!`, 'Welcome to QuickEats');
+
+            const role = response.role;
+            if (role === 'Owner') {
+              this.router.navigate(['/owner']);
+            } else if (role === 'Admin') {
+              this.router.navigate(['/admin/dashboard']);
+            } else if (role === 'DeliveryPartner' || role === 'Delivery Partner') {
+              this.router.navigate(['/delivery/dashboard']);
+            } else {
+              this.router.navigate(['/home']);
+            }
+          },
+          error: () => {
+            this.isLoading.set(false);
+            this.toastr.success('Account created successfully! Please sign in.', 'Welcome to QuickEats');
+            this.router.navigate(['/login']);
+          }
+        });
       },
       error: (err) => {
         this.isLoading.set(false);

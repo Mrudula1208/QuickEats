@@ -61,9 +61,9 @@ namespace QuickEats.API.Controllers
             var userId = int.Parse(
                 User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
-            await _favoriteService.CreateAsync(userId, dto);
+            var created = await _favoriteService.CreateAsync(userId, dto);
 
-            return Ok("Restaurant added to favorites successfully.");
+            return Ok(created);
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace QuickEats.API.Controllers
 
             await _favoriteService.DeleteAsync(userId, id);
 
-            return Ok("Restaurant removed from favorites.");
+            return Ok(new { message = "Restaurant removed from favorites." });
         }
     }
 }

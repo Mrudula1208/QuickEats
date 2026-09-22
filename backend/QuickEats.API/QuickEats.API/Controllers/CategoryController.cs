@@ -55,7 +55,7 @@ namespace QuickEats.API.Controllers
         public async Task<IActionResult> Create(CreateCategoryDto dto)
         {
             await _categoryService.CreateAsync(dto);
-            return Ok("Category created successfully.");
+            return Ok(new { message = "Category created successfully." });
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace QuickEats.API.Controllers
         public async Task<IActionResult> Update(int id, UpdateCategoryDto dto)
         {
             await _categoryService.UpdateAsync(id, dto);
-            return Ok("Category updated successfully.");
+            return Ok(new { message = "Category updated successfully." });
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace QuickEats.API.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             await _categoryService.DeleteAsync(id);
-            return Ok("Category deleted successfully.");
+            return Ok(new { message = "Category deleted successfully." });
         }
     }
 }

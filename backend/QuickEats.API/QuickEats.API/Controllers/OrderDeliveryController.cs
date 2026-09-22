@@ -122,15 +122,16 @@ namespace QuickEats.API.Controllers
         public async Task<IActionResult> Create(CreateOrderDeliveryDto dto)
         {
             await _orderDeliveryService.CreateAsync(dto);
-            return Ok("Delivery created successfully.");
+            return Ok(new { message = "Delivery created successfully." });
         }
 
         /// <summary>
-        /// Updates the delivery status (Delivery Partner or Admin).
+        /// Updates the delivery status (Delivery Partner ONLY - the assigned partner).
+        /// Transitions: Assigned -> Picked Up -> Out for Delivery -> Delivered.
         /// </summary>
         /// <param name="id">Delivery id.</param>
-        /// <param name="dto">New status (Assigned, Picked Up, Out for Delivery, Delivered).</param>
-        [Authorize(Roles = "DeliveryPartner,Delivery Partner,Admin")]
+        /// <param name="dto">New status (Picked Up, Out for Delivery, Delivered).</param>
+        [Authorize(Roles = "DeliveryPartner,Delivery Partner")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateStatus(int id, UpdateDeliveryStatusDto dto)
         {
@@ -138,31 +139,15 @@ namespace QuickEats.API.Controllers
             if (delivery == null)
                 return NotFound("Delivery not found.");
 
-            if (!User.IsInRole("Admin"))
-            {
-                var currentUserId = int.Parse(
-                    User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var currentUserId = int.Parse(
+                User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
-                if (delivery.DeliveryPartnerId != currentUserId)
-                    return Forbid();
-
-                // Validate transition
-                var allowed = delivery.DeliveryStatus switch
-                {
-                    "Assigned" => new[] { "Picked Up" },
-                    "Picked Up" => new[] { "Out for Delivery" },
-                    "Out for Delivery" => new[] { "Delivered" },
-                    _ => Array.Empty<string>()
-                };
-
-                if (!allowed.Contains(dto.DeliveryStatus))
-                {
-                    return BadRequest($"Cannot change delivery status from \"{delivery.DeliveryStatus}\" to \"{dto.DeliveryStatus}\".");
-                }
-            }
+            // Only the assigned delivery partner may update this delivery.
+            if (delivery.DeliveryPartnerId != currentUserId)
+                return Forbid();
 
             await _orderDeliveryService.UpdateStatusAsync(id, dto);
-            return Ok("Delivery updated successfully.");
+            return Ok(new { message = "Delivery updated successfully." });
         }
 
         /// <summary>
@@ -174,7 +159,7 @@ namespace QuickEats.API.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             await _orderDeliveryService.DeleteAsync(id);
-          return Ok("Delivery deleted successfully.");
+            return Ok(new { message = "Delivery deleted successfully." });
         }
     }
 }

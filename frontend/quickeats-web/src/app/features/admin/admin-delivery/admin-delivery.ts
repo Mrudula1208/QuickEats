@@ -129,9 +129,9 @@ export class AdminDelivery implements OnInit {
   loadReadyOrders(): void {
     this.orderService.getAllOrdersApi().subscribe({
       next: (orders) => {
-        // Orders that are Ready for Pickup, Confirmed, or Preparing and not already delivered/assigned
-        const ready = (orders || []).filter(o => 
-          ['ready for pickup', 'ready', 'confirmed', 'preparing'].includes(o.status.toLowerCase())
+        // Assignment is only allowed after the kitchen marks the order Ready for Pickup.
+        const ready = (orders || []).filter(o =>
+          ['ready for pickup', 'ready'].includes(o.status.toLowerCase())
         );
         this.readyOrders.set(ready);
       },
@@ -240,19 +240,8 @@ export class AdminDelivery implements OnInit {
     this.selectedDelivery.set(null);
   }
 
-  // Update Status
-  updateDeliveryStatus(deliveryId: number, newStatus: string): void {
-    this.deliveryService.updateDeliveryStatus(deliveryId, newStatus).subscribe({
-      next: () => {
-        this.toastr.success(`Delivery status updated to ${newStatus}`);
-        this.loadAllData();
-      },
-      error: (err: any) => {
-        const msg = err.error?.message || 'Failed to update delivery status';
-        this.toastr.error(msg);
-      }
-    });
-  }
+  // Delivery status is controlled by the Delivery Partner via their own portal.
+  // Admin only assigns/reassigns partners - they never advance the delivery status.
 
   // Delete Delivery
   deleteDelivery(deliveryId: number): void {

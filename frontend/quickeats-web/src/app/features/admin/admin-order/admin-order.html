@@ -13,7 +13,7 @@
           <span class="active">Orders</span>
         </div>
         <h1 class="ao-title">Order Management</h1>
-        <p class="ao-subtitle">Monitor live customer orders, update delivery progress, and view receipts</p>
+        <p class="ao-subtitle">Monitor live customer orders, assign delivery partners, and view receipts</p>
       </div>
     </div>
 
@@ -66,7 +66,7 @@
         <span class="material-icons search-icon">search</span>
         <input
           type="text"
-          placeholder="Search by Order #, Customer, Phone, Restaurant..."
+          placeholder="Search by Order #, Customer, Phone, Restaurant, Partner..."
           [ngModel]="searchText()"
           (ngModelChange)="searchText.set($event)"
           class="search-input">
@@ -95,6 +95,12 @@
           [class.active]="selectedStatus() === 'preparing'"
           (click)="selectedStatus.set('preparing')">
           Preparing
+        </button>
+        <button
+          class="tab-btn"
+          [class.active]="selectedStatus() === 'ready for pickup'"
+          (click)="selectedStatus.set('ready for pickup')">
+          Ready for Pickup
         </button>
         <button
           class="tab-btn"
@@ -141,11 +147,12 @@
             <thead>
               <tr>
                 <th>Order</th>
-                <th>Customer Details</th>
+                <th>Customer</th>
                 <th>Restaurant</th>
-                <th>Items & Total</th>
+                <th>Items &amp; Total</th>
                 <th>Payment</th>
                 <th>Status</th>
+                <th>Delivery Partner</th>
                 <th>Date</th>
                 <th class="text-right">Actions</th>
               </tr>
@@ -158,13 +165,19 @@
                     <strong class="order-id-badge">#{{ order.id }}</strong>
                   </td>
 
-                  <!-- Customer Details -->
+                  <!-- Customer Details (each on its own line) -->
                   <td>
                     <div class="customer-info-cell">
                       <strong class="customer-name">{{ order.customerName }}</strong>
-                      <span class="customer-phone">{{ order.phoneNumber || 'N/A' }}</span>
+                      <span class="customer-phone">
+                        <span class="material-icons">phone</span>
+                        {{ order.phoneNumber || 'N/A' }}
+                      </span>
                       @if (order.deliveryAddress) {
-                        <span class="customer-addr" title="{{ order.deliveryAddress }}">{{ order.deliveryAddress }}</span>
+                        <span class="customer-addr" title="{{ order.deliveryAddress }}">
+                          <span class="material-icons">place</span>
+                          {{ order.deliveryAddress }}
+                        </span>
                       }
                     </div>
                   </td>
@@ -180,29 +193,44 @@
                   <!-- Items & Total -->
                   <td>
                     <div class="order-total-cell">
+                      <div class="items-list">
+                        @for (item of order.items; track $index) {
+                          <span class="item-chip">{{ item.quantity }} × {{ item.name }}</span>
+                        }
+                        @if (!order.items || order.items.length === 0) {
+                          <span class="items-count">No items</span>
+                        }
+                      </div>
+                      <span class="items-count">{{ getTotalItems(order) }} item(s)</span>
                       <strong class="total-amount">₹{{ order.totalAmount | number:'1.0-2' }}</strong>
-                      <span class="items-count">{{ order.items?.length || 0 }} items</span>
                     </div>
                   </td>
 
-                  <!-- Payment Status -->
+                  <!-- Payment Status (kept separate from Order Status) -->
                   <td>
-                    <span class="payment-badge" [class.paid]="order.paymentStatus === 'Paid'">
-                      {{ order.paymentStatus || 'Pending' }}
+                    <span class="payment-badge" [class]="getPaymentClass(order.paymentStatus)">
+                      {{ formatPaymentStatus(order.paymentStatus) }}
                     </span>
                   </td>
 
-                  <!-- Status -->
+                  <!-- Order Status Badge (no dropdown) -->
                   <td>
-                    <select
-                      class="status-select"
-                      [class]="getStatusClass(order.status)"
-                      [ngModel]="order.status"
-                      (ngModelChange)="updateStatus(order.id, $event)">
-                      @for (s of statusList; track s) {
-                        <option [value]="s">{{ s }}</option>
-                      }
-                    </select>
+                    <span class="order-status-badge" [class]="getStatusClass(order.status)">
+                      <span class="material-icons">{{ orderStatusIcon(order.status) }}</span>
+                      {{ order.status }}
+                    </span>
+                  </td>
+
+                  <!-- Delivery Partner -->
+                  <td>
+                    @if (order.deliveryPartnerName) {
+                      <div class="partner-cell">
+                        <strong class="partner-name">{{ order.deliveryPartnerName }}</strong>
+                        <span class="partner-status">{{ order.deliveryStatus || 'Assigned' }}</span>
+                      </div>
+                    } @else {
+                      <span class="partner-none">Not assigned</span>
+                    }
                   </td>
 
                   <!-- Date -->
@@ -216,6 +244,27 @@
                       <button (click)="viewOrder(order.id)" class="action-btn view-btn" title="View Order Details">
                         <span class="material-icons">visibility</span>
                       </button>
+
+                      @if (canAssign(order)) {
+                        <button
+                          (click)="openAssignModal(order)"
+                          class="action-btn assign-btn"
+                          [title]="isReassign(order) ? 'Reassign Delivery Partner' : 'Assign Delivery Partner'"
+                        >
+                          <span class="material-icons">{{ isReassign(order) ? 'swap_horiz' : 'sports_motorsports' }}</span>
+                        </button>
+                      }
+
+                      @if (canCancel(order)) {
+                        <button (click)="adminCancelOrder(order)" class="action-btn cancel-btn" title="Cancel Order">
+                          <span class="material-icons">block</span>
+                        </button>
+                      }
+
+                      <button (click)="openOverrideModal(order)" class="action-btn override-btn" title="Admin Override">
+                        <span class="material-icons">tune</span>
+                      </button>
+
                       <button (click)="deleteOrder(order.id)" class="action-btn delete-btn" title="Delete Order">
                         <span class="material-icons">delete_outline</span>
                       </button>
@@ -252,3 +301,100 @@
 
   </div>
 </div>
+
+<!-- Assign / Reassign Delivery Partner Modal -->
+@if (isAssignModalOpen() && assignTargetOrder()) {
+  <div class="ao-modal-backdrop" (click)="closeAssignModal()">
+    <div class="ao-modal" (click)="$event.stopPropagation()">
+      <div class="ao-modal-header">
+        <h3>{{ isReassign(assignTargetOrder()!) ? 'Reassign Delivery Partner' : 'Assign Delivery Partner' }}</h3>
+        <button class="ao-modal-close" (click)="closeAssignModal()" title="Close">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="ao-modal-body">
+        <div class="ao-modal-order-info">
+          <span><strong>Order:</strong> #{{ assignTargetOrder()!.id }}</span>
+          <span><strong>Customer:</strong> {{ assignTargetOrder()!.customerName }}</span>
+          <span><strong>Restaurant:</strong> {{ assignTargetOrder()!.restaurantName }}</span>
+          <span><strong>Amount:</strong> ₹{{ assignTargetOrder()!.totalAmount | number:'1.0-2' }}</span>
+        </div>
+
+        @if (isReassign(assignTargetOrder()!)) {
+          <div class="ao-modal-current">
+            Currently assigned to <strong>{{ assignTargetOrder()!.deliveryPartnerName }}</strong>
+          </div>
+        }
+
+        <label class="ao-field-label" for="assignPartner">Delivery Partner</label>
+        <select id="assignPartner" class="ao-select" [(ngModel)]="assignPartnerId">
+          <option [ngValue]="null" disabled>Select a delivery partner</option>
+          @for (p of activePartners(); track p.id) {
+            <option [ngValue]="p.id">{{ p.name }} ({{ p.phoneNumber || p.phone || 'N/A' }})</option>
+          }
+        </select>
+      </div>
+      <div class="ao-modal-footer">
+        <button class="ao-btn-cancel" (click)="closeAssignModal()">Cancel</button>
+        <button class="ao-btn-primary" (click)="submitAssignment()" [disabled]="isSubmittingAssign()">
+          @if (isSubmittingAssign()) {
+            <span class="material-icons spinning">progress_activity</span>
+          }
+          {{ isReassign(assignTargetOrder()!) ? 'Reassign' : 'Assign' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Admin Override Modal -->
+@if (isOverrideModalOpen() && overrideTargetOrder()) {
+  <div class="ao-modal-backdrop" (click)="closeOverrideModal()">
+    <div class="ao-modal" (click)="$event.stopPropagation()">
+      <div class="ao-modal-header">
+        <h3>Admin Override</h3>
+        <button class="ao-modal-close" (click)="closeOverrideModal()" title="Close">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="ao-modal-body">
+        <div class="ao-override-note">
+          <span class="material-icons">warning_amber</span>
+          This is an exceptional, audited action. The override will be recorded with your details and reason.
+        </div>
+
+        <div class="ao-modal-order-info">
+          <span><strong>Order:</strong> #{{ overrideTargetOrder()!.id }}</span>
+          <span><strong>Current Status:</strong>
+            <span class="order-status-badge" [class]="getStatusClass(overrideTargetOrder()!.status)">
+              {{ overrideTargetOrder()!.status }}
+            </span>
+          </span>
+          <span><strong>Customer:</strong> {{ overrideTargetOrder()!.customerName }}</span>
+        </div>
+
+        <label class="ao-field-label" for="overrideStatus">New Status</label>
+        <select id="overrideStatus" class="ao-select" [(ngModel)]="overrideStatus">
+          @for (s of overrideStatuses; track s) {
+            <option [ngValue]="s">{{ s }}</option>
+          }
+        </select>
+
+        <label class="ao-field-label" for="overrideReason">Reason (required)</label>
+        <textarea
+          id="overrideReason"
+          class="ao-textarea"
+          [(ngModel)]="overrideReason"
+          rows="3"
+          placeholder="Explain why this override is required e.g. order stuck, operational issue, customer request...">
+        </textarea>
+      </div>
+      <div class="ao-modal-footer">
+        <button class="ao-btn-cancel" (click)="closeOverrideModal()">Cancel</button>
+        <button class="ao-btn-primary ao-btn-danger" (click)="submitOverride()">
+          Confirm Override
+        </button>
+      </div>
+    </div>
+  </div>
+}

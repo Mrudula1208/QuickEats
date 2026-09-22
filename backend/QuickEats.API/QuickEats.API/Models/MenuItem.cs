@@ -24,6 +24,11 @@
         // Example: 10 means 10% off
         public decimal DiscountPercent { get; set; } = 0;
 
+        // Set only by the trending query with the real number of times this dish
+        // has been ordered (sum of OrderItem.Quantity). Not stored in the database.
+        [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+        public int TotalOrdered { get; set; }
+
         public Restaurant Restaurant { get; set; } = null!;
         public ICollection<Order> Orders { get; set; } = new List<Order>();
 

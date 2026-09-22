@@ -12,21 +12,21 @@
 <section class="ph-content">
   <div class="container">
 
-    @if (isLoading) {
+    @if (isLoading()) {
       <div class="ph-state">
         <span class="material-icons spinning">sync</span>
         <p>Loading payments...</p>
       </div>
-    } @else if (loadError) {
+    } @else if (loadError()) {
       <div class="ph-state">
         <span class="material-icons">error_outline</span>
-        <p>{{ loadError }}</p>
+        <p>{{ loadError() }}</p>
         <button class="ph-retry" (click)="retry()">
           <span class="material-icons">refresh</span>
           Try Again
         </button>
       </div>
-    } @else if (payments.length === 0) {
+    } @else if (payments().length === 0) {
       <div class="ph-state">
         <span class="material-icons">account_balance_wallet</span>
         <h2>No Payments Yet</h2>
@@ -34,7 +34,7 @@
       </div>
     } @else {
       <div class="payment-grid">
-        @for (payment of payments; track payment.id) {
+        @for (payment of payments(); track payment.id) {
           <div class="payment-card">
             <div class="payment-head">
               <h3>Payment #{{ payment.id }}</h3>

@@ -13,6 +13,7 @@ namespace QuickEats.API.Repositories.Interfaces
         Task AddAsync(Order order);
         void Update(Order order);
         void Delete(Order order);
+        Task AddAdminOverrideAsync(AdminOrderOverride adminOrderOverride);
         Task SaveChangesAsync();
     }
 }

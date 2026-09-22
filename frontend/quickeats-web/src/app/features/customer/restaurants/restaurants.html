@@ -229,6 +229,33 @@
               {{ filteredRestaurants().length }} {{ filteredRestaurants().length === 1 ? 'restaurant' : 'restaurants' }} found
             }
           </span>
+
+          <!-- Quick Availability Filter Pills -->
+          @if (activeView() === 'restaurants') {
+            <div class="availability-quick-filter">
+              <button
+                class="avail-pill"
+                [class.active]="!showOpenOnly && !showClosedOnly"
+                (click)="setAvailabilityFilter('all')">
+                All ({{ restaurants().length }})
+              </button>
+              <button
+                class="avail-pill pill-open"
+                [class.active]="showOpenOnly"
+                (click)="setAvailabilityFilter('open')">
+                <span class="avail-dot dot-open"></span>
+                Open Now ({{ openRestaurantsCount }})
+              </button>
+              <button
+                class="avail-pill pill-closed"
+                [class.active]="showClosedOnly"
+                (click)="setAvailabilityFilter('closed')">
+                <span class="avail-dot dot-closed"></span>
+                Closed ({{ closedRestaurantsCount }})
+              </button>
+            </div>
+          }
+
           @if (hasActiveFilters()) {
             <div class="active-tags">
               @if (searchText) {
@@ -267,6 +294,14 @@
                 <span class="active-tag">
                   Open Now
                   <button (click)="toggleOpen()">
+                    <span class="material-icons">close</span>
+                  </button>
+                </span>
+              }
+              @if (showClosedOnly) {
+                <span class="active-tag">
+                  Closed
+                  <button (click)="toggleClosed()">
                     <span class="material-icons">close</span>
                   </button>
                 </span>
@@ -424,10 +459,12 @@
                     @if (restaurant.isOpenNow) {
                       <span class="status-badge status-badge--open">
                         <span class="status-pulse"></span>
-                        Open
+                        ● Open
                       </span>
                     } @else {
-                      <span class="status-badge status-badge--closed">Closed</span>
+                      <span class="status-badge status-badge--closed">
+                        ● Closed
+                      </span>
                     }
 
                     <!-- Favorite -->
@@ -464,6 +501,16 @@
 
                     <p class="card-cuisines">{{ getRestaurantCuisines(restaurant.id) }}</p>
                     <p class="card-desc">{{ restaurant.description }}</p>
+
+                    <!-- Operating Hours Status Row -->
+                    <div class="card-schedule-chip" [class.open]="restaurant.isOpenNow" [class.closed]="!restaurant.isOpenNow">
+                      <span class="material-icons">schedule</span>
+                      @if (restaurant.isOpenNow) {
+                        <span>Open Now · Closes at {{ formatTime(restaurant.closingTime) }}</span>
+                      } @else {
+                        <span>Closed · Opens at {{ formatTime(restaurant.openingTime) }}</span>
+                      }
+                    </div>
 
                     <div class="card-meta">
                       <span class="meta-chip">

@@ -20,6 +20,7 @@ import { OwnerMenuComponent } from './features/owner/owner-menu/owner-menu';
 import { OwnerMenuItemFormComponent } from './features/owner/owner-menu-item-form/owner-menu-item-form';
 import { OwnerOrdersComponent } from './features/owner/owner-orders/owner-orders';
 import { OwnerReviewsComponent } from './features/owner/owner-reviews/owner-reviews';
+import { OwnerProfileComponent } from './features/owner/owner-profile/owner-profile';
 import { authGuard } from './guards/auth.guard';
 import { adminGuard } from './guards/admin.guard';
 import { ownerGuard } from './guards/owner.guard';
@@ -101,7 +102,8 @@ export const routes: Routes = [
       },
       {
         path: 'cart',
-        component: CartComponent
+        component: CartComponent,
+        canActivate: [authGuard]
       },
       {
         path: 'checkout',
@@ -369,6 +371,11 @@ export const routes: Routes = [
   {
     path: 'owner/reviews',
     component: OwnerReviewsComponent,
+    canActivate: [ownerGuard]
+  },
+  {
+    path: 'owner/profile',
+    component: OwnerProfileComponent,
     canActivate: [ownerGuard]
   },
 

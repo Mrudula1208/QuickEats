@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 
@@ -31,13 +31,13 @@ import { ToastrService } from 'ngx-toastr';
 export class CouponsComponent {
 
   // Store Coupons.
-  coupons: CouponModel[] = [];
+  coupons = signal<CouponModel[]>([]);
 
   // Loading state.
-  isLoading = true;
+  isLoading = signal(true);
 
   // Error state.
-  loadError = '';
+  loadError = signal('');
 
   constructor(
     private couponService: CouponService,
@@ -52,19 +52,19 @@ export class CouponsComponent {
   // LOAD COUPONS
   // ==========================================
   loadCoupons(): void {
-    this.isLoading = true;
-    this.loadError = '';
+    this.isLoading.set(true);
+    this.loadError.set('');
 
     this.couponService
       .getCoupons()
       .subscribe({
         next: (data: CouponModel[]) => {
-          this.coupons = data;
-          this.isLoading = false;
+          this.coupons.set(data);
+          this.isLoading.set(false);
         },
         error: () => {
-          this.isLoading = false;
-          this.loadError = 'Could not load coupons. Please try again.';
+          this.isLoading.set(false);
+          this.loadError.set('Could not load coupons. Please try again.');
           this.toastr.error('Failed to load coupons');
         }
       });

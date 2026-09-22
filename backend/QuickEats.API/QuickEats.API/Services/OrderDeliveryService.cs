@@ -85,6 +85,29 @@ namespace QuickEats.API.Services
                 throw new BadRequestException("Cannot assign delivery to a cancelled order.");
             }
 
+            // A delivery partner may only be assigned once the order is Ready for Pickup
+            // (or re-assigned while a delivery is still pending pickup).
+            var existingDelivery = await _orderDeliveryRepository.GetByOrderIdAsync(dto.OrderId);
+
+            if (existingDelivery == null)
+            {
+                if (!string.Equals(order.Status, "Ready for Pickup", StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new BadRequestException(
+                        "A delivery partner can only be assigned after the order is Ready for Pickup. " +
+                        $"The current order status is \"{order.Status}\".");
+                }
+            }
+            else
+            {
+                // Reassignment allowed only before the food has been picked up.
+                if (!string.Equals(existingDelivery.DeliveryStatus, "Assigned", StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new BadRequestException(
+                        "The delivery partner can only be reassigned while the delivery is still in the Assigned state.");
+                }
+            }
+
             var partner = await _userRepository.GetByIdAsync(dto.DeliveryPartnerId);
             if (partner == null)
             {
@@ -96,7 +119,6 @@ namespace QuickEats.API.Services
                 throw new BadRequestException("Cannot assign delivery to an inactive delivery partner.");
             }
 
-            var existingDelivery = await _orderDeliveryRepository.GetByOrderIdAsync(dto.OrderId);
             if (existingDelivery != null)
             {
                 // Reassign delivery partner
@@ -140,13 +162,47 @@ namespace QuickEats.API.Services
                 throw new NotFoundException($"Delivery with Id {id} not found.");
             }
 
-            delivery.DeliveryStatus = dto.DeliveryStatus;
+            // Normalise the incoming status.
+            string newStatus = OrderService.NormalizeStatus(dto.DeliveryStatus);
 
-            if (dto.DeliveryStatus == "Picked Up")
+            var validStatuses = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "Assigned", "Picked Up", "Out for Delivery", "Delivered"
+            };
+            if (!validStatuses.Contains(newStatus))
+            {
+                throw new BadRequestException($"Invalid delivery status: \"{dto.DeliveryStatus}\".");
+            }
+
+            // A delivery partner can only advance one stage at a time.
+            var allowedTransitions = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["Assigned"] = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Picked Up" },
+                ["Picked Up"] = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Out for Delivery" },
+                ["Out for Delivery"] = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Delivered" },
+                ["Delivered"] = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { }
+            };
+
+            if (string.Equals(newStatus, delivery.DeliveryStatus, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new BadRequestException($"Delivery is already in \"{newStatus}\" state.");
+            }
+
+            if (!allowedTransitions.TryGetValue(delivery.DeliveryStatus, out var nextStatuses) ||
+                !nextStatuses.Contains(newStatus))
+            {
+                throw new BadRequestException(
+                    $"Invalid delivery status transition: \"{delivery.DeliveryStatus}\" -> \"{newStatus}\". " +
+                    "Deliveries must progress: Assigned -> Picked Up -> Out for Delivery -> Delivered.");
+            }
+
+            delivery.DeliveryStatus = newStatus;
+
+            if (newStatus == "Picked Up")
             {
                 delivery.PickedUpAt = DateTime.UtcNow;
             }
-            else if (dto.DeliveryStatus == "Delivered")
+            else if (newStatus == "Delivered")
             {
                 delivery.DeliveredAt = DateTime.UtcNow;
             }
@@ -156,7 +212,7 @@ namespace QuickEats.API.Services
             // Sync order status
             if (delivery.Order != null)
             {
-                delivery.Order.Status = dto.DeliveryStatus;
+                delivery.Order.Status = newStatus;
                 _orderRepository.Update(delivery.Order);
 
                 // Notify customer of delivery status update
@@ -164,7 +220,7 @@ namespace QuickEats.API.Services
                 {
                     UserId = delivery.Order.UserId,
                     Title = "Delivery Status Updated",
-                    Message = $"Your order #{delivery.OrderId} status is now: {dto.DeliveryStatus}."
+                    Message = $"Your order #{delivery.OrderId} status is now: {newStatus}."
                 });
             }
 

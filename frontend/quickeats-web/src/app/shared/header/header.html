@@ -34,6 +34,10 @@
            class="nav-link" (click)="closeMobileMenu()">Orders</a>
         <a routerLink="/favorites" routerLinkActive="active"
            class="nav-link" (click)="closeMobileMenu()">Favorites</a>
+        @if (isCustomer) {
+          <a routerLink="/reviews" routerLinkActive="active"
+             class="nav-link" (click)="closeMobileMenu()">Reviews</a>
+        }
       }
 
       <a routerLink="/cart" class="nav-link cart-link" (click)="closeMobileMenu()">

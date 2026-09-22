@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Payment } from '../../../core/models/payment.model';
 import { PaymentService } from '../../../core/services/payment.service';
@@ -13,9 +13,9 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class PaymentHistoryComponent {
 
-  payments: Payment[] = [];
-  isLoading = true;
-  loadError = '';
+  payments = signal<Payment[]>([]);
+  isLoading = signal(true);
+  loadError = signal('');
 
   constructor(
     private paymentService: PaymentService,
@@ -25,17 +25,17 @@ export class PaymentHistoryComponent {
   }
 
   loadPayments(): void {
-    this.isLoading = true;
-    this.loadError = '';
+    this.isLoading.set(true);
+    this.loadError.set('');
 
     this.paymentService.getUserPayments(Number(localStorage.getItem('userId'))).subscribe({
       next: (data) => {
-        this.payments = data;
-        this.isLoading = false;
+        this.payments.set(data);
+        this.isLoading.set(false);
       },
       error: () => {
-        this.isLoading = false;
-        this.loadError = 'Could not load payment history. Please try again.';
+        this.isLoading.set(false);
+        this.loadError.set('Could not load payment history. Please try again.');
         this.toastr.error('Failed to load payment history');
       }
     });

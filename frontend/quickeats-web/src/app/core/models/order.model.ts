@@ -37,6 +37,14 @@ export interface OrderModel {
 
   paymentStatus?: string;
 
+  deliveryStatus?: string;
+
+  deliveryPartnerName?: string;
+
+  cancelledBy?: string;
+
+  cancelledAt?: Date;
+
   createdAt: Date;
 
   items: OrderItemModel[];

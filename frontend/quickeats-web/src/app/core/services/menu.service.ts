@@ -9,6 +9,7 @@ import { Observable } from 'rxjs';
 // We import Observable because API calls take time, so data is returned asynchronously.
 
 import { MenuItem } from '../models/menu.model';
+import { TrendingDish } from '../models/trending-dish.model';
 // We import MenuItem so TypeScript knows the structure of menu data coming from the Backend.
 
 @Injectable({
@@ -39,6 +40,12 @@ export class MenuService {
 
   getCategories(): Observable<string[]> {
     return this.http.get<string[]>(`${this.apiUrl}/categories`);
+  }
+
+  getTrendingDishes(count: number = 6): Observable<TrendingDish[]> {
+    return this.http.get<TrendingDish[]>(`${this.apiUrl}/trending`, {
+      params: { count }
+    });
   }
 
   getMenuByRestaurantId(restaurantId: number): Observable<MenuItem[]> {

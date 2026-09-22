@@ -125,6 +125,76 @@ $transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   margin-bottom: 6px;
 }
 
+.role-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.role-option {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 4px;
+  border: 1.5px solid $border;
+  border-radius: $radius-md;
+  background: $white;
+  cursor: pointer;
+  transition: all $transition;
+  user-select: none;
+  text-align: center;
+
+  input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .role-icon {
+    font-size: 22px;
+    color: $dark-300;
+    margin-bottom: 4px;
+    transition: color $transition;
+  }
+
+  .role-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: $dark-500;
+    transition: color $transition;
+    white-space: nowrap;
+  }
+
+  &:hover {
+    border-color: $primary-light;
+    background: $primary-bg;
+
+    .role-icon {
+      color: $primary;
+    }
+    .role-title {
+      color: $primary;
+    }
+  }
+
+  &.active {
+    border-color: $primary;
+    background: $primary-bg;
+    box-shadow: 0 2px 8px rgba($primary, 0.18);
+
+    .role-icon {
+      color: $primary;
+    }
+    .role-title {
+      color: $primary;
+      font-weight: 700;
+    }
+  }
+}
+
 .input-wrap {
   position: relative;
   display: flex;

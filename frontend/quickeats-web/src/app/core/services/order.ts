@@ -52,10 +52,25 @@ export class OrderService {
 
   }
 
-  // Update the status of one order (used by Admin / Owner).
+  // Update the status of one order (Owner of the order's restaurant ONLY).
+  // Owners can only set: Confirmed, Preparing, Ready for Pickup, Cancelled(Pending only).
   updateOrderStatusApi(id: number, status: string): Observable<any> {
 
     return this.http.put(`${this.apiUrl}/${id}`, { status: status });
+
+  }
+
+  // Admin cancels an order (only while Pending or Confirmed).
+  adminCancelOrder(id: number): Observable<any> {
+
+    return this.http.post(`${this.apiUrl}/${id}/admin-cancel`, {});
+
+  }
+
+  // Admin emergency override - requires a reason; recorded in the audit log.
+  adminOverride(id: number, status: string, reason: string): Observable<any> {
+
+    return this.http.post(`${this.apiUrl}/${id}/override`, { status, reason });
 
   }
 

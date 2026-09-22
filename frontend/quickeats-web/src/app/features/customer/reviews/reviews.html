@@ -1,175 +1,432 @@
-<section class="rev-hero">
-  <div class="rev-hero-inner">
-    <span class="material-icons rev-hero-icon">rate_review</span>
-    <h1>Customer Reviews</h1>
-    <p>See what our customers are saying</p>
+<div class="reviews-container">
+  <!-- Page Header -->
+  <div class="reviews-header">
+    <div class="header-content">
+      <span class="badge-pill">
+        <span class="material-icons">rate_review</span> Verified Reviews
+      </span>
+      <h1>Restaurant Reviews & Ratings</h1>
+      <p>Real feedback from verified QuickEats food lovers across the city</p>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="tabs-nav">
+      @if (isCustomer) {
+        <button
+          class="tab-btn"
+          [class.active]="activeTab === 'my-reviews'"
+          (click)="switchTab('my-reviews')"
+        >
+          <span class="material-icons">person</span>
+          <span>My Reviews</span>
+          <span class="tab-count">{{ myReviews().length }}</span>
+        </button>
+
+        <button
+          class="tab-btn"
+          [class.active]="activeTab === 'write-review'"
+          (click)="switchTab('write-review')"
+        >
+          <span class="material-icons">edit_note</span>
+          <span>Write a Review</span>
+          @if (unreviewedOrders().length > 0) {
+            <span class="tab-count alert-count">{{ unreviewedOrders().length }}</span>
+          }
+        </button>
+      }
+
+      <button
+        class="tab-btn"
+        [class.active]="activeTab === 'all-reviews'"
+        (click)="switchTab('all-reviews')"
+      >
+        <span class="material-icons">forum</span>
+        <span>Community Feedback</span>
+      </button>
+    </div>
   </div>
-</section>
 
-<section class="rev-content">
-  <div class="rev-container">
+  <!-- Loading Indicator -->
+  @if (isLoading()) {
+    <div class="state-card loading-state">
+      <span class="material-icons spinning">progress_activity</span>
+      <h3>Loading Reviews...</h3>
+      <p>Fetching authentic customer ratings from database.</p>
+    </div>
+  }
 
-    @if (isLoading()) {
-      <div class="rev-loading">
-        <span class="material-icons spinning">progress_activity</span>
-        <p>Loading reviews...</p>
+  <!-- TAB 1: MY REVIEWS -->
+  @else if (activeTab === 'my-reviews') {
+    @if (myReviews().length === 0) {
+      <div class="state-card empty-state">
+        <div class="empty-icon-wrap">
+          <span class="material-icons">rate_review</span>
+        </div>
+        <h3>No Reviews Submitted Yet</h3>
+        <p>You haven't written any reviews yet. Share your experience for your completed food orders!</p>
+        @if (eligibleOrders().length > 0) {
+          <button class="btn-primary" (click)="switchTab('write-review')">
+            <span class="material-icons">edit</span>
+            <span>Review a Delivered Order</span>
+          </button>
+        } @else {
+          <a routerLink="/restaurants" class="btn-primary">
+            <span class="material-icons">restaurant</span>
+            <span>Browse Restaurants</span>
+          </a>
+        }
       </div>
     } @else {
-      <div class="rev-layout">
+      <div class="reviews-section-header">
+        <h2>Your Submitted Reviews</h2>
+        <span class="sub-text">{{ myReviews().length }} restaurant reviews published</span>
+      </div>
 
-        <!-- Left: Summary + Write Review -->
-        <div class="rev-sidebar">
-
-          <!-- Rating Summary -->
-          @if (reviewCount > 0) {
-            <div class="rev-summary-card">
-              <div class="rev-summary-top">
-                <span class="rev-big-number">{{ averageRating | number:'1.1-1' }}</span>
-                <div class="rev-summary-stars">
-                  @for (star of stars; track star) {
-                    <span class="material-icons" [class.filled]="isStarFilled(star, averageRating)">star</span>
-                  }
-                  <span class="rev-summary-count">{{ reviewCount }} {{ reviewCount === 1 ? 'review' : 'reviews' }}</span>
-                </div>
-              </div>
-
-              <!-- Rating Breakdown -->
-              <div class="rev-breakdown">
-                @for (star of [5, 4, 3, 2, 1]; track star) {
-                  <div class="rev-bar-row">
-                    <span class="rev-bar-label">{{ star }}</span>
-                    <span class="material-icons rev-bar-star">star</span>
-                    <div class="rev-bar-track">
-                      <div class="rev-bar-fill" [style.width.%]="getRatingPercent(star)"></div>
-                    </div>
-                    <span class="rev-bar-count">{{ ratingDistribution[star - 1] }}</span>
-                  </div>
-                }
+      <div class="reviews-grid">
+        @for (review of myReviews(); track review.id) {
+          <div class="customer-review-card">
+            <div class="card-restaurant-banner">
+              <img
+                [src]="review.restaurantImageUrl || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500&auto=format&fit=crop&q=60'"
+                [alt]="review.restaurantName"
+                class="rest-banner-img"
+              />
+              <div class="rest-overlay">
+                <span class="rest-name">{{ review.restaurantName }}</span>
+                <span class="review-date-badge">
+                  <span class="material-icons">event</span>
+                  {{ review.createdAt | date:'mediumDate' }}
+                </span>
               </div>
             </div>
-          }
 
-          <!-- Write Review -->
-          @if (isLoggedIn) {
-            <div class="rev-write-card">
-              <div class="rev-write-header">
-                <h3>
-                  <span class="material-icons">edit</span>
-                  Write a Review
-                </h3>
-                <button class="rev-toggle-btn" (click)="toggleForm()">
-                  <span class="material-icons">{{ showForm() ? 'expand_less' : 'expand_more' }}</span>
-                </button>
-              </div>
-
-              @if (showForm()) {
-                <div class="rev-write-body">
-                  <div class="rev-form-group">
-                    <label>Select Restaurant</label>
-                    <select [(ngModel)]="selectedRestaurantId">
-                      <option [value]="0" disabled>Choose a restaurant</option>
-                      @for (r of restaurants(); track r.id) {
-                        <option [value]="r.id">{{ r.name }}</option>
-                      }
-                    </select>
+            <div class="card-body">
+              @if (editingReviewId === review.id) {
+                <!-- Inline Edit Review Form -->
+                <div class="edit-review-form">
+                  <div class="edit-form-head">
+                    <span class="material-icons">edit_note</span>
+                    <span>Edit your review for {{ review.restaurantName }}</span>
                   </div>
 
-                  <div class="rev-form-group">
-                    <label>Your Rating</label>
-                    <div class="rev-star-selector">
-                      @for (star of stars; track star) {
-                        <button type="button" class="rev-star-btn" [class.active]="star <= newRating" (click)="setRating(star)">
+                  @if (editError) {
+                    <div class="form-error-alert">
+                      <span class="material-icons">error_outline</span>
+                      <span>{{ editError }}</span>
+                    </div>
+                  }
+
+                  <div class="edit-field">
+                    <label class="edit-label">Your Rating <span class="req">*</span></label>
+                    <div class="edit-star-picker" (mouseleave)="resetEditHoverRating()">
+                      @for (star of [1, 2, 3, 4, 5]; track star) {
+                        <button
+                          type="button"
+                          class="edit-star-btn"
+                          [class.active]="(editHoverRating || editRating) >= star"
+                          (mouseenter)="setEditHoverRating(star)"
+                          (click)="setEditRating(star)"
+                          [title]="star + ' Stars'"
+                        >
                           <span class="material-icons">star</span>
                         </button>
                       }
-                      <span class="rev-rating-text">{{ newRating }} / 5</span>
+                      <span class="edit-rating-num">{{ editRating || editHoverRating }}.0</span>
                     </div>
                   </div>
 
-                  <div class="rev-form-group">
-                    <label>Your Review</label>
-                    <textarea rows="4" placeholder="Share your experience..." [(ngModel)]="newComment" (ngModelChange)="validateComment()"></textarea>
-                    @if (commentError) {
-                      <span class="rev-error">{{ commentError }}</span>
+                  <div class="edit-field">
+                    <label for="editCommentInput" class="edit-label">Your Review <span class="req">*</span></label>
+                    <textarea
+                      id="editCommentInput"
+                      name="editComment"
+                      [(ngModel)]="editComment"
+                      rows="3"
+                      maxlength="1000"
+                      placeholder="How was the food flavor and delivery speed?"
+                      class="edit-comment"
+                    ></textarea>
+                    <div class="textarea-meta">
+                      <small class="min-hint">Minimum 5 characters</small>
+                      <small class="char-count">{{ editComment.length }} / 1000</small>
+                    </div>
+                  </div>
+
+                  <div class="edit-actions">
+                    <button type="button" class="btn-edit-cancel" (click)="cancelEdit()">
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      class="btn-edit-save"
+                      [disabled]="isSavingEdit() || !editComment.trim()"
+                      (click)="saveEdit(review)"
+                    >
+                      @if (isSavingEdit()) {
+                        <span class="material-icons spinning">sync</span>
+                        <span>Saving...</span>
+                      } @else {
+                        <span class="material-icons">check</span>
+                        <span>Save Changes</span>
+                      }
+                    </button>
+                  </div>
+                </div>
+              } @else {
+                <div class="rating-header">
+                  <div class="stars-box">
+                    @for (st of getStarsArray(review.rating); track $index) {
+                      <span class="material-icons star-gold">star</span>
                     }
+                    <span class="rating-num">{{ review.rating }}.0</span>
                   </div>
-
-                  @if (reviewSuccess) {
-                    <div class="rev-success">
-                      <span class="material-icons">check_circle</span>
-                      Review submitted successfully!
-                    </div>
+                  @if (review.orderId) {
+                    <span class="order-badge">
+                      <span class="material-icons">receipt_long</span> Order #{{ review.orderId }}
+                    </span>
                   }
+                </div>
 
-                  <button class="rev-submit-btn" [disabled]="!canSubmitReview()" (click)="submitReview()">
-                    <span class="material-icons">send</span>
-                    Submit Review
-                  </button>
+                <blockquote class="review-comment">
+                  "{{ review.comment }}"
+                </blockquote>
+
+                <div class="card-actions">
+                  <a [routerLink]="['/restaurants', review.restaurantId]" class="btn-view-rest">
+                    <span class="material-icons">storefront</span>
+                    <span>View Restaurant</span>
+                  </a>
+                  <div class="action-buttons">
+                    <button class="btn-edit" (click)="startEdit(review)" title="Edit your review">
+                      <span class="material-icons">edit</span>
+                      <span>Edit</span>
+                    </button>
+                    <button class="btn-delete" (click)="deleteReview(review.id)" title="Delete your review">
+                      <span class="material-icons">delete_outline</span>
+                      <span>Delete</span>
+                    </button>
+                  </div>
                 </div>
               }
             </div>
-          } @else {
-            <div class="rev-login-card">
-              <span class="material-icons">login</span>
-              <p>Log in to write a review</p>
-              <a routerLink="/login" class="rev-login-btn">Log In</a>
+          </div>
+        }
+      </div>
+    }
+  }
+
+  <!-- TAB 2: WRITE A REVIEW -->
+  @else if (activeTab === 'write-review') {
+    <div class="write-review-container">
+      @if (eligibleOrders().length === 0) {
+        <div class="state-card info-state">
+          <div class="empty-icon-wrap">
+            <span class="material-icons">shopping_bag</span>
+          </div>
+          <h3>No Eligible Delivered Orders</h3>
+          <p>You can review restaurants after your food order has been successfully <strong>Delivered</strong>.</p>
+          <a routerLink="/orders" class="btn-primary">
+            <span class="material-icons">receipt_long</span>
+            <span>Check Order Status</span>
+          </a>
+        </div>
+      } @else {
+        <div class="form-card">
+          <div class="form-header">
+            <h2>Write a Verified Review</h2>
+            <p>Select your delivered meal and share how the food tasted and delivery performed</p>
+          </div>
+
+          @if (formError) {
+            <div class="form-error-alert">
+              <span class="material-icons">error_outline</span>
+              <span>{{ formError }}</span>
             </div>
           }
-        </div>
 
-        <!-- Right: Review List -->
-        <div class="rev-list">
-          @if (reviewCount === 0) {
-            <div class="rev-empty">
-              <span class="material-icons">chat_bubble_outline</span>
-              <h3>No Reviews Yet</h3>
-              <p>Be the first to share your experience!</p>
-            </div>
-          } @else {
-            <h3 class="rev-list-title">
-              <span class="material-icons">reviews</span>
-              All Reviews ({{ reviewCount }})
-            </h3>
-
-            @for (review of reviews(); track review.id) {
-              <div class="rev-card">
-                <div class="rev-card-header">
-                  <div class="rev-avatar">
-                    {{ getCustomerInitial(review.customerName) }}
-                  </div>
-                  <div class="rev-card-info">
-                    <h4>{{ review.customerName }}</h4>
-                    <small>{{ review.restaurantName }}</small>
-                  </div>
-                  <div class="rev-card-right">
-                    <div class="rev-card-stars">
-                      @for (star of stars; track star) {
-                        <span class="material-icons" [class.filled]="isStarFilled(star, review.rating)">star</span>
-                      }
-                    </div>
-                    <span class="rev-time">{{ getTimeAgo(review.createdAt) }}</span>
-                  </div>
-                </div>
-                <p class="rev-card-text">{{ review.comment }}</p>
-                <div class="rev-card-footer">
-                  <span class="rev-card-date">
-                    <span class="material-icons">schedule</span>
-                    {{ review.createdAt | date:'mediumDate' }}
-                  </span>
-                  @if (isOwnReview(review)) {
-                    <button class="rev-delete-btn" (click)="deleteReview(review.id)">
-                      <span class="material-icons">delete_outline</span>
-                      Delete
-                    </button>
+          <form (ngSubmit)="submitReview()" class="review-form">
+            <!-- Step 1: Select Delivered Order -->
+            <div class="form-group">
+              <label for="orderSelect">Choose Delivered Meal <span class="req">*</span></label>
+              <div class="select-order-wrap">
+                <select
+                  id="orderSelect"
+                  [(ngModel)]="selectedOrderId"
+                  name="selectedOrder"
+                  (change)="onOrderDropdownChange()"
+                  class="order-dropdown"
+                >
+                  @for (order of eligibleOrders(); track order.orderId) {
+                    <option [value]="order.orderId">
+                      {{ order.restaurantName }} — Order #{{ order.orderId }} ({{ order.orderDate | date:'mediumDate' }}) {{ order.alreadyReviewed ? '• [Already Reviewed]' : '• [Eligible]' }}
+                    </option>
                   }
+                </select>
+              </div>
+            </div>
+
+            <!-- Restaurant Preview Pill -->
+            @if (selectedRestaurantName) {
+              <div class="selected-rest-pill">
+                <img
+                  [src]="selectedRestaurantImage || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500&auto=format&fit=crop&q=60'"
+                  [alt]="selectedRestaurantName"
+                  class="pill-thumb"
+                />
+                <div class="pill-info">
+                  <span class="pill-name">{{ selectedRestaurantName }}</span>
+                  <span class="pill-status">Verified Delivered Customer</span>
                 </div>
               </div>
             }
-          }
+
+            <!-- Step 2: Choose Star Rating -->
+            <div class="form-group rating-selection-group">
+              <label>Your Rating <span class="req">*</span></label>
+              <div class="star-rating-picker" (mouseleave)="resetHoverRating()">
+                @for (star of [1, 2, 3, 4, 5]; track star) {
+                  <button
+                    type="button"
+                    class="star-btn"
+                    [class.active]="(hoverRating || newRating) >= star"
+                    (mouseenter)="setHoverRating(star)"
+                    (click)="setRating(star)"
+                    [title]="star + ' Stars'"
+                  >
+                    <span class="material-icons">star</span>
+                  </button>
+                }
+                <span class="rating-desc">
+                  @switch (hoverRating || newRating) {
+                    @case (5) { 5.0 — Outstanding & Delicious! }
+                    @case (4) { 4.0 — Really Good Experience }
+                    @case (3) { 3.0 — Average Food & Delivery }
+                    @case (2) { 2.0 — Needs Improvement }
+                    @case (1) { 1.0 — Very Disappointed }
+                  }
+                </span>
+              </div>
+            </div>
+
+            <!-- Step 3: Write Experience -->
+            <div class="form-group">
+              <label for="commentInput">Your Review <span class="req">*</span></label>
+              <textarea
+                id="commentInput"
+                name="comment"
+                [(ngModel)]="newComment"
+                rows="4"
+                maxlength="1000"
+                placeholder="How was the food flavor, packaging, freshness, and delivery speed? Share details to help other foodies..."
+                class="comment-textarea"
+                required
+              ></textarea>
+              <div class="textarea-meta">
+                <small class="min-hint">Minimum 5 characters</small>
+                <small class="char-count">{{ newComment.length }} / 1000</small>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="form-actions">
+              <button
+                type="button"
+                class="btn-cancel"
+                (click)="switchTab('my-reviews')"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                class="btn-submit"
+                [disabled]="isSubmitting() || !newComment.trim() || !selectedRestaurantId"
+              >
+                @if (isSubmitting()) {
+                  <span class="material-icons spinning">sync</span>
+                  <span>Submitting Review...</span>
+                } @else {
+                  <span class="material-icons">send</span>
+                  <span>Submit Verified Review</span>
+                }
+              </button>
+            </div>
+          </form>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- TAB 3: ALL COMMUNITY REVIEWS -->
+  @else if (activeTab === 'all-reviews') {
+    <div class="community-reviews-view">
+      <!-- Search & Rating Filters -->
+      <div class="community-toolbar">
+        <div class="search-input-wrap">
+          <span class="material-icons">search</span>
+          <input
+            type="text"
+            placeholder="Search by restaurant, customer, or keywords..."
+            [ngModel]="allReviewsSearch()"
+            (ngModelChange)="allReviewsSearch.set($event)"
+          />
         </div>
 
+        <div class="rating-filter-pills">
+          <button
+            class="pill"
+            [class.active]="selectedFilterRating() === null"
+            (click)="selectedFilterRating.set(null)"
+          >
+            All Ratings
+          </button>
+          @for (s of [5, 4, 3, 2, 1]; track s) {
+            <button
+              class="pill"
+              [class.active]="selectedFilterRating() === s"
+              (click)="selectedFilterRating.set(selectedFilterRating() === s ? null : s)"
+            >
+              {{ s }} ★
+            </button>
+          }
+        </div>
       </div>
-    }
 
-  </div>
-</section>
+      <!-- Reviews Grid -->
+      @if (filteredAllReviews().length === 0) {
+        <div class="state-card empty-state">
+          <span class="material-icons">reviews</span>
+          <h3>No Reviews Match Your Filter</h3>
+          <p>Try clearing your search keyword or selecting a different rating filter.</p>
+        </div>
+      } @else {
+        <div class="community-grid">
+          @for (review of filteredAllReviews(); track review.id) {
+            <div class="community-card">
+              <div class="card-top">
+                <div class="author-info">
+                  <div class="author-avatar">{{ getInitials(review.customerName) }}</div>
+                  <div>
+                    <span class="author-name">{{ review.customerName }}</span>
+                    <span class="card-date">{{ review.createdAt | date:'mediumDate' }}</span>
+                  </div>
+                </div>
+
+                <div class="rating-pill">
+                  <span class="material-icons star-gold">star</span>
+                  <span>{{ review.rating }}.0</span>
+                </div>
+              </div>
+
+              <div class="rest-tag">
+                <span class="material-icons">storefront</span>
+                <span>{{ review.restaurantName }}</span>
+              </div>
+
+              <p class="community-comment">"{{ review.comment }}"</p>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

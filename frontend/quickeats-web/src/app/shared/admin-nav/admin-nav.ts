@@ -1,27 +1,30 @@
-import { Component } from '@angular/core';
-// Controls the Admin Navigation bar.
-
-import { RouterLink, RouterLinkActive } from '@angular/router';
-// RouterLink makes links navigate.
-// RouterLinkActive highlights the current page link.
-
-import { Router } from '@angular/router';
-// Router moves the Admin to another page.
+import { Component, signal } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-admin-nav',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './admin-nav.html',
   styleUrl: './admin-nav.scss'
 })
 export class AdminNavComponent {
+  mobileMenuOpen = signal(false);
+  adminName = localStorage.getItem('name') || 'Administrator';
+  adminEmail = localStorage.getItem('email') || 'admin@quickeats.com';
 
-  constructor(private router: Router) { }
+  constructor(private router: Router) {}
 
-  // Log out the Admin.
+  toggleMobileMenu(): void {
+    this.mobileMenuOpen.update(v => !v);
+  }
+
+  closeMobileMenu(): void {
+    this.mobileMenuOpen.set(false);
+  }
+
   logout(): void {
-
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
     localStorage.removeItem('name');
@@ -31,5 +34,4 @@ export class AdminNavComponent {
 
     this.router.navigate(['/login']);
   }
-
 }

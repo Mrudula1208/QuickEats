@@ -111,9 +111,10 @@
 } @else {
 
   <!-- ============================================
-       FEATURED RESTAURANTS (Max 4)
+       FEATURED RESTAURANTS (Max 6)
+       Loaded from its own endpoint: /api/Restaurant/featured
        ============================================ -->
-  @if (featuredRestaurants().length > 0) {
+  @if (featuredLoading()) {
     <section class="section restaurants-section">
       <div class="container">
         <div class="section-header">
@@ -121,8 +122,31 @@
             <h2 class="section-title">Featured Restaurants</h2>
             <p class="section-subtitle">Handpicked restaurants loved by our customers</p>
           </div>
-          <a routerLink="/restaurants" class="view-all-link">
-            View All Restaurants
+        </div>
+        <div class="restaurant-grid four-cols">
+          @for (skeleton of [1, 2, 3, 4]; track skeleton) {
+            <div class="restaurant-card skeleton-card">
+              <div class="restaurant-card-img skeleton-block"></div>
+              <div class="restaurant-card-body">
+                <div class="skeleton-block skeleton-line skeleton-line--title"></div>
+                <div class="skeleton-block skeleton-line"></div>
+                <div class="skeleton-block skeleton-line skeleton-line--short"></div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+  } @else if (featuredRestaurants().length > 0) {
+    <section class="section restaurants-section featured-section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Featured Restaurants</h2>
+            <p class="section-subtitle">Handpicked restaurants loved by our customers</p>
+          </div>
+          <a [routerLink]="['/restaurants']" [queryParams]="{ filter: 'featured', view: 'restaurants' }" class="view-all-link">
+            View All Top Rated
             <span class="material-icons">arrow_forward</span>
           </a>
         </div>
@@ -131,16 +155,22 @@
           @for (restaurant of featuredRestaurants(); track trackByRestaurantId($index, restaurant)) {
             <a class="restaurant-card" [routerLink]="['/restaurants', restaurant.id]">
               <div class="restaurant-card-img">
-                <img [src]="restaurant.imageUrl || 'assets/images/restaurants/dominos.jpg'" [alt]="restaurant.name" loading="lazy">
+                <img [src]="restaurant.imageUrl || 'assets/images/restaurants/dominos.jpg'"
+                     (error)="onImageError($event, 'assets/images/restaurants/dominos.jpg')"
+                     [alt]="restaurant.name" loading="lazy">
+                <span class="featured-badge">
+                  <span class="material-icons">workspace_premium</span>
+                  Featured
+                </span>
                 @if (restaurant.isOpenNow) {
                   <span class="status-badge status-badge--open">
                     <span class="status-dot"></span>
-                    Open
+                    ● Open
                   </span>
                 } @else {
                   <span class="status-badge status-badge--closed">
                     <span class="status-dot"></span>
-                    Closed
+                    ● Closed
                   </span>
                 }
                 @if (restaurant.deliveryCharge === 0) {
@@ -175,10 +205,14 @@
                     <span class="material-icons">location_on</span>
                     {{ restaurant.address }}
                   </span>
-                  <span class="meta-item">
+                  <div class="restaurant-card-schedule" [class.open]="restaurant.isOpenNow" [class.closed]="!restaurant.isOpenNow">
                     <span class="material-icons">schedule</span>
-                    {{ restaurant.openingTime }} - {{ restaurant.closingTime }}
-                  </span>
+                    @if (restaurant.isOpenNow) {
+                      <span>Open Now · Closes at {{ formatTime(restaurant.closingTime) }}</span>
+                    } @else {
+                      <span>Closed · Opens at {{ formatTime(restaurant.openingTime) }}</span>
+                    }
+                  </div>
                 </div>
                 <div class="restaurant-card-action">
                   <span class="view-menu-btn">
@@ -195,9 +229,10 @@
   }
 
   <!-- ============================================
-       SECTION 1: TRENDING DISHES 🔥 (Max 6)
+       TRENDING DISHES 🔥 (Max 6)
+       Loaded from its own endpoint: /api/Menu/trending
        ============================================ -->
-  @if (trendingDishes().length > 0) {
+  @if (trendingLoading()) {
     <section class="section dishes-section">
       <div class="container">
         <div class="section-header">
@@ -205,8 +240,31 @@
             <h2 class="section-title">Trending Dishes 🔥</h2>
             <p class="section-subtitle">Most popular picks ordered by food lovers</p>
           </div>
-          <a routerLink="/restaurants" class="view-all-link">
-            View All
+        </div>
+        <div class="dishes-grid six-cols">
+          @for (skeleton of [1, 2, 3]; track skeleton) {
+            <div class="dish-card skeleton-card">
+              <div class="dish-card-img skeleton-block"></div>
+              <div class="dish-card-body">
+                <div class="skeleton-block skeleton-line skeleton-line--title"></div>
+                <div class="skeleton-block skeleton-line"></div>
+                <div class="skeleton-block skeleton-line skeleton-line--short"></div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+  } @else if (trendingDishes().length > 0) {
+    <section class="section dishes-section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Trending Dishes 🔥</h2>
+            <p class="section-subtitle">Most popular picks ordered by food lovers</p>
+          </div>
+          <a [routerLink]="['/restaurants']" [queryParams]="{ filter: 'trending', view: 'dishes' }" class="view-all-link">
+            Explore All Dishes
             <span class="material-icons">arrow_forward</span>
           </a>
         </div>
@@ -214,8 +272,10 @@
         <div class="dishes-grid six-cols">
           @for (dish of trendingDishes(); track trackByMenuId($index, dish)) {
             <div class="dish-card">
-              <div class="dish-card-img">
-                <img [src]="dish.imageUrl || 'assets/images/menu/cheese-pizza.png'" [alt]="dish.name" loading="lazy">
+              <a class="dish-card-img" [routerLink]="['/restaurants', dish.restaurantId]">
+                <img [src]="dish.imageUrl || 'assets/images/menu/cheese-pizza.png'"
+                     (error)="onImageError($event, 'assets/images/menu/cheese-pizza.png')"
+                     [alt]="dish.name" loading="lazy">
                 @if (dish.discountPercent > 0) {
                   <span class="dish-discount">{{ dish.discountPercent }}% OFF</span>
                 }
@@ -237,10 +297,12 @@
                     {{ isDishWishlisted(dish.id) ? 'favorite' : 'favorite_border' }}
                   </span>
                 </button>
-              </div>
+              </a>
               <div class="dish-card-body">
                 <div class="dish-card-header">
-                  <h4 class="dish-card-name">{{ dish.name }}</h4>
+                  <h4 class="dish-card-name">
+                    <a [routerLink]="['/restaurants', dish.restaurantId]">{{ dish.name }}</a>
+                  </h4>
                   @if (dish.isBestseller) {
                     <span class="bestseller-tag">
                       <span class="material-icons">local_fire_department</span>
@@ -249,9 +311,25 @@
                   }
                 </div>
                 <p class="dish-restaurant-name">
-                  <span class="material-icons">store</span>
-                  {{ getRestaurantName(dish.restaurantId) }}
+                  <a [routerLink]="['/restaurants', dish.restaurantId]">
+                    <span class="material-icons">store</span>
+                    {{ dish.restaurantName }}
+                  </a>
                 </p>
+                <div class="dish-card-info">
+                  @if (dish.rating && dish.rating > 0) {
+                    <span class="rating-pill dish-rating">
+                      <span class="material-icons">star</span>
+                      {{ dish.rating | number:'1.1-1' }}
+                    </span>
+                  }
+                  @if (dish.totalOrdered > 0) {
+                    <span class="dish-order-count">
+                      <span class="material-icons">local_fire_department</span>
+                      {{ dish.totalOrdered }} orders
+                    </span>
+                  }
+                </div>
                 <div class="dish-card-footer">
                   <div class="dish-price">
                     @if (dish.discountPercent > 0) {
@@ -275,7 +353,7 @@
   }
 
   <!-- ============================================
-       SECTION 2: TODAY'S BEST OFFERS 🎁 (Max 3)
+       TODAY'S BEST OFFERS 🎁 (Max 3)
        ============================================ -->
   @if (bestOffers().length > 0) {
     <section class="section offers-section">
@@ -325,36 +403,269 @@
   }
 
   <!-- ============================================
-       SECTION 3: RESTAURANTS NEAR YOU 📍 (Max 4)
+       WHAT OUR CUSTOMERS SAY 💬
+       Loaded from its own endpoint: /api/Review/public
        ============================================ -->
-  @if (restaurantsNearYou().length > 0) {
-    <section class="section restaurants-section nearby-section">
-      <div class="container">
-        <div class="section-header">
-          <div>
-            <h2 class="section-title">Restaurants Near You 📍</h2>
-            <p class="section-subtitle">Discover top kitchens and eateries delivering to your neighborhood</p>
-          </div>
-          <a routerLink="/restaurants" class="view-all-link">
-            View All Restaurants
+  <section class="section reviews-section">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">What Our Customers Say 💬</h2>
+          <p class="section-subtitle">Real feedback from verified QuickEats customers after their delivered orders</p>
+        </div>
+        @if (isCustomer) {
+          <a [routerLink]="['/reviews']" class="view-all-link">
+            View All Reviews
             <span class="material-icons">arrow_forward</span>
           </a>
-        </div>
+        }
+      </div>
 
+      @if (reviewsLoading()) {
+        <div class="reviews-grid">
+          @for (skeleton of [1, 2, 3]; track skeleton) {
+            <div class="review-card skeleton-card">
+              <div class="review-card-header">
+                <div class="review-avatar skeleton-block"></div>
+                <div>
+                  <div class="skeleton-block skeleton-line skeleton-line--title"></div>
+                  <div class="skeleton-block skeleton-line"></div>
+                </div>
+              </div>
+              <div class="skeleton-block skeleton-line"></div>
+              <div class="skeleton-block skeleton-line"></div>
+              <div class="skeleton-block skeleton-line skeleton-line--short"></div>
+            </div>
+          }
+        </div>
+      } @else if (reviewsError()) {
+        <div class="review-state">
+          <span class="material-icons review-state-icon">cloud_off</span>
+          <h3>Couldn't load customer reviews</h3>
+          <p>{{ reviewsError() }}</p>
+          <button class="review-retry-btn" (click)="loadReviews()">
+            <span class="material-icons">refresh</span>
+            Try Again
+          </button>
+        </div>
+      } @else if (reviews().length === 0) {
+        <div class="review-state">
+          <span class="material-icons review-state-icon">rate_review</span>
+          <h3>No reviews yet</h3>
+          <p>Be the first to share your food experience with the QuickEats community!</p>
+        </div>
+      } @else {
+        <div class="reviews-grid">
+          @for (review of reviews(); track review.id) {
+            <div class="review-card">
+              @if (review.restaurantImageUrl) {
+                <div class="review-card-media">
+                  <img [src]="review.restaurantImageUrl" [alt]="review.restaurantName"
+                       (error)="onImageError($event)" class="review-restaurant-img" loading="lazy">
+                </div>
+              }
+
+              <div class="review-card-header">
+                <div class="review-avatar">
+                  @if (review.customerProfileImageUrl) {
+                    <img [src]="review.customerProfileImageUrl" [alt]="review.customerName"
+                         (error)="onAvatarError($event)" class="review-avatar-img">
+                  } @else {
+                    {{ getInitials(review.customerName) }}
+                  }
+                </div>
+                <div>
+                  <div class="review-name">{{ review.customerName }}</div>
+                  <p class="review-restaurant">
+                    <span class="material-icons">storefront</span>
+                    {{ review.restaurantName }}
+                  </p>
+                </div>
+              </div>
+
+              @if (review.isVerifiedOrder) {
+                <span class="review-verified-badge">
+                  <span class="material-icons">verified</span>
+                  Verified Order
+                </span>
+              }
+
+              <div class="review-stars">
+                @for (star of getStarArray(review.rating); track $index) {
+                  <span class="material-icons review-star" [class.filled]="star === 1">star</span>
+                }
+              </div>
+
+              <p class="review-text">"{{ review.comment }}"</p>
+
+              <div class="review-card-footer">
+                <span class="review-date">
+                  <span class="material-icons">event</span>
+                  {{ review.createdAt | date:'mediumDate' }}
+                </span>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- ============================================
+       RESTAURANTS NEAR YOU 📍
+       Loaded from its own endpoint: /api/Restaurant/nearby (browser geolocation)
+       ============================================ -->
+  <section class="section restaurants-section nearby-section">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Restaurants Near You 📍</h2>
+          <p class="section-subtitle">
+            Discover top kitchens and eateries delivering to your neighborhood
+            @if (selectedCityName()) {
+              <span class="selected-city-tag">· {{ selectedCityName() }}</span>
+            }
+          </p>
+        </div>
+        <a [routerLink]="['/restaurants']" [queryParams]="{ filter: 'nearby', view: 'restaurants' }" class="view-all-link">
+          View Nearby Kitchens
+          <span class="material-icons">arrow_forward</span>
+        </a>
+      </div>
+
+      <!-- City / Location Selector Chips -->
+      <div class="city-selector-bar">
+        <button
+          class="city-chip"
+          [class.active]="selectedCityName() === 'Current Location'"
+          (click)="loadNearby()"
+          type="button">
+          <span class="material-icons">my_location</span>
+          Use GPS Location
+        </button>
+        @for (city of popularCities; track city.name) {
+          <button
+            class="city-chip"
+            [class.active]="selectedCityName() === city.name"
+            (click)="selectCity(city)"
+            type="button">
+            <span class="material-icons">location_city</span>
+            {{ city.name }}
+          </button>
+        }
+      </div>
+
+      <!-- Loading -->
+      @if (nearbyState() === 'loading') {
         <div class="restaurant-grid four-cols">
-          @for (restaurant of restaurantsNearYou(); track trackByRestaurantId($index, restaurant)) {
+          @for (skeleton of [1, 2, 3, 4]; track skeleton) {
+            <div class="restaurant-card skeleton-card">
+              <div class="restaurant-card-img skeleton-block"></div>
+              <div class="restaurant-card-body">
+                <div class="skeleton-block skeleton-line skeleton-line--title"></div>
+                <div class="skeleton-block skeleton-line"></div>
+                <div class="skeleton-block skeleton-line skeleton-line--short"></div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Permission denied / location unavailable -->
+      @if (nearbyState() === 'idle' || nearbyState() === 'denied' || nearbyState() === 'unavailable') {
+        <div class="location-prompt">
+          <span class="material-icons location-prompt-icon">location_on</span>
+          <h3>Set your location to discover restaurants near you</h3>
+          <p>
+            @if (nearbyState() === 'denied') {
+              Location access is disabled in your browser. Select a city above or allow GPS to view nearby restaurants.
+            } @else if (nearbyState() === 'unavailable') {
+              We could not determine your exact GPS position. Select a city above to see local kitchens.
+            } @else {
+              Turn on location or select your city above to see the closest restaurants delivering to you.
+            }
+          </p>
+          <div class="prompt-actions">
+            <button class="location-btn" (click)="loadNearby()">
+              <span class="material-icons">my_location</span>
+              Allow Location (GPS)
+            </button>
+            <button class="location-btn location-btn--outline" (click)="selectCity(popularCities[0])">
+              <span class="material-icons">explore</span>
+              Explore {{ popularCities[0].name }}
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- API error -->
+      @if (nearbyState() === 'error') {
+        <div class="location-prompt">
+          <span class="material-icons empty-icon">cloud_off</span>
+          <h3>Couldn't load nearby restaurants</h3>
+          <p>{{ nearbyError() }}</p>
+          <div class="prompt-actions">
+            <button class="location-btn" (click)="loadNearby()">
+              <span class="material-icons">refresh</span>
+              Try Again
+            </button>
+            <button class="location-btn location-btn--outline" (click)="selectCity(popularCities[0])">
+              <span class="material-icons">explore</span>
+              Explore {{ popularCities[0].name }}
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- No nearby restaurants found -->
+      @if (nearbyState() === 'empty') {
+        <div class="location-prompt">
+          <span class="material-icons empty-icon">explore_off</span>
+          <h3>No restaurants found in this radius</h3>
+          <p>No kitchens found within range of {{ selectedCityName() || 'your current area' }}. Try another city above or browse our full catalogue.</p>
+          <div class="prompt-actions">
+            <button class="location-btn location-btn--outline" (click)="selectCity(popularCities[0])">
+              <span class="material-icons">location_city</span>
+              View {{ popularCities[0].name }}
+            </button>
+            <a routerLink="/restaurants" class="location-btn">
+              <span class="material-icons">restaurant_menu</span>
+              Browse All Restaurants
+            </a>
+          </div>
+        </div>
+      }
+
+      <!-- Ready: real restaurants sorted by distance -->
+      @if (nearbyState() === 'ready') {
+        <div class="restaurant-grid four-cols">
+          @for (restaurant of nearbyRestaurants(); track trackByRestaurantId($index, restaurant)) {
             <a class="restaurant-card" [routerLink]="['/restaurants', restaurant.id]">
               <div class="restaurant-card-img">
-                <img [src]="restaurant.imageUrl || 'assets/images/restaurants/dominos.jpg'" [alt]="restaurant.name" loading="lazy">
+                <img [src]="restaurant.imageUrl || 'assets/images/restaurants/dominos.jpg'"
+                     (error)="onImageError($event, 'assets/images/restaurants/dominos.jpg')"
+                     [alt]="restaurant.name" loading="lazy">
+                @if (restaurant.distanceKm != null) {
+                  <span class="distance-badge">
+                    <span class="material-icons">near_me</span>
+                    {{ formatDistance(restaurant.distanceKm) }}
+                  </span>
+                }
                 @if (restaurant.isOpenNow) {
                   <span class="status-badge status-badge--open">
                     <span class="status-dot"></span>
-                    Open
+                    ● Open
                   </span>
                 } @else {
                   <span class="status-badge status-badge--closed">
                     <span class="status-dot"></span>
-                    Closed
+                    ● Closed
+                  </span>
+                }
+                @if (restaurant.deliveryCharge === 0) {
+                  <span class="free-delivery-badge">
+                    <span class="material-icons">local_shipping</span>
+                    Free Delivery
                   </span>
                 }
                 <button
@@ -383,10 +694,20 @@
                     <span class="material-icons">place</span>
                     {{ restaurant.address }}
                   </span>
-                  <span class="meta-item">
+                  <div class="restaurant-card-schedule" [class.open]="restaurant.isOpenNow" [class.closed]="!restaurant.isOpenNow">
                     <span class="material-icons">schedule</span>
-                    {{ restaurant.openingTime }} - {{ restaurant.closingTime }}
-                  </span>
+                    @if (restaurant.isOpenNow) {
+                      <span>Open Now · Closes at {{ formatTime(restaurant.closingTime) }}</span>
+                    } @else {
+                      <span>Closed · Opens at {{ formatTime(restaurant.openingTime) }}</span>
+                    }
+                  </div>
+                  @if (restaurant.distanceKm != null) {
+                    <span class="meta-item meta-item--distance">
+                      <span class="material-icons">near_me</span>
+                      {{ formatDistance(restaurant.distanceKm) }}
+                    </span>
+                  }
                 </div>
                 <div class="restaurant-card-action">
                   <span class="view-menu-btn">
@@ -398,9 +719,9 @@
             </a>
           }
         </div>
-      </div>
-    </section>
-  }
+      }
+    </div>
+  </section>
 
   <!-- ============================================
        WHY CHOOSE QUICKEATS
@@ -460,4 +781,3 @@
   </section>
 
 }
-

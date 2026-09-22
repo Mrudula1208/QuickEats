@@ -12,21 +12,21 @@
 <section class="coupons-section">
   <div class="container">
 
-    @if (isLoading) {
+    @if (isLoading()) {
       <div class="loading-state">
         <span class="material-icons spinning">sync</span>
         <p>Loading coupons...</p>
       </div>
-    } @else if (loadError) {
+    } @else if (loadError()) {
       <div class="loading-state">
         <span class="material-icons">error_outline</span>
-        <p>{{ loadError }}</p>
+        <p>{{ loadError() }}</p>
         <button class="retry-btn" (click)="retry()">
           <span class="material-icons">refresh</span>
           Try Again
         </button>
       </div>
-    } @else if (coupons.length === 0) {
+    } @else if (coupons().length === 0) {
       <div class="loading-state">
         <span class="material-icons">local_offer</span>
         <p>No coupons available right now. Check back later.</p>
@@ -34,7 +34,7 @@
     } @else {
 
       <div class="coupon-grid">
-        @for(coupon of coupons; track coupon.couponId) {
+        @for(coupon of coupons(); track coupon.couponId) {
 
           @if (coupon.isActive) {
             <div class="coupon-card">

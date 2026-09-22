@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.ComponentModel.DataAnnotations;
 using QuickEats.API.DTos.Restaurant;
 using QuickEats.API.Services.Interfaces;
 using System.Resources;
@@ -38,23 +39,91 @@ namespace QuickEats.API.Controllers
         }
 
         /// <summary>
+        /// Gets a limited selection of featured/high-quality restaurants for the Home page.
+        /// </summary>
+        /// <remarks>
+        /// Featured restaurants are ranked by their IsFeatured flag, order popularity and
+        /// review rating. This is NOT the same query as the general restaurant listing.
+        /// </remarks>
+        /// <param name="count">Maximum number of restaurants to return. Defaults to 6.</param>
+        [AllowAnonymous]
+        [HttpGet("featured")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetFeatured(
+            [FromQuery, Range(1, 12)] int count = 6)
+        {
+            var restaurants = await _restaurantService.GetFeaturedAsync(count);
+            return Ok(restaurants);
+        }
+
+        /// <summary>
+        /// Gets personalized/smart recommendations for the user based on real order history,
+        /// preferred cuisines, rating, popularity and open status.
+        /// </summary>
+        /// <param name="count">Maximum number of recommendations to return. Defaults to 6.</param>
+        [AllowAnonymous]
+        [HttpGet("recommended")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetRecommended([FromQuery, Range(1, 12)] int count = 6)
+        {
+            int? customerId = null;
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim != null && int.TryParse(userIdClaim.Value, out var uid))
+            {
+                customerId = uid;
+            }
+
+            var recommendations = await _restaurantService.GetRecommendedAsync(customerId, count);
+            return Ok(recommendations);
+        }
+
+        /// <summary>
+        /// Gets active restaurants within a radius of the given coordinates, nearest first.
+        /// </summary>
+        /// <remarks>
+        /// Distances are computed with the Haversine formula using real coordinates.
+        /// Restaurants without coordinates are simply not included.
+        /// </remarks>
+        /// <param name="latitude">Caller latitude (-90 to 90).</param>
+        /// <param name="longitude">Caller longitude (-180 to 180).</param>
+        /// <param name="radiusKm">Search radius in kilometres (max 100). Defaults to 5.</param>
+        /// <param name="count">Maximum number of restaurants to return. Defaults to 4.</param>
+        [AllowAnonymous]
+        [HttpGet("nearby")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetNearby(
+            [FromQuery, Range(-90, 90)] double latitude,
+            [FromQuery, Range(-180, 180)] double longitude,
+            [FromQuery, Range(0.1, 100)] double radiusKm = 5,
+            [FromQuery, Range(1, 12)] int count = 4)
+        {
+            var restaurants = await _restaurantService.GetNearbyAsync(latitude, longitude, radiusKm, count);
+            return Ok(restaurants);
+        }
+
+        /// <summary>
         /// Gets a single restaurant by id.
         /// </summary>
         /// <param name="id">Restaurant id.</param>
         /// <returns>The restaurant details.</returns>
         [AllowAnonymous]
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(int id)
         {
-            if (User.IsInRole("Owner") && !await IsOwnerOfRestaurant(id))
-                return Forbid();
-
             var restaurant = await _restaurantService.GetByIdAsync(id);
             if (restaurant == null)
                 return NotFound("Restaurant not found.");
+
+            // An Owner may only view their own restaurant details (even by direct id).
+            // Anonymous customers can still browse any restaurant publicly.
+            if (User.IsInRole("Owner") && !await IsOwnerOfRestaurant(id))
+                return Forbid();
+
             return Ok(restaurant);
         }
 
@@ -86,7 +155,7 @@ namespace QuickEats.API.Controllers
             var ownerId = int.Parse(
                 User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
             await _restaurantService.CreateAsync(dto, ownerId);
-            return Ok("Restaurant created successfully.");
+            return Ok(new { message = "Restaurant created successfully." });
         }
 
         /// <summary>
@@ -96,7 +165,7 @@ namespace QuickEats.API.Controllers
         /// <param name="id">Restaurant id.</param>
         /// <param name="dto">Updated restaurant details.</param>
         [Authorize(Roles = "Admin,Owner")]
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> Update(int id, UpdateRestaurantDto dto)
@@ -104,7 +173,7 @@ namespace QuickEats.API.Controllers
             if (User.IsInRole("Owner") && !await IsOwnerOfRestaurant(id))
                 return Forbid();
             await _restaurantService.UpdateAsync(id, dto);
-            return Ok("Restaurant updated successfully.");
+            return Ok(new { message = "Restaurant updated successfully." });
         }
 
         /// <summary>
@@ -113,7 +182,7 @@ namespace QuickEats.API.Controllers
         /// <remarks>Owners can only delete their own restaurants.</remarks>
         /// <param name="id">Restaurant id.</param>
         [Authorize(Roles = "Admin,Owner")]
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> Delete(int id)
@@ -121,7 +190,7 @@ namespace QuickEats.API.Controllers
             if (User.IsInRole("Owner") && !await IsOwnerOfRestaurant(id))
                 return Forbid();
             await _restaurantService.DeleteAsync(id);
-            return Ok("Restaurant deleted successfully.");
+            return Ok(new { message = "Restaurant deleted successfully." });
         }
 
         /// <summary>
@@ -130,7 +199,7 @@ namespace QuickEats.API.Controllers
         /// <remarks>Owners can only toggle their own restaurants.</remarks>
         /// <param name="id">Restaurant id.</param>
         [Authorize(Roles = "Admin,Owner")]
-        [HttpPatch("{id}/toggle-status")]
+        [HttpPatch("{id:int}/toggle-status")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> ToggleStatus(int id)
@@ -139,7 +208,7 @@ namespace QuickEats.API.Controllers
                 return Forbid();
 
             await _restaurantService.ToggleActiveStatusAsync(id);
-            return Ok("Status updated successfully.");
+            return Ok(new { message = "Status updated successfully." });
         }
 
         private async Task<bool> IsOwnerOfRestaurant(int restaurantId)

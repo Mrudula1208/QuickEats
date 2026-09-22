@@ -131,6 +131,16 @@ private apiUrl = `${environment.apiUrl}/Auth`;
 
   }
 
+  // ==========================================
+  // GET CURRENT USER ROLE
+  // ==========================================
+
+  getRole(): string {
+
+    return localStorage.getItem('role') || '';
+
+  }
+
 }
 
 /*

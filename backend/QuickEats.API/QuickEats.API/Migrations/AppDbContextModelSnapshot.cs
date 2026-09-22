@@ -22,6 +22,44 @@ namespace QuickEats.API.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("QuickEats.API.Models.AdminOrderOverride", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AdminId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FromStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ToStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdminId");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("AdminOrderOverrides");
+                });
+
             modelBuilder.Entity("QuickEats.API.Models.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -222,6 +260,12 @@ namespace QuickEats.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime?>("CancelledAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CancelledBy")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -402,6 +446,15 @@ namespace QuickEats.API.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsFeatured")
+                        .HasColumnType("bit");
+
+                    b.Property<double?>("Latitude")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("Longitude")
+                        .HasColumnType("float");
+
                     b.Property<decimal>("MinimumOrder")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
@@ -567,6 +620,12 @@ namespace QuickEats.API.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<double?>("Latitude")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("Longitude")
+                        .HasColumnType("float");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -619,6 +678,25 @@ namespace QuickEats.API.Migrations
                     b.ToTable("WishlistItems");
                 });
 
+            modelBuilder.Entity("QuickEats.API.Models.AdminOrderOverride", b =>
+                {
+                    b.HasOne("QuickEats.API.Models.User", "Admin")
+                        .WithMany()
+                        .HasForeignKey("AdminId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("QuickEats.API.Models.Order", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Admin");
+
+                    b.Navigation("Order");
+                });
+
             modelBuilder.Entity("QuickEats.API.Models.MenuItem", b =>
                 {
                     b.HasOne("QuickEats.API.Models.Restaurant", "Restaurant")
@@ -662,7 +740,7 @@ namespace QuickEats.API.Migrations
                         .IsRequired();
 
                     b.HasOne("QuickEats.API.Models.Order", "Order")
-                        .WithMany()
+                        .WithMany("OrderDeliveries")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -694,7 +772,7 @@ namespace QuickEats.API.Migrations
             modelBuilder.Entity("QuickEats.API.Models.Payment", b =>
                 {
                     b.HasOne("QuickEats.API.Models.Order", "Order")
-                        .WithMany()
+                        .WithMany("Payments")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -769,7 +847,11 @@ namespace QuickEats.API.Migrations
 
             modelBuilder.Entity("QuickEats.API.Models.Order", b =>
                 {
+                    b.Navigation("OrderDeliveries");
+
                     b.Navigation("OrderItems");
+
+                    b.Navigation("Payments");
                 });
 
             modelBuilder.Entity("QuickEats.API.Models.User", b =>

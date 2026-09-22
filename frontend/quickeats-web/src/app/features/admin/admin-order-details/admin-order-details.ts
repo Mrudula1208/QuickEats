@@ -1,162 +1,247 @@
-import { Component } from '@angular/core';
-// Component
-// Tells Angular that this file is a Component.
-// This Component controls the Admin Order Details page.
-
+import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-// CommonModule
-// Gives Angular common features used by the HTML.
-// We need it for @if and @for.
-
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-// ActivatedRoute
-// Used to read the Order ID from the URL.
-//
-// Example:
-// /admin/order-details/101
-//
-// We can read:
-// id = 101
-
 import { OrderService } from '../../../core/services/order';
-// OrderService
-// Contains the order data and order-related methods.
-
+import { DeliveryService } from '../../../core/services/delivery.service';
 import { OrderModel } from '../../../core/models/order.model';
-// OrderModel
-// Defines the structure of one Order object.
-
+import { DeliveryPartnerSummary } from '../../../core/models/delivery.model';
 import { AdminNavComponent } from '../../../shared/admin-nav/admin-nav';
-
 import { ToastrService } from 'ngx-toastr';
 
-
 @Component({
-
   selector: 'app-admin-order-details',
-  // selector
-  // Name used to identify this Component.
-
   standalone: true,
-  // standalone
-  // Means this Component works independently.
-
-  imports: [
-    CommonModule,
-    AdminNavComponent
-  ],
-  // imports
-  // Lists the Angular modules required by this Component.
-
+  imports: [CommonModule, FormsModule, AdminNavComponent],
   templateUrl: './admin-order-details.html',
-  // Connects this TypeScript file
-  // with admin-order-details.html.
-
   styleUrl: './admin-order-details.scss'
-  // Connects the SCSS file.
-  // We won't work on SCSS now.
-
 })
-
-
 export class AdminOrderDetails {
 
-  // Store the selected Order.
-  //
-  // OrderModel
-  // Means the object follows OrderModel structure.
-  //
-  // !
-  // Definite assignment operator.
-  //
-  // It tells TypeScript:
-  // "This variable will receive a value later."
-  order!: OrderModel;
+  order = signal<OrderModel | undefined>(undefined);
+  isLoading = signal(true);
+  loadError = signal<string | null>(null);
 
-  // True while the order is being fetched.
-  isLoading = true;
+  deliveryPartners = signal<DeliveryPartnerSummary[]>([]);
 
-  // Holds the error message if loading fails.
-  loadError: string | null = null;
+  // Assign modal
+  isAssignModalOpen = signal(false);
+  assignPartnerId = signal<number | null>(null);
+  isSubmittingAssign = signal(false);
 
+  // Override modal
+  isOverrideModalOpen = signal(false);
+  overrideStatus = signal('');
+  overrideReason = signal('');
+
+  activePartners = computed(() => this.deliveryPartners().filter(p => p.isActive));
+
+  overrideStatuses = ['Confirmed', 'Preparing', 'Ready for Pickup', 'Cancelled'];
 
   constructor(
-
-    // ActivatedRoute
-    // Angular gives us the current URL information.
-
-    // route
-    // Variable name used to access that URL information.
-
     private route: ActivatedRoute,
-
-    // OrderService
-    // Gives us access to order data.
-
     private orderService: OrderService,
-
-    // ToastrService
-    // Shows toast notifications.
+    private deliveryService: DeliveryService,
     private toastr: ToastrService
-
   ) {
-
     this.loadOrder();
-
+    this.loadDeliveryPartners();
   }
 
   loadOrder(): void {
+    this.isLoading.set(true);
+    this.loadError.set(null);
 
-    this.isLoading = true;
-    this.loadError = null;
+    const id = Number(this.route.snapshot.paramMap.get('id'));
 
-    // Read Order ID from URL.
-    //
-    // Example URL:
-    // /admin/order-details/101
-    //
-    // snapshot
-    // Gets the current URL information.
-    //
-    // paramMap
-    // Contains parameters from the URL.
-    //
-    // get('id')
-    // Gets the parameter named "id".
-    //
-    // Number()
-    // Converts the URL value from text
-    // into a number.
+    this.orderService.getOrderById(id).subscribe({
+      next: (data) => {
+        this.order.set(data);
+        this.isLoading.set(false);
+      },
+      error: () => {
+        this.isLoading.set(false);
+        this.loadError.set('Failed to load order details');
+        this.toastr.error('Failed to load order details');
+      }
+    });
+  }
 
-    const id =
-      Number(
-        this.route.snapshot.paramMap.get('id')
-      );
-
-    // Load the order from the Backend.
-    this.orderService
-      .getOrderById(id)
-      .subscribe({
-
-        next: (data) => {
-
-          this.order = data;
-          this.isLoading = false;
-
-        },
-
-        error: () => {
-          this.isLoading = false;
-          this.loadError = 'Failed to load order details';
-          this.toastr.error('Failed to load order details');
-        }
-
-      });
-
+  loadDeliveryPartners(): void {
+    this.deliveryService.getDeliveryPartners().subscribe({
+      next: (partners) => this.deliveryPartners.set(partners || []),
+      error: () => this.deliveryPartners.set([])
+    });
   }
 
   retry(): void {
     this.loadOrder();
   }
 
+  // ------------------------------------------------------------------
+  // Helpers
+  // ------------------------------------------------------------------
+
+  canAssign(order: OrderModel): boolean {
+    const s = order.status.toLowerCase();
+    return s === 'ready for pickup' || s === 'assigned';
+  }
+
+  isReassign(order: OrderModel): boolean {
+    return !!order.deliveryPartnerName && order.status.toLowerCase() === 'assigned';
+  }
+
+  canCancel(order: OrderModel): boolean {
+    const s = order.status.toLowerCase();
+    return s === 'pending' || s === 'confirmed';
+  }
+
+  getStatusClass(status: string): string {
+    switch (status?.toLowerCase()) {
+      case 'delivered': return 'status-delivered';
+      case 'out for delivery': return 'status-out';
+      case 'preparing': return 'status-preparing';
+      case 'ready for pickup': return 'status-ready';
+      case 'assigned': return 'status-assigned';
+      case 'picked up': return 'status-picked';
+      case 'confirmed': return 'status-confirmed';
+      case 'pending': return 'status-pending';
+      case 'cancelled': return 'status-cancelled';
+      default: return '';
+    }
+  }
+
+  orderStatusIcon(status: string): string {
+    const s = status?.toLowerCase() || '';
+    if (s === 'delivered') return 'task_alt';
+    if (s === 'out for delivery') return 'delivery_dining';
+    if (s === 'preparing') return 'outdoor_grill';
+    if (s === 'ready for pickup') return 'inventory_2';
+    if (s === 'assigned') return 'sports_motorsports';
+    if (s === 'picked up') return 'shopping_bag';
+    if (s === 'confirmed') return 'check_circle';
+    if (s === 'pending') return 'schedule';
+    if (s === 'cancelled') return 'cancel';
+    return 'receipt_long';
+  }
+
+  getPaymentClass(paymentStatus?: string): string {
+    const s = (paymentStatus || 'pending').toLowerCase();
+    if (s === 'paid' || s === 'success') return 'paid';
+    if (s === 'failed') return 'failed';
+    if (s === 'refunded') return 'refunded';
+    return 'pending';
+  }
+
+  formatPaymentStatus(paymentStatus?: string): string {
+    if (!paymentStatus) return 'Pending';
+    return paymentStatus.toLowerCase() === 'success' ? 'Paid' : paymentStatus;
+  }
+
+  getTotalItems(order: OrderModel): number {
+    return order.items?.reduce((sum, i) => sum + i.quantity, 0) || 0;
+  }
+
+  // ------------------------------------------------------------------
+  // Admin actions
+  // ------------------------------------------------------------------
+
+  openAssignModal(): void {
+    const order = this.order();
+    if (!order) return;
+    if (this.activePartners().length === 0) {
+      this.toastr.warning('No active delivery partners available.');
+      return;
+    }
+    this.assignPartnerId.set(null);
+    this.isAssignModalOpen.set(true);
+  }
+
+  closeAssignModal(): void {
+    this.isAssignModalOpen.set(false);
+    this.assignPartnerId.set(null);
+    this.isSubmittingAssign.set(false);
+  }
+
+  submitAssignment(): void {
+    const order = this.order();
+    const partnerId = this.assignPartnerId();
+    if (!order || !partnerId) {
+      this.toastr.warning('Please select a delivery partner');
+      return;
+    }
+
+    this.isSubmittingAssign.set(true);
+    this.deliveryService.assignDeliveryPartner(order.id, Number(partnerId)).subscribe({
+      next: () => {
+        this.isSubmittingAssign.set(false);
+        this.toastr.success(`Delivery partner assigned to Order #${order.id}`);
+        this.closeAssignModal();
+        this.loadOrder();
+      },
+      error: (err) => {
+        this.isSubmittingAssign.set(false);
+        const msg = err?.error?.message || 'Failed to assign delivery partner';
+        this.toastr.error(msg);
+      }
+    });
+  }
+
+  cancelOrder(): void {
+    const order = this.order();
+    if (!order) return;
+    if (!confirm(`Cancel Order #${order.id}? Only Pending or Confirmed orders can be cancelled.`)) return;
+
+    this.orderService.adminCancelOrder(order.id).subscribe({
+      next: () => {
+        this.toastr.warning(`Order #${order.id} cancelled`);
+        this.loadOrder();
+      },
+      error: (err) => {
+        const msg = err?.error?.message || 'Failed to cancel order';
+        this.toastr.error(msg);
+      }
+    });
+  }
+
+  openOverrideModal(): void {
+    this.overrideStatus.set('Cancelled');
+    this.overrideReason.set('');
+    this.isOverrideModalOpen.set(true);
+  }
+
+  closeOverrideModal(): void {
+    this.isOverrideModalOpen.set(false);
+    this.overrideStatus.set('');
+    this.overrideReason.set('');
+  }
+
+  submitOverride(): void {
+    const order = this.order();
+    if (!order) return;
+
+    const status = this.overrideStatus();
+    const reason = this.overrideReason();
+
+    if (!status) {
+      this.toastr.warning('Please select the target status');
+      return;
+    }
+    if (!reason || reason.trim().length < 5) {
+      this.toastr.warning('Please provide a reason (at least 5 characters)');
+      return;
+    }
+
+    this.orderService.adminOverride(order.id, status, reason.trim()).subscribe({
+      next: () => {
+        this.toastr.success(`Order #${order.id} overridden to "${status}"`);
+        this.closeOverrideModal();
+        this.loadOrder();
+      },
+      error: (err) => {
+        const msg = err?.error?.message || 'Failed to override order status';
+        this.toastr.error(msg);
+      }
+    });
+  }
 }

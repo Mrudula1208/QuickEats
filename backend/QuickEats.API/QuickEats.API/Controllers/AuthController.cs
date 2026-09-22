@@ -38,17 +38,17 @@ namespace QuickEats.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Register(RegisterRequestDto request)
         {
-            if (!AllowedRoles.Contains(request.Role))
+            if (!AllowedRoles.Contains(request.Role, StringComparer.OrdinalIgnoreCase))
             {
                 request.Role = "Customer";
             }
-            else if (request.Role == "Delivery Partner")
+            else if (string.Equals(request.Role, "Delivery Partner", StringComparison.OrdinalIgnoreCase))
             {
                 request.Role = "DeliveryPartner";
             }
 
             await _userService.RegisterAsync(request);
-            return Ok("User registered successfully.");
+            return Ok(new { message = "User registered successfully." });
         }
 
         /// <summary>

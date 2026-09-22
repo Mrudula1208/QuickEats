@@ -66,7 +66,7 @@
       <form (ngSubmit)="submitTicket()" #supportForm="ngForm" class="support-form">
         <div class="form-group">
           <label for="name">Your Name *</label>
-          <input type="text" id="name" name="name" [(ngModel)]="contactForm.name" required #name="ngModel" placeholder="e.g. John Doe">
+          <input type="text" id="name" name="name" [(ngModel)]="contactForm.name" required #name="ngModel" placeholder="e.g. Aarav Sharma">
           @if (name.invalid && name.touched) {
             <span class="form-error">Name is required</span>
           }
@@ -74,7 +74,7 @@
 
         <div class="form-group">
           <label for="email">Email Address *</label>
-          <input type="email" id="email" name="email" [(ngModel)]="contactForm.email" required email #email="ngModel" placeholder="e.g. john@example.com">
+          <input type="email" id="email" name="email" [(ngModel)]="contactForm.email" required email #email="ngModel" placeholder="e.g. aarav.sharma@gmail.com">
           @if (email.invalid && email.touched) {
             <span class="form-error">Please enter a valid email address</span>
           }

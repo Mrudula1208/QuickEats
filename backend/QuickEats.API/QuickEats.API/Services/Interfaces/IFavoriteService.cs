@@ -15,7 +15,7 @@ namespace QuickEats.API.Services.Interfaces
 
         // Add a Restaurant into Favorites.
 
-        Task CreateAsync(int userId, CreateFavoriteDto dto);
+        Task<FavoriteResponseDto> CreateAsync(int userId, CreateFavoriteDto dto);
 
         // Remove a Restaurant from Favorites.
 

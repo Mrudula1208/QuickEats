@@ -1,278 +1,181 @@
 using Microsoft.AspNetCore.Authorization;
-// Authorization
-// Used to control which users can access Review APIs.
-
 using Microsoft.AspNetCore.Mvc;
-// ControllerBase, IActionResult, Ok(), NotFound(), etc.
-
 using QuickEats.API.DTos.Review;
-// Import Review DTOs.
-
 using QuickEats.API.Services.Interfaces;
-// Import IReviewService.
-// Import IRestaurantService (for Owner ownership checks).
-
 using System.Security.Claims;
-// ClaimTypes.NameIdentifier
-// Used to read the logged in Customer ID.
-
 
 namespace QuickEats.API.Controllers
 {
-    /// <summary>
-    /// Written restaurant reviews: browse reviews (public), create (Customer) and delete (Admin).
-    /// </summary>
-
     [Tags("Reviews")]
-    [Authorize]
-    // User must be logged in
-    // to access these APIs.
-
     [Route("api/[controller]")]
-    // Creates the URL:
-    // /api/Review
-
     [ApiController]
-    // Enables API Controller features.
-
     public class ReviewController : ControllerBase
     {
-        // Store Review Service.
-        // Store Restaurant Service (for Owner ownership checks).
-
-        private readonly IReviewService
-            _reviewService;
-
-        private readonly IRestaurantService
-            _restaurantService;
-
-
-        // Constructor.
+        private readonly IReviewService _reviewService;
+        private readonly IRestaurantService _restaurantService;
 
         public ReviewController(
             IReviewService reviewService,
             IRestaurantService restaurantService
         )
         {
-            // Store injected services.
-
-            _reviewService =
-                reviewService;
-
-            _restaurantService =
-                restaurantService;
+            _reviewService = reviewService;
+            _restaurantService = restaurantService;
         }
 
-
         /// <summary>
-        /// Gets all reviews.
+        /// Gets all reviews across the platform.
         /// </summary>
-
         [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            // Ask Service for all Reviews.
-
-            var reviews =
-                await _reviewService
-                    .GetAllAsync();
-
-
-            // Return HTTP 200
-            // with Review data.
-
+            var reviews = await _reviewService.GetAllAsync();
             return Ok(reviews);
         }
 
+        /// <summary>
+        /// Gets the public reviews shown on the Home page (approved / published reviews).
+        /// </summary>
+        [AllowAnonymous]
+        [HttpGet("public")]
+        public async Task<IActionResult> GetPublic(int? limit)
+        {
+            var reviews = await _reviewService.GetPublicAsync(limit);
+            return Ok(reviews);
+        }
 
         /// <summary>
         /// Gets one review by id.
         /// </summary>
-        /// <param name="id">Review id.</param>
-
         [AllowAnonymous]
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(
-            int id
-        )
+        public async Task<IActionResult> GetById(int id)
         {
-            // Ask Service for Review
-            // using the given ID.
-
-            var review =
-                await _reviewService
-                    .GetByIdAsync(id);
-
-
-            // Check whether Review exists.
-
+            var review = await _reviewService.GetByIdAsync(id);
             if (review == null)
             {
-                // HTTP 404
-                // Means Review was not found.
-
-                return NotFound("Review not found.");
+                return NotFound(new { message = "Review not found." });
             }
 
-
-            // HTTP 200
-            // Return Review.
+            // An Owner may only read reviews of their own restaurants.
+            if (User.IsInRole("Owner") &&
+                !await IsOwnerOfRestaurant(review.RestaurantId))
+            {
+                return Forbid();
+            }
 
             return Ok(review);
         }
 
+        /// <summary>
+        /// Gets all reviews submitted by the logged-in customer.
+        /// </summary>
+        [Authorize(Roles = "Customer")]
+        [HttpGet("my")]
+        public async Task<IActionResult> GetMyReviews()
+        {
+            var customerId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var reviews = await _reviewService.GetByCustomerIdAsync(customerId);
+            return Ok(reviews);
+        }
+
+        /// <summary>
+        /// Gets delivered orders that are eligible for customer review.
+        /// </summary>
+        [Authorize(Roles = "Customer")]
+        [HttpGet("eligible-orders")]
+        public async Task<IActionResult> GetEligibleOrders()
+        {
+            var customerId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var eligibleOrders = await _reviewService.GetEligibleOrdersAsync(customerId);
+            return Ok(eligibleOrders);
+        }
 
         /// <summary>
         /// Gets all reviews of one restaurant.
         /// </summary>
-        /// <param name="restaurantId">Restaurant id.</param>
-
         [AllowAnonymous]
         [HttpGet("restaurant/{restaurantId}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<IActionResult> GetByRestaurantId(
-            int restaurantId
-        )
+        public async Task<IActionResult> GetByRestaurantId(int restaurantId)
         {
-            // Owner can only see reviews of their own restaurants.
-            if (User.IsInRole("Owner") && !await IsOwnerOfRestaurant(restaurantId))
+            // An Owner may only read reviews for their own restaurants.
+            if (User.IsInRole("Owner") &&
+                !await IsOwnerOfRestaurant(restaurantId))
+            {
                 return Forbid();
+            }
 
-            // Ask Service for Reviews
-            // of the given Restaurant.
-
-            var reviews =
-                await _reviewService
-                    .GetByRestaurantIdAsync(restaurantId);
-
-
-            // HTTP 200
-            // Return Reviews.
-
+            var reviews = await _reviewService.GetByRestaurantIdAsync(restaurantId);
             return Ok(reviews);
         }
 
         /// <summary>
-        /// Gets all reviews for the logged in Owner's restaurants.
+        /// Gets all reviews for the logged-in Owner's restaurants.
         /// </summary>
         [Authorize(Roles = "Owner")]
         [HttpGet("owner")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetOwnerReviews()
         {
-            var ownerId = int.Parse(
-                User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-
+            var ownerId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
             var reviews = await _reviewService.GetByOwnerIdAsync(ownerId);
             return Ok(reviews);
         }
 
-
         /// <summary>
-        /// Gets the average rating of one restaurant (null when no reviews exist).
+        /// Gets the average rating of one restaurant.
         /// </summary>
-        /// <param name="restaurantId">Restaurant id.</param>
-
         [AllowAnonymous]
         [HttpGet("restaurant/{restaurantId}/average")]
-        public async Task<IActionResult> GetAverageRating(
-            int restaurantId
-        )
+        public async Task<IActionResult> GetAverageRating(int restaurantId)
         {
-            // Ask Service for average Rating
-            // of the given Restaurant.
-
-            var average =
-                await _reviewService
-                    .GetAverageRatingAsync(restaurantId);
-
-
-            // HTTP 200
-            // Return average Rating.
-            //
-            // When no Reviews exist,
-            // average will be null.
-
+            var average = await _reviewService.GetAverageRatingAsync(restaurantId);
             return Ok(average);
         }
 
-
         /// <summary>
-        /// Creates a new review (Customer only). The customer id always comes from the JWT token.
+        /// Creates a new review for a delivered order (Customer only).
         /// </summary>
-        /// <param name="dto">Restaurant id, rating (1-5) and comment.</param>
-
         [Authorize(Roles = "Customer")]
-        // Only Customer can create a Review.
-
         [HttpPost]
-        public async Task<IActionResult> Create(
-            CreateReviewDto dto
-        )
+        public async Task<IActionResult> Create([FromBody] CreateReviewDto dto)
         {
-            // Read the logged in Customer ID
-            // from the JWT token.
-
-            var customerId = int.Parse(
-                User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-
-            // Send DTO to Service.
-            //
-            // CustomerId always comes from the token.
-            // It is never trusted from the request.
-
-            await _reviewService
-                .CreateAsync(customerId, dto);
-
-
-            // HTTP 200
-            // Tell Angular that Review
-            // was successfully created.
-
-            return Ok(
-                "Review created successfully."
-            );
+            var customerId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            await _reviewService.CreateAsync(customerId, dto);
+            return Ok(new { message = "Review submitted successfully." });
         }
-
 
         /// <summary>
-        /// Deletes a review (Admin only).
+        /// Updates a review owned by the logged-in customer.
         /// </summary>
-        /// <param name="id">Review id.</param>
-
-        [Authorize(Roles = "Admin")]
-        // Only Admin can delete Reviews.
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(
-            int id
-        )
+        [Authorize(Roles = "Customer")]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateReviewDto dto)
         {
-            // Send Review ID to Service.
-
-            await _reviewService
-                .DeleteAsync(id);
-
-
-            // HTTP 200
-            // Tell Angular that Review
-            // was successfully deleted.
-
-            return Ok(
-                "Review deleted successfully."
-            );
+            var customerId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            await _reviewService.UpdateAsync(id, customerId, dto);
+            return Ok(new { message = "Review updated successfully." });
         }
 
-        // Check whether the logged in Owner owns this restaurant.
+        /// <summary>
+        /// Deletes a review (Admin or the Customer who created it).
+        /// </summary>
+        [Authorize]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var role = User.FindFirst(ClaimTypes.Role)?.Value ?? "";
+
+            await _reviewService.DeleteAsync(id, userId, role);
+            return Ok(new { message = "Review deleted successfully." });
+        }
+
+        // Check whether the logged-in Owner owns this restaurant.
         private async Task<bool> IsOwnerOfRestaurant(int restaurantId)
         {
-            var ownerId = int.Parse(
-                User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-
+            var ownerId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
             var restaurants = await _restaurantService.GetByOwnerIdAsync(ownerId);
-
             return restaurants.Any(r => r.Id == restaurantId);
         }
     }

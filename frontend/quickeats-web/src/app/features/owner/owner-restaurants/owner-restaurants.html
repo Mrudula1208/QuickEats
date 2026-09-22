@@ -17,7 +17,7 @@
                 Try Again
             </button>
         </div>
-    } @else if (!restaurant) {
+    } @else if (restaurants().length === 0) {
 
         <div class="empty create-state">
             <span class="material-icons">storefront</span>
@@ -31,75 +31,90 @@
 
     } @else {
 
-        <div class="restaurant-card">
-
-            <div class="restaurant-image">
-                @if (restaurant.imageUrl) {
-                    <img [src]="restaurant.imageUrl" alt="{{ restaurant.name }}">
-                } @else {
-                    <span class="material-icons">restaurant</span>
-                }
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <div>
+                <h1 style="font-size: 26px; font-weight: 800; color: #1e293b; margin: 0;">My Restaurants</h1>
+                <p style="color: #64748b; margin: 4px 0 0 0; font-size: 14px;">Manage your restaurant details, operating hours, and menus</p>
             </div>
+            <a routerLink="/owner/restaurants/new" class="create-btn" style="padding: 10px 20px; font-size: 14px;">
+                <span class="material-icons" style="font-size: 18px;">add</span>
+                Add Restaurant
+            </a>
+        </div>
 
-            <div class="restaurant-body">
+        <div style="display: flex; flex-direction: column; gap: 24px;">
+            @for (restaurant of restaurants(); track restaurant.id) {
+                <div class="restaurant-card">
 
-                <div class="restaurant-head">
-                    <h1>{{ restaurant.name }}</h1>
-                    <div class="restaurant-status">
-                        @if (restaurant.isOpenNow) {
-                            <span class="badge-open">Open Now</span>
+                    <div class="restaurant-image">
+                        @if (restaurant.imageUrl) {
+                            <img [src]="restaurant.imageUrl" alt="{{ restaurant.name }}">
                         } @else {
-                            <span class="badge-closed">Closed</span>
+                            <span class="material-icons">restaurant</span>
                         }
-                        <span [ngClass]="restaurant.isActive ? 'badge-active' : 'badge-inactive'">
-                            {{ restaurant.isActive ? 'Active' : 'Inactive' }}
-                        </span>
                     </div>
+
+                    <div class="restaurant-body">
+
+                        <div class="restaurant-head">
+                            <h2 style="font-family: 'DM Sans', sans-serif; font-size: 24px; color: #222; margin: 0;">{{ restaurant.name }}</h2>
+                            <div class="restaurant-status">
+                                @if (restaurant.isOpenNow) {
+                                    <span class="badge-open">Open Now</span>
+                                } @else {
+                                    <span class="badge-closed">Closed</span>
+                                }
+                                <span [ngClass]="restaurant.isActive ? 'badge-active' : 'badge-inactive'">
+                                    {{ restaurant.isActive ? 'Active' : 'Inactive' }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <p class="description">{{ restaurant.description }}</p>
+
+                        <div class="restaurant-details">
+                            <div class="detail-item">
+                                <span class="material-icons">location_on</span>
+                                <span>{{ restaurant.address }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="material-icons">phone</span>
+                                <span>{{ restaurant.phoneNumber }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="material-icons">schedule</span>
+                                <span>{{ restaurant.openingTime }} - {{ restaurant.closingTime }}</span>
+                            </div>
+                        </div>
+
+                        <div class="actions">
+                            <button class="action-btn" routerLink="/owner/restaurants/{{ restaurant.id }}/edit">
+                                <span class="material-icons">edit</span>
+                                Edit Details
+                            </button>
+
+                            <button class="action-btn" routerLink="/owner/menu/{{ restaurant.id }}">
+                                <span class="material-icons">restaurant_menu</span>
+                                Manage Menu
+                            </button>
+
+                            @if (restaurant.isActive) {
+                                <button class="action-btn action-deactivate" (click)="toggleStatus(restaurant.id)">
+                                    <span class="material-icons">toggle_off</span>
+                                    Deactivate
+                                </button>
+                            } @else {
+                                <button class="action-btn action-activate" (click)="toggleStatus(restaurant.id)">
+                                    <span class="material-icons">toggle_on</span>
+                                    Activate
+                                </button>
+                            }
+                        </div>
+
+                    </div>
+
                 </div>
-
-                <p class="description">{{ restaurant.description }}</p>
-
-                <div class="restaurant-details">
-                    <div class="detail-item">
-                        <span class="material-icons">location_on</span>
-                        <span>{{ restaurant.address }}</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="material-icons">phone</span>
-                        <span>{{ restaurant.phoneNumber }}</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="material-icons">schedule</span>
-                        <span>{{ restaurant.openingTime }} - {{ restaurant.closingTime }}</span>
-                    </div>
-                </div>
-
-                <div class="actions">
-                    <button class="action-btn" routerLink="/owner/restaurants/{{ restaurant.id }}/edit">
-                        <span class="material-icons">edit</span>
-                        Edit Details
-                    </button>
-
-                    <button class="action-btn" routerLink="/owner/menu/{{ restaurant.id }}">
-                        <span class="material-icons">restaurant_menu</span>
-                        Manage Menu
-                    </button>
-
-                    @if (restaurant.isActive) {
-                        <button class="action-btn action-deactivate" (click)="toggleStatus(restaurant.id)">
-                            <span class="material-icons">toggle_off</span>
-                            Deactivate
-                        </button>
-                    } @else {
-                        <button class="action-btn action-activate" (click)="toggleStatus(restaurant.id)">
-                            <span class="material-icons">toggle_on</span>
-                            Activate
-                        </button>
-                    }
-                </div>
-
-            </div>
-
+            }
         </div>
 
     }

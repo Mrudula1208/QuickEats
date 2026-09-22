@@ -12,6 +12,13 @@ namespace QuickEats.API.Models
         public string PhoneNumber { get; set; } = string.Empty;
         public string Role { get;set; }=string.Empty; // e.g., "Customer", "Admin","Owner","Delivery Partner"
         public string ProfileImageUrl { get; set; } = string.Empty;
+
+        // Optional geographic coordinates for a customer's current/default location.
+        // Nullable so existing users without coordinates never break.
+        public double? Latitude { get; set; }
+
+        public double? Longitude { get; set; }
+
         public bool IsActive { get; set; } = true;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

@@ -98,6 +98,19 @@ export class RestaurantsComponent implements OnInit {
       } else if (params['view'] === 'dishes') {
         this.activeView.set('dishes');
       }
+
+      if (params['filter'] === 'featured') {
+        this.activeView.set('restaurants');
+        this.minRating = 4;
+        this.sortBy = 'rating';
+      } else if (params['filter'] === 'nearby') {
+        this.activeView.set('restaurants');
+        this.showOpenOnly = true;
+        this.sortBy = 'delivery';
+      } else if (params['filter'] === 'trending') {
+        this.activeView.set('dishes');
+      }
+
       this.loadData();
     });
   }
@@ -218,6 +231,20 @@ export class RestaurantsComponent implements OnInit {
       resResult = resResult.filter(r => !r.isOpenNow);
     }
 
+    if (this.showVegOnly) {
+      const vegRestaurantIds = new Set(
+        this.allMenuItems().filter(m => m.isVeg).map(m => m.restaurantId)
+      );
+      resResult = resResult.filter(r => vegRestaurantIds.has(r.id));
+    }
+
+    if (this.showNonVegOnly) {
+      const nonVegRestaurantIds = new Set(
+        this.allMenuItems().filter(m => !m.isVeg).map(m => m.restaurantId)
+      );
+      resResult = resResult.filter(r => nonVegRestaurantIds.has(r.id));
+    }
+
     if (this.minRating > 0) {
       resResult = resResult.filter(r => (r.rating ?? 0) >= this.minRating);
     }
@@ -253,9 +280,23 @@ export class RestaurantsComponent implements OnInit {
       dishResult = dishResult.filter(m =>
         m.name.toLowerCase().includes(search) ||
         m.category.toLowerCase().includes(search) ||
-        m.description.toLowerCase().includes(search) ||
+        (m.description && m.description.toLowerCase().includes(search)) ||
         this.getRestaurantName(m.restaurantId).toLowerCase().includes(search)
       );
+    }
+
+    if (this.showOpenOnly) {
+      const openRestaurantIds = new Set(
+        this.restaurants().filter(r => r.isOpenNow).map(r => r.id)
+      );
+      dishResult = dishResult.filter(m => openRestaurantIds.has(m.restaurantId));
+    }
+
+    if (this.showClosedOnly) {
+      const closedRestaurantIds = new Set(
+        this.restaurants().filter(r => !r.isOpenNow).map(r => r.id)
+      );
+      dishResult = dishResult.filter(m => closedRestaurantIds.has(m.restaurantId));
     }
 
     if (this.showVegOnly) {
@@ -300,6 +341,38 @@ export class RestaurantsComponent implements OnInit {
 
   clearSearch(): void {
     this.searchText = '';
+    this.applyFilters();
+  }
+  get openRestaurantsCount(): number {
+    return this.restaurants().filter(r => r.isOpenNow).length;
+  }
+
+  get closedRestaurantsCount(): number {
+    return this.restaurants().filter(r => !r.isOpenNow).length;
+  }
+
+  formatTime(timeStr?: string): string {
+    if (!timeStr) return '';
+    const parts = timeStr.split(':');
+    if (parts.length < 2) return timeStr;
+    let hour = parseInt(parts[0], 10);
+    const min = parts[1];
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    hour = hour % 12 || 12;
+    return `${hour}:${min} ${ampm}`;
+  }
+
+  setAvailabilityFilter(type: 'all' | 'open' | 'closed'): void {
+    if (type === 'all') {
+      this.showOpenOnly = false;
+      this.showClosedOnly = false;
+    } else if (type === 'open') {
+      this.showOpenOnly = true;
+      this.showClosedOnly = false;
+    } else if (type === 'closed') {
+      this.showOpenOnly = false;
+      this.showClosedOnly = true;
+    }
     this.applyFilters();
   }
 
@@ -359,6 +432,11 @@ export class RestaurantsComponent implements OnInit {
   }
 
   addToCart(dish: MenuItem): void {
+    if (!this.authService.isLoggedIn()) {
+      this.toastr.info('Please login to add items to your cart.', 'Login Required');
+      this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
+      return;
+    }
     this.cartService.addToCart(dish);
     this.toastr.success(`${dish.name} added to cart!`);
   }

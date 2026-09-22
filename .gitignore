@@ -12,6 +12,11 @@ obj/
 
 # Logs
 *.log
+build-bg.log.err
+build-out3.txt
+
+# Dev scratch scripts
+scratch/
 
 # Node
 node_modules/

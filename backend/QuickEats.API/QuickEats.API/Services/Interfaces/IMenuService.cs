@@ -7,6 +7,10 @@ namespace QuickEats.API.Services.Interfaces
     public interface IMenuService
     {
         Task<IEnumerable<MenuResponseDto>> GetAllAsync();
+
+        // Most popular dishes across all restaurants, for the Home "Trending Dishes" section.
+        Task<IEnumerable<TrendingDishDto>> GetTrendingAsync(int count);
+
         Task<PagedResult<MenuResponseDto>> GetPagedAsync(int page, int pageSize, string? sortBy, bool sortDesc);
         Task<IEnumerable<string>> GetCategoriesAsync();
         Task<MenuResponseDto?> GetByIdAsync(int id);

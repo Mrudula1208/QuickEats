@@ -17,6 +17,16 @@ export class UserService {
     return this.http.get<UserModel[]>(this.apiUrl);
   }
 
+  // Get the profile of the currently logged in user.
+  getCurrentUser(): Observable<UserModel> {
+    return this.http.get<UserModel>(`${this.apiUrl}/me`);
+  }
+
+  // Update the profile image of the currently logged in user.
+  updateProfileImage(imageUrl: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/profile-image`, { profileImageUrl: imageUrl });
+  }
+
   deleteUser(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }

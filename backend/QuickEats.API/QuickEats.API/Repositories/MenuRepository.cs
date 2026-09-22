@@ -19,6 +19,57 @@ namespace QuickEats.API.Repositories
             return await _context.MenuItems.ToListAsync();
         }
 
+        public async Task<IEnumerable<MenuItem>> GetTrendingAsync(int count)
+        {
+            // PRIMARY: real popularity = total ordered quantity per dish.
+            // This is real aggregate data from the OrderItems table, never fabricated.
+            var popularIds = await _context.OrderItems
+                .GroupBy(oi => oi.MenuItemId)
+                .Select(g => new { MenuItemId = g.Key, TotalOrdered = g.Sum(oi => oi.Quantity) })
+                .OrderByDescending(g => g.TotalOrdered)
+                .Take(count)
+                .ToListAsync();
+
+            // FALLBACK: when the database has no order history yet, there is no real
+            // popularity data to rank by. In that case we return manually flagged
+            // bestseller dishes first, then the most recent available dishes. No fake
+            // popularity numbers are fabricated - TotalOrdered simply stays 0.
+            if (popularIds.Count == 0)
+            {
+                return await _context.MenuItems
+                    .Include(m => m.Restaurant)
+                    .Where(m => m.IsAvailable && m.Restaurant.IsActive)
+                    .OrderByDescending(m => m.IsBestseller)
+                    .ThenByDescending(m => m.Id)
+                    .Take(count)
+                    .ToListAsync();
+            }
+
+            var menuItems = await _context.MenuItems
+                .Include(m => m.Restaurant)
+                .Where(m => m.IsAvailable && m.Restaurant.IsActive && popularIds.Select(p => p.MenuItemId).Contains(m.Id))
+                .ToListAsync();
+
+            // Attach the real popularity count so it can be exposed on the DTO.
+            foreach (var item in menuItems)
+            {
+                var popularity = popularIds.FirstOrDefault(p => p.MenuItemId == item.Id);
+                item.TotalOrdered = popularity?.TotalOrdered ?? 0;
+            }
+
+            // Re-order by the popularity ranking computed above so the result is
+            // deterministic and truly ordered by number of times ordered.
+            var ordered = new List<MenuItem>();
+            foreach (var popular in popularIds)
+            {
+                var item = menuItems.FirstOrDefault(m => m.Id == popular.MenuItemId);
+                if (item != null)
+                    ordered.Add(item);
+            }
+
+            return ordered;
+        }
+
         public async Task<PagedResult<MenuItem>> GetPagedAsync(int page, int pageSize, string? sortBy, bool sortDesc)
         {
             var query = _context.MenuItems.AsQueryable();

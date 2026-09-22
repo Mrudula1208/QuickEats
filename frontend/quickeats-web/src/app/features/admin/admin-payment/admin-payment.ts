@@ -1,267 +1,154 @@
-// Import Component because this file controls
-// the Admin Payment page.
-import { Component } from '@angular/core';
-
-// Import CommonModule because the HTML
-// will use Angular features such as @if and @for.
+import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
 import { FormsModule } from '@angular/forms';
-
-// Import PaymentService because
-// PaymentService contains the payment data.
 import { PaymentService } from '../../../core/services/payment.service';
-
-// Import Payment because it defines
-// the structure of one payment object.
 import { Payment } from '../../../core/models/payment.model';
-
 import { AdminNavComponent } from '../../../shared/admin-nav/admin-nav';
-// Top navigation bar for the Admin Panel.
-
 import { ToastrService } from 'ngx-toastr';
-// Displays success/error toast notifications.
-
 
 @Component({
-
-  // selector
-  // Name used by Angular to identify this component.
   selector: 'app-admin-payment',
-
-  // standalone
-  // Means this component does not need
-  // to be declared inside an NgModule.
   standalone: true,
-
-  // imports
-  // Lists modules required by this component.
   imports: [
     CommonModule,
     FormsModule,
     AdminNavComponent
   ],
-
-  // Connect this TypeScript file
-  // with the HTML file.
   templateUrl: './admin-payment.html',
-
-  // Connect the SCSS file.
   styleUrl: './admin-payment.scss'
-
 })
+export class AdminPayment implements OnInit {
+  payments = signal<Payment[]>([]);
+  filteredPayments = signal<Payment[]>([]);
+  isLoading = signal(true);
+  loadError = signal('');
 
+  // Filter & Search state
+  searchQuery = '';
+  selectedStatus = 'All';
+  selectedMethod = 'All';
+  sortBy = 'newest';
 
-export class AdminPayment {
-
-  // Store all payments.
-  //
-  // Payment
-  // Means one Payment object.
-  //
-  // []
-  // Means multiple Payment objects.
-  //
-  // =
-  // Assigns an empty array initially.
-  payments: Payment[] = [];
-
-  // Page loading state.
-  isLoading = true;
-
-  // Error message when payments fail to load.
-  loadError = '';
-
+  // Stats
+  totalAmount = signal(0);
+  successfulCount = signal(0);
+  pendingCount = signal(0);
+  failedCount = signal(0);
 
   constructor(
-
-    // paymentService
-    // Variable name used to access PaymentService.
-    //
-    // :
-    // Separates variable name from its type.
-    //
-    // PaymentService
-    // Type of the injected service.
-    //
-    // private
-    // This variable can be used only inside
-    // this AdminPayment component.
     private paymentService: PaymentService,
     private toastr: ToastrService
+  ) {}
 
-  ) {
-
-    // Load payments when the Admin Payment
-    // page opens.
+  ngOnInit(): void {
     this.loadPayments();
-
   }
 
+  loadPayments(): void {
+    this.isLoading.set(true);
+    this.loadError.set('');
 
-  // Load all payments.
-  // Load all payments from Backend.
-loadPayments(): void {
-
-  // Start loading payments.
-  this.isLoading = true;
-  this.loadError = '';
-
-  // STEP 1
-  // Call PaymentService.
-  //
-  // getPayments()
-  // Sends GET request to Backend.
-  this.paymentService
-    .getPayments()
-
-    // STEP 2
-    // subscribe()
-    // Waits for Backend response.
-
-    .subscribe({
-
-      // Backend successfully returned payments.
+    this.paymentService.getPayments().subscribe({
       next: (data: Payment[]) => {
-
-        // Store Backend data
-        // inside the Component variable.
-        this.payments = data;
-
-        this.isLoading = false;
-
+        this.payments.set(Array.isArray(data) ? data : []);
+        this.calculateStats();
+        this.applyFilters();
+        this.isLoading.set(false);
       },
-
-      // Backend/API request failed.
       error: () => {
-        this.isLoading = false;
-        this.loadError = 'Could not load payments. Please try again.';
+        this.isLoading.set(false);
+        this.loadError.set('Could not load payments. Please try again.');
         this.toastr.error('Could not load payments. Please try again.');
       }
+    });
+  }
 
+  calculateStats(): void {
+    let total = 0;
+    let success = 0;
+    let pending = 0;
+    let failed = 0;
+
+    for (const p of this.payments()) {
+      if (p.paymentStatus === 'Success' || p.paymentStatus === 'Completed') {
+        total += (p.amount || 0);
+        success++;
+      } else if (p.paymentStatus === 'Pending') {
+        pending++;
+      } else {
+        failed++;
+      }
+    }
+
+    this.totalAmount.set(total);
+    this.successfulCount.set(success);
+    this.pendingCount.set(pending);
+    this.failedCount.set(failed);
+  }
+
+  applyFilters(): void {
+    let list = [...this.payments()];
+
+    // Search query (Order ID, Payment ID, Payment Method)
+    if (this.searchQuery && this.searchQuery.trim()) {
+      const q = this.searchQuery.toLowerCase().trim();
+      list = list.filter(p =>
+        (p.id && p.id.toString().includes(q)) ||
+        (p.orderId && p.orderId.toString().includes(q)) ||
+        (p.paymentMethod && p.paymentMethod.toLowerCase().includes(q))
+      );
+    }
+
+    // Status filter
+    if (this.selectedStatus !== 'All') {
+      list = list.filter(p => p.paymentStatus === this.selectedStatus);
+    }
+
+    // Method filter
+    if (this.selectedMethod !== 'All') {
+      list = list.filter(p => p.paymentMethod === this.selectedMethod);
+    }
+
+    // Sort
+    list.sort((a, b) => {
+      const dateA = a.paidAt ? new Date(a.paidAt).getTime() : 0;
+      const dateB = b.paidAt ? new Date(b.paidAt).getTime() : 0;
+
+      if (this.sortBy === 'newest') return dateB - dateA;
+      if (this.sortBy === 'oldest') return dateA - dateB;
+      if (this.sortBy === 'highest') return (b.amount || 0) - (a.amount || 0);
+      if (this.sortBy === 'lowest') return (a.amount || 0) - (b.amount || 0);
+      return 0;
     });
 
-}
+    this.filteredPayments.set(list);
+  }
 
-// Retry loading payments.
-retry(): void {
-  this.loadPayments();
-}
-// Update Payment Status.
-// Update Payment Status.
-updatePaymentStatus(
-
-  // ID of the payment we want to update.
-  //
-  // paymentId
-  // Variable name.
-  //
-  // : number
-  // Means paymentId stores a number.
-  paymentId: number,
-
-  // New status we want to give the payment.
-  //
-  // newStatus
-  // Variable name.
-  //
-  // : string
-  // Means newStatus stores text.
-  newStatus: string
-
-): void {
-
-  // STEP 1
-  // Call the PaymentService.
-  //
-  // this
-  // Refers to the current AdminPayment Component.
-  //
-  // paymentService
-  // Our injected PaymentService.
-  //
-  // updatePaymentStatus()
-  // Calls the Service method.
-  //
-  // The Service sends the PUT request
-  // to the ASP.NET Core Backend.
-
-  this.paymentService
-    .updatePaymentStatus(
-      paymentId,
-      newStatus
-    )
-
-    // STEP 2
-    // subscribe()
-    // Waits for the Backend response.
-    //
-    // next
-    // Runs when the Backend successfully
-    // updates the payment.
-
-    .subscribe({
-
+  updatePaymentStatus(paymentId: number, newStatus: string): void {
+    this.paymentService.updatePaymentStatus(paymentId, newStatus).subscribe({
       next: () => {
-
-        // STEP 3
-        // Show success message.
-        this.toastr.success('Payment status updated');
-
-        // Load payments again.
-        //
-        // This gets the latest data
-        // from the Backend.
-
+        this.toastr.success(`Payment #${paymentId} updated to ${newStatus}`);
         this.loadPayments();
-
       },
-
-      // error
-      // Runs when the Backend request fails.
-
       error: () => this.toastr.error('Failed to update payment status')
-
     });
+  }
 
-}// Delete Payment.
-deletePayment(
+  deletePayment(paymentId: number): void {
+    if (!confirm(`Delete payment transaction #${paymentId}? This cannot be undone.`)) return;
 
-  // ID of the payment we want to delete.
-  paymentId: number
-
-): void {
-
-  // Ask for confirmation before deleting.
-  if (!confirm('Delete this payment? This cannot be undone.')) return;
-
-  // STEP 1
-  // Call PaymentService.
-  //
-  // deletePayment()
-  // Sends DELETE request to ASP.NET Core.
-  this.paymentService
-    .deletePayment(paymentId)
-
-    // STEP 2
-    // Wait for Backend response.
-    .subscribe({
-
-      // Backend successfully deleted payment.
+    this.paymentService.deletePayment(paymentId).subscribe({
       next: () => {
-
-        // STEP 3
-        // Show success message.
-        this.toastr.success('Payment deleted');
-
-        // Reload payments from Backend.
-        this.loadPayments();
-
+        this.toastr.success('Payment deleted successfully');
+        this.payments.set(this.payments().filter(p => p.id !== paymentId));
+        this.calculateStats();
+        this.applyFilters();
       },
-
-      // Backend/API error.
       error: () => this.toastr.error('Failed to delete payment')
-
     });
+  }
 
-}}
+  retry(): void {
+    this.loadPayments();
+  }
+}

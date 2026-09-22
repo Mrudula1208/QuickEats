@@ -53,7 +53,7 @@ namespace QuickEats.API.Services
 
         // Add a Restaurant into Favorites.
 
-        public async Task CreateAsync(int userId, CreateFavoriteDto dto)
+        public async Task<FavoriteResponseDto> CreateAsync(int userId, CreateFavoriteDto dto)
         {
             // Check whether the Restaurant exists.
 
@@ -70,7 +70,14 @@ namespace QuickEats.API.Services
 
             if (existing != null)
             {
-                return;
+                return new FavoriteResponseDto
+                {
+                    FavoriteId = existing.Id,
+                    RestaurantId = existing.RestaurantId,
+                    RestaurantName = restaurant.Name ?? "Unknown Restaurant",
+                    RestaurantImage = restaurant.ImageUrl ?? string.Empty,
+                    RestaurantLocation = restaurant.Address ?? string.Empty
+                };
             }
 
             var favorite = new Favorite
@@ -82,6 +89,15 @@ namespace QuickEats.API.Services
 
             await _favoriteRepository.AddAsync(favorite);
             await _favoriteRepository.SaveChangesAsync();
+
+            return new FavoriteResponseDto
+            {
+                FavoriteId = favorite.Id,
+                RestaurantId = favorite.RestaurantId,
+                RestaurantName = restaurant.Name ?? "Unknown Restaurant",
+                RestaurantImage = restaurant.ImageUrl ?? string.Empty,
+                RestaurantLocation = restaurant.Address ?? string.Empty
+            };
         }
 
         // Remove a Restaurant from Favorites.

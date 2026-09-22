@@ -27,7 +27,9 @@ export class RestaurantFavoritesService {
 
     this.favoriteService.getFavorites().subscribe({
       next: (data: FavoriteModel[]) => {
-        this.favoriteMap = new Map(data.map(f => [f.restaurantId, f.favoriteId]));
+        if (data && Array.isArray(data)) {
+          this.favoriteMap = new Map(data.map(f => [f.restaurantId, f.favoriteId]));
+        }
       },
       error: () => {}
     });
@@ -40,7 +42,7 @@ export class RestaurantFavoritesService {
 
   // Toggle a restaurant heart.
   // Guests are sent to Login and redirected back here afterwards.
-  toggle(restaurant: { id: number; name: string; imageUrl: string; address: string }): void {
+  toggle(restaurant: { id: number; name: string; imageUrl?: string; address?: string }): void {
     if (!this.authService.isLoggedIn()) {
       this.toastr.info('Login to save your favorite restaurants.');
       this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
@@ -55,26 +57,26 @@ export class RestaurantFavoritesService {
           this.favoriteMap.delete(restaurant.id);
           this.toastr.success(`${restaurant.name} removed from favorites`);
         },
-        error: () => this.toastr.error('Could not remove from favorites. Please try again.')
+        error: (err) => {
+          console.error('Remove favorite failed:', err);
+          this.toastr.error('Could not remove from favorites. Please try again.');
+        }
       });
       return;
     }
 
-    const favorite: FavoriteModel = {
-      favoriteId: 0,
-      restaurantId: restaurant.id,
-      restaurantName: restaurant.name,
-      restaurantImage: restaurant.imageUrl,
-      restaurantLocation: restaurant.address
-    };
-
-    this.favoriteService.addFavorite(favorite).subscribe({
-      next: () => {
-        // Refresh to learn the newly created favoriteId.
+    this.favoriteService.addFavorite({ restaurantId: restaurant.id }).subscribe({
+      next: (res) => {
+        if (res && res.favoriteId) {
+          this.favoriteMap.set(restaurant.id, res.favoriteId);
+        }
         this.load();
         this.toastr.success(`${restaurant.name} added to favorites`);
       },
-      error: () => this.toastr.error('Could not add to favorites. Please try again.')
+      error: (err) => {
+        console.error('Add favorite failed:', err);
+        this.toastr.error('Could not add to favorites. Please try again.');
+      }
     });
   }
 }

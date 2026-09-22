@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 // Component.
 // Controls Saved Address Page.
 
@@ -41,13 +41,13 @@ import { ToastrService } from 'ngx-toastr';
 export class SavedAddressComponent {
 
   // Store Addresses.
-  customerAddresses: SavedAddressModel[] = [];
+  customerAddresses = signal<SavedAddressModel[]>([]);
 
   // Loading state.
-  isLoading = true;
+  isLoading = signal(true);
 
   // Error state.
-  loadError = '';
+  loadError = signal('');
 
   // Track if user clicked Add Address.
   submitted = false;
@@ -200,21 +200,21 @@ export class SavedAddressComponent {
   // Returns Nothing.
   loadAddresses(): void {
 
-    this.isLoading = true;
-    this.loadError = '';
+    this.isLoading.set(true);
+    this.loadError.set('');
 
     this.savedAddressService
       .getAddresses()
       .subscribe({
 
         next: (data: SavedAddressModel[]) => {
-          this.customerAddresses = data;
-          this.isLoading = false;
+          this.customerAddresses.set(data);
+          this.isLoading.set(false);
         },
 
         error: () => {
-          this.isLoading = false;
-          this.loadError = 'Could not load saved addresses. Please try again.';
+          this.isLoading.set(false);
+          this.loadError.set('Could not load saved addresses. Please try again.');
         }
 
       });

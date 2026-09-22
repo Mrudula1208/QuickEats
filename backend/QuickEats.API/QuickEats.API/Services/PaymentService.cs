@@ -1,4 +1,4 @@
-﻿using QuickEats.API.DTos.Payment;
+using QuickEats.API.DTos.Payment;
 using QuickEats.API.Exceptions;
 using QuickEats.API.Models;
 using QuickEats.API.Repositories.Interfaces;
@@ -127,7 +127,7 @@ namespace QuickEats.API.Services
 
                 PaymentMethod = dto.PaymentMethod,
 
-                PaymentStatus = "Pending",
+                PaymentStatus = dto.PaymentMethod == "Cash On Delivery" ? "Pending" : "Success",
 
                 PaidAt = DateTime.UtcNow
             };

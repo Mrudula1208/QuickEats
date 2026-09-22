@@ -1,12 +1,16 @@
 import { Component } from '@angular/core';
 // Controls the Owner Navigation bar.
 
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 // RouterLink makes links navigate.
 // RouterLinkActive highlights the current page link.
-
-import { Router } from '@angular/router';
 // Router moves the Owner to another page.
+
+import { AuthService } from '../../core/services/auth.service';
+// Single source of truth for logout (clears token + profile data).
+
+import { RestaurantService } from '../../core/services/restaurant.service';
+// Used to build the "Menu" quick link to the owner's first restaurant.
 
 @Component({
   selector: 'app-owner-nav',
@@ -17,18 +21,30 @@ import { Router } from '@angular/router';
 })
 export class OwnerNavComponent {
 
-  constructor(private router: Router) { }
+  menuLink = '/owner/restaurants';
+
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+    private restaurantService: RestaurantService
+  ) {
+    const token = localStorage.getItem('token');
+    if (token) {
+      this.restaurantService.getMyRestaurants().subscribe({
+        next: (restaurants) => {
+          if (restaurants && restaurants.length > 0) {
+            this.menuLink = `/owner/menu/${restaurants[0].id}`;
+          }
+        },
+        error: () => { /* keep default link */ }
+      });
+    }
+  }
 
   // Log out the Owner.
   logout(): void {
 
-    localStorage.removeItem('token');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('name');
-    localStorage.removeItem('email');
-    localStorage.removeItem('role');
-    localStorage.removeItem('profileImageUrl');
-
+    this.authService.logout();
     this.router.navigate(['/login']);
   }
 

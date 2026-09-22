@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using QuickEats.API.Common;
 using QuickEats.API.DTos.Restaurant;
 using QuickEats.API.Models;
@@ -9,6 +9,16 @@ namespace QuickEats.API.Repositories.Interfaces
     {
 
         Task<IEnumerable<Restaurant>> GetAllAsync();
+
+        // Returns active restaurants selected for the Featured home section.
+        Task<IEnumerable<Restaurant>> GetFeaturedAsync(int count);
+
+        // Smart Discovery: Returns recommended restaurants based on customer history or popularity/quality.
+        Task<IEnumerable<Restaurant>> GetRecommendedAsync(int? customerId, int count);
+
+        // Returns active restaurants that have geographic coordinates,
+        // used by the "Near You" home feature (distance is computed in the service).
+        Task<IEnumerable<Restaurant>> GetWithCoordinatesAsync();
 
         Task<PagedResult<Restaurant>> GetPagedAsync(int page, int pageSize, string? sortBy, bool sortDesc);
 

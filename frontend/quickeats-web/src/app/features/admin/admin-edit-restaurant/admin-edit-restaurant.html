@@ -1,160 +1,312 @@
 <app-admin-nav></app-admin-nav>
 
-@if (isLoading) {
-  <div class="adm-state">
-    <span class="material-icons spinning">progress_activity</span>
-    <p>Loading...</p>
+<div class="aer-wrapper">
+  <div class="aer-container">
+
+    <!-- Breadcrumb / Header -->
+    <div class="aer-header">
+      <div class="aer-breadcrumbs">
+        <a routerLink="/admin/dashboard">Admin</a>
+        <span class="material-icons">chevron_right</span>
+        <a routerLink="/admin/restaurants">Restaurants</a>
+        <span class="material-icons">chevron_right</span>
+        <span class="active">Edit Restaurant #{{ restaurantId() }}</span>
+      </div>
+      <div class="aer-title-row">
+        <div>
+          <h1>Edit Restaurant</h1>
+          <p>Update restaurant profile, operating hours, delivery parameters, and live status</p>
+        </div>
+        <a routerLink="/admin/restaurants" class="aer-back-btn">
+          <span class="material-icons">arrow_back</span>
+          <span>Back to List</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    @if (isLoading()) {
+      <div class="aer-state-card loading-state">
+        <span class="material-icons spinning">progress_activity</span>
+        <h3>Loading Restaurant Details...</h3>
+        <p>Fetching latest menu and operating records from database.</p>
+      </div>
+    }
+
+    <!-- Error / Not Found State -->
+    @else if (loadError()) {
+      <div class="aer-state-card error-state">
+        <span class="material-icons state-icon">error_outline</span>
+        <h3>Unable to Load Restaurant</h3>
+        <p>{{ loadError() }}</p>
+        <div class="state-actions">
+          <button class="btn-retry" (click)="retry()">
+            <span class="material-icons">refresh</span> Retry
+          </button>
+          <a routerLink="/admin/restaurants" class="btn-cancel">
+            Back to Restaurants
+          </a>
+        </div>
+      </div>
+    }
+
+    <!-- Edit Form Card -->
+    @else if (restaurant()) {
+      <div class="aer-form-card">
+        <form #restaurantForm="ngForm" (ngSubmit)="updateRestaurant()" class="aer-form">
+
+          <!-- Section 1: Basic Information -->
+          <div class="form-section">
+            <div class="section-header">
+              <span class="material-icons">storefront</span>
+              <div>
+                <h3>Basic Information</h3>
+                <small>Public restaurant brand and description</small>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group flex-2">
+                <label for="name">Restaurant Name <span class="required">*</span></label>
+                <div class="input-wrap">
+                  <span class="material-icons input-icon">store</span>
+                  <input
+                    id="name"
+                    type="text"
+                    name="name"
+                    [(ngModel)]="restaurant()!.name"
+                    required
+                    minlength="2"
+                    maxlength="200"
+                    placeholder="e.g. Spice Route Kitchen"
+                    #name="ngModel">
+                </div>
+                @if (name.invalid && name.touched) {
+                  <span class="field-error">Restaurant name is required (min 2 characters).</span>
+                }
+              </div>
+
+              <div class="form-group flex-1">
+                <label for="status">Active Status</label>
+                <div class="toggle-wrap">
+                  <label class="switch">
+                    <input
+                      type="checkbox"
+                      id="status"
+                      name="isActive"
+                      [(ngModel)]="restaurant()!.isActive">
+                    <span class="slider round"></span>
+                  </label>
+                  <span class="status-label" [class.active]="restaurant()!.isActive">
+                    {{ restaurant()!.isActive ? 'Active (Open for Orders)' : 'Inactive (Hidden)' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="description">Description / Tagline</label>
+              <div class="input-wrap">
+                <textarea
+                  id="description"
+                  name="description"
+                  rows="3"
+                  [(ngModel)]="restaurant()!.description"
+                  maxlength="1000"
+                  placeholder="Describe your cuisines, specialties, and signature meals..."></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Contact & Location -->
+          <div class="form-section">
+            <div class="section-header">
+              <span class="material-icons">place</span>
+              <div>
+                <h3>Contact & Location</h3>
+                <small>Physical address and customer support phone</small>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group flex-2">
+                <label for="address">Address <span class="required">*</span></label>
+                <div class="input-wrap">
+                  <span class="material-icons input-icon">location_on</span>
+                  <input
+                    id="address"
+                    type="text"
+                    name="address"
+                    [(ngModel)]="restaurant()!.address"
+                    required
+                    minlength="5"
+                    maxlength="500"
+                    placeholder="e.g. 102 Linking Road, Bandra West, Mumbai"
+                    #address="ngModel">
+                </div>
+                @if (address.invalid && address.touched) {
+                  <span class="field-error">Address is required (min 5 characters).</span>
+                }
+              </div>
+
+              <div class="form-group flex-1">
+                <label for="phone">Phone Number <span class="required">*</span></label>
+                <div class="input-wrap">
+                  <span class="material-icons input-icon">phone</span>
+                  <input
+                    id="phone"
+                    type="tel"
+                    name="phoneNumber"
+                    [(ngModel)]="restaurant()!.phoneNumber"
+                    required
+                    placeholder="10-digit number"
+                    #phone="ngModel">
+                </div>
+                @if (phone.invalid && phone.touched) {
+                  <span class="field-error">Phone number is required.</span>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: Visual & Media -->
+          <div class="form-section">
+            <div class="section-header">
+              <span class="material-icons">image</span>
+              <div>
+                <h3>Media & Image</h3>
+                <small>High resolution banner or storefront photograph</small>
+              </div>
+            </div>
+
+            <div class="image-upload-row">
+              <div class="image-preview-box">
+                @if (imagePreview() || restaurant()!.imageUrl) {
+                  <img [src]="imagePreview() || restaurant()!.imageUrl" alt="Restaurant Preview" class="preview-img">
+                } @else {
+                  <div class="no-img-placeholder">
+                    <span class="material-icons">add_photo_alternate</span>
+                    <small>No image uploaded</small>
+                  </div>
+                }
+              </div>
+
+              <div class="image-inputs flex-1">
+                <div class="form-group">
+                  <label>Upload New Photo</label>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    (change)="onFileSelected($event)"
+                    class="file-input">
+                </div>
+
+                <div class="form-group">
+                  <label for="imageUrl">Or Image URL</label>
+                  <div class="input-wrap">
+                    <span class="material-icons input-icon">link</span>
+                    <input
+                      id="imageUrl"
+                      type="text"
+                      name="imageUrl"
+                      [(ngModel)]="restaurant()!.imageUrl"
+                      maxlength="500"
+                      placeholder="https://images.unsplash.com/...">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 4: Operational Settings -->
+          <div class="form-section">
+            <div class="section-header">
+              <span class="material-icons">schedule</span>
+              <div>
+                <h3>Operating Hours & Pricing</h3>
+                <small>Delivery fee, minimum order, and working hours</small>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label for="openingTime">Opening Time <span class="required">*</span></label>
+                <div class="input-wrap">
+                  <span class="material-icons input-icon">schedule</span>
+                  <input
+                    id="openingTime"
+                    type="time"
+                    name="openingTime"
+                    [(ngModel)]="restaurant()!.openingTime"
+                    required>
+                </div>
+              </div>
+
+              <div class="form-group flex-1">
+                <label for="closingTime">Closing Time <span class="required">*</span></label>
+                <div class="input-wrap">
+                  <span class="material-icons input-icon">schedule</span>
+                  <input
+                    id="closingTime"
+                    type="time"
+                    name="closingTime"
+                    [(ngModel)]="restaurant()!.closingTime"
+                    required>
+                </div>
+              </div>
+
+              <div class="form-group flex-1">
+                <label for="deliveryCharge">Delivery Fee (₹)</label>
+                <div class="input-wrap">
+                  <span class="currency-symbol">₹</span>
+                  <input
+                    id="deliveryCharge"
+                    type="number"
+                    name="deliveryCharge"
+                    [(ngModel)]="restaurant()!.deliveryCharge"
+                    min="0"
+                    max="1000">
+                </div>
+              </div>
+
+              <div class="form-group flex-1">
+                <label for="minimumOrder">Min. Order (₹)</label>
+                <div class="input-wrap">
+                  <span class="currency-symbol">₹</span>
+                  <input
+                    id="minimumOrder"
+                    type="number"
+                    name="minimumOrder"
+                    [(ngModel)]="restaurant()!.minimumOrder"
+                    min="0"
+                    max="10000">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form Action Buttons -->
+          <div class="form-actions-bar">
+            <a routerLink="/admin/restaurants" class="btn-secondary">
+              Cancel
+            </a>
+            <button
+              type="submit"
+              class="btn-primary"
+              [disabled]="restaurantForm.invalid || isUploading() || isSaving()">
+              @if (isUploading() || isSaving()) {
+                <span class="material-icons spinning">sync</span>
+                <span>Saving Changes...</span>
+              } @else {
+                <span class="material-icons">save</span>
+                <span>Save Restaurant Changes</span>
+              }
+            </button>
+          </div>
+
+        </form>
+      </div>
+    }
+
   </div>
-} @else if (loadError) {
-  <div class="adm-state">
-    <span class="material-icons">error_outline</span>
-    <p>{{ loadError }}</p>
-    <button class="adm-state-btn" (click)="retry()">Try Again</button>
-  </div>
-} @else {
-
-<h1 class="adm-title">Edit Restaurant</h1>
-
-@if(restaurant){
-
-<form #restaurantForm="ngForm" (ngSubmit)="updateRestaurant()">
-
-<input
-type="text"
-name="name"
-[(ngModel)]="restaurant.name"
-required
-minlength="2"
-maxlength="200"
-#name="ngModel">
-
-@if (name.invalid && name.touched) {
-    <div class="error">
-        @if (name.errors?.['required']) {
-            Restaurant name is required
-        }
-        @else if (name.errors?.['minlength']) {
-            Name must be at least 2 characters
-        }
-    </div>
-}
-
-<input
-type="text"
-name="description"
-[(ngModel)]="restaurant.description"
-maxlength="1000">
-
-<input
-type="text"
-name="address"
-[(ngModel)]="restaurant.address"
-required
-minlength="5"
-maxlength="500"
-#address="ngModel">
-
-@if (address.invalid && address.touched) {
-    <div class="error">
-        @if (address.errors?.['required']) {
-            Address is required
-        }
-        @else if (address.errors?.['minlength']) {
-            Address must be at least 5 characters
-        }
-    </div>
-}
-
-<input
-type="tel"
-name="phoneNumber"
-[(ngModel)]="restaurant.phoneNumber"
-required
-#phone="ngModel">
-
-@if (phone.invalid && phone.touched) {
-    <div class="error">
-        @if (phone.errors?.['required']) {
-            Phone number is required
-        }
-    </div>
-}
-
-<!-- Image Upload -->
-<label>Restaurant Image</label>
-
-@if (restaurant.imageUrl && !imagePreview) {
-    <img [src]="restaurant.imageUrl" class="image-preview" alt="Current">
-}
-
-<input
-type="file"
-accept="image/jpeg,image/png,image/webp"
-(change)="onFileSelected($event)">
-
-@if (imagePreview) {
-    <img [src]="imagePreview" class="image-preview" alt="New Preview">
-}
-
-<input
-type="text"
-name="imageUrl"
-[(ngModel)]="restaurant.imageUrl"
-maxlength="500">
-
-<!-- Opening Hours -->
-<div class="hours-row">
-    <div class="time-group">
-        <label>Opening Time</label>
-        <input
-            type="time"
-            name="openingTime"
-            [(ngModel)]="restaurant.openingTime"
-            required>
-    </div>
-    <div class="time-group">
-        <label>Closing Time</label>
-        <input
-            type="time"
-            name="closingTime"
-            [(ngModel)]="restaurant.closingTime"
-            required>
-    </div>
 </div>
-
-<label>Delivery Charge (₹)</label>
-
-<input
-type="number"
-name="deliveryCharge"
-[(ngModel)]="restaurant.deliveryCharge"
-min="0"
-max="1000">
-
-<label>Minimum Order (₹)</label>
-
-<input
-type="number"
-name="minimumOrder"
-[(ngModel)]="restaurant.minimumOrder"
-min="0"
-max="10000">
-
-<button
-type="submit"
-[disabled]="restaurantForm.invalid || isUploading">
-
-@if (isUploading) {
-    Uploading...
-}
-@else {
-    Update Restaurant
-}
-
-</button>
-
-</form>
-
-}
-
-}

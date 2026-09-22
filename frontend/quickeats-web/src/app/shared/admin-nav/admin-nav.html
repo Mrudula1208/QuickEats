@@ -1,117 +1,159 @@
-<div class="admin-nav">
+<header class="admin-header">
+  <div class="admin-header-main">
+    <!-- Brand -->
+    <a routerLink="/admin/dashboard" class="admin-brand">
+      <span class="brand-badge-icon">Q</span>
+      <div class="brand-text-wrap">
+        <span class="brand-title">Quick<span class="brand-accent">Eats</span></span>
+        <span class="admin-portal-badge">ADMIN</span>
+      </div>
+    </a>
 
-    <div class="brand">
+    <!-- Desktop Navigation Links -->
+    <nav class="admin-nav-scroll" aria-label="Admin Navigation">
+      <div class="admin-nav-links">
+        <a routerLink="/admin/dashboard" routerLinkActive="active" class="adm-link" title="Dashboard">
+          <span class="material-icons">dashboard</span>
+          <span>Dashboard</span>
+        </a>
 
-        Admin Panel
+        <a routerLink="/admin/restaurants" routerLinkActive="active" class="adm-link" title="Restaurants">
+          <span class="material-icons">storefront</span>
+          <span>Restaurants</span>
+        </a>
 
+        <a routerLink="/admin/menu" routerLinkActive="active" class="adm-link" title="Menu Items">
+          <span class="material-icons">restaurant_menu</span>
+          <span>Menu</span>
+        </a>
+
+        <a routerLink="/admin/orders" routerLinkActive="active" class="adm-link" title="Orders">
+          <span class="material-icons">receipt_long</span>
+          <span>Orders</span>
+        </a>
+
+        <a routerLink="/admin/payments" routerLinkActive="active" class="adm-link" title="Payments">
+          <span class="material-icons">account_balance_wallet</span>
+          <span>Payments</span>
+        </a>
+
+        <a routerLink="/admin/deliveries" routerLinkActive="active" class="adm-link" title="Deliveries">
+          <span class="material-icons">local_shipping</span>
+          <span>Deliveries</span>
+        </a>
+
+        <a routerLink="/admin/delivery-partners" routerLinkActive="active" class="adm-link" title="Delivery Partners">
+          <span class="material-icons">two_wheeler</span>
+          <span>Riders</span>
+        </a>
+
+        <a routerLink="/admin/reviews" routerLinkActive="active" class="adm-link" title="Reviews & Ratings">
+          <span class="material-icons">rate_review</span>
+          <span>Reviews</span>
+        </a>
+
+        <a routerLink="/admin/users" routerLinkActive="active" class="adm-link" title="User Management">
+          <span class="material-icons">people</span>
+          <span>Users</span>
+        </a>
+
+        <a routerLink="/admin/owners" routerLinkActive="active" class="adm-link" title="Restaurant Owners">
+          <span class="material-icons">manage_accounts</span>
+          <span>Owners</span>
+        </a>
+
+        <a routerLink="/admin/categories" routerLinkActive="active" class="adm-link" title="Cuisine Categories">
+          <span class="material-icons">category</span>
+          <span>Categories</span>
+        </a>
+
+        <a routerLink="/admin/coupons" routerLinkActive="active" class="adm-link" title="Promo Coupons">
+          <span class="material-icons">local_offer</span>
+          <span>Coupons</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- Admin User / Actions -->
+    <div class="admin-header-actions">
+      <div class="admin-user-pill" title="{{ adminEmail }}">
+        <span class="admin-avatar">{{ adminName.charAt(0).toUpperCase() }}</span>
+        <span class="admin-user-name">{{ adminName }}</span>
+      </div>
+
+      <button class="adm-logout-btn" (click)="logout()" title="Sign Out">
+        <span class="material-icons">logout</span>
+        <span class="btn-text">Logout</span>
+      </button>
+
+      <!-- Mobile Hamburger Toggle -->
+      <button class="admin-mobile-toggle" (click)="toggleMobileMenu()" [attr.aria-label]="mobileMenuOpen() ? 'Close Menu' : 'Open Menu'">
+        <span class="material-icons">{{ mobileMenuOpen() ? 'close' : 'menu' }}</span>
+      </button>
     </div>
+  </div>
 
-    <div class="links">
+  <!-- Mobile Drawer / Sidebar Overlay -->
+  @if (mobileMenuOpen()) {
+    <div class="admin-mobile-backdrop" (click)="closeMobileMenu()"></div>
+    <div class="admin-mobile-drawer">
+      <div class="drawer-header">
+        <div class="drawer-user">
+          <span class="admin-avatar-lg">{{ adminName.charAt(0).toUpperCase() }}</span>
+          <div class="drawer-user-info">
+            <strong>{{ adminName }}</strong>
+            <small>{{ adminEmail }}</small>
+          </div>
+        </div>
+        <button class="drawer-close-btn" (click)="closeMobileMenu()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
 
-        <a
-            routerLink="/admin/dashboard"
-            routerLinkActive="active">
-
-            Dashboard
-
+      <div class="drawer-links">
+        <a routerLink="/admin/dashboard" routerLinkActive="active" (click)="closeMobileMenu()">
+          <span class="material-icons">dashboard</span> Dashboard
         </a>
-
-        <a
-            routerLink="/admin/restaurants"
-            routerLinkActive="active">
-
-            Restaurants
-
+        <a routerLink="/admin/restaurants" routerLinkActive="active" (click)="closeMobileMenu()">
+          <span class="material-icons">storefront</span> Restaurants
         </a>
-
-        <a
-            routerLink="/admin/menu"
-            routerLinkActive="active">
-
-            Menu
-
+        <a routerLink="/admin/menu" routerLinkActive="active" (click)="closeMobileMenu()">
+          <span class="material-icons">restaurant_menu</span> Menu Items
         </a>
-
-        <a
-            routerLink="/admin/order"
-            routerLinkActive="active">
-
-            Orders
-
+        <a routerLink="/admin/orders" routerLinkActive="active" (click)="closeMobileMenu()">
+          <span class="material-icons">receipt_long</span> Orders
         </a>
-
-        <a
-            routerLink="/admin/payment"
-            routerLinkActive="active">
-
-            Payments
-
+        <a routerLink="/admin/payments" routerLinkActive="active" (click)="closeMobileMenu()">
+          <span class="material-icons">account_balance_wallet</span> Payments
         </a>
-
-        <a
-            routerLink="/admin/delivery"
-            routerLinkActive="active">
-
-            Deliveries
-
+        <a routerLink="/admin/deliveries" routerLinkActive="active" (click)="closeMobileMenu()">
+          <span class="material-icons">local_shipping</span> Deliveries
         </a>
-
-        <a
-            routerLink="/admin/delivery-partners"
-            routerLinkActive="active">
-
-            Delivery Partners
-
+        <a routerLink="/admin/delivery-partners" routerLinkActive="active" (click)="closeMobileMenu()">
+          <span class="material-icons">two_wheeler</span> Delivery Partners
         </a>
-
-        <a
-            routerLink="/admin/reviews"
-            routerLinkActive="active">
-
-            Reviews
-
+        <a routerLink="/admin/reviews" routerLinkActive="active" (click)="closeMobileMenu()">
+          <span class="material-icons">rate_review</span> Reviews Moderation
         </a>
-
-        <a
-            routerLink="/admin/users"
-            routerLinkActive="active">
-
-            Users
-
+        <a routerLink="/admin/users" routerLinkActive="active" (click)="closeMobileMenu()">
+          <span class="material-icons">people</span> Users
         </a>
-
-        <a
-            routerLink="/admin/owners"
-            routerLinkActive="active">
-
-            Owners
-
+        <a routerLink="/admin/owners" routerLinkActive="active" (click)="closeMobileMenu()">
+          <span class="material-icons">manage_accounts</span> Restaurant Owners
         </a>
-
-        <a
-            routerLink="/admin/categories"
-            routerLinkActive="active">
-
-            Categories
-
+        <a routerLink="/admin/categories" routerLinkActive="active" (click)="closeMobileMenu()">
+          <span class="material-icons">category</span> Categories
         </a>
-
-        <a
-            routerLink="/admin/coupons"
-            routerLinkActive="active">
-
-            Coupons
-
+        <a routerLink="/admin/coupons" routerLinkActive="active" (click)="closeMobileMenu()">
+          <span class="material-icons">local_offer</span> Coupons
         </a>
+      </div>
 
+      <div class="drawer-footer">
+        <button class="drawer-logout-btn" (click)="logout()">
+          <span class="material-icons">logout</span> Sign Out
+        </button>
+      </div>
     </div>
-
-    <button
-        class="logout-btn"
-        (click)="logout()">
-
-        Logout
-
-    </button>
-
-</div>
+  }
+</header>

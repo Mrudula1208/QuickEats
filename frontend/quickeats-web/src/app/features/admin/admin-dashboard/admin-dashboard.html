@@ -1,136 +1,186 @@
 <app-admin-nav></app-admin-nav>
 
-<section class="ad-hero">
-  <div class="ad-hero-inner">
-    <h1>Admin Dashboard</h1>
-    <p>Real-time platform overview and system management</p>
-  </div>
-</section>
-
-<section class="ad-content">
+<div class="ad-page">
   <div class="ad-container">
 
-    @if (isLoading()) {
-      <div class="ad-loading">
-        <span class="material-icons spinning">progress_activity</span>
-        <p>Loading dashboard metrics...</p>
+    <!-- Header / Welcome Banner -->
+    <div class="ad-header-banner">
+      <div class="ad-header-text">
+        <div class="ad-badge">
+          <span class="material-icons">insights</span>
+          <span>PLATFORM ANALYTICS</span>
+        </div>
+        <h1>Executive Dashboard</h1>
+        <p>Live operational insights, revenue metrics, and restaurant activity across QuickEats.</p>
       </div>
-    } @else if (dashboard()) {
-      <!-- 6 Key Statistics Cards -->
-      <div class="ad-stats">
-        <div class="ad-stat-card stat-restaurants">
-          <div class="ad-stat-icon">
-            <span class="material-icons">store</span>
+      <button class="ad-refresh-btn" (click)="loadDashboardData()" [disabled]="isLoading()">
+        <span class="material-icons" [class.spinning]="isLoading()">refresh</span>
+        <span>Refresh Metrics</span>
+      </button>
+    </div>
+
+    @if (isLoading()) {
+      <div class="ad-loading-state">
+        <span class="material-icons spinning">progress_activity</span>
+        <p>Fetching real-time platform statistics...</p>
+      </div>
+    } @else {
+      <!-- 7 Key Summary Cards -->
+      <div class="ad-stats-grid">
+        <!-- Revenue -->
+        <div class="ad-stat-card stat--revenue">
+          <div class="stat-icon-wrap">
+            <span class="material-icons">account_balance_wallet</span>
           </div>
-          <div class="ad-stat-info">
-            <span class="ad-stat-value">{{ dashboard()!.totalRestaurants }}</span>
-            <span class="ad-stat-label">Restaurants</span>
+          <div class="stat-data">
+            <span class="stat-label">Platform Revenue</span>
+            <h2 class="stat-val">₹{{ totalRevenue() | number:'1.0-0' }}</h2>
+            <span class="stat-sub">From all fulfilled orders</span>
           </div>
         </div>
-        <div class="ad-stat-card stat-menus">
-          <div class="ad-stat-icon">
+
+        <!-- Orders -->
+        <div class="ad-stat-card stat--orders">
+          <div class="stat-icon-wrap">
+            <span class="material-icons">receipt_long</span>
+          </div>
+          <div class="stat-data">
+            <span class="stat-label">Total Orders</span>
+            <h2 class="stat-val">{{ orders().length }}</h2>
+            <span class="stat-sub">{{ statusBreakdown().delivered }} delivered</span>
+          </div>
+        </div>
+
+        <!-- Restaurants -->
+        <div class="ad-stat-card stat--restaurants">
+          <div class="stat-icon-wrap">
+            <span class="material-icons">storefront</span>
+          </div>
+          <div class="stat-data">
+            <span class="stat-label">Active Restaurants</span>
+            <h2 class="stat-val">{{ restaurants().length }}</h2>
+            <span class="stat-sub">Across all cuisines</span>
+          </div>
+        </div>
+
+        <!-- Menu Items -->
+        <div class="ad-stat-card stat--menu">
+          <div class="stat-icon-wrap">
             <span class="material-icons">restaurant_menu</span>
           </div>
-          <div class="ad-stat-info">
-            <span class="ad-stat-value">{{ dashboard()!.totalMenus }}</span>
-            <span class="ad-stat-label">Menu Items</span>
+          <div class="stat-data">
+            <span class="stat-label">Dishes & Items</span>
+            <h2 class="stat-val">{{ menus().length }}</h2>
+            <span class="stat-sub">Listed in catalog</span>
           </div>
         </div>
-        <div class="ad-stat-card stat-orders">
-          <div class="ad-stat-icon">
-            <span class="material-icons">receipt_long</span>
-          </div>
-          <div class="ad-stat-info">
-            <span class="ad-stat-value">{{ dashboard()!.totalOrders }}</span>
-            <span class="ad-stat-label">Orders</span>
-          </div>
-        </div>
-        <div class="ad-stat-card stat-users">
-          <div class="ad-stat-icon">
+
+        <!-- Customers -->
+        <div class="ad-stat-card stat--customers">
+          <div class="stat-icon-wrap">
             <span class="material-icons">people</span>
           </div>
-          <div class="ad-stat-info">
-            <span class="ad-stat-value">{{ dashboard()!.totalUsers }}</span>
-            <span class="ad-stat-label">Customers</span>
+          <div class="stat-data">
+            <span class="stat-label">Registered Customers</span>
+            <h2 class="stat-val">{{ totalCustomers() }}</h2>
+            <span class="stat-sub">Food lovers</span>
           </div>
         </div>
-        <div class="ad-stat-card stat-owners">
-          <div class="ad-stat-icon">
-            <span class="material-icons">supervisor_account</span>
+
+        <!-- Owners -->
+        <div class="ad-stat-card stat--owners">
+          <div class="stat-icon-wrap">
+            <span class="material-icons">manage_accounts</span>
           </div>
-          <div class="ad-stat-info">
-            <span class="ad-stat-value">{{ totalOwners() }}</span>
-            <span class="ad-stat-label">Restaurant Owners</span>
+          <div class="stat-data">
+            <span class="stat-label">Restaurant Partners</span>
+            <h2 class="stat-val">{{ totalOwners() }}</h2>
+            <span class="stat-sub">Verified kitchen owners</span>
           </div>
         </div>
-        <div class="ad-stat-card stat-revenue">
-          <div class="ad-stat-icon">
-            <span class="material-icons">paid</span>
+
+        <!-- Delivery Partners -->
+        <div class="ad-stat-card stat--riders">
+          <div class="stat-icon-wrap">
+            <span class="material-icons">two_wheeler</span>
           </div>
-          <div class="ad-stat-info">
-            <span class="ad-stat-value">₹{{ dashboard()!.totalRevenue | number:'1.0-0' }}</span>
-            <span class="ad-stat-label">Total Revenue</span>
+          <div class="stat-data">
+            <span class="stat-label">Delivery Fleet</span>
+            <h2 class="stat-val">{{ totalDeliveryPartners() }}</h2>
+            <span class="stat-sub">Active delivery riders</span>
           </div>
         </div>
       </div>
 
-      <!-- Quick Actions Bar -->
-      <div class="ad-quick-links">
-        <h3>Quick Actions</h3>
-        <div class="ad-links-row">
-          <a routerLink="/admin/add-restaurant" class="ad-link-card">
-            <span class="material-icons">add_business</span>
-            Add Restaurant
-          </a>
-          <a routerLink="/admin/restaurants" class="ad-link-card">
-            <span class="material-icons">storefront</span>
-            Manage Restaurants
-          </a>
-          <a routerLink="/admin/orders" class="ad-link-card">
-            <span class="material-icons">receipt_long</span>
-            Manage Orders
-          </a>
-          <a routerLink="/admin/users" class="ad-link-card">
-            <span class="material-icons">people</span>
-            Manage Users
-          </a>
-          <a routerLink="/admin/owners" class="ad-link-card">
-            <span class="material-icons">badge</span>
-            Manage Owners
-          </a>
-          <a routerLink="/admin/categories" class="ad-link-card">
-            <span class="material-icons">category</span>
-            Categories
-          </a>
-          <a routerLink="/admin/coupons" class="ad-link-card">
-            <span class="material-icons">local_offer</span>
-            Coupons
-          </a>
-          <a routerLink="/admin/payments" class="ad-link-card">
-            <span class="material-icons">payments</span>
-            Payments
-          </a>
-          <a routerLink="/admin/deliveries" class="ad-link-card">
-            <span class="material-icons">local_shipping</span>
-            Deliveries
-          </a>
+      <!-- Order Status Lifecycle Bar -->
+      <div class="ad-card ad-status-summary-card">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="material-icons">timeline</span>
+            <h3>Live Order Status Lifecycle</h3>
+          </div>
+          <a routerLink="/admin/orders" class="card-link">Manage Orders →</a>
+        </div>
+
+        <div class="status-pills-row">
+          <div class="status-pill status-pill--pending">
+            <span class="pill-dot"></span>
+            <span class="pill-name">Pending</span>
+            <strong>{{ statusBreakdown().pending }}</strong>
+          </div>
+          <div class="status-pill status-pill--confirmed">
+            <span class="pill-dot"></span>
+            <span class="pill-name">Confirmed</span>
+            <strong>{{ statusBreakdown().confirmed }}</strong>
+          </div>
+          <div class="status-pill status-pill--preparing">
+            <span class="pill-dot"></span>
+            <span class="pill-name">Preparing</span>
+            <strong>{{ statusBreakdown().preparing }}</strong>
+          </div>
+          <div class="status-pill status-pill--ready">
+            <span class="pill-dot"></span>
+            <span class="pill-name">Ready for Pickup</span>
+            <strong>{{ statusBreakdown().ready }}</strong>
+          </div>
+          <div class="status-pill status-pill--out">
+            <span class="pill-dot"></span>
+            <span class="pill-name">Out for Delivery</span>
+            <strong>{{ statusBreakdown().outForDelivery }}</strong>
+          </div>
+          <div class="status-pill status-pill--delivered">
+            <span class="pill-dot"></span>
+            <span class="pill-name">Delivered</span>
+            <strong>{{ statusBreakdown().delivered }}</strong>
+          </div>
+          <div class="status-pill status-pill--cancelled">
+            <span class="pill-dot"></span>
+            <span class="pill-name">Cancelled</span>
+            <strong>{{ statusBreakdown().cancelled }}</strong>
+          </div>
         </div>
       </div>
 
-      <!-- Overview Tables -->
-      <div class="ad-overview-grid">
-        <!-- Recent Orders -->
-        <div class="ad-overview-card">
-          <div class="ad-overview-header">
-            <h3><span class="material-icons">receipt</span> Recent Orders</h3>
-            <a routerLink="/admin/orders" class="ad-view-all">View All Orders →</a>
+      <!-- Row 1: Recent Orders + Top Restaurants -->
+      <div class="ad-grid-2col">
+        <!-- Recent Orders Table -->
+        <div class="ad-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="material-icons text-primary">receipt_long</span>
+              <h3>Recent Customer Orders</h3>
+            </div>
+            <a routerLink="/admin/orders" class="card-link">View All ({{ orders().length }}) →</a>
           </div>
+
           <div class="ad-table-wrap">
-            <table class="ad-mini-table">
+            <table class="ad-table">
               <thead>
                 <tr>
-                  <th>Order #</th>
-                  <th>Amount</th>
+                  <th>Order</th>
+                  <th>Customer</th>
+                  <th>Restaurant</th>
+                  <th>Total</th>
                   <th>Status</th>
                   <th>Date</th>
                 </tr>
@@ -139,60 +189,163 @@
                 @for (o of recentOrders(); track o.id) {
                   <tr>
                     <td><strong>#{{ o.id }}</strong></td>
-                    <td>₹{{ o.totalAmount | number:'1.0-0' }}</td>
+                    <td>
+                      <span class="cell-user">{{ o.customerName || 'Customer #' + o.userId }}</span>
+                    </td>
+                    <td>
+                      <span class="cell-restaurant">{{ o.restaurantName || 'Restaurant #' + o.restaurantId }}</span>
+                    </td>
+                    <td><strong class="cell-amount">₹{{ o.totalAmount | number:'1.0-0' }}</strong></td>
                     <td>
                       <span class="status-badge" [ngClass]="getStatusClass(o.status)">
                         {{ o.status }}
                       </span>
                     </td>
-                    <td>{{ o.createdAt | date:'shortDate' }}</td>
+                    <td><span class="cell-date">{{ o.createdAt | date:'shortDate' }}</span></td>
                   </tr>
                 } @empty {
-                  <tr><td colspan="4" class="empty-cell">No recent orders.</td></tr>
+                  <tr>
+                    <td colspan="6" class="empty-state-cell">No customer orders placed yet.</td>
+                  </tr>
                 }
               </tbody>
             </table>
           </div>
         </div>
 
-        <!-- Recent Restaurants -->
-        <div class="ad-overview-card">
-          <div class="ad-overview-header">
-            <h3><span class="material-icons">storefront</span> Recent Restaurants</h3>
-            <a routerLink="/admin/restaurants" class="ad-view-all">View All Restaurants →</a>
+        <!-- Top Restaurants -->
+        <div class="ad-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="material-icons text-warning">star</span>
+              <h3>Top Performing Restaurants</h3>
+            </div>
+            <a routerLink="/admin/restaurants" class="card-link">All Restaurants →</a>
           </div>
-          <div class="ad-table-wrap">
-            <table class="ad-mini-table">
-              <thead>
-                <tr>
-                  <th>Restaurant</th>
-                  <th>Location</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (r of recentRestaurants(); track r.id) {
-                  <tr>
-                    <td class="r-cell">
-                      <img [src]="r.imageUrl" [alt]="r.name" class="r-thumb">
-                      <span>{{ r.name }}</span>
-                    </td>
-                    <td>{{ r.address }}</td>
-                    <td>
-                      <span class="status-badge" [ngClass]="r.isActive ? 'status-badge--success' : 'status-badge--danger'">
-                        {{ r.isActive ? 'Active' : 'Inactive' }}
-                      </span>
-                    </td>
-                  </tr>
-                } @empty {
-                  <tr><td colspan="3" class="empty-cell">No restaurants listed yet.</td></tr>
-                }
-              </tbody>
-            </table>
+
+          <div class="top-list">
+            @for (r of topRestaurants(); track r.id; let i = $index) {
+              <div class="top-list-item">
+                <div class="top-rank-badge">#{{ i + 1 }}</div>
+                <div class="top-item-info">
+                  <span class="top-item-title">{{ r.name }}</span>
+                  <div class="top-item-sub">
+                    <span class="rating-pill">
+                      <span class="material-icons">star</span> {{ r.rating | number:'1.1-1' }}
+                    </span>
+                    <span>{{ r.orderCount }} {{ r.orderCount === 1 ? 'order' : 'orders' }}</span>
+                  </div>
+                </div>
+                <div class="top-item-revenue">
+                  <strong>₹{{ r.revenue | number:'1.0-0' }}</strong>
+                  <small>Revenue</small>
+                </div>
+              </div>
+            } @empty {
+              <div class="empty-state-box">
+                <span class="material-icons">storefront</span>
+                <p>No restaurant orders yet.</p>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 2: Top Selling Dishes + Quick Management Links -->
+      <div class="ad-grid-2col">
+        <!-- Top Dishes -->
+        <div class="ad-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="material-icons text-secondary">local_fire_department</span>
+              <h3>Top Selling Menu Items</h3>
+            </div>
+            <a routerLink="/admin/menu" class="card-link">View Menu Catalog →</a>
+          </div>
+
+          <div class="top-list">
+            @for (dish of topDishes(); track dish.name; let i = $index) {
+              <div class="top-list-item">
+                <div class="top-rank-badge rank-dish">#{{ i + 1 }}</div>
+                <div class="top-item-info">
+                  <span class="top-item-title">{{ dish.name }}</span>
+                  <small class="text-muted">{{ dish.restaurantName }}</small>
+                </div>
+                <div class="dish-stats">
+                  <span class="dish-qty-badge">{{ dish.orderCount }} ordered</span>
+                  <strong class="text-success">₹{{ dish.revenue | number:'1.0-0' }}</strong>
+                </div>
+              </div>
+            } @empty {
+              <div class="empty-state-box">
+                <span class="material-icons">restaurant_menu</span>
+                <p>No dish order history available yet.</p>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Quick Administration Actions -->
+        <div class="ad-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="material-icons">bolt</span>
+              <h3>Platform Shortcuts</h3>
+            </div>
+          </div>
+
+          <div class="quick-actions-grid">
+            <a routerLink="/admin/add-restaurant" class="quick-btn">
+              <span class="material-icons text-primary">add_business</span>
+              <div class="quick-btn-text">
+                <strong>Add Restaurant</strong>
+                <small>Onboard new partner</small>
+              </div>
+            </a>
+
+            <a routerLink="/admin/add-menu" class="quick-btn">
+              <span class="material-icons text-accent">add_circle</span>
+              <div class="quick-btn-text">
+                <strong>Add Menu Item</strong>
+                <small>Create new dish</small>
+              </div>
+            </a>
+
+            <a routerLink="/admin/orders" class="quick-btn">
+              <span class="material-icons text-success">receipt_long</span>
+              <div class="quick-btn-text">
+                <strong>Live Orders</strong>
+                <small>Track & update</small>
+              </div>
+            </a>
+
+            <a routerLink="/admin/reviews" class="quick-btn">
+              <span class="material-icons text-warning">rate_review</span>
+              <div class="quick-btn-text">
+                <strong>Review Moderation</strong>
+                <small>Inspect ratings</small>
+              </div>
+            </a>
+
+            <a routerLink="/admin/deliveries" class="quick-btn">
+              <span class="material-icons text-info">local_shipping</span>
+              <div class="quick-btn-text">
+                <strong>Assign Deliveries</strong>
+                <small>Manage fleet</small>
+              </div>
+            </a>
+
+            <a routerLink="/admin/coupons" class="quick-btn">
+              <span class="material-icons text-purple">local_offer</span>
+              <div class="quick-btn-text">
+                <strong>Discount Coupons</strong>
+                <small>Create promo codes</small>
+              </div>
+            </a>
           </div>
         </div>
       </div>
     }
 
   </div>
-</section>
+</div>

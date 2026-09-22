@@ -215,25 +215,25 @@
 
     <div class="address-list">
 
-        @if (isLoading) {
+        @if (isLoading()) {
 
             <div class="state-box">
                 <span class="material-icons spinning">sync</span>
                 <p>Loading addresses...</p>
             </div>
 
-        } @else if (loadError) {
+        } @else if (loadError()) {
 
             <div class="state-box">
                 <span class="material-icons">error_outline</span>
-                <p>{{ loadError }}</p>
+                <p>{{ loadError() }}</p>
                 <button class="state-btn" (click)="retry()">
                     <span class="material-icons">refresh</span>
                     Try Again
                 </button>
             </div>
 
-        } @else if (customerAddresses.length === 0) {
+        } @else if (customerAddresses().length === 0) {
 
             <div class="state-box">
                 <span class="material-icons">location_on</span>
@@ -243,7 +243,7 @@
 
         } @else {
 
-        @for(address of customerAddresses; track address.addressId){
+        @for(address of customerAddresses(); track address.addressId){
 
         <div class="address-card">
 

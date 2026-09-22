@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Review } from '../models/review.model';
+import { Review, CreateReviewRequest, EligibleReviewOrder, UpdateReviewRequest } from '../models/review.model';
 
 @Injectable({
   providedIn: 'root'
@@ -12,12 +12,28 @@ export class ReviewService {
 
   constructor(private http: HttpClient) {}
 
-  // Get all Reviews (Admin)
+  // Get all Reviews across platform (Admin / Public)
   getReviews(): Observable<Review[]> {
     return this.http.get<Review[]>(this.apiUrl);
   }
 
-  // Get all Reviews of one Restaurant
+  // Get the public reviews shown on the Home page (approved/published reviews)
+  getPublicReviews(limit?: number): Observable<Review[]> {
+    const params = limit ? `?limit=${limit}` : '';
+    return this.http.get<Review[]>(`${this.apiUrl}/public${params}`);
+  }
+
+  // Get all Reviews submitted by the currently logged-in Customer
+  getMyReviews(): Observable<Review[]> {
+    return this.http.get<Review[]>(`${this.apiUrl}/my`);
+  }
+
+  // Get delivered orders eligible for review by the currently logged-in Customer
+  getEligibleOrders(): Observable<EligibleReviewOrder[]> {
+    return this.http.get<EligibleReviewOrder[]>(`${this.apiUrl}/eligible-orders`);
+  }
+
+  // Get all Reviews of one Restaurant (Public)
   getReviewsByRestaurant(restaurantId: number): Observable<Review[]> {
     return this.http.get<Review[]>(`${this.apiUrl}/restaurant/${restaurantId}`);
   }
@@ -32,16 +48,26 @@ export class ReviewService {
     return this.http.get<number>(`${this.apiUrl}/restaurant/${restaurantId}/average`);
   }
 
-  // Delete one Review
+  // Delete one Review (Admin or Author Customer)
   deleteReview(reviewId: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${reviewId}`);
   }
 
-  // Add a new Review
-  addReview(review: Review): Observable<any> {
+  // Update one Review (Author Customer only; backend enforces ownership)
+  updateReview(reviewId: number, review: UpdateReviewRequest): Observable<any> {
     const dto = {
-      CustomerId: review.customerId,
+      Rating: review.rating,
+      Comment: review.comment
+    };
+
+    return this.http.put(`${this.apiUrl}/${reviewId}`, dto);
+  }
+
+  // Create a new Review
+  addReview(review: CreateReviewRequest | Review): Observable<any> {
+    const dto = {
       RestaurantId: review.restaurantId,
+      OrderId: review.orderId,
       Rating: review.rating,
       Comment: review.comment
     };

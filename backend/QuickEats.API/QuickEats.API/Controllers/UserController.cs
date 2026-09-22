@@ -65,10 +65,6 @@ namespace QuickEats.API.Controllers
             var partners = await _userService.GetDeliveryPartnersAsync();
             return Ok(partners);
         }
-
-        /// <summary>
-        /// Creates a new delivery partner account (Admin only).
-        /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpPost("delivery-partner")]
         public async Task<IActionResult> CreateDeliveryPartner([FromBody] CreateDeliveryPartnerDto dto)
@@ -103,7 +99,36 @@ namespace QuickEats.API.Controllers
             await _userRepository.DeleteAsync(user);
             await _userRepository.SaveChangesAsync();
 
-            return Ok("User deleted successfully.");
+            return Ok(new { message = "User deleted successfully." });
+        }
+
+        /// <summary>
+        /// Gets the profile of the currently logged in user (any role).
+        /// </summary>
+        /// <response code="200">The current user's profile (password never returned).</response>
+        [HttpGet("me")]
+        public async Task<IActionResult> GetMe()
+        {
+            var userId = int.Parse(
+                User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+                return NotFound("User not found.");
+
+            var response = new UserResponseDto
+            {
+                Id = user.Id,
+                Name = user.Name,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                Role = user.Role,
+                ProfileImageUrl = user.ProfileImageUrl,
+                IsActive = user.IsActive,
+                CreatedAt = user.CreatedAt
+            };
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -118,7 +143,7 @@ namespace QuickEats.API.Controllers
 
             await _userService.UpdateProfileImageUrlAsync(userId, dto.ProfileImageUrl);
 
-            return Ok("Profile image updated successfully.");
+            return Ok(new { message = "Profile image updated successfully." });
         }
     }
 }

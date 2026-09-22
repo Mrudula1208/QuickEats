@@ -1,30 +1,36 @@
 export interface Review {
-
-  // Unique ID of this review.
   id: number;
-
-  // ID of the customer who wrote the review.
   customerId: number;
-
-  // ID of the restaurant being reviewed.
   restaurantId: number;
-
-  // Name of the customer.
+  orderId?: number;
   customerName: string;
-
-  // Name of the restaurant.
+  customerProfileImageUrl?: string;
+  isVerifiedOrder?: boolean;
   restaurantName: string;
-
-  // Rating given by the customer.
-  //
-  // Example:
-  // 1, 2, 3, 4, or 5
+  restaurantImageUrl?: string;
   rating: number;
-
-  // Text written by the customer.
   comment: string;
-
-  // Date when the review was created.
   createdAt: Date;
+}
 
+export interface CreateReviewRequest {
+  restaurantId: number;
+  orderId?: number;
+  rating: number;
+  comment: string;
+}
+
+export interface UpdateReviewRequest {
+  rating: number;
+  comment: string;
+}
+
+export interface EligibleReviewOrder {
+  orderId: number;
+  restaurantId: number;
+  restaurantName: string;
+  restaurantImageUrl?: string;
+  totalAmount: number;
+  orderDate: Date;
+  alreadyReviewed: boolean;
 }

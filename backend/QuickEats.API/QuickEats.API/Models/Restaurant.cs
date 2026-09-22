@@ -15,6 +15,17 @@
 
         public bool IsActive { get; set; } = true;
 
+        // True when this restaurant is selected to appear in the "Featured" home section.
+        // If no restaurants are flagged, the featured query falls back to the most
+        // popular/highly rated active restaurants.
+        public bool IsFeatured { get; set; } = false;
+
+        // Optional geographic coordinates used by the "Near You" home section.
+        // Nullable so existing restaurants without coordinates never break.
+        public double? Latitude { get; set; }
+
+        public double? Longitude { get; set; }
+
         // Operating hours stored as "HH:mm" strings (24-hour format).
         public string OpeningTime { get; set; } = "09:00";
         public string ClosingTime { get; set; } = "22:00";

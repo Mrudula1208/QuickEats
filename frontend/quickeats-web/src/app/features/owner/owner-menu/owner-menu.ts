@@ -32,7 +32,10 @@ export class OwnerMenuComponent {
     let items = this.menuItems();
     if (this.searchText) {
       const s = this.searchText.toLowerCase();
-      items = items.filter(m => m.name.toLowerCase().includes(s) || m.description.toLowerCase().includes(s));
+      items = items.filter(m =>
+        (m.name || '').toLowerCase().includes(s) ||
+        (m.description || '').toLowerCase().includes(s)
+      );
     }
     const cat = this.selectedCategory();
     if (cat !== 'All') {

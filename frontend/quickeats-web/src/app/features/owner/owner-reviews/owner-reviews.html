@@ -31,7 +31,7 @@
           Try Again
         </button>
       </div>
-    } @else if (!restaurant()) {
+    } @else if (!restaurant() && reviews().length === 0) {
       <div class="or-empty">
         <span class="material-icons">storefront</span>
         <h3>No Restaurant Yet</h3>

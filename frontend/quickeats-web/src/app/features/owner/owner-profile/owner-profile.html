@@ -1,0 +1,110 @@
+<app-owner-nav></app-owner-nav>
+
+<section class="op-hero">
+  <div class="op-hero-inner">
+    <h1>My Profile</h1>
+    <p>Your account details</p>
+  </div>
+</section>
+
+<section class="op-content">
+  <div class="op-container">
+
+    @if (isLoading()) {
+      <div class="op-loading">
+        <span class="material-icons spinning">progress_activity</span>
+        <p>Loading profile...</p>
+      </div>
+    } @else if (loadError()) {
+      <div class="op-error">
+        <span class="material-icons">error_outline</span>
+        <h3>Something went wrong</h3>
+        <p>{{ loadError() }}</p>
+        <button class="op-retry-btn" (click)="loadProfile()">
+          <span class="material-icons">refresh</span>
+          Try Again
+        </button>
+      </div>
+    } @else if (profile()) {
+      @let p = profile();
+
+      <div class="op-card">
+
+        <div class="op-card-head">
+          <div class="op-avatar-wrap">
+            @if (p!.profileImageUrl) {
+              <img [src]="p!.profileImageUrl" alt="Profile photo" class="op-avatar-img">
+            } @else {
+              <div class="op-avatar">{{ getInitial(p!.name) }}</div>
+            }
+
+            <label class="op-camera" title="Change profile photo">
+              <span class="material-icons">photo_camera</span>
+              <input type="file" accept="image/*" (change)="onFileSelected($event)" [hidden]="true">
+            </label>
+
+            @if (savingImage()) {
+              <span class="material-icons spinning op-saving">progress_activity</span>
+            }
+          </div>
+
+          <div class="op-title">
+            <h2>{{ p!.name }}</h2>
+            <span class="op-role">{{ getRoleLabel(p!.role) }}</span>
+          </div>
+        </div>
+
+        <div class="op-detail-grid">
+          <div class="op-detail">
+            <span class="material-icons">person</span>
+            <div>
+              <small>Name</small>
+              <p>{{ p!.name }}</p>
+            </div>
+          </div>
+
+          <div class="op-detail">
+            <span class="material-icons">email</span>
+            <div>
+              <small>Email</small>
+              <p>{{ p!.email }}</p>
+            </div>
+          </div>
+
+          <div class="op-detail">
+            <span class="material-icons">phone</span>
+            <div>
+              <small>Phone</small>
+              <p>{{ p!.phoneNumber || '—' }}</p>
+            </div>
+          </div>
+
+          <div class="op-detail">
+            <span class="material-icons">badge</span>
+            <div>
+              <small>Role</small>
+              <p>{{ getRoleLabel(p!.role) }}</p>
+            </div>
+          </div>
+
+          <div class="op-detail">
+            <span class="material-icons">calendar_today</span>
+            <div>
+              <small>Member since</small>
+              <p>{{ p!.createdAt | date:'MMMM d, yyyy' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="op-actions">
+          <button class="op-logout-btn" (click)="logout()">
+            <span class="material-icons">logout</span>
+            Logout
+          </button>
+        </div>
+
+      </div>
+    }
+
+  </div>
+</section>

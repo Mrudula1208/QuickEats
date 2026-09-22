@@ -19,9 +19,18 @@
 
         <a
             routerLink="/owner/restaurants"
-            routerLinkActive="active">
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }">
 
             My Restaurants
+
+        </a>
+
+        <a
+            [routerLink]="menuLink"
+            routerLinkActive="active">
+
+            Menu
 
         </a>
 
@@ -38,6 +47,14 @@
             routerLinkActive="active">
 
             Reviews
+
+        </a>
+
+        <a
+            routerLink="/owner/profile"
+            routerLinkActive="active">
+
+            Profile
 
         </a>
 

@@ -1,181 +1,106 @@
 using Microsoft.EntityFrameworkCore;
-// Import Entity Framework Core.
-// Used to communicate with SQL Server.
-
 using QuickEats.API.Data;
-// Import AppDbContext.
-// AppDbContext gives us access to database tables.
-
+using QuickEats.API.DTos.Review;
 using QuickEats.API.Models;
-// Import Review model.
-
 using QuickEats.API.Repositories.Interfaces;
-// Import IReviewRepository.
-// This class implements that interface.
-
 
 namespace QuickEats.API.Repositories
 {
-    // ReviewRepository
-    // Contains the actual database logic.
-
     public class ReviewRepository : IReviewRepository
     {
-        // Store the database context.
-
         private readonly AppDbContext _context;
 
-
-        // Constructor.
-
-        public ReviewRepository(
-            AppDbContext context
-        )
+        public ReviewRepository(AppDbContext context)
         {
-            // Store the injected database context.
-
             _context = context;
         }
 
-
-        // Get all reviews.
-
         public async Task<IEnumerable<Reviews>> GetAllAsync()
         {
-            // Reviews
-            // Represents the Review table.
-
-            // Include()
-            // Also loads the Customer name
-            // and Restaurant name
-            // with every Review.
-
-            // ToListAsync()
-            // Executes the database query
-            // and returns all records as a list.
-
             return await _context.Reviews
                 .Include(review => review.Customer)
                 .Include(review => review.Restaurant)
+                .OrderByDescending(r => r.CreatedAt)
                 .ToListAsync();
         }
 
-
-        // Get one review by ID.
-
-        public async Task<Reviews?> GetByIdAsync(
-            int id
-        )
+        public async Task<Reviews?> GetByIdAsync(int id)
         {
-            // FirstOrDefaultAsync()
-            // Searches for the first matching record.
-            //
-            // If no record is found,
-            // it returns null.
-
             return await _context.Reviews
                 .Include(review => review.Customer)
                 .Include(review => review.Restaurant)
-                .FirstOrDefaultAsync(
-                    review => review.Id == id
-                );
+                .FirstOrDefaultAsync(review => review.Id == id);
         }
 
-
-        // Get all reviews of one Restaurant.
-
-        public async Task<IEnumerable<Reviews>> GetByRestaurantIdAsync(
-            int restaurantId
-        )
+        public async Task<IEnumerable<Reviews>> GetByRestaurantIdAsync(int restaurantId)
         {
-            // Where()
-            // Keeps only Reviews
-            // that belong to the given Restaurant.
-
             return await _context.Reviews
                 .Include(review => review.Customer)
                 .Include(review => review.Restaurant)
                 .Where(review => review.RestaurantId == restaurantId)
+                .OrderByDescending(r => r.CreatedAt)
                 .ToListAsync();
         }
 
-        // Get all reviews of all Restaurants owned by an Owner.
-        public async Task<IEnumerable<Reviews>> GetByOwnerIdAsync(
-            int ownerId
-        )
+        public async Task<IEnumerable<Reviews>> GetByCustomerIdAsync(int customerId)
+        {
+            return await _context.Reviews
+                .Include(review => review.Customer)
+                .Include(review => review.Restaurant)
+                .Where(review => review.CustomerId == customerId)
+                .OrderByDescending(r => r.CreatedAt)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Reviews>> GetByOwnerIdAsync(int ownerId)
         {
             return await _context.Reviews
                 .Include(review => review.Customer)
                 .Include(review => review.Restaurant)
                 .Where(review => review.Restaurant.OwnerId == ownerId)
+                .OrderByDescending(r => r.CreatedAt)
                 .ToListAsync();
         }
 
-
-        // Get average Rating of one Restaurant.
-
-        public async Task<double?> GetAverageRatingAsync(
-            int restaurantId
-        )
+        public async Task<double?> GetAverageRatingAsync(int restaurantId)
         {
-            // AnyAsync()
-            // Checks whether the Restaurant
-            // has at least one Review.
-
-            if (!await _context.Reviews
-                .AnyAsync(review => review.RestaurantId == restaurantId))
-            {
-                // No Reviews yet.
-
-                return null;
-            }
-
-            // AverageAsync()
-            // Calculates the average of all Ratings.
-
             return await _context.Reviews
                 .Where(review => review.RestaurantId == restaurantId)
-                .AverageAsync(review => review.Rating);
+                .Select(review => (double?)review.Rating)
+                .AverageAsync();
         }
 
-
-        // Add new Review.
-
-        public async Task AddAsync(
-            Reviews review
-        )
+        public async Task<int> GetReviewCountAsync(int restaurantId)
         {
-            // AddAsync()
-            // Adds the Review object
-            // to the database context.
-
-            await _context.Reviews
-                .AddAsync(review);
+            return await _context.Reviews
+                .CountAsync(review => review.RestaurantId == restaurantId);
         }
 
-
-        // Delete Review.
-
-        public void Delete(
-            Reviews review
-        )
+        public async Task<RatingSummaryDto?> GetRatingSummaryAsync(int restaurantId)
         {
-            // Remove()
-            // Marks the Review for deletion.
-
-            _context.Reviews
-                .Remove(review);
+            return await _context.Reviews
+                .Where(review => review.RestaurantId == restaurantId)
+                .GroupBy(review => review.RestaurantId)
+                .Select(g => new RatingSummaryDto
+                {
+                    Average = g.Average(review => (double)review.Rating),
+                    Count = g.Count()
+                })
+                .FirstOrDefaultAsync();
         }
 
+        public async Task AddAsync(Reviews review)
+        {
+            await _context.Reviews.AddAsync(review);
+        }
 
-        // Save database changes.
+        public void Delete(Reviews review)
+        {
+            _context.Reviews.Remove(review);
+        }
 
         public async Task SaveChangesAsync()
         {
-            // SaveChangesAsync()
-            // Actually saves Add/Delete changes
-            // to SQL Server.
-
             await _context.SaveChangesAsync();
         }
     }

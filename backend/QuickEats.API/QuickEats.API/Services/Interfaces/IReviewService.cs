@@ -1,81 +1,35 @@
 using QuickEats.API.DTos.Review;
-// Import Review DTOs.
-// DTOs carry Review data between
-// Controller and Service.
 
 namespace QuickEats.API.Services.Interfaces
 {
-    // Review Service Interface.
-    //
-    // This defines WHAT operations
-    // the ReviewService must provide.
-    //
-    // The actual implementation
-    // will be inside ReviewService.cs.
-
     public interface IReviewService
     {
-        // Get all Reviews.
-        //
-        // Task
-        // Means the operation is asynchronous.
-        //
-        // IEnumerable
-        // Means multiple objects.
-
         Task<IEnumerable<ReviewResponseDto>> GetAllAsync();
 
+        // Public reviews for the Home page. The customer must have ordered from a delivered order.
+        Task<IEnumerable<ReviewResponseDto>> GetPublicAsync(int? limit);
 
-        // Get one Review by ID.
-        //
-        // int id
-        // Receives the Review ID.
-        //
-        // ?
-        // Means the Review may not exist.
-        //
-        // If it does not exist,
-        // the result will be null.
+        Task<ReviewResponseDto?> GetByIdAsync(int id);
 
-        Task<ReviewResponseDto?> GetByIdAsync(
-            int id
-        );
+        Task<IEnumerable<ReviewResponseDto>> GetByRestaurantIdAsync(int restaurantId);
 
+        Task<IEnumerable<ReviewResponseDto>> GetByCustomerIdAsync(int customerId);
 
-        // Get all Reviews of one Restaurant.
+        Task<IEnumerable<ReviewResponseDto>> GetByOwnerIdAsync(int ownerId);
 
-        Task<IEnumerable<ReviewResponseDto>> GetByRestaurantIdAsync(
-            int restaurantId
-        );
+        Task<IEnumerable<EligibleReviewOrderDto>> GetEligibleOrdersAsync(int customerId);
 
-        // Get all Reviews of all Restaurants owned by an Owner.
-        Task<IEnumerable<ReviewResponseDto>> GetByOwnerIdAsync(
-            int ownerId
-        );
+        Task<double?> GetAverageRatingAsync(int restaurantId);
 
+        Task<int> GetReviewCountAsync(int restaurantId);
 
-        // Get average Rating of one Restaurant.
-        //
-        // Returns null when the Restaurant
-        // has no Reviews yet.
+        Task<RatingSummaryDto?> GetRatingSummaryAsync(int restaurantId);
 
-        Task<double?> GetAverageRatingAsync(
-            int restaurantId
-        );
+        Task CreateAsync(int customerId, CreateReviewDto dto);
 
+        // Updates a review owned by the given customer (ownership enforced here).
+        Task UpdateAsync(int reviewId, int customerId, UpdateReviewDto dto);
 
-        // Create a new Review.
-
-        Task CreateAsync(
-            int customerId,
-            CreateReviewDto dto
-        );
-
-
-        // Delete one Review.
-
-        Task DeleteAsync(
-            int id
-        );
+        Task DeleteAsync(int id, int? requestUserId = null, string? role = null);
     }
 }

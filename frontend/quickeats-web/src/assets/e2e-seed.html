@@ -1,0 +1,22 @@
+<!doctype html>
+<meta charset="utf-8"><title>e2e-seed</title>
+<script>
+try {
+  const q = new URLSearchParams(location.search);
+  const token = q.get('token');
+  const role = q.get('role') || 'Customer';
+  const route = q.get('route') || '/';
+  if (token) {
+    localStorage.setItem('token', token);
+    localStorage.setItem('role', role);
+    localStorage.setItem('name', q.get('name') || 'QA User');
+    localStorage.setItem('email', q.get('email') || 'qa@quickeats.app');
+    localStorage.setItem('userId', q.get('userId') || '2');
+  } else {
+    localStorage.clear();
+  }
+  location.replace(route);
+} catch (e) {
+  document.write('SEED-ERROR ' + e.message);
+}
+</script>

@@ -161,6 +161,17 @@
             Gets all menu items of all restaurants.
             </summary>
         </member>
+        <member name="M:QuickEats.API.Controllers.MenuController.GetTrending(System.Int32)">
+            <summary>
+            Gets the most popular dishes across all restaurants for the Home page.
+            </summary>
+            <remarks>
+            Trending dishes are MENU ITEMS (not restaurants). They are ranked by the real
+            number of times each dish has been ordered. If there is no order history, only
+            real bestseller/available dishes are returned as a fallback.
+            </remarks>
+            <param name="count">Maximum number of dishes to return. Defaults to 6.</param>
+        </member>
         <member name="M:QuickEats.API.Controllers.MenuController.GetByID(System.Int32)">
             <summary>
             Gets a single menu item by id.
@@ -246,7 +257,8 @@
         </member>
         <member name="T:QuickEats.API.Controllers.OrderController">
             <summary>
-            Order management: customers place/cancel orders, owners and admins manage order status.
+            Order management: customers place/cancel orders, owners manage preparation status,
+            admins monitor orders, assign delivery partners and can authorise emergency overrides.
             </summary>
         </member>
         <member name="M:QuickEats.API.Controllers.OrderController.GetAll">
@@ -256,7 +268,8 @@
         </member>
         <member name="M:QuickEats.API.Controllers.OrderController.GetByIdAsync(System.Int32)">
             <summary>
-            Gets a single order by id.
+            Gets a single order by id. Access is restricted per role:
+            Admin sees all, Customer only own, Owner only own restaurants, Delivery Partner only assigned.
             </summary>
             <param name="id">Order id.</param>
         </member>
@@ -280,16 +293,35 @@
         </member>
         <member name="M:QuickEats.API.Controllers.OrderController.UpdateStatus(System.Int32,QuickEats.API.DTos.Order.UpdateOrderStatusDto)">
             <summary>
-            Updates the status of an order (Admin, or Owner of the order's restaurant).
+            Updates the status of an order (Owner of the order's restaurant ONLY).
+            Owners may advance Pending -> Confirmed -> Preparing -> Ready for Pickup
+            and may reject/cancel an order only while it is still Pending.
             </summary>
             <param name="id">Order id.</param>
-            <param name="dto">New status (Pending, Confirmed, Preparing, Ready for Pickup, Out for Delivery, Delivered, Cancelled).</param>
+            <param name="dto">New status (Confirmed, Preparing, Ready for Pickup, Cancelled).</param>
         </member>
         <member name="M:QuickEats.API.Controllers.OrderController.Cancel(System.Int32)">
             <summary>
-            Cancels an order belonging to the logged in Customer.
+            Cancels an order belonging to the logged in Customer (self-service cancellation).
+            Only allowed while the order is Pending or Confirmed.
             </summary>
             <param name="id">Order id.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.OrderController.AdminCancel(System.Int32)">
+            <summary>
+            Cancels an order (Admin only, authorised exceptional situations).
+            Only allowed while the order is Pending or Confirmed.
+            </summary>
+            <param name="id">Order id.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.OrderController.Override(System.Int32,QuickEats.API.DTos.Order.AdminOverrideOrderDto)">
+            <summary>
+            Admin emergency override: validates the requested transition, requires a reason,
+            records the actor/timestamp/reason in the audit log, then applies the status.
+            The normal per-role workflow is never bypassed; this is a controlled exceptional path.
+            </summary>
+            <param name="id">Order id.</param>
+            <param name="dto">Target status and mandatory reason.</param>
         </member>
         <member name="M:QuickEats.API.Controllers.OrderController.Delete(System.Int32)">
             <summary>
@@ -332,10 +364,11 @@
         </member>
         <member name="M:QuickEats.API.Controllers.OrderDeliveryController.UpdateStatus(System.Int32,QuickEats.API.DTos.OrderDelivery.UpdateDeliveryStatusDto)">
             <summary>
-            Updates the delivery status (Delivery Partner or Admin).
+            Updates the delivery status (Delivery Partner ONLY - the assigned partner).
+            Transitions: Assigned -> Picked Up -> Out for Delivery -> Delivered.
             </summary>
             <param name="id">Delivery id.</param>
-            <param name="dto">New status (Assigned, Picked Up, Out for Delivery, Delivered).</param>
+            <param name="dto">New status (Picked Up, Out for Delivery, Delivered).</param>
         </member>
         <member name="M:QuickEats.API.Controllers.OrderDeliveryController.Delete(System.Int32)">
             <summary>
@@ -400,6 +433,36 @@
             Gets all restaurants.
             </summary>
             <returns>List of all restaurants.</returns>
+        </member>
+        <member name="M:QuickEats.API.Controllers.RestaurantController.GetFeatured(System.Int32)">
+            <summary>
+            Gets a limited selection of featured/high-quality restaurants for the Home page.
+            </summary>
+            <remarks>
+            Featured restaurants are ranked by their IsFeatured flag, order popularity and
+            review rating. This is NOT the same query as the general restaurant listing.
+            </remarks>
+            <param name="count">Maximum number of restaurants to return. Defaults to 6.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.RestaurantController.GetRecommended(System.Int32)">
+            <summary>
+            Gets personalized/smart recommendations for the user based on real order history,
+            preferred cuisines, rating, popularity and open status.
+            </summary>
+            <param name="count">Maximum number of recommendations to return. Defaults to 6.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.RestaurantController.GetNearby(System.Double,System.Double,System.Double,System.Int32)">
+            <summary>
+            Gets active restaurants within a radius of the given coordinates, nearest first.
+            </summary>
+            <remarks>
+            Distances are computed with the Haversine formula using real coordinates.
+            Restaurants without coordinates are simply not included.
+            </remarks>
+            <param name="latitude">Caller latitude (-90 to 90).</param>
+            <param name="longitude">Caller longitude (-180 to 180).</param>
+            <param name="radiusKm">Search radius in kilometres (max 100). Defaults to 5.</param>
+            <param name="count">Maximum number of restaurants to return. Defaults to 4.</param>
         </member>
         <member name="M:QuickEats.API.Controllers.RestaurantController.GetById(System.Int32)">
             <summary>
@@ -477,50 +540,60 @@
             </summary>
             <param name="id">Rating id.</param>
         </member>
-        <member name="T:QuickEats.API.Controllers.ReviewController">
-            <summary>
-            Written restaurant reviews: browse reviews (public), create (Customer) and delete (Admin).
-            </summary>
-        </member>
         <member name="M:QuickEats.API.Controllers.ReviewController.GetAll">
             <summary>
-            Gets all reviews.
+            Gets all reviews across the platform.
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.ReviewController.GetPublic(System.Nullable{System.Int32})">
+            <summary>
+            Gets the public reviews shown on the Home page (approved / published reviews).
             </summary>
         </member>
         <member name="M:QuickEats.API.Controllers.ReviewController.GetById(System.Int32)">
             <summary>
             Gets one review by id.
             </summary>
-            <param name="id">Review id.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.ReviewController.GetMyReviews">
+            <summary>
+            Gets all reviews submitted by the logged-in customer.
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Controllers.ReviewController.GetEligibleOrders">
+            <summary>
+            Gets delivered orders that are eligible for customer review.
+            </summary>
         </member>
         <member name="M:QuickEats.API.Controllers.ReviewController.GetByRestaurantId(System.Int32)">
             <summary>
             Gets all reviews of one restaurant.
             </summary>
-            <param name="restaurantId">Restaurant id.</param>
         </member>
         <member name="M:QuickEats.API.Controllers.ReviewController.GetOwnerReviews">
             <summary>
-            Gets all reviews for the logged in Owner's restaurants.
+            Gets all reviews for the logged-in Owner's restaurants.
             </summary>
         </member>
         <member name="M:QuickEats.API.Controllers.ReviewController.GetAverageRating(System.Int32)">
             <summary>
-            Gets the average rating of one restaurant (null when no reviews exist).
+            Gets the average rating of one restaurant.
             </summary>
-            <param name="restaurantId">Restaurant id.</param>
         </member>
         <member name="M:QuickEats.API.Controllers.ReviewController.Create(QuickEats.API.DTos.Review.CreateReviewDto)">
             <summary>
-            Creates a new review (Customer only). The customer id always comes from the JWT token.
+            Creates a new review for a delivered order (Customer only).
             </summary>
-            <param name="dto">Restaurant id, rating (1-5) and comment.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.ReviewController.Update(System.Int32,QuickEats.API.DTos.Review.UpdateReviewDto)">
+            <summary>
+            Updates a review owned by the logged-in customer.
+            </summary>
         </member>
         <member name="M:QuickEats.API.Controllers.ReviewController.Delete(System.Int32)">
             <summary>
-            Deletes a review (Admin only).
+            Deletes a review (Admin or the Customer who created it).
             </summary>
-            <param name="id">Review id.</param>
         </member>
         <member name="T:QuickEats.API.Controllers.SavedAddressController">
             <summary>
@@ -565,11 +638,6 @@
             Gets all delivery partners with delivery stats (Admin only).
             </summary>
         </member>
-        <member name="M:QuickEats.API.Controllers.UserController.CreateDeliveryPartner(QuickEats.API.DTos.User.CreateDeliveryPartnerDto)">
-            <summary>
-            Creates a new delivery partner account (Admin only).
-            </summary>
-        </member>
         <member name="M:QuickEats.API.Controllers.UserController.ToggleUserStatus(System.Int32)">
             <summary>
             Toggles active/inactive status for a user or delivery partner (Admin only).
@@ -580,6 +648,12 @@
             Deletes a user by id (Admin only).
             </summary>
             <param name="id">User id.</param>
+        </member>
+        <member name="M:QuickEats.API.Controllers.UserController.GetMe">
+            <summary>
+            Gets the profile of the currently logged in user (any role).
+            </summary>
+            <response code="200">The current user's profile (password never returned).</response>
         </member>
         <member name="M:QuickEats.API.Controllers.UserController.UpdateProfileImage(QuickEats.API.DTos.Auth.UpdateProfileImageDto)">
             <summary>
@@ -629,6 +703,19 @@
         <member name="T:QuickEats.API.DTos.Menu.CreateMenuDto">
             <summary>Details required to create a new menu item.</summary>
         </member>
+        <member name="T:QuickEats.API.DTos.Menu.TrendingDishDto">
+            <summary>
+            A single dish shown in the "Trending Dishes" home section.
+            Contains the dish details plus enough restaurant context for the Home UI.
+            </summary>
+        </member>
+        <member name="T:QuickEats.API.DTos.Order.AdminOverrideOrderDto">
+            <summary>
+            Request body for the Admin emergency override action.
+            The override is validated against the legal order lifecycle plus a small set
+            of rescue transitions, requires a reason and is persisted to the audit log.
+            </summary>
+        </member>
         <member name="T:QuickEats.API.DTos.Order.CreateOrderDto">
             <summary>Details required to place a new order (restaurant, delivery info and items).</summary>
         </member>
@@ -643,6 +730,12 @@
         </member>
         <member name="T:QuickEats.API.DTos.Restaurant.UpdateRestaurantDto">
             <summary>Updated restaurant details.</summary>
+        </member>
+        <member name="T:QuickEats.API.DTos.Review.RatingSummaryDto">
+            <summary>
+            Average rating and total review count for one restaurant, fetched
+            together in a single grouped query to avoid redundant round-trips.
+            </summary>
         </member>
         <member name="T:QuickEats.API.Migrations.InitialCreate">
             <inheritdoc />
@@ -823,6 +916,64 @@
         </member>
         <member name="M:QuickEats.API.Migrations.AddDeliveryWorkflowAndUserStatus.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
+        </member>
+        <member name="T:QuickEats.API.Migrations.AddHomeLocationAndFeatured">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddHomeLocationAndFeatured.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddHomeLocationAndFeatured.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddHomeLocationAndFeatured.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:QuickEats.API.Migrations.AddOrderCancelledByAndAdminOverride">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddOrderCancelledByAndAdminOverride.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddOrderCancelledByAndAdminOverride.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:QuickEats.API.Migrations.AddOrderCancelledByAndAdminOverride.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:QuickEats.API.Models.AdminOrderOverride">
+            <summary>
+            Audit record of an admin-approved emergency order status override.
+            Keeps the normal workflow untouched while logging who overrode what, why and when.
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Services.OrderService.OverrideStatusAsync(System.Int32,System.String,System.String,System.Int32)">
+            <summary>
+            Applies an Admin-authorised emergency override to the order status.
+            The override is validated against the same legal lifecycle plus a small
+            set of "rescue" transitions (e.g. cancel a stuck order) and every
+            override is persisted to the audit table so nothing happens silently.
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Services.OrderService.AdminCancelAsync(System.Int32,System.Int32)">
+            <summary>
+            Cancels an order by an Admin (exceptional cases). Admin can cancel
+            Pending or Confirmed orders, recording who authorised the cancellation.
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Services.OrderService.ValidateStatusTransition(System.String,System.String)">
+            <summary>
+            Enforces the legal order lifecycle so statuses can only move forward.
+            Pending -> Confirmed -> Preparing -> Ready for Pickup -> Assigned -> Picked Up -> Out for Delivery -> Delivered.
+            Cancelled is a terminal state that may only be entered from Pending or Confirmed.
+            </summary>
+        </member>
+        <member name="M:QuickEats.API.Services.OrderService.ValidateOverrideTransition(System.String,System.String)">
+            <summary>
+            Admin override validation: normal forward transitions are always allowed.
+            In addition Admin may cancel an order from any pre-delivery state (rescue
+            scenario), but never deliver/pick-up/skip stages or revive a cancelled/completed order.
+            </summary>
         </member>
     </members>
 </doc>

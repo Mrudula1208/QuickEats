@@ -18,6 +18,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   isLoggedIn = false;
   userName = '';
+  isCustomer = false;
   mobileMenuOpen = false;
   cartCount = 0;
   unreadCount = 0;
@@ -55,7 +56,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.isLoggedIn = this.authService.isLoggedIn();
     if (this.isLoggedIn) {
       this.userName = localStorage.getItem('name') || '';
+      this.isCustomer = this.authService.getRole() === 'Customer';
       this.loadUnreadCount();
+    } else {
+      this.isCustomer = false;
     }
   }
 
@@ -86,6 +90,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.authService.logout();
     this.isLoggedIn = false;
     this.userName = '';
+    this.isCustomer = false;
     this.closeMobileMenu();
     this.router.navigate(['/']);
   }

@@ -40,5 +40,15 @@ namespace QuickEats.API.DTos.Restaurant
         // Minimum order amount required to place an order.
         [Range(0, 10000, ErrorMessage = "Minimum order must be between 0 and 10000")]
         public decimal MinimumOrder { get; set; } = 0;
+
+        // Optional geographic coordinates for the "Near You" feature.
+        [Range(-90, 90, ErrorMessage = "Latitude must be between -90 and 90")]
+        public double? Latitude { get; set; }
+
+        [Range(-180, 180, ErrorMessage = "Longitude must be between -180 and 180")]
+        public double? Longitude { get; set; }
+
+        // True to surface this restaurant in the "Featured" home section.
+        public bool IsFeatured { get; set; } = false;
     }
 }

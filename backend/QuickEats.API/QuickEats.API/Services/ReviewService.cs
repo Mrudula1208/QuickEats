@@ -1,360 +1,234 @@
 using QuickEats.API.DTos.Review;
-// Import Review DTOs.
-// Used to transfer Review data.
-
 using QuickEats.API.Exceptions;
 using QuickEats.API.Models;
-// Import Review model.
-// This represents the database object.
-
 using QuickEats.API.Repositories.Interfaces;
 using QuickEats.API.Services.Interfaces;
-// Import IReviewRepository.
-// Used to communicate with the database.
-
 
 namespace QuickEats.API.Services
 {
-    // ReviewService
-    // Contains the business logic
-    // for Reviews.
-
     public class ReviewService : IReviewService
     {
-        // Store the Review Repository.
-
-        private readonly IReviewRepository
-            _reviewRepository;
-
-
-        // Constructor.
+        private readonly IReviewRepository _reviewRepository;
+        private readonly IOrderRepository _orderRepository;
 
         public ReviewService(
-            IReviewRepository reviewRepository
+            IReviewRepository reviewRepository,
+            IOrderRepository orderRepository
         )
         {
-            // Store the injected Repository.
-
-            _reviewRepository =
-                reviewRepository;
+            _reviewRepository = reviewRepository;
+            _orderRepository = orderRepository;
         }
 
-
-        // Get all Reviews.
-
-        public async Task<IEnumerable<ReviewResponseDto>>
-            GetAllAsync()
+        public async Task<IEnumerable<ReviewResponseDto>> GetAllAsync()
         {
-            // STEP 1
-            // Get Reviews from database.
+            var reviews = await _reviewRepository.GetAllAsync();
+            return reviews.Select(MapToResponseDto).ToList();
+        }
 
-            var reviews =
-                await _reviewRepository
-                    .GetAllAsync();
+        public async Task<IEnumerable<ReviewResponseDto>> GetPublicAsync(int? limit)
+        {
+            var reviews = await _reviewRepository.GetAllAsync();
 
+            // Public reviews only: skip blank/placeholder comments that are not
+            // meaningful content for the Home page.
+            var publicReviews = reviews
+                .Where(r => !string.IsNullOrWhiteSpace(r.Comment))
+                .ToList();
 
-            // STEP 2
-            // Create an empty list
-            // for Response DTOs.
-
-            var response =
-                new List<ReviewResponseDto>();
-
-
-            // STEP 3
-            // Go through every Review.
-
-            foreach (var review in reviews)
+            if (limit.HasValue && limit.Value > 0)
             {
-                // STEP 4
-                // Convert Review model
-                // into ReviewResponseDto.
-
-                response.Add(
-                    new ReviewResponseDto
-                    {
-                        Id = review.Id,
-
-                        CustomerId =
-                            review.CustomerId,
-
-                        RestaurantId =
-                            review.RestaurantId,
-
-                        CustomerName =
-                            review.Customer.Name,
-
-                        RestaurantName =
-                            review.Restaurant.Name,
-
-                        Rating =
-                            review.Rating,
-
-                        Comment =
-                            review.Comment,
-
-                        CreatedAt =
-                            review.CreatedAt
-                    }
-                );
+                publicReviews = publicReviews.Take(limit.Value).ToList();
             }
 
-
-            // STEP 5
-            // Return all converted Reviews.
-
-            return response;
+            return publicReviews.Select(MapToResponseDto).ToList();
         }
 
-
-        // Get one Review by ID.
-
-        public async Task<ReviewResponseDto?>
-            GetByIdAsync(int id)
+        public async Task<ReviewResponseDto?> GetByIdAsync(int id)
         {
-            // STEP 1
-            // Ask Repository to find
-            // the Review using its ID.
-
-            var review =
-                await _reviewRepository
-                    .GetByIdAsync(id);
-
-
-            // STEP 2
-            // Check whether Review exists.
-
-            if (review == null)
-            {
-                // No Review found.
-
-                return null;
-            }
-
-
-            // STEP 3
-            // Convert database Model
-            // into Response DTO.
-
-            return new ReviewResponseDto
-            {
-                Id = review.Id,
-
-                CustomerId =
-                    review.CustomerId,
-
-                RestaurantId =
-                    review.RestaurantId,
-
-                CustomerName =
-                    review.Customer.Name,
-
-                RestaurantName =
-                    review.Restaurant.Name,
-
-                Rating =
-                    review.Rating,
-
-                Comment =
-                    review.Comment,
-
-                CreatedAt =
-                    review.CreatedAt
-            };
+            var review = await _reviewRepository.GetByIdAsync(id);
+            return review == null ? null : MapToResponseDto(review);
         }
 
-
-        // Get all Reviews of one Restaurant.
-
-        public async Task<IEnumerable<ReviewResponseDto>>
-            GetByRestaurantIdAsync(int restaurantId)
+        public async Task<IEnumerable<ReviewResponseDto>> GetByRestaurantIdAsync(int restaurantId)
         {
-            // STEP 1
-            // Get Reviews from database.
-
-            var reviews =
-                await _reviewRepository
-                    .GetByRestaurantIdAsync(restaurantId);
-
-
-            // STEP 2
-            // Create an empty list
-            // for Response DTOs.
-
-            var response =
-                new List<ReviewResponseDto>();
-
-
-            // STEP 3
-            // Go through every Review.
-
-            foreach (var review in reviews)
-            {
-                // STEP 4
-                // Convert Review model
-                // into ReviewResponseDto.
-
-                response.Add(
-                    new ReviewResponseDto
-                    {
-                        Id = review.Id,
-
-                        CustomerId =
-                            review.CustomerId,
-
-                        RestaurantId =
-                            review.RestaurantId,
-
-                        CustomerName =
-                            review.Customer.Name,
-
-                        RestaurantName =
-                            review.Restaurant.Name,
-
-                        Rating =
-                            review.Rating,
-
-                        Comment =
-                            review.Comment,
-
-                        CreatedAt =
-                            review.CreatedAt
-                    }
-                );
-            }
-
-
-            // STEP 5
-            // Return all converted Reviews.
-
-            return response;
+            var reviews = await _reviewRepository.GetByRestaurantIdAsync(restaurantId);
+            return reviews.Select(MapToResponseDto).ToList();
         }
 
+        public async Task<IEnumerable<ReviewResponseDto>> GetByCustomerIdAsync(int customerId)
+        {
+            var reviews = await _reviewRepository.GetByCustomerIdAsync(customerId);
+            return reviews.Select(MapToResponseDto).ToList();
+        }
 
-        // Get all Reviews of all Restaurants owned by an Owner.
-        public async Task<IEnumerable<ReviewResponseDto>>
-            GetByOwnerIdAsync(int ownerId)
+        public async Task<IEnumerable<ReviewResponseDto>> GetByOwnerIdAsync(int ownerId)
         {
             var reviews = await _reviewRepository.GetByOwnerIdAsync(ownerId);
-            var response = new List<ReviewResponseDto>();
+            return reviews.Select(MapToResponseDto).ToList();
+        }
 
-            foreach (var review in reviews)
+        public async Task<IEnumerable<EligibleReviewOrderDto>> GetEligibleOrdersAsync(int customerId)
+        {
+            var userOrders = await _orderRepository.GetByUserIdAsync(customerId);
+            var deliveredOrders = userOrders
+                .Where(o => string.Equals(o.Status, "Delivered", StringComparison.OrdinalIgnoreCase))
+                .OrderByDescending(o => o.CreatedAt)
+                .ToList();
+
+            var existingReviews = await _reviewRepository.GetByCustomerIdAsync(customerId);
+            var reviewedRestaurantIds = existingReviews.Select(r => r.RestaurantId).ToHashSet();
+
+            var result = new List<EligibleReviewOrderDto>();
+            foreach (var order in deliveredOrders)
             {
-                response.Add(new ReviewResponseDto
+                result.Add(new EligibleReviewOrderDto
                 {
-                    Id = review.Id,
-                    CustomerId = review.CustomerId,
-                    RestaurantId = review.RestaurantId,
-                    CustomerName = review.Customer.Name,
-                    RestaurantName = review.Restaurant.Name,
-                    Rating = review.Rating,
-                    Comment = review.Comment,
-                    CreatedAt = review.CreatedAt
+                    OrderId = order.Id,
+                    RestaurantId = order.RestaurantId,
+                    RestaurantName = order.Restaurant?.Name ?? $"Restaurant #{order.RestaurantId}",
+                    RestaurantImageUrl = order.Restaurant?.ImageUrl ?? "",
+                    TotalAmount = order.TotalAmount,
+                    OrderDate = order.CreatedAt,
+                    AlreadyReviewed = reviewedRestaurantIds.Contains(order.RestaurantId)
                 });
             }
 
-            return response;
+            return result;
         }
 
-
-        // Get average Rating of one Restaurant.
-
-        public async Task<double?>
-            GetAverageRatingAsync(int restaurantId)
+        public async Task<double?> GetAverageRatingAsync(int restaurantId)
         {
-            // Ask Repository to calculate
-            // the average Rating.
-
-            return await _reviewRepository
-                .GetAverageRatingAsync(restaurantId);
+            return await _reviewRepository.GetAverageRatingAsync(restaurantId);
         }
 
-
-        // Create a new Review.
-
-        public async Task CreateAsync(
-            int customerId,
-            CreateReviewDto dto
-        )
+        public async Task<int> GetReviewCountAsync(int restaurantId)
         {
-            // STEP 1
-            // Convert DTO into
-            // Review database object.
-
-            var review =
-                new Reviews
-                {
-                    CustomerId =
-                        customerId,
-
-                    RestaurantId =
-                        dto.RestaurantId,
-
-                    Rating =
-                        dto.Rating,
-
-                    Comment =
-                        dto.Comment,
-
-                    CreatedAt =
-                        DateTime.UtcNow
-                };
-
-
-            // STEP 2
-            // Add Review to database context.
-
-            await _reviewRepository
-                .AddAsync(review);
-
-
-            // STEP 3
-            // Save Review to SQL Server.
-
-            await _reviewRepository
-                .SaveChangesAsync();
+            return await _reviewRepository.GetReviewCountAsync(restaurantId);
         }
 
-
-        // Delete one Review.
-
-        public async Task DeleteAsync(
-            int id
-        )
+        public async Task<RatingSummaryDto?> GetRatingSummaryAsync(int restaurantId)
         {
-            // STEP 1
-            // Find Review by ID.
+            return await _reviewRepository.GetRatingSummaryAsync(restaurantId);
+        }
 
-            var review =
-                await _reviewRepository
-                    .GetByIdAsync(id);
-
-
-            // STEP 2
-            // Check whether Review exists.
-
-            if (review == null)
+        public async Task CreateAsync(int customerId, CreateReviewDto dto)
+        {
+            if (dto.Rating < 1 || dto.Rating > 5)
             {
-                // Review was not found.
-
-                throw new NotFoundException(
-                    $"Review with Id {id} not found."
-                );
+                throw new BadRequestException("Rating must be between 1 and 5 stars.");
             }
 
+            if (string.IsNullOrWhiteSpace(dto.Comment))
+            {
+                throw new BadRequestException("Review comment is required.");
+            }
 
-            // STEP 3
-            // Mark Review for deletion.
+            // Verify that the customer has at least one Delivered order with this restaurant
+            var userOrders = await _orderRepository.GetByUserIdAsync(customerId);
+            var deliveredOrders = userOrders
+                .Where(o => o.RestaurantId == dto.RestaurantId && string.Equals(o.Status, "Delivered", StringComparison.OrdinalIgnoreCase))
+                .ToList();
 
-            _reviewRepository
-                .Delete(review);
+            if (!deliveredOrders.Any())
+            {
+                throw new BadRequestException("You can only review restaurants after your order has been successfully Delivered.");
+            }
 
+            // Check if specific OrderId was supplied and verify ownership
+            if (dto.OrderId.HasValue && dto.OrderId.Value > 0)
+            {
+                var specificOrder = deliveredOrders.FirstOrDefault(o => o.Id == dto.OrderId.Value);
+                if (specificOrder == null)
+                {
+                    throw new BadRequestException("The specified order does not belong to you or has not been marked as Delivered.");
+                }
+            }
 
-            // STEP 4
-            // Save deletion to SQL Server.
+            // Check for existing review to prevent duplicates
+            var existingReviews = await _reviewRepository.GetByCustomerIdAsync(customerId);
+            if (existingReviews.Any(r => r.RestaurantId == dto.RestaurantId))
+            {
+                throw new BadRequestException("You have already submitted a review for this restaurant.");
+            }
 
-            await _reviewRepository
-                .SaveChangesAsync();
+            var review = new Reviews
+            {
+                CustomerId = customerId,
+                RestaurantId = dto.RestaurantId,
+                Rating = dto.Rating,
+                Comment = dto.Comment.Trim(),
+                CreatedAt = DateTime.UtcNow
+            };
+
+            await _reviewRepository.AddAsync(review);
+            await _reviewRepository.SaveChangesAsync();
+        }
+
+        public async Task UpdateAsync(int reviewId, int customerId, UpdateReviewDto dto)
+        {
+            if (dto.Rating < 1 || dto.Rating > 5)
+            {
+                throw new BadRequestException("Rating must be between 1 and 5 stars.");
+            }
+
+            if (string.IsNullOrWhiteSpace(dto.Comment))
+            {
+                throw new BadRequestException("Review comment is required.");
+            }
+
+            var review = await _reviewRepository.GetByIdAsync(reviewId);
+            if (review == null)
+            {
+                throw new NotFoundException($"Review with Id {reviewId} not found.");
+            }
+
+            // Only the author of the review may edit it.
+            if (review.CustomerId != customerId)
+            {
+                throw new ForbiddenException("You are not authorized to edit this review.");
+            }
+
+            review.Rating = dto.Rating;
+            review.Comment = dto.Comment.Trim();
+
+            await _reviewRepository.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(int id, int? requestUserId = null, string? role = null)
+        {
+            var review = await _reviewRepository.GetByIdAsync(id);
+            if (review == null)
+            {
+                throw new NotFoundException($"Review with Id {id} not found.");
+            }
+
+            // If not admin, ensure the requesting user is the author
+            if (role != "Admin" && requestUserId.HasValue && review.CustomerId != requestUserId.Value)
+            {
+                throw new ForbiddenException("You are not authorized to delete this review.");
+            }
+
+            _reviewRepository.Delete(review);
+            await _reviewRepository.SaveChangesAsync();
+        }
+
+        private static ReviewResponseDto MapToResponseDto(Reviews review)
+        {
+            return new ReviewResponseDto
+            {
+                Id = review.Id,
+                CustomerId = review.CustomerId,
+                RestaurantId = review.RestaurantId,
+                CustomerName = review.Customer?.Name ?? $"Customer #{review.CustomerId}",
+                CustomerProfileImageUrl = review.Customer?.ProfileImageUrl ?? "",
+                IsVerifiedOrder = true,
+                RestaurantName = review.Restaurant?.Name ?? $"Restaurant #{review.RestaurantId}",
+                RestaurantImageUrl = review.Restaurant?.ImageUrl ?? "",
+                Rating = review.Rating,
+                Comment = review.Comment,
+                CreatedAt = review.CreatedAt
+            };
         }
     }
 }

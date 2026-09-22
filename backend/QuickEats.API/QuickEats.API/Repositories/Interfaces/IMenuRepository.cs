@@ -6,6 +6,11 @@ namespace QuickEats.API.Repositories.Interfaces
     public interface IMenuRepository
     {
         Task<IEnumerable<MenuItem>> GetAllAsync();
+
+        // Returns the most popular available dishes across active restaurants,
+        // ordered by how many times each dish has been ordered.
+        Task<IEnumerable<MenuItem>> GetTrendingAsync(int count);
+
         Task<PagedResult<MenuItem>> GetPagedAsync(int page, int pageSize, string? sortBy, bool sortDesc);
         Task<MenuItem?> GetByIdAsync(int id);
         Task<IEnumerable<MenuItem>> GetByRestaurantIdAsync(int restaurantId);

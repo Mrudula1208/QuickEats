@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 
@@ -32,13 +32,13 @@ export class CustomerDashboardComponent {
 
   customerName: string = 'there';
 
-  totalOrders = 0;
-  wishlistItems = 0;
-  savedAddresses = 0;
-  availableCoupons = 0;
-  unreadNotifications = 0;
+  totalOrders = signal(0);
+  wishlistItems = signal(0);
+  savedAddresses = signal(0);
+  availableCoupons = signal(0);
+  unreadNotifications = signal(0);
 
-  isLoading = true;
+  isLoading = signal(true);
 
   private readonly userId: number = Number(localStorage.getItem('userId') || 0);
 
@@ -59,16 +59,16 @@ export class CustomerDashboardComponent {
   }
 
   loadDashboard(): void {
-    this.isLoading = true;
+    this.isLoading.set(true);
 
     if (!this.userId) {
-      this.isLoading = false;
+      this.isLoading.set(false);
       return;
     }
 
     this.orderService.getUserOrders(this.userId).subscribe({
       next: (orders) => {
-        this.totalOrders = orders.length;
+        this.totalOrders.set(orders.length);
         this.trackWishlist();
       },
       error: () => {
@@ -80,7 +80,7 @@ export class CustomerDashboardComponent {
   private trackWishlist(): void {
     this.wishlistService.getWishlist().subscribe({
       next: (items) => {
-        this.wishlistItems = items.length;
+        this.wishlistItems.set(items.length);
         this.trackAddresses();
       },
       error: () => {
@@ -92,7 +92,7 @@ export class CustomerDashboardComponent {
   private trackAddresses(): void {
     this.savedAddressService.getAddresses().subscribe({
       next: (addresses) => {
-        this.savedAddresses = addresses.length;
+        this.savedAddresses.set(addresses.length);
         this.trackCoupons();
       },
       error: () => {
@@ -105,7 +105,7 @@ export class CustomerDashboardComponent {
     this.couponService.getCoupons().subscribe({
       next: (coupons) => {
         const now = new Date();
-        this.availableCoupons = coupons.filter(c => c.isActive && new Date(c.expiryDate) >= now).length;
+        this.availableCoupons.set(coupons.filter(c => c.isActive && new Date(c.expiryDate) >= now).length);
         this.trackNotifications();
       },
       error: () => {
@@ -117,11 +117,11 @@ export class CustomerDashboardComponent {
   private trackNotifications(): void {
     this.notificationService.getUnreadCount().subscribe({
       next: (count) => {
-        this.unreadNotifications = count;
-        this.isLoading = false;
+        this.unreadNotifications.set(count);
+        this.isLoading.set(false);
       },
       error: () => {
-        this.isLoading = false;
+        this.isLoading.set(false);
       }
     });
   }

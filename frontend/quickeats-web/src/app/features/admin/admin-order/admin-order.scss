@@ -373,3 +373,290 @@ $transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   border: none;
   cursor: pointer;
 }
+
+/* ================= CUSTOMER CELL ================= */
+.customer-info-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 170px;
+  max-width: 240px;
+
+  .customer-name { color: $dark; font-size: 14px; font-weight: 700; }
+
+  .customer-phone,
+  .customer-addr {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: $dark-400;
+    line-height: 1.35;
+
+    .material-icons { font-size: 13px; color: $dark-300; }
+  }
+
+  .customer-addr {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 230px;
+  }
+}
+
+/* ================= RESTAURANT PILL ================= */
+.restaurant-name-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #EEF2FF;
+  color: #4F46E5;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: $radius-full;
+  white-space: nowrap;
+
+  .material-icons { font-size: 15px; }
+}
+
+/* ================= ITEMS & TOTAL CELL ================= */
+.order-total-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 220px;
+
+  .items-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+
+    .item-chip {
+      background: $light-bg;
+      border: 1px solid $border;
+      border-radius: 6px;
+      padding: 2px 7px;
+      font-size: 11px;
+      color: $dark-500;
+      white-space: nowrap;
+    }
+  }
+
+  .items-count { font-size: 11px; color: $dark-300; }
+  .total-amount {
+    font-size: 15px;
+    font-weight: 800;
+    color: $dark;
+  }
+}
+
+/* ================= PAYMENT BADGE ================= */
+.payment-badge {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: $radius-full;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: capitalize;
+
+  &.paid { background: #ECFDF5; color: #047857; }
+  &.pending { background: #FEF3C7; color: #92400E; }
+  &.failed { background: #FEF2F2; color: #B91C1C; }
+  &.refunded { background: #EEF2FF; color: #4F46E5; }
+}
+
+/* ================= ORDER STATUS BADGE ================= */
+.order-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: $radius-full;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+
+  .material-icons { font-size: 15px; }
+
+  &.status-pending { background: #FEF3C7; color: #92400E; }
+  &.status-confirmed { background: #EFF6FF; color: #1D4ED8; }
+  &.status-preparing { background: #FFFBEB; color: #B45309; }
+  &.status-ready { background: #F0FDF4; color: #15803D; }
+  &.status-assigned { background: #F5F3FF; color: #6D28D9; }
+  &.status-picked { background: #ECFEFF; color: #0E7490; }
+  &.status-out { background: #FFF7ED; color: #C2410C; }
+  &.status-delivered { background: #ECFDF5; color: #047857; }
+  &.status-cancelled { background: #FEF2F2; color: #B91C1C; }
+}
+
+/* ================= DELIVERY PARTNER CELL ================= */
+.partner-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 130px;
+
+  .partner-name { color: $dark; font-size: 13px; font-weight: 700; }
+  .partner-status { font-size: 11px; color: $dark-400; }
+}
+
+.partner-none {
+  font-size: 12px;
+  color: $dark-300;
+  font-style: italic;
+}
+
+/* ================= ACTION BUTTONS ================= */
+.action-btn {
+  &.assign-btn:hover { background: #F5F3FF; border-color: #DDD6FE; color: #6D28D9; }
+  &.cancel-btn:hover { background: #FFF7ED; border-color: #FED7AA; color: #C2410C; }
+  &.override-btn:hover { background: #FAF5FF; border-color: #E9D5FF; color: #9333EA; }
+}
+
+/* ================= MODALS ================= */
+.ao-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 20, 33, 0.5);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+}
+
+.ao-modal {
+  background: $white;
+  border-radius: $radius-lg;
+  width: 100%;
+  max-width: 460px;
+  box-shadow: 0 20px 50px rgba(27, 40, 56, 0.25);
+  overflow: hidden;
+
+  .ao-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 22px;
+    border-bottom: 1px solid $border;
+
+    h3 { margin: 0; font-family: $font-heading; font-size: 17px; color: $dark; }
+
+    .ao-modal-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: $dark-300;
+      display: flex;
+      &:hover { color: $dark; }
+    }
+  }
+
+  .ao-modal-body {
+    padding: 20px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .ao-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 22px;
+    border-top: 1px solid $border;
+    background: #FCFCFE;
+  }
+}
+
+.ao-modal-order-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: $light-bg;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  padding: 12px 14px;
+  font-size: 13px;
+  color: $dark-500;
+}
+
+.ao-modal-current {
+  font-size: 13px;
+  color: $dark-600;
+  background: #FEF3C7;
+  border: 1px solid #FDE68A;
+  border-radius: $radius-sm;
+  padding: 8px 12px;
+}
+
+.ao-override-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12px;
+  color: #92400E;
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  border-radius: $radius-sm;
+  padding: 10px 12px;
+
+  .material-icons { font-size: 18px; color: #D97706; }
+}
+
+.ao-field-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: $dark-500;
+}
+
+.ao-select,
+.ao-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid $border;
+  border-radius: $radius-sm;
+  font-size: 13px;
+  color: $dark;
+  outline: none;
+  font-family: $font-body;
+  background: $white;
+
+  &:focus { border-color: $primary; box-shadow: 0 0 0 3px rgba($primary, 0.1); }
+}
+
+.ao-btn-cancel {
+  padding: 9px 18px;
+  border: 1px solid $border;
+  border-radius: $radius-full;
+  background: $white;
+  color: $dark-400;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  &:hover { background: $light-bg; }
+}
+
+.ao-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 20px;
+  border: none;
+  border-radius: $radius-full;
+  background: linear-gradient(135deg, $primary, $primary-dark);
+  color: $white;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  &.ao-btn-danger { background: linear-gradient(135deg, #DC2626, #B91C1C); }
+}
+
+.spinning {
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }

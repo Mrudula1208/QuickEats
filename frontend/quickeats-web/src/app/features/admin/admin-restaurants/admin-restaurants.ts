@@ -128,4 +128,15 @@ export class AdminRestaurants {
   editRestaurant(r: Restaurant): void {
     this.router.navigate(['/admin/edit-restaurant', r.id]);
   }
+
+  formatTime(timeStr?: string): string {
+    if (!timeStr) return '';
+    const parts = timeStr.split(':');
+    if (parts.length < 2) return timeStr;
+    let hour = parseInt(parts[0], 10);
+    const min = parts[1];
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    hour = hour % 12 || 12;
+    return `${hour}:${min} ${ampm}`;
+  }
 }

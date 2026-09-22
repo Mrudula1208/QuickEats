@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 // Component
 // Tells Angular that this file controls a Component/page.
 
@@ -60,23 +60,17 @@ export class AdminPaymentDetails {
 
   // Store the selected payment.
   //
-  // Payment
-  // Means this variable will contain
-  // one Payment object.
-  //
-  // !
-  // Definite assignment operator.
-  //
-  // Means:
-  // "The value is not available right now,
-  // but it will be assigned later."
-  payment!: Payment;
+  // signal
+  // Makes the value reactive.
+  // When the API responds, the template
+  // automatically re-renders.
+  payment = signal<Payment | undefined>(undefined);
 
   // True while the payment is being fetched.
-  isLoading = true;
+  isLoading = signal(true);
 
   // Holds the error message if loading fails.
-  loadError: string | null = null;
+  loadError = signal<string | null>(null);
 
 
   constructor(
@@ -109,8 +103,8 @@ export class AdminPaymentDetails {
 
   loadPayment(): void {
 
-    this.isLoading = true;
-    this.loadError = null;
+    this.isLoading.set(true);
+    this.loadError.set(null);
 
     // STEP 1
     // Get the Payment ID from the URL.
@@ -157,20 +151,21 @@ export class AdminPaymentDetails {
 
         next: (payments) => {
 
-          this.payment =
+          this.payment.set(
             payments.find(
               payment =>
                 payment.id === id
-            )!;
+            )
+          );
 
-          this.isLoading = false;
+          this.isLoading.set(false);
 
         },
 
         // API Failed.
         error: () => {
-          this.isLoading = false;
-          this.loadError = 'Failed to load payment details';
+          this.isLoading.set(false);
+          this.loadError.set('Failed to load payment details');
           this.toastr.error('Failed to load payment details');
         }
 

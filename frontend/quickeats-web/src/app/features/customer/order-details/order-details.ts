@@ -21,7 +21,26 @@ export class OrderDetailsComponent {
   delivery = signal<Delivery | null>(null);
   isLoading = signal(true);
 
-  timelineSteps = ['Pending', 'Confirmed', 'Preparing', 'Out for Delivery', 'Delivered'];
+  timelineSteps = ['Placed', 'Confirmed', 'Preparing', 'Ready for Pickup', 'Out for Delivery', 'Delivered'];
+
+  // Maps the backend status to the friendly step shown to the customer.
+  private statusToStep: Record<string, string> = {
+    'Pending': 'Placed',
+    'Confirmed': 'Confirmed',
+    'Preparing': 'Preparing',
+    'Ready for Pickup': 'Ready for Pickup',
+    'Ready': 'Ready for Pickup',
+    'Assigned': 'Ready for Pickup',
+    'Picked Up': 'Out for Delivery',
+    'Out for Delivery': 'Out for Delivery',
+    'OutForDelivery': 'Out for Delivery',
+    'Delivered': 'Delivered',
+    'Cancelled': 'Cancelled'
+  };
+
+  private normalize(status: string): string {
+    return this.statusToStep[status] || status;
+  }
 
   constructor(
     private currentRoute: ActivatedRoute,
@@ -60,31 +79,35 @@ export class OrderDetailsComponent {
   }
 
   getStatusClass(status: string): string {
+    const step = this.normalize(status);
     const classes: Record<string, string> = {
-      'Pending': 'status-pending',
+      'Placed': 'status-pending',
       'Confirmed': 'status-confirmed',
       'Preparing': 'status-preparing',
+      'Ready for Pickup': 'status-ready',
       'Out for Delivery': 'status-out',
       'Delivered': 'status-delivered',
       'Cancelled': 'status-cancelled'
     };
-    return classes[status] || '';
+    return classes[step] || '';
   }
 
   getStatusIcon(status: string): string {
+    const step = this.normalize(status);
     const icons: Record<string, string> = {
-      'Pending': 'hourglass_empty',
+      'Placed': 'hourglass_empty',
       'Confirmed': 'check_circle',
       'Preparing': 'skillet',
+      'Ready for Pickup': 'inventory_2',
       'Out for Delivery': 'delivery_dining',
       'Delivered': 'check_circle',
       'Cancelled': 'cancel'
     };
-    return icons[status] || 'info';
+    return icons[step] || 'info';
   }
 
   getStepIndex(status: string): number {
-    return this.timelineSteps.indexOf(status);
+    return this.timelineSteps.indexOf(this.normalize(status));
   }
 
   isStepCompleted(stepIndex: number, currentStatus: string): boolean {

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QuickEats.API.DTos.RestaurantRating;
@@ -58,16 +58,11 @@ namespace QuickEats.API.Controllers
         /// Gets the rating of one restaurant.
         /// </summary>
         /// <param name="restaurantId">Restaurant id.</param>
+        [AllowAnonymous]
         [HttpGet("restaurant/{restaurantId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-
         public async Task <IActionResult> GetByRestaurantId(int restaurantId)
         {
-            // Owner can only see ratings of their own restaurants.
-            if (User.IsInRole("Owner") && !await IsOwnerOfRestaurant(restaurantId))
-                return Forbid();
-
             var rating = await _restaurantRatingService.GetByRestaurantIdAsync(restaurantId);
             return Ok(rating);
         }

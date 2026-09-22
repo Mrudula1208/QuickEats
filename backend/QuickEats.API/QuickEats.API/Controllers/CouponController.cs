@@ -79,7 +79,7 @@ namespace QuickEats.API.Controllers
         {
             await _couponService.CreateAsync(dto);
 
-            return Ok("Coupon created successfully.");
+            return Ok(new { message = "Coupon created successfully." });
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace QuickEats.API.Controllers
         public async Task<IActionResult> Update(int id, UpdateCouponDto dto)
         {
             await _couponService.UpdateAsync(id, dto);
-            return Ok("Coupon updated successfully.");
+            return Ok(new { message = "Coupon updated successfully." });
         }
 
         /// <summary>
@@ -110,7 +110,7 @@ namespace QuickEats.API.Controllers
         {
             await _couponService.DeleteAsync(id);
 
-            return Ok("Coupon deleted successfully.");
+            return Ok(new { message = "Coupon deleted successfully." });
         }
     }
 }

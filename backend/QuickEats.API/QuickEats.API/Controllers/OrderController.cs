@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QuickEats.API.DTos.Order;
+using QuickEats.API.DTos.OrderDelivery;
 using QuickEats.API.Repositories.Interfaces;
 using QuickEats.API.Services.Interfaces;
 using System.Security.Claims;
@@ -9,7 +10,8 @@ using System.Security.Claims;
 namespace QuickEats.API.Controllers
 {
     /// <summary>
-    /// Order management: customers place/cancel orders, owners and admins manage order status.
+    /// Order management: customers place/cancel orders, owners manage preparation status,
+    /// admins monitor orders, assign delivery partners and can authorise emergency overrides.
     /// </summary>
     [Tags("Orders")]
     [Authorize]
@@ -39,12 +41,14 @@ namespace QuickEats.API.Controllers
         }
 
         /// <summary>
-        /// Gets a single order by id.
+        /// Gets a single order by id. Access is restricted per role:
+        /// Admin sees all, Customer only own, Owner only own restaurants, Delivery Partner only assigned.
         /// </summary>
         /// <param name="id">Order id.</param>
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
             var order = await _orderService.GetByIdAsync(id);
@@ -134,35 +138,52 @@ namespace QuickEats.API.Controllers
         }
 
         /// <summary>
-        /// Updates the status of an order (Admin, or Owner of the order's restaurant).
+        /// Updates the status of an order (Owner of the order's restaurant ONLY).
+        /// Owners may advance Pending -> Confirmed -> Preparing -> Ready for Pickup
+        /// and may reject/cancel an order only while it is still Pending.
         /// </summary>
         /// <param name="id">Order id.</param>
-        /// <param name="dto">New status (Pending, Confirmed, Preparing, Ready for Pickup, Out for Delivery, Delivered, Cancelled).</param>
-        [Authorize(Roles = "Admin,Owner")]
+        /// <param name="dto">New status (Confirmed, Preparing, Ready for Pickup, Cancelled).</param>
+        [Authorize(Roles = "Owner")]
         [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> UpdateStatus(int id, UpdateOrderStatusDto dto)
         {
             // An Owner can update only orders of their own restaurant.
-            if (User.IsInRole("Owner"))
+            if (!await IsOrderOfOwner(id))
             {
-                if (!await IsOrderOfOwner(id))
-                {
-                    return Forbid();
-                }
+                return Forbid();
+            }
 
-                var allowedOwnerStatuses = new[] { "Confirmed", "Preparing", "Ready for Pickup", "Cancelled" };
-                if (!allowedOwnerStatuses.Contains(dto.Status))
+            var allowedOwnerStatuses = new[] { "Confirmed", "Preparing", "Ready for Pickup", "Cancelled" };
+            if (!allowedOwnerStatuses.Contains(dto.Status))
+            {
+                return BadRequest("Owners can only update order status to Confirmed, Preparing, Ready for Pickup, or Cancelled.");
+            }
+
+            // Owner may reject/cancel only while the order is still Pending.
+            if (string.Equals(dto.Status, "Cancelled", StringComparison.OrdinalIgnoreCase))
+            {
+                var current = await _orderService.GetByIdAsync(id);
+                if (current == null)
                 {
-                    return BadRequest("Owners can only update order status to Confirmed, Preparing, Ready for Pickup, or Cancelled.");
+                    return NotFound($"Order with id {id} not found.");
+                }
+                if (!string.Equals(current.Status, "Pending", StringComparison.OrdinalIgnoreCase))
+                {
+                    return BadRequest("Owners can only reject/cancel an order while it is still Pending.");
                 }
             }
 
             await _orderService.UpdateStatusAsync(id, dto);
-            return Ok("Order status updated successfully.");
+            return Ok(new { message = "Order status updated successfully." });
         }
 
         /// <summary>
-        /// Cancels an order belonging to the logged in Customer.
+        /// Cancels an order belonging to the logged in Customer (self-service cancellation).
+        /// Only allowed while the order is Pending or Confirmed.
         /// </summary>
         /// <param name="id">Order id.</param>
         [Authorize(Roles = "Customer")]
@@ -173,7 +194,49 @@ namespace QuickEats.API.Controllers
                 User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
             await _orderService.CancelAsync(id, userId);
-            return Ok("Order cancelled successfully.");
+            return Ok(new { message = "Order cancelled successfully." });
+        }
+
+        /// <summary>
+        /// Cancels an order (Admin only, authorised exceptional situations).
+        /// Only allowed while the order is Pending or Confirmed.
+        /// </summary>
+        /// <param name="id">Order id.</param>
+        [Authorize(Roles = "Admin")]
+        [HttpPost("{id}/admin-cancel")]
+        public async Task<IActionResult> AdminCancel(int id)
+        {
+            var adminId = int.Parse(
+                User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            await _orderService.AdminCancelAsync(id, adminId);
+            return Ok(new { message = "Order cancelled by admin." });
+        }
+
+        /// <summary>
+        /// Admin emergency override: validates the requested transition, requires a reason,
+        /// records the actor/timestamp/reason in the audit log, then applies the status.
+        /// The normal per-role workflow is never bypassed; this is a controlled exceptional path.
+        /// </summary>
+        /// <param name="id">Order id.</param>
+        /// <param name="dto">Target status and mandatory reason.</param>
+        [Authorize(Roles = "Admin")]
+        [HttpPost("{id}/override")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Override(int id, AdminOverrideOrderDto dto)
+        {
+            if (dto == null || string.IsNullOrWhiteSpace(dto.Status) || string.IsNullOrWhiteSpace(dto.Reason))
+            {
+                return BadRequest("Admin override requires both a target status and a reason.");
+            }
+
+            var adminId = int.Parse(
+                User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            var newStatus = await _orderService.OverrideStatusAsync(id, dto.Status.Trim(), dto.Reason.Trim(), adminId);
+
+            return Ok(new { message = $"Order #{id} status overridden to {newStatus}." });
         }
 
         /// <summary>
@@ -184,10 +247,9 @@ namespace QuickEats.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-        await _orderService.DeleteAsync(id);
-            return Ok("Order deleted successfully.");
-
-    }
+            await _orderService.DeleteAsync(id);
+            return Ok(new { message = "Order deleted successfully." });
+        }
 
         // Check whether the logged in Owner owns the order's restaurant.
         private async Task<bool> IsOrderOfOwner(int orderId)

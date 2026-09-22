@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using QuickEats.API.DTos.Menu;
 using QuickEats.API.Services.Interfaces;
 using System.Security.Claims;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
 namespace QuickEats.API.Controllers
@@ -39,6 +40,24 @@ namespace QuickEats.API.Controllers
         }
 
         /// <summary>
+        /// Gets the most popular dishes across all restaurants for the Home page.
+        /// </summary>
+        /// <remarks>
+        /// Trending dishes are MENU ITEMS (not restaurants). They are ranked by the real
+        /// number of times each dish has been ordered. If there is no order history, only
+        /// real bestseller/available dishes are returned as a fallback.
+        /// </remarks>
+        /// <param name="count">Maximum number of dishes to return. Defaults to 6.</param>
+        [AllowAnonymous]
+        [HttpGet("trending")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetTrending([FromQuery, Range(1, 12)] int count = 6)
+        {
+            var dishes = await _menuService.GetTrendingAsync(count);
+            return Ok(dishes);
+        }
+
+        /// <summary>
         /// Gets a single menu item by id.
         /// </summary>
         /// <param name="id">Menu item id.</param>
@@ -53,6 +72,14 @@ namespace QuickEats.API.Controllers
             {
                 return NotFound($"Menu item with id {id} not found.");  
             }
+
+            // An Owner may only read menu items of their own restaurants.
+            if (User.IsInRole("Owner") &&
+                !await IsOwnerOfRestaurant(menuItems.RestaurantId))
+            {
+                return Forbid();
+            }
+
             return Ok(menuItems);
         }
 
@@ -74,11 +101,14 @@ namespace QuickEats.API.Controllers
         [AllowAnonymous]
         [HttpGet("restaurant/{restaurantId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task <IActionResult> GetByRestaurantId(int restaurantId)
         {
-            if (User.IsInRole("Owner") && !await IsOwnerOfRestaurant(restaurantId))
+            // An Owner may only read the menu of their own restaurants.
+            if (User.IsInRole("Owner") &&
+                !await IsOwnerOfRestaurant(restaurantId))
+            {
                 return Forbid();
+            }
 
             var menuItems = await _menuService.GetByRestaurantIdAsync(restaurantId);
             return Ok(menuItems);
@@ -105,7 +135,7 @@ namespace QuickEats.API.Controllers
             }
 
             await _menuService.CreateAsync(dto);
-            return Ok("Menu item created successfully.");
+            return Ok(new { message = "Menu item created successfully." });
         }
         /// <summary>
         /// Updates an existing menu item.
@@ -132,7 +162,7 @@ namespace QuickEats.API.Controllers
             }
 
             await _menuService.UpdateAsync(id, dto);
-            return Ok("Menu item updated successfully.");
+            return Ok(new { message = "Menu item updated successfully." });
         }
         /// <summary>
         /// Deletes a menu item.
@@ -158,7 +188,7 @@ namespace QuickEats.API.Controllers
             }
 
             await _menuService.DeleteAsync(id);
-            return Ok("Menu item deleted successfully.");
+            return Ok(new { message = "Menu item deleted successfully." });
         }
 
         /// <summary>
@@ -184,7 +214,7 @@ namespace QuickEats.API.Controllers
             }
 
             await _menuService.ToggleAvailabilityAsync(id);
-            return Ok("Availability updated successfully.");
+            return Ok(new { message = "Availability updated successfully." });
         }
 
         // Check whether the logged in Owner owns this restaurant.

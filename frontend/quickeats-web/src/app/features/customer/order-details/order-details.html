@@ -84,7 +84,15 @@
               <span class="material-icons">cancel</span>
               <div>
                 <h3>Order Cancelled</h3>
-                <p>This order has been cancelled</p>
+                <p>
+                  This order has been cancelled
+                  @if (selectedOrder()!.cancelledBy) {
+                    by <strong>{{ selectedOrder()!.cancelledBy }}</strong>
+                  }
+                  @if (selectedOrder()!.cancelledAt) {
+                    on {{ selectedOrder()!.cancelledAt | date:'medium' }}
+                  }
+                </p>
               </div>
             </div>
           }
@@ -144,6 +152,10 @@
                 <span class="info-value">{{ selectedOrder()!.paymentMethod }}</span>
               </div>
               <div class="info-row">
+                <span class="info-label">Payment Status</span>
+                <span class="info-value">{{ selectedOrder()!.paymentStatus || 'Pending' }}</span>
+              </div>
+              <div class="info-row">
                 <span class="info-label">Delivery Address</span>
                 <span class="info-value">{{ selectedOrder()!.deliveryAddress }}</span>
               </div>
@@ -201,6 +213,10 @@
                   <span class="material-icons">favorite_border</span>
                   Add to Wishlist
                 </button>
+                <a class="action-btn action-btn--review" [routerLink]="['/reviews']" [queryParams]="{ tab: 'write' }">
+                  <span class="material-icons">rate_review</span>
+                  Write a Review
+                </a>
               }
             </div>
           </div>

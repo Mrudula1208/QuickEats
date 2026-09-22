@@ -1,148 +1,228 @@
 <app-admin-nav></app-admin-nav>
 
-@if (isLoading) {
+@if (isLoading()) {
   <div class="adm-state">
     <span class="material-icons spinning">progress_activity</span>
     <p>Loading...</p>
   </div>
-} @else if (loadError) {
+} @else if (loadError()) {
   <div class="adm-state">
     <span class="material-icons">error_outline</span>
-    <p>{{ loadError }}</p>
+    <p>{{ loadError() }}</p>
     <button class="adm-state-btn" (click)="retry()">Try Again</button>
   </div>
-} @else {
-  <h1 class="adm-title">Order Details</h1>
-
-  <!--
-    @if
-
-    Checks whether the order exists.
-
-    order
-    Contains the selected Order object.
-  -->
-
-  @if (order) {
-
-    <div class="order-details">
-
-
-      <!--
-        {{ }}
-
-        Angular interpolation.
-
-        Takes a value from TypeScript
-        and displays it on the screen.
-      -->
-
-      <h2>
-        Order #{{ order.id }}
-      </h2>
-
-
-      <p>
-
-        <strong>Customer:</strong>
-
-        {{ order.customerName }}
-
-      </p>
-
-
-      <p>
-
-        <strong>Restaurant:</strong>
-
-        {{ order.restaurantName }}
-
-      </p>
-
-
-      <p>
-
-        <strong>Address:</strong>
-
-        {{ order.deliveryAddress }}
-
-      </p>
-
-
-      <p>
-
-        <strong>Phone:</strong>
-
-        {{ order.phoneNumber }}
-
-      </p>
-
-
-      <p>
-
-        <strong>Total:</strong>
-
-        ₹{{ order.totalAmount }}
-
-      </p>
-
-
-      <p>
-
-        <strong>Payment Method:</strong>
-
-        {{ order.paymentMethod }}
-
-      </p>
-
-
-      <p>
-
-        <strong>Status:</strong>
-
-        {{ order.status }}
-
-      </p>
-
-
-      <p>
-
-        <strong>Date:</strong>
-
-        {{ order.createdAt | date:'medium' }}
-
-      </p>
-
-
-      <h3>Items</h3>
-
-
-      <!--
-        @for
-
-        Repeats the HTML for every item
-        inside the order.items array.
-
-        item
-        Represents one item.
-
-        $index
-        Angular's automatic index number.
-      -->
-
-      @for (item of order.items; track $index) {
-
-        <p>
-
-          {{ item.name }} × {{ item.quantity }}
-          — ₹{{ item.totalPrice }}
-
-        </p>
-
-      }
-
-
+} @else if (order()) {
+
+  <div class="adm-page">
+    <div class="adm-head">
+      <div>
+        <div class="adm-breadcrumbs">
+          <span>Admin Portal</span>
+          <span class="material-icons">chevron_right</span>
+          <span>Order Details</span>
+        </div>
+        <h1 class="adm-title">Order #{{ order()!.id }}</h1>
+      </div>
+
+      <div class="adm-head-actions">
+        @if (canAssign(order()!)) {
+          <button class="adm-btn assign" (click)="openAssignModal()">
+            <span class="material-icons">{{ isReassign(order()!) ? 'swap_horiz' : 'sports_motorsports' }}</span>
+            {{ isReassign(order()!) ? 'Reassign Partner' : 'Assign Delivery Partner' }}
+          </button>
+        }
+        @if (canCancel(order()!)) {
+          <button class="adm-btn cancel" (click)="cancelOrder()">
+            <span class="material-icons">block</span>
+            Cancel Order
+          </button>
+        }
+        <button class="adm-btn override" (click)="openOverrideModal()">
+          <span class="material-icons">tune</span>
+          Admin Override
+        </button>
+      </div>
     </div>
 
-  }
+    <div class="adm-grid">
+
+      <!-- Order summary card -->
+      <div class="adm-card">
+        <h3 class="adm-card-title">Order Summary</h3>
+
+        <div class="adm-row">
+          <span class="adm-label">Order Status</span>
+          <span class="order-status-badge" [class]="getStatusClass(order()!.status)">
+            <span class="material-icons">{{ orderStatusIcon(order()!.status) }}</span>
+            {{ order()!.status }}
+          </span>
+        </div>
+
+        <div class="adm-row">
+          <span class="adm-label">Payment Status</span>
+          <span class="payment-badge" [class]="getPaymentClass(order()!.paymentStatus)">
+            {{ formatPaymentStatus(order()!.paymentStatus) }}
+          </span>
+        </div>
+
+        <div class="adm-row">
+          <span class="adm-label">Payment Method</span>
+          <span class="adm-value">{{ order()!.paymentMethod }}</span>
+        </div>
+
+        <div class="adm-row">
+          <span class="adm-label">Total</span>
+          <span class="adm-value strong">₹{{ order()!.totalAmount | number:'1.0-2' }}</span>
+        </div>
+
+        <div class="adm-row">
+          <span class="adm-label">Placed On</span>
+          <span class="adm-value">{{ order()!.createdAt | date:'medium' }}</span>
+        </div>
+
+        @if (order()!.deliveryPartnerName) {
+          <div class="adm-row">
+            <span class="adm-label">Delivery Partner</span>
+            <span class="adm-value strong">{{ order()!.deliveryPartnerName }}</span>
+          </div>
+        }
+
+        @if (order()!.cancelledBy) {
+          <div class="adm-row">
+            <span class="adm-label">Cancelled By</span>
+            <span class="adm-value cancelled">{{ order()!.cancelledBy }}
+              @if (order()!.cancelledAt) {
+                ({{ order()!.cancelledAt | date:'medium' }})
+              }
+            </span>
+          </div>
+        }
+      </div>
+
+      <!-- Customer card -->
+      <div class="adm-card">
+        <h3 class="adm-card-title">Customer</h3>
+
+        <div class="adm-row">
+          <span class="adm-label">Name</span>
+          <span class="adm-value strong">{{ order()!.customerName }}</span>
+        </div>
+
+        <div class="adm-row">
+          <span class="adm-label">Phone</span>
+          <span class="adm-value">{{ order()!.phoneNumber }}</span>
+        </div>
+
+        <div class="adm-row block">
+          <span class="adm-label">Address</span>
+          <span class="adm-value">{{ order()!.deliveryAddress }}</span>
+        </div>
+      </div>
+
+      <!-- Restaurant card -->
+      <div class="adm-card">
+        <h3 class="adm-card-title">Restaurant</h3>
+
+        <div class="adm-row">
+          <span class="adm-label">Name</span>
+          <span class="adm-value strong">{{ order()!.restaurantName }}</span>
+        </div>
+
+        <div class="adm-row">
+          <span class="adm-label">ID</span>
+          <span class="adm-value">#{{ order()!.restaurantId }}</span>
+        </div>
+      </div>
+
+      <!-- Items card -->
+      <div class="adm-card items-card">
+        <h3 class="adm-card-title">Items ({{ getTotalItems(order()!) }} item(s))</h3>
+
+        <div class="adm-items">
+          @for (item of order()!.items; track $index) {
+            <div class="adm-item">
+              <span class="adm-item-qty">{{ item.quantity }} ×</span>
+              <span class="adm-item-name">{{ item.name }}</span>
+              <span class="adm-item-price">₹{{ item.totalPrice | number:'1.0-2' }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="adm-total-line">
+          <span>Total</span>
+          <strong>₹{{ order()!.totalAmount | number:'1.0-2' }}</strong>
+        </div>
+      </div>
+
+    </div>
+  </div>
+}
+
+<!-- Assign / Reassign modal -->
+@if (isAssignModalOpen()) {
+  <div class="adm-modal-backdrop" (click)="closeAssignModal()">
+    <div class="adm-modal" (click)="$event.stopPropagation()">
+      <div class="adm-modal-head">
+        <h3>{{ isReassign(order()!) ? 'Reassign Delivery Partner' : 'Assign Delivery Partner' }}</h3>
+        <button class="adm-modal-close" (click)="closeAssignModal()"><span class="material-icons">close</span></button>
+      </div>
+      <div class="adm-modal-body">
+        <p class="adm-modal-note">
+          @if (isReassign(order()!)) {
+            Order #{{ order()!.id }} is currently assigned to <strong>{{ order()!.deliveryPartnerName }}</strong>.
+          } @else {
+            Assign a delivery partner for Order #{{ order()!.id }}.
+          }
+        </p>
+        <select class="adm-select" [(ngModel)]="assignPartnerId">
+          <option [ngValue]="null" disabled>Select a delivery partner</option>
+          @for (p of activePartners(); track p.id) {
+            <option [ngValue]="p.id">{{ p.name }} ({{ p.phoneNumber || p.phone || 'N/A' }})</option>
+          }
+        </select>
+      </div>
+      <div class="adm-modal-foot">
+        <button class="adm-btn-ghost" (click)="closeAssignModal()">Cancel</button>
+        <button class="adm-btn assign" (click)="submitAssignment()" [disabled]="isSubmittingAssign()">
+          @if (isSubmittingAssign()) { <span class="material-icons spinning">progress_activity</span> }
+          Assign
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Admin override modal -->
+@if (isOverrideModalOpen()) {
+  <div class="adm-modal-backdrop" (click)="closeOverrideModal()">
+    <div class="adm-modal" (click)="$event.stopPropagation()">
+      <div class="adm-modal-head">
+        <h3>Admin Override</h3>
+        <button class="adm-modal-close" (click)="closeOverrideModal()"><span class="material-icons">close</span></button>
+      </div>
+      <div class="adm-modal-body">
+        <p class="adm-override-note">
+          <span class="material-icons">warning_amber</span>
+          Exceptional, audited action. The detail, reason and timestamp will be recorded.
+        </p>
+        <div class="adm-status-line">
+          <span>Current:</span>
+          <span class="order-status-badge" [class]="getStatusClass(order()!.status)">{{ order()!.status }}</span>
+        </div>
+        <label class="adm-label">New Status</label>
+        <select class="adm-select" [(ngModel)]="overrideStatus">
+          @for (s of overrideStatuses; track s) {
+            <option [ngValue]="s">{{ s }}</option>
+          }
+        </select>
+        <label class="adm-label">Reason (required)</label>
+        <textarea class="adm-textarea" [(ngModel)]="overrideReason" rows="3"
+          placeholder="Explain why this override is required..."></textarea>
+      </div>
+      <div class="adm-modal-foot">
+        <button class="adm-btn-ghost" (click)="closeOverrideModal()">Cancel</button>
+        <button class="adm-btn override" (click)="submitOverride()">Confirm Override</button>
+      </div>
+    </div>
+  </div>
 }

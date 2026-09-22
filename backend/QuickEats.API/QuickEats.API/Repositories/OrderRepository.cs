@@ -24,6 +24,9 @@ namespace QuickEats.API.Repositories
                 .Include(o => o.Restaurant)
                 .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.MenuItem)
+                .Include(o => o.Payments)
+                .Include(o => o.OrderDeliveries)
+                .ThenInclude(od => od.DeliveryPartner)
                 .ToListAsync();
 
         }
@@ -35,6 +38,9 @@ namespace QuickEats.API.Repositories
                 .Include(o => o.Restaurant)
                 .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.MenuItem)
+                .Include(o => o.Payments)
+                .Include(o => o.OrderDeliveries)
+                .ThenInclude(od => od.DeliveryPartner)
                 .AsQueryable();
 
             query = sortBy?.ToLower() switch
@@ -68,6 +74,9 @@ namespace QuickEats.API.Repositories
                 .Include(o => o.Restaurant)
                 .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.MenuItem)
+                .Include(o => o.Payments)
+                .Include(o => o.OrderDeliveries)
+                .ThenInclude(od => od.DeliveryPartner)
                 .FirstOrDefaultAsync(o => o.Id == id);
         }
 
@@ -79,6 +88,9 @@ namespace QuickEats.API.Repositories
         .Include(o => o.Restaurant)
         .Include(o => o.OrderItems)
         .ThenInclude(oi => oi.MenuItem)
+        .Include(o => o.Payments)
+        .Include(o => o.OrderDeliveries)
+        .ThenInclude(od => od.DeliveryPartner)
         .ToListAsync();
 }
 
@@ -91,6 +103,9 @@ namespace QuickEats.API.Repositories
         .Include(o => o.Restaurant)
         .Include(o => o.OrderItems)
         .ThenInclude(oi => oi.MenuItem)
+        .Include(o => o.Payments)
+        .Include(o => o.OrderDeliveries)
+        .ThenInclude(od => od.DeliveryPartner)
         .ToListAsync();
 }
 
@@ -109,6 +124,11 @@ namespace QuickEats.API.Repositories
         public void Delete(Order order)
         {
             _context.Orders.Remove(order);
+        }
+
+        public async Task AddAdminOverrideAsync(AdminOrderOverride adminOrderOverride)
+        {
+            await _context.AdminOrderOverrides.AddAsync(adminOrderOverride);
         }
 
         public Task SaveChangesAsync()

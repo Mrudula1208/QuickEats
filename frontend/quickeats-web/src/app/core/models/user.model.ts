@@ -4,5 +4,7 @@ export interface UserModel {
   email: string;
   phoneNumber: string;
   role: string;
+  isActive: boolean;
+  profileImageUrl: string;
   createdAt: Date;
 }

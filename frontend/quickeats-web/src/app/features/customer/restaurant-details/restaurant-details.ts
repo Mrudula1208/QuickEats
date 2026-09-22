@@ -1,7 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { of, catchError, Subscription } from 'rxjs';
 import { Restaurant } from '../../../core/models/restaurant.model';
 import { MenuItem } from '../../../core/models/menu.model';
 import { RestaurantService } from '../../../core/services/restaurant.service';
@@ -22,16 +23,16 @@ import { LoadingSpinnerComponent } from '../../../shared/loading-spinner/loading
   templateUrl: './restaurant-details.html',
   styleUrl: './restaurant-details.scss'
 })
-export class RestaurantDetailsComponent {
+export class RestaurantDetailsComponent implements OnInit, OnDestroy {
 
-  restaurant?: Restaurant;
-  isLoadingRestaurant = true;
-  isLoadingMenu = true;
-  restaurantError: string | null = null;
-  menuError: string | null = null;
+  restaurant = signal<Restaurant | undefined>(undefined);
+  isLoadingRestaurant = signal(true);
+  isLoadingMenu = signal(true);
+  restaurantError = signal<string | null>(null);
+  menuError = signal<string | null>(null);
 
-  menus: MenuItem[] = [];
-  filteredMenus: MenuItem[] = [];
+  menus = signal<MenuItem[]>([]);
+  filteredMenus = signal<MenuItem[]>([]);
 
   searchText = '';
   selectedCategory = 'All';
@@ -39,23 +40,25 @@ export class RestaurantDetailsComponent {
   minPrice = 0;
   maxPrice = 10000;
 
-  categories: string[] = [];
+  categories = signal<string[]>([]);
 
-  reviews: Review[] = [];
-  averageRating = 0;
-  reviewCount = 0;
+  reviews = signal<Review[]>([]);
+  averageRating = signal(0);
+  reviewCount = signal(0);
 
   isLoggedIn = false;
   newRating = 5;
   newComment = '';
   stars = [1, 2, 3, 4, 5];
-  commentError = '';
-  reviewSuccess = false;
+  commentError = signal('');
+  reviewSuccess = signal(false);
 
   activeMenuTab = signal('menu');
 
   skeletonMenuCards = Array.from({ length: 4 });
   cartCount = 0;
+
+  private routeSub?: Subscription;
 
   constructor(
     private route: ActivatedRoute,
@@ -71,7 +74,19 @@ export class RestaurantDetailsComponent {
   ) {
     this.isLoggedIn = this.authService.isLoggedIn();
     this.favoritesService.load();
-    this.loadRestaurant(this.restaurantId);
+  }
+
+  ngOnInit(): void {
+    this.routeSub = this.route.paramMap.subscribe(params => {
+      const id = Number(params.get('id'));
+      if (id) {
+        this.loadRestaurantData(id);
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.routeSub?.unsubscribe();
   }
 
   get restaurantId(): number {
@@ -100,64 +115,86 @@ export class RestaurantDetailsComponent {
     });
   }
 
-  loadRestaurant(id: number): void {
-    this.isLoadingRestaurant = true;
-    this.restaurantError = null;
+  loadRestaurantData(id: number): void {
+    this.restaurant.set(undefined);
+    this.isLoadingRestaurant.set(true);
+    this.isLoadingMenu.set(true);
+    this.restaurantError.set(null);
+    this.menuError.set(null);
 
-    this.restaurantService.getRestaurantById(id).subscribe({
-      next: (data) => { this.restaurant = data; this.isLoadingRestaurant = false; },
-      error: (err) => {
-        this.isLoadingRestaurant = false;
-        this.restaurantError = err?.status === 404
-          ? 'restaurant-not-found'
-          : err?.status === 0
-            ? 'Could not reach the server. Please check your connection.'
-            : 'Something went wrong while loading this restaurant.';
-      }
-    });
-
+    // Each request resolves independently so the page is never blocked on a slow
+    // side section. The restaurant and menu render as soon as THEY are ready,
+    // while reviews and the average rating load in the background (they only
+    // populate the Reviews tab, which is hidden by default).
+    this.loadRestaurantDetails(id);
     this.loadMenu(id);
     this.loadReviews(id);
     this.loadAverageRating(id);
   }
 
+  private loadRestaurantDetails(id: number): void {
+    this.restaurantService.getRestaurantById(id).pipe(
+      catchError(err => {
+        this.restaurantError.set(err?.status === 404
+          ? 'restaurant-not-found'
+          : err?.status === 0
+            ? 'Could not reach the server. Please check your connection.'
+            : 'Something went wrong while loading this restaurant.');
+        return of(null);
+      })
+    ).subscribe({
+      next: (restaurant) => {
+        this.isLoadingRestaurant.set(false);
+        if (restaurant) {
+          this.restaurant.set(restaurant);
+          // The restaurant payload already includes rating + review count,
+          // so the header shows these instantly without waiting for the
+          // separate reviews requests.
+          this.averageRating.set(restaurant.rating ?? 0);
+          this.reviewCount.set(restaurant.reviewCount ?? 0);
+        } else if (!this.restaurantError()) {
+          this.restaurantError.set('restaurant-not-found');
+        }
+      }
+    });
+  }
+
   retryRestaurant(): void {
-    this.restaurant = undefined;
-    this.loadRestaurant(this.restaurantId);
+    this.restaurant.set(undefined);
+    this.loadRestaurantData(this.restaurantId);
+  }
+
+  loadRestaurant(id: number): void {
+    this.loadRestaurantData(id);
   }
 
   loadMenu(id: number): void {
-    this.isLoadingMenu = true;
-    this.menuError = null;
-    this.menus = [];
-    this.filteredMenus = [];
-
     this.menuService.getMenuByRestaurantId(id).subscribe({
       next: (data) => {
-        this.menus = data;
-        this.filteredMenus = data;
-        this.categories = data
+        this.menus.set(data);
+        this.filteredMenus.set(data);
+        this.categories.set(data
           .map(m => m.category)
-          .filter((value, index, array) => array.indexOf(value) === index);
-        this.isLoadingMenu = false;
+          .filter((value, index, array) => array.indexOf(value) === index));
+        this.isLoadingMenu.set(false);
       },
       error: () => {
-        this.isLoadingMenu = false;
-        this.menuError = 'Could not load the menu. Please try again later.';
+        this.isLoadingMenu.set(false);
+        this.menuError.set('Could not load the menu. Please try again later.');
       }
     });
   }
 
   loadReviews(restaurantId: number): void {
     this.reviewService.getReviewsByRestaurant(restaurantId).subscribe({
-      next: (data: Review[]) => { this.reviews = data; this.reviewCount = data.length; },
+      next: (data: Review[]) => { this.reviews.set(data); this.reviewCount.set(data.length); },
       error: () => {}
     });
   }
 
   loadAverageRating(restaurantId: number): void {
     this.reviewService.getAverageRating(restaurantId).subscribe({
-      next: (data: number) => { this.averageRating = data; },
+      next: (data: number) => { this.averageRating.set(data); },
       error: () => {}
     });
   }
@@ -168,8 +205,9 @@ export class RestaurantDetailsComponent {
 
   toggleFavorite(event: Event): void {
     event.stopPropagation();
-    if (this.restaurant) {
-      this.favoritesService.toggle(this.restaurant);
+    const restaurant = this.restaurant();
+    if (restaurant) {
+      this.favoritesService.toggle(restaurant);
     }
   }
 
@@ -183,14 +221,14 @@ export class RestaurantDetailsComponent {
 
   validateComment(): boolean {
     if (!this.newComment.trim()) {
-      this.commentError = 'Please write a review before submitting.';
+      this.commentError.set('Please write a review before submitting.');
       return false;
     }
     if (this.newComment.trim().length < 5) {
-      this.commentError = 'Review must be at least 5 characters.';
+      this.commentError.set('Review must be at least 5 characters.');
       return false;
     }
-    this.commentError = '';
+    this.commentError.set('');
     return true;
   }
 
@@ -199,9 +237,14 @@ export class RestaurantDetailsComponent {
   }
 
   submitReview(): void {
+    if (!this.authService.isLoggedIn()) {
+      this.toastr.info('Please login to submit a review.', 'Login Required');
+      this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
+      return;
+    }
     if (!this.validateComment()) return;
     const restaurantId = Number(this.route.snapshot.paramMap.get('id'));
-    this.reviewSuccess = false;
+    this.reviewSuccess.set(false);
 
     const review: Review = {
       id: 0,
@@ -218,8 +261,8 @@ export class RestaurantDetailsComponent {
       next: () => {
         this.newRating = 5;
         this.newComment = '';
-        this.commentError = '';
-        this.reviewSuccess = true;
+        this.commentError.set('');
+        this.reviewSuccess.set(true);
         this.toastr.success('Review submitted successfully!');
         this.loadReviews(restaurantId);
         this.loadAverageRating(restaurantId);
@@ -229,7 +272,7 @@ export class RestaurantDetailsComponent {
   }
 
   applyFilters(): void {
-    let result = this.menus;
+    let result = this.menus();
 
     if (this.searchText) {
       const search = this.searchText.toLowerCase();
@@ -246,7 +289,7 @@ export class RestaurantDetailsComponent {
 
     result = result.filter(m => m.price >= this.minPrice && m.price <= this.maxPrice);
 
-    this.filteredMenus = result;
+    this.filteredMenus.set(result);
   }
 
   selectCategory(category: string): void {
@@ -265,11 +308,21 @@ export class RestaurantDetailsComponent {
   // Add a single item to the cart. The Add button then becomes a
   // quantity stepper, so this only fires when the item is not yet in cart.
   addToCart(menu: MenuItem): void {
+    if (!this.authService.isLoggedIn()) {
+      this.toastr.info('Please login to add items to your cart.', 'Login Required');
+      this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
+      return;
+    }
     this.cartService.addToCart(menu);
     this.toastr.success(`${menu.name} added to cart!`);
   }
 
   cartIncrease(menuId: number): void {
+    if (!this.authService.isLoggedIn()) {
+      this.toastr.info('Please login to modify your cart.', 'Login Required');
+      this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
+      return;
+    }
     this.cartService.increaseQuantity(menuId);
   }
 
@@ -286,15 +339,20 @@ export class RestaurantDetailsComponent {
   }
 
   getPopularItems(): MenuItem[] {
-    return this.filteredMenus.filter(m => m.isBestseller);
+    return this.filteredMenus().filter(m => m.isBestseller);
   }
 
   addToWishlist(menu: MenuItem): void {
+    if (!this.authService.isLoggedIn()) {
+      this.toastr.info('Please login to save items to your wishlist.', 'Login Required');
+      this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
+      return;
+    }
     this.wishlistService.addToWishlist({
       wishlistId: 0,
       menuId: menu.id,
       restaurantId: menu.restaurantId,
-      restaurantName: this.restaurant?.name || '',
+      restaurantName: this.restaurant()?.name || '',
       foodName: menu.name,
       imageUrl: menu.imageUrl,
       price: menu.price,
@@ -306,10 +364,21 @@ export class RestaurantDetailsComponent {
   }
 
   getMenuItemsByCategory(category: string): MenuItem[] {
-    return this.filteredMenus.filter(m => m.category === category);
+    return this.filteredMenus().filter(m => m.category === category);
   }
 
   getDistinctFilteredCategories(): string[] {
-    return [...new Set(this.filteredMenus.map(m => m.category))].filter(Boolean);
+    return [...new Set(this.filteredMenus().map(m => m.category))].filter(Boolean);
+  }
+
+  formatTime(timeStr?: string): string {
+    if (!timeStr) return '';
+    const parts = timeStr.split(':');
+    if (parts.length < 2) return timeStr;
+    let hour = parseInt(parts[0], 10);
+    const min = parts[1];
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    hour = hour % 12 || 12;
+    return `${hour}:${min} ${ampm}`;
   }
 }

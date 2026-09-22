@@ -1,170 +1,247 @@
 <app-admin-nav></app-admin-nav>
 
-<h1>
-  Admin Reviews
-</h1>
-
-
-<!--
-  @if
-
-  Checks whether there are no reviews.
-
-  reviews.length
-  Gives the number of reviews.
-
-  ===
-  Means strictly equal to.
-
-  0
-  Means there are no reviews.
--->
-
-@if (isLoading) {
-
-  <div class="adm-state">
-    <span class="material-icons spinning">progress_activity</span>
-    <p>Loading...</p>
-  </div>
-
-}
-
-@else if (loadError) {
-
-  <div class="adm-state">
-    <span class="material-icons">error_outline</span>
-    <p>{{ loadError }}</p>
-    <button class="adm-state-btn" (click)="retry()">Try Again</button>
-  </div>
-
-}
-
-@else if (reviews.length === 0) {
-
-  <div class="adm-state">
-    <span class="material-icons">inbox</span>
-    <h3>No Reviews Found</h3>
-    <p>There are no reviews yet. Reviews will appear here once customers rate their orders.</p>
-  </div>
-
-}
-
-
-@else {
-
-
-  <!--
-    @for
-
-    Repeats the HTML for every review.
-
-    review
-    Represents the current review.
-
-    reviews
-    Is the complete reviews array.
-
-    track review.id
-    Gives Angular a unique ID
-    for every review.
-  -->
-
-  @for (
-    review of reviews;
-    track review.id
-  ) {
-
-
-    <div class="review-card">
-
-
-      <!-- Review ID -->
-
-      <h2>
-
-        Review #{{ review.id }}
-
-      </h2>
-
-
-      <!-- Customer -->
-
-      <p>
-
-        <strong>
-          Customer:
-        </strong>
-
-        {{ review.customerName }}
-
-      </p>
-
-
-      <!-- Restaurant -->
-
-      <p>
-
-        <strong>
-          Restaurant:
-        </strong>
-
-        {{ review.restaurantName }}
-
-      </p>
-
-
-      <!-- Rating -->
-
-      <p>
-
-        <strong>
-          Rating:
-        </strong>
-
-        {{ review.rating }} / 5
-
-      </p>
-
-
-      <!-- Comment -->
-
-      <p>
-
-        <strong>
-          Comment:
-        </strong>
-
-        {{ review.comment }}
-
-      </p>
-
-
-      <!-- Date -->
-
-      <p>
-
-        <strong>
-          Date:
-        </strong>
-
-        {{ review.createdAt | date:'medium' }}
-
-      </p>
-
-
-      <!-- Delete -->
-
-      <button
-        (click)="deleteReview(review.id)"
-      >
-
-        Delete
-
-      </button>
-
-
+<div class="reviews-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1>Reviews & Moderation</h1>
+      <p class="subtitle">Monitor ratings, customer feedback, and moderate content across all restaurants</p>
     </div>
+    <div class="header-actions">
+      <button class="btn-refresh" (click)="retry()" [disabled]="isLoading()" title="Refresh Reviews">
+        <span class="material-icons" [class.spinning]="isLoading()">refresh</span>
+        <span>Refresh</span>
+      </button>
+    </div>
+  </div>
 
+  <!-- Loading State -->
+  @if (isLoading() && reviews().length === 0) {
+    <div class="adm-loading-box">
+      <span class="material-icons spinning">progress_activity</span>
+      <p>Loading customer reviews from database...</p>
+    </div>
   }
 
-}
+  <!-- Error State -->
+  @else if (loadError() && reviews().length === 0) {
+    <div class="adm-error-box">
+      <span class="material-icons">error_outline</span>
+      <h3>Failed to Load Reviews</h3>
+      <p>{{ loadError() }}</p>
+      <button class="btn-primary" (click)="retry()">Try Again</button>
+    </div>
+  }
+
+  @else {
+    <!-- Review Stats Overview -->
+    <div class="stats-grid">
+      <!-- Average Rating Card -->
+      <div class="stat-card rating-overview-card">
+        <div class="stat-header">
+          <span class="stat-title">Overall Rating</span>
+          <span class="material-icons stat-icon star-gold">star</span>
+        </div>
+        <div class="rating-display">
+          <span class="rating-number">{{ averageRating() || '0.0' }}</span>
+          <div class="rating-meta">
+            <div class="stars-row">
+              @for (st of getStarsArray(averageRating()); track $index) {
+                <span class="material-icons star-filled">star</span>
+              }
+            </div>
+            <span class="rating-sub">out of 5.0 stars</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total Reviews Card -->
+      <div class="stat-card">
+        <div class="stat-header">
+          <span class="stat-title">Total Reviews</span>
+          <span class="material-icons stat-icon">rate_review</span>
+        </div>
+        <div class="stat-body">
+          <span class="stat-value">{{ totalReviews() }}</span>
+          <span class="stat-trend">{{ uniqueRestaurants().length }} active restaurants reviewed</span>
+        </div>
+      </div>
+
+      <!-- Star Distribution Card -->
+      <div class="stat-card distribution-card">
+        <div class="stat-header">
+          <span class="stat-title">Rating Breakdown</span>
+          <span class="stat-badge">5-Star Scale</span>
+        </div>
+        <div class="breakdown-list">
+          @for (star of [5, 4, 3, 2, 1]; track star) {
+            <div class="breakdown-row" (click)="setRatingFilter(selectedRating === star ? null : star)" [class.active]="selectedRating === star">
+              <span class="star-label">{{ star }} ★</span>
+              <div class="bar-track">
+                <div class="bar-fill" [style.width.%]="getStarPercent(star)"></div>
+              </div>
+              <span class="star-count">{{ ratingCounts()[star] || 0 }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters & Search Toolbar -->
+    <div class="toolbar-card">
+      <div class="search-box">
+        <span class="material-icons search-icon">search</span>
+        <input
+          type="text"
+          placeholder="Search by customer, restaurant, or keyword..."
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="applyFilters()"
+        />
+        @if (searchQuery) {
+          <button class="clear-search" (click)="searchQuery = ''; applyFilters()">
+            <span class="material-icons">close</span>
+          </button>
+        }
+      </div>
+
+      <div class="filters-row">
+        <!-- Rating Filter Pills -->
+        <div class="rating-pills">
+          <button
+            class="pill"
+            [class.active]="selectedRating === null"
+            (click)="setRatingFilter(null)"
+          >
+            All Ratings
+          </button>
+          <button
+            class="pill"
+            [class.active]="selectedRating === 5"
+            (click)="setRatingFilter(selectedRating === 5 ? null : 5)"
+          >
+            5 ★
+          </button>
+          <button
+            class="pill"
+            [class.active]="selectedRating === 4"
+            (click)="setRatingFilter(selectedRating === 4 ? null : 4)"
+          >
+            4 ★
+          </button>
+          <button
+            class="pill"
+            [class.active]="selectedRating === 3"
+            (click)="setRatingFilter(selectedRating === 3 ? null : 3)"
+          >
+            3 ★
+          </button>
+          <button
+            class="pill"
+            [class.active]="selectedRating === 2"
+            (click)="setRatingFilter(selectedRating === 2 ? null : 2)"
+          >
+            2 ★
+          </button>
+          <button
+            class="pill"
+            [class.active]="selectedRating === 1"
+            (click)="setRatingFilter(selectedRating === 1 ? null : 1)"
+          >
+            1 ★
+          </button>
+        </div>
+
+        <!-- Restaurant Select -->
+        <div class="select-wrapper">
+          <select [(ngModel)]="selectedRestaurant" (ngModelChange)="applyFilters()">
+            <option value="">All Restaurants</option>
+            @for (rest of uniqueRestaurants(); track rest) {
+              <option [value]="rest">{{ rest }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Sort Select -->
+        <div class="select-wrapper">
+          <select [(ngModel)]="sortBy" (ngModelChange)="applyFilters()">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="highest">Highest Rating</option>
+            <option value="lowest">Lowest Rating</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reviews Grid -->
+    @if (filteredReviews().length === 0) {
+      <div class="empty-state">
+        <span class="material-icons empty-icon">reviews</span>
+        <h3>No Reviews Found</h3>
+        <p>No reviews match your current filters or search query.</p>
+        @if (searchQuery || selectedRating !== null || selectedRestaurant) {
+          <button class="btn-clear-filters" (click)="searchQuery = ''; selectedRating = null; selectedRestaurant = ''; applyFilters()">
+            Clear All Filters
+          </button>
+        }
+      </div>
+    } @else {
+      <div class="reviews-count-bar">
+        <span>Showing <strong>{{ filteredReviews().length }}</strong> of <strong>{{ totalReviews() }}</strong> reviews</span>
+      </div>
+
+      <div class="reviews-grid">
+        @for (review of filteredReviews(); track review.id) {
+          <div class="review-card">
+            <!-- Review Card Header -->
+            <div class="card-header">
+              <div class="customer-info">
+                <div class="avatar">
+                  {{ getInitials(review.customerName) }}
+                </div>
+                <div class="customer-details">
+                  <div class="name-row">
+                    <span class="customer-name">{{ review.customerName || 'Customer #' + review.customerId }}</span>
+                    <span class="verified-tag" title="Verified Order">
+                      <span class="material-icons">verified</span> Verified
+                    </span>
+                  </div>
+                  <span class="review-date">
+                    <span class="material-icons">schedule</span>
+                    {{ review.createdAt | date:'mediumDate' }} • {{ review.createdAt | date:'shortTime' }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Rating Badge -->
+              <div class="rating-badge" [class.rating-high]="review.rating >= 4" [class.rating-mid]="review.rating === 3" [class.rating-low]="review.rating <= 2">
+                <span class="material-icons">star</span>
+                <span>{{ review.rating }}.0</span>
+              </div>
+            </div>
+
+            <!-- Restaurant Pill -->
+            <div class="restaurant-tag">
+              <span class="material-icons">storefront</span>
+              <span>{{ review.restaurantName || 'Restaurant #' + review.restaurantId }}</span>
+            </div>
+
+            <!-- Comment Body -->
+            <div class="comment-box">
+              <p class="comment-text">"{{ review.comment || 'No comment provided with this rating.' }}"</p>
+            </div>
+
+            <!-- Card Footer & Actions -->
+            <div class="card-footer">
+              <span class="review-id-tag">Review #{{ review.id }}</span>
+              <button class="btn-delete" (click)="deleteReview(review.id)" title="Moderate / Delete Review">
+                <span class="material-icons">delete_outline</span>
+                <span>Delete Review</span>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

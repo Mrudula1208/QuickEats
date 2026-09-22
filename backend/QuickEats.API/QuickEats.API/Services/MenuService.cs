@@ -10,9 +10,12 @@ namespace QuickEats.API.Services
     public class MenuService : IMenuService
     {
         private readonly IMenuRepository _menuRepository;
-        public MenuService(IMenuRepository menuRepository)
+        private readonly IReviewService _reviewService;
+
+        public MenuService(IMenuRepository menuRepository, IReviewService reviewService)
         {
             _menuRepository = menuRepository;
+            _reviewService = reviewService;
         }
 
         // Converts a stored image value (filename or full path) into a full /uploads/ URL.
@@ -90,6 +93,43 @@ namespace QuickEats.API.Services
             };
         }
 
+
+        public async Task<IEnumerable<TrendingDishDto>> GetTrendingAsync(int count)
+        {
+            var menuItems = await _menuRepository.GetTrendingAsync(count);
+            var response = new List<TrendingDishDto>();
+
+            foreach (var menuItem in menuItems)
+            {
+                // Use the owning restaurant's average review rating as the dish rating.
+                // Menu items do not have their own rating table, so this is the best
+                // real rating data available for a dish.
+                var rating = menuItem.Restaurant != null
+                    ? await _reviewService.GetAverageRatingAsync(menuItem.RestaurantId) ?? 0
+                    : 0;
+
+                response.Add(new TrendingDishDto
+                {
+                    Id = menuItem.Id,
+                    Name = menuItem.Name,
+                    Description = menuItem.Description,
+                    Price = menuItem.Price,
+                    ImageUrl = GetImageUrl(menuItem.ImageUrl),
+                    IsAvailable = menuItem.IsAvailable,
+                    Category = menuItem.Category,
+                    IsVeg = menuItem.IsVeg,
+                    IsBestseller = menuItem.IsBestseller,
+                    DiscountPercent = menuItem.DiscountPercent,
+                    RestaurantId = menuItem.RestaurantId,
+                    RestaurantName = menuItem.Restaurant?.Name ?? string.Empty,
+                    Rating = rating,
+                    // In the fallback (no order history) this stays 0 and is never fabricated.
+                    TotalOrdered = menuItem.TotalOrdered
+                });
+            }
+
+            return response;
+        }
 
         public async Task<IEnumerable<string>> GetCategoriesAsync()
         {

@@ -1,224 +1,260 @@
 <app-admin-nav></app-admin-nav>
 
-<h1>
-  Admin Payments
-</h1>
-
-
-<!--
-  @if
-
-  Checks whether the payments array
-  contains zero payments.
-
-  payments.length
-  Gives the number of payments.
-
-  ===
-  Means strictly equal to.
-
-  0
-  Means there are no payments.
--->
-
-@if (isLoading) {
-
-  <div class="adm-state">
-    <span class="material-icons spinning">progress_activity</span>
-    <p>Loading...</p>
-  </div>
-
-}
-
-@else if (loadError) {
-
-  <div class="adm-state">
-    <span class="material-icons">error_outline</span>
-    <p>{{ loadError }}</p>
-    <button class="adm-state-btn" (click)="retry()">Try Again</button>
-  </div>
-
-}
-
-@else if (payments.length === 0) {
-
-  <div class="adm-state">
-    <span class="material-icons">inbox</span>
-    <h3>No Payments Found</h3>
-    <p>There are no payments yet. Payments will appear here once customers place orders.</p>
-  </div>
-
-}
-
-
-@else {
-
-  <!--
-    @for
-
-    Repeats this HTML for every payment.
-
-    payment
-    Represents the current payment.
-
-    payments
-    Is our complete Payment[] array.
-
-    track payment.id
-    Gives Angular a unique ID
-    for each payment.
-  -->
-
-  @for (payment of payments; track payment.id) {
-
-    <div class="payment-card">
-
-
-      <!-- Payment ID -->
-
-      <h2>
-
-        Payment #{{ payment.id }}
-
-      </h2>
-
-
-      <!-- Order ID -->
-
-      <p>
-
-        <strong>
-          Order:
-        </strong>
-
-        {{ payment.orderId }}
-
-      </p>
-
-
-      <!-- Amount -->
-
-      <p>
-
-        <strong>
-          Amount:
-        </strong>
-
-        ₹{{ payment.amount }}
-
-      </p>
-
-
-      <!-- Payment Method -->
-
-      <p>
-
-        <strong>
-          Method:
-        </strong>
-
-        {{ payment.paymentMethod }}
-
-      </p>
-
-
-      <!-- Payment Status -->
-
-      <p>
-
-        <strong>
-          Status:
-        </strong>
-
-        {{ payment.paymentStatus }}
-
-      </p>
-
-<!--
-  select
-  Creates a dropdown.
-
-  [(ngModel)]
-  Two-way binding.
-
-  It connects the dropdown
-  with payment.paymentStatus.
--->
-
-<select
-  [(ngModel)]="payment.paymentStatus"
->
-
-  <!--
-    option
-    Creates one dropdown option.
-
-    value
-    Is the actual value stored.
-  -->
-
-  <option value="Pending">
-    Pending
-  </option>
-
-  <option value="Success">
-    Success
-  </option>
-
-  <option value="Failed">
-    Failed
-  </option>
-
-  <option value="Refunded">
-    Refunded
-  </option>
-
-</select>
-
-
-<!--
-  (click)
-  Runs updatePaymentStatus()
-  when Admin clicks the button.
-
-  payment.id
-  Sends the selected Payment ID.
-
-  payment.paymentStatus
-  Sends the newly selected status.
--->
-
-<button
-  (click)="updatePaymentStatus(
-    payment.id,
-    payment.paymentStatus
-  )"
->
-
-  Update Status
-
-</button>
-
-      <!-- Payment Date -->
-
-      <p>
-
-        <strong>
-          Date:
-        </strong>
-
-        {{ payment.paidAt | date:'medium' }}
-
-      </p>
-
-      <button
-        (click)="deletePayment(payment.id)"
-      >
-        Delete
+<div class="payments-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1>Payment Transactions</h1>
+      <p class="subtitle">Real-time ledger of orders, transaction amounts, payment methods, and settlement statuses</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-refresh" (click)="retry()" [disabled]="isLoading()" title="Refresh Payments">
+        <span class="material-icons" [class.spinning]="isLoading()">refresh</span>
+        <span>Refresh</span>
       </button>
+    </div>
+  </div>
 
+  <!-- Loading State -->
+  @if (isLoading() && payments().length === 0) {
+    <div class="adm-loading-box">
+      <span class="material-icons spinning">progress_activity</span>
+      <p>Loading transactions ledger from database...</p>
+    </div>
+  }
 
+  <!-- Error State -->
+  @else if (loadError() && payments().length === 0) {
+    <div class="adm-error-box">
+      <span class="material-icons">error_outline</span>
+      <h3>Failed to Load Payments</h3>
+      <p>{{ loadError() }}</p>
+      <button class="btn-primary" (click)="retry()">Try Again</button>
+    </div>
+  }
+
+  @else {
+    <!-- Financial Metrics Cards -->
+    <div class="stats-grid">
+      <!-- Total Volume Card -->
+      <div class="stat-card volume-card">
+        <div class="stat-header">
+          <span class="stat-title">Gross Revenue Collected</span>
+          <span class="material-icons stat-icon">account_balance_wallet</span>
+        </div>
+        <div class="stat-body">
+          <span class="stat-value">₹{{ totalAmount().toLocaleString('en-IN') }}</span>
+          <span class="stat-trend">{{ payments().length }} total transactions processed</span>
+        </div>
+      </div>
+
+      <!-- Successful Transactions -->
+      <div class="stat-card success-card">
+        <div class="stat-header">
+          <span class="stat-title">Settled Payments</span>
+          <span class="material-icons stat-icon">check_circle</span>
+        </div>
+        <div class="stat-body">
+          <span class="stat-value">{{ successfulCount() }}</span>
+          <span class="stat-trend">Successfully captured</span>
+        </div>
+      </div>
+
+      <!-- Pending Payments -->
+      <div class="stat-card pending-card">
+        <div class="stat-header">
+          <span class="stat-title">Pending Payments</span>
+          <span class="material-icons stat-icon">pending</span>
+        </div>
+        <div class="stat-body">
+          <span class="stat-value">{{ pendingCount() }}</span>
+          <span class="stat-trend">COD / Awaiting confirmation</span>
+        </div>
+      </div>
+
+      <!-- Failed / Refunded -->
+      <div class="stat-card failed-card">
+        <div class="stat-header">
+          <span class="stat-title">Failed / Refunded</span>
+          <span class="material-icons stat-icon">cancel</span>
+        </div>
+        <div class="stat-body">
+          <span class="stat-value">{{ failedCount() }}</span>
+          <span class="stat-trend">Declined or returned</span>
+        </div>
+      </div>
     </div>
 
+    <!-- Filters & Search Toolbar -->
+    <div class="toolbar-card">
+      <div class="search-box">
+        <span class="material-icons search-icon">search</span>
+        <input
+          type="text"
+          placeholder="Search by Payment #, Order #, or payment method..."
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="applyFilters()"
+        />
+        @if (searchQuery) {
+          <button class="clear-search" (click)="searchQuery = ''; applyFilters()">
+            <span class="material-icons">close</span>
+          </button>
+        }
+      </div>
+
+      <div class="filters-row">
+        <!-- Status Filter Pills -->
+        <div class="filter-pills">
+          <button
+            class="pill"
+            [class.active]="selectedStatus === 'All'"
+            (click)="selectedStatus = 'All'; applyFilters()"
+          >
+            All Statuses
+          </button>
+          <button
+            class="pill"
+            [class.active]="selectedStatus === 'Success'"
+            (click)="selectedStatus = 'Success'; applyFilters()"
+          >
+            Success
+          </button>
+          <button
+            class="pill"
+            [class.active]="selectedStatus === 'Pending'"
+            (click)="selectedStatus = 'Pending'; applyFilters()"
+          >
+            Pending
+          </button>
+          <button
+            class="pill"
+            [class.active]="selectedStatus === 'Failed'"
+            (click)="selectedStatus = 'Failed'; applyFilters()"
+          >
+            Failed
+          </button>
+          <button
+            class="pill"
+            [class.active]="selectedStatus === 'Refunded'"
+            (click)="selectedStatus = 'Refunded'; applyFilters()"
+          >
+            Refunded
+          </button>
+        </div>
+
+        <!-- Method Select -->
+        <div class="select-wrapper">
+          <select [(ngModel)]="selectedMethod" (ngModelChange)="applyFilters()">
+            <option value="All">All Methods</option>
+            <option value="Razorpay">Razorpay / UPI</option>
+            <option value="Cash On Delivery">Cash On Delivery</option>
+            <option value="Card">Credit/Debit Card</option>
+          </select>
+        </div>
+
+        <!-- Sort Select -->
+        <div class="select-wrapper">
+          <select [(ngModel)]="sortBy" (ngModelChange)="applyFilters()">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="highest">Highest Amount</option>
+            <option value="lowest">Lowest Amount</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payments Ledger Table / Cards -->
+    @if (filteredPayments().length === 0) {
+      <div class="empty-state">
+        <span class="material-icons empty-icon">receipt_long</span>
+        <h3>No Transactions Found</h3>
+        <p>No payment records match your active search filters.</p>
+        @if (searchQuery || selectedStatus !== 'All' || selectedMethod !== 'All') {
+          <button class="btn-clear-filters" (click)="searchQuery = ''; selectedStatus = 'All'; selectedMethod = 'All'; applyFilters()">
+            Reset Filters
+          </button>
+        }
+      </div>
+    } @else {
+      <div class="table-container">
+        <table class="payments-table">
+          <thead>
+            <tr>
+              <th>Payment ID</th>
+              <th>Order ID</th>
+              <th>Amount</th>
+              <th>Payment Method</th>
+              <th>Status</th>
+              <th>Date & Time</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (payment of filteredPayments(); track payment.id) {
+              <tr>
+                <!-- Payment ID -->
+                <td class="payment-id-cell">
+                  <span class="id-badge">#TXN-{{ payment.id }}</span>
+                </td>
+
+                <!-- Order ID -->
+                <td>
+                  <span class="order-ref">Order #{{ payment.orderId }}</span>
+                </td>
+
+                <!-- Amount -->
+                <td class="amount-cell">
+                  <strong>₹{{ (payment.amount || 0).toLocaleString('en-IN') }}</strong>
+                </td>
+
+                <!-- Method -->
+                <td>
+                  <div class="method-tag">
+                    <span class="material-icons">
+                      {{ (payment.paymentMethod || '').toLowerCase().includes('cash') ? 'payments' : 'credit_card' }}
+                    </span>
+                    <span>{{ payment.paymentMethod || 'Online Payment' }}</span>
+                  </div>
+                </td>
+
+                <!-- Status Selector -->
+                <td>
+                  <div class="status-cell">
+                    <select
+                      [(ngModel)]="payment.paymentStatus"
+                      (change)="updatePaymentStatus(payment.id, payment.paymentStatus)"
+                      class="status-select"
+                      [class.status-success]="payment.paymentStatus === 'Success' || payment.paymentStatus === 'Completed'"
+                      [class.status-pending]="payment.paymentStatus === 'Pending'"
+                      [class.status-failed]="payment.paymentStatus === 'Failed'"
+                      [class.status-refunded]="payment.paymentStatus === 'Refunded'"
+                    >
+                      <option value="Success">Success</option>
+                      <option value="Pending">Pending</option>
+                      <option value="Failed">Failed</option>
+                      <option value="Refunded">Refunded</option>
+                    </select>
+                  </div>
+                </td>
+
+                <!-- Date -->
+                <td class="date-cell">
+                  <span>{{ payment.paidAt | date:'mediumDate' }}</span>
+                  <small>{{ payment.paidAt | date:'shortTime' }}</small>
+                </td>
+
+                <!-- Actions -->
+                <td class="actions-cell">
+                  <button class="btn-delete" (click)="deletePayment(payment.id)" title="Delete Payment Record">
+                    <span class="material-icons">delete_outline</span>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
   }
-}
+</div>

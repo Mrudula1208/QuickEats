@@ -1,14 +1,14 @@
 <app-admin-nav></app-admin-nav>
 
-@if (isLoading) {
+@if (isLoading()) {
   <div class="adm-state">
     <span class="material-icons spinning">progress_activity</span>
     <p>Loading...</p>
   </div>
-} @else if (loadError) {
+} @else if (loadError()) {
   <div class="adm-state">
     <span class="material-icons">error_outline</span>
-    <p>{{ loadError }}</p>
+    <p>{{ loadError() }}</p>
     <button class="adm-state-btn" (click)="retry()">Try Again</button>
   </div>
 } @else {
@@ -26,7 +26,7 @@
     Contains the selected Payment object.
   -->
 
-  @if (payment) {
+  @if (payment(); as payment) {
 
     <div class="payment-details">
 

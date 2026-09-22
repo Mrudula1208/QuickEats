@@ -132,6 +132,9 @@ export class OwnerDashboardComponent {
       case 'pending': return 'status-pending';
       case 'confirmed': return 'status-confirmed';
       case 'preparing': return 'status-preparing';
+      case 'ready for pickup': case 'ready': return 'status-ready';
+      case 'assigned': return 'status-assigned';
+      case 'picked up': case 'pickedup': return 'status-picked';
       case 'out for delivery': case 'ondelivery': return 'status-out';
       case 'delivered': return 'status-delivered';
       case 'cancelled': return 'status-cancelled';

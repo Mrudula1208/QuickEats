@@ -26,6 +26,7 @@ namespace QuickEats.API.Data
         public DbSet<RestaurantRating> RestaurantRatings { get; set; }
 
         public DbSet<OrderDelivery> OrderDeliveries { get; set; }
+        public DbSet<AdminOrderOverride> AdminOrderOverrides { get; set; }
         public DbSet<Reviews> Reviews { get; set; }
         public DbSet<WishlistItem> WishlistItems { get; set; }
         public DbSet<Coupon> Coupons { get; set; }
@@ -76,9 +77,22 @@ namespace QuickEats.API.Data
 
             modelBuilder.Entity<OrderDelivery>()
                 .HasOne(od => od.Order)
-                .WithMany()
+                .WithMany(o => o.OrderDeliveries)
                 .HasForeignKey(od => od.OrderId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // AdminOrderOverride audit relationships
+            modelBuilder.Entity<AdminOrderOverride>()
+                .HasOne(a => a.Order)
+                .WithMany()
+                .HasForeignKey(a => a.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<AdminOrderOverride>()
+                .HasOne(a => a.Admin)
+                .WithMany()
+                .HasForeignKey(a => a.AdminId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Restaurant>()
                 .Property(r => r.DeliveryCharge)

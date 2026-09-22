@@ -1,206 +1,172 @@
-import { Component } from '@angular/core';
-// Component
-// Tells Angular that this file controls the Admin Reviews page.
-
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-// CommonModule
-// Gives us Angular features such as @if, @for and date pipe.
-
+import { FormsModule } from '@angular/forms';
 import { ReviewService } from '../../../core/services/review.service';
-// ReviewService
-// Used to call Review APIs.
-
 import { Review } from '../../../core/models/review.model';
-// Review
-// Defines the structure of one review.
-
 import { AdminNavComponent } from '../../../shared/admin-nav/admin-nav';
-// Top navigation bar for the Admin Panel.
-
 import { ToastrService } from 'ngx-toastr';
-// Displays success/error toast notifications.
-
 
 @Component({
-
-  // selector
-  // Name Angular uses for this Component.
   selector: 'app-admin-reviews',
-
-  // standalone
-  // Means this Component works independently.
   standalone: true,
-
-  // imports
-  // Modules required by this Component.
   imports: [
     CommonModule,
+    FormsModule,
     AdminNavComponent
   ],
-
-  // Connects TypeScript with HTML.
   templateUrl: './admin-reviews.html',
-
-  // Connects the SCSS file.
   styleUrl: './admin-reviews.scss'
-
 })
+export class AdminReviews implements OnInit {
+  reviews = signal<Review[]>([]);
+  filteredReviews = signal<Review[]>([]);
+  isLoading = signal(true);
+  loadError = signal('');
 
+  // Search & Filter state
+  searchQuery = '';
+  selectedRating: number | null = null;
+  selectedRestaurant = '';
+  sortBy: 'newest' | 'oldest' | 'highest' | 'lowest' = 'newest';
 
-export class AdminReviews {
-
-
-  // Store all reviews.
-  //
-  // Review
-  // Means one Review object.
-  //
-  // []
-  // Means multiple Review objects.
-  //
-  // =
-  // Starts with an empty array.
-
-  reviews: Review[] = [];
-
-  // Page loading state.
-  isLoading = true;
-
-  // Error message when reviews fail to load.
-  loadError = '';
-
+  // Computed Stats
+  totalReviews = signal(0);
+  averageRating = signal(0);
+  ratingCounts = signal<{ [star: number]: number }>({ 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 });
+  uniqueRestaurants = signal<string[]>([]);
 
   constructor(
-
-    // reviewService
-    // Variable used to access ReviewService.
-    //
-    // private
-    // Can be used only inside this Component.
-    //
-    // :
-    // Separates variable name from its type.
-    //
-    // ReviewService
-    // Type of the injected Service.
-
     private reviewService: ReviewService,
     private toastr: ToastrService
+  ) {}
 
-  ) {
-
-    // Constructor runs automatically
-    // when Admin Reviews page opens.
-
-    // Load all reviews immediately.
-
+  ngOnInit(): void {
     this.loadReviews();
-
   }
 
-
-  // Load all Reviews.
   loadReviews(): void {
+    this.isLoading.set(true);
+    this.loadError.set('');
 
-    // Start loading reviews.
-    this.isLoading = true;
-    this.loadError = '';
-
-    // STEP 1
-    // Call ReviewService.
-    //
-    // getReviews()
-    // Sends GET request to Backend.
-
-    this.reviewService
-      .getReviews()
-
-      // STEP 2
-      // subscribe()
-      // Waits for Backend response.
-
-      .subscribe({
-
-        // Backend successfully returned reviews.
-
-        next: (data: Review[]) => {
-
-          // Store Backend data
-          // inside reviews array.
-
-          this.reviews = data;
-
-          this.isLoading = false;
-
-        },
-
-
-        // Backend/API request failed.
-
-        error: () => {
-          this.isLoading = false;
-          this.loadError = 'Could not load reviews. Please try again.';
-          this.toastr.error('Could not load reviews. Please try again.');
-        }
-
-      });
-
+    this.reviewService.getReviews().subscribe({
+      next: (data: Review[]) => {
+        this.reviews.set(Array.isArray(data) ? data : []);
+        this.calculateStats();
+        this.applyFilters();
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        this.isLoading.set(false);
+        this.loadError.set('Could not load reviews. Please verify server connection.');
+        this.toastr.error('Could not load reviews. Please try again.');
+      }
+    });
   }
 
+  calculateStats(): void {
+    const reviews = this.reviews();
+    const total = reviews.length;
+    this.totalReviews.set(total);
 
-  // Retry loading reviews.
+    if (total === 0) {
+      this.averageRating.set(0);
+      this.uniqueRestaurants.set([]);
+      this.ratingCounts.set({ 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 });
+      return;
+    }
+
+    let sum = 0;
+    const counts: { [star: number]: number } = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+    const restSet = new Set<string>();
+
+    for (const r of reviews) {
+      const roundedStar = Math.min(5, Math.max(1, Math.round(r.rating || 0)));
+      counts[roundedStar] = (counts[roundedStar] || 0) + 1;
+      sum += (r.rating || 0);
+
+      if (r.restaurantName) {
+        restSet.add(r.restaurantName);
+      }
+    }
+
+    this.averageRating.set(+(sum / total).toFixed(1));
+    this.uniqueRestaurants.set(Array.from(restSet).sort());
+    this.ratingCounts.set(counts);
+  }
+
+  applyFilters(): void {
+    let result = [...this.reviews()];
+
+    // Search query
+    if (this.searchQuery && this.searchQuery.trim()) {
+      const q = this.searchQuery.toLowerCase().trim();
+      result = result.filter(r =>
+        (r.customerName && r.customerName.toLowerCase().includes(q)) ||
+        (r.restaurantName && r.restaurantName.toLowerCase().includes(q)) ||
+        (r.comment && r.comment.toLowerCase().includes(q))
+      );
+    }
+
+    // Rating filter
+    if (this.selectedRating !== null) {
+      result = result.filter(r => Math.round(r.rating) === this.selectedRating);
+    }
+
+    // Restaurant filter
+    if (this.selectedRestaurant) {
+      result = result.filter(r => r.restaurantName === this.selectedRestaurant);
+    }
+
+    // Sort
+    result.sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+
+      if (this.sortBy === 'newest') return dateB - dateA;
+      if (this.sortBy === 'oldest') return dateA - dateB;
+      if (this.sortBy === 'highest') return (b.rating || 0) - (a.rating || 0);
+      if (this.sortBy === 'lowest') return (a.rating || 0) - (b.rating || 0);
+      return 0;
+    });
+
+    this.filteredReviews.set(result);
+  }
+
+  setRatingFilter(star: number | null): void {
+    this.selectedRating = star;
+    this.applyFilters();
+  }
+
+  getStarPercent(star: number): number {
+    if (this.totalReviews() === 0) return 0;
+    return Math.round(((this.ratingCounts()[star] || 0) / this.totalReviews()) * 100);
+  }
+
+  getStarsArray(rating: number): number[] {
+    const fullStars = Math.floor(rating || 0);
+    return Array.from({ length: 5 }, (_, i) => i < fullStars ? 1 : 0);
+  }
+
+  getInitials(name: string): string {
+    if (!name) return 'U';
+    return name.split(' ').map(p => p[0]).join('').toUpperCase().substring(0, 2);
+  }
+
+  deleteReview(reviewId: number): void {
+    if (!confirm('Are you sure you want to delete this review? This action cannot be undone.')) return;
+
+    this.reviewService.deleteReview(reviewId).subscribe({
+      next: () => {
+        this.toastr.success('Review deleted successfully.');
+        this.reviews.set(this.reviews().filter(r => r.id !== reviewId));
+        this.calculateStats();
+        this.applyFilters();
+      },
+      error: () => this.toastr.error('Failed to delete review.')
+    });
+  }
+
   retry(): void {
     this.loadReviews();
   }
-
-
-  // Delete Review.
-  deleteReview(
-
-    // ID of the review we want to delete.
-    reviewId: number
-
-  ): void {
-
-    // Ask for confirmation before deleting.
-    if (!confirm('Delete this review? This cannot be undone.')) return;
-
-    // STEP 1
-    // Call ReviewService.
-    //
-    // deleteReview()
-    // Sends DELETE request to Backend.
-
-    this.reviewService
-      .deleteReview(reviewId)
-
-      // STEP 2
-      // Wait for Backend response.
-
-      .subscribe({
-
-        // Backend successfully deleted review.
-
-        next: () => {
-
-          // STEP 3
-          // Show success message.
-          this.toastr.success('Review deleted');
-
-          // Load the latest reviews
-          // from Backend.
-
-          this.loadReviews();
-
-        },
-
-
-        // Backend/API error.
-
-        error: () => this.toastr.error('Failed to delete review')
-
-      });
-
-  }
-
 }

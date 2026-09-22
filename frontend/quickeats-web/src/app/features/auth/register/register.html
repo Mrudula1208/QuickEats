@@ -21,6 +21,36 @@
         </div>
       }
 
+      <!-- Role Selection -->
+      <div class="form-group role-selection-group">
+        <label>I want to join as:</label>
+        <div class="role-grid">
+          <label class="role-option" [class.active]="user.role === 'Customer'">
+            <input type="radio" name="role" value="Customer" [(ngModel)]="user.role">
+            <span class="material-icons role-icon">person</span>
+            <span class="role-title">Customer</span>
+          </label>
+
+          <label class="role-option" [class.active]="user.role === 'Owner'">
+            <input type="radio" name="role" value="Owner" [(ngModel)]="user.role">
+            <span class="material-icons role-icon">restaurant</span>
+            <span class="role-title">Owner</span>
+          </label>
+
+          <label class="role-option" [class.active]="user.role === 'DeliveryPartner'">
+            <input type="radio" name="role" value="DeliveryPartner" [(ngModel)]="user.role">
+            <span class="material-icons role-icon">two_wheeler</span>
+            <span class="role-title">Delivery</span>
+          </label>
+
+          <label class="role-option" [class.active]="user.role === 'Admin'">
+            <input type="radio" name="role" value="Admin" [(ngModel)]="user.role">
+            <span class="material-icons role-icon">admin_panel_settings</span>
+            <span class="role-title">Admin</span>
+          </label>
+        </div>
+      </div>
+
       <!-- Full Name -->
       <div class="form-group">
         <label for="name">Full Name</label>

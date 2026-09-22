@@ -65,7 +65,11 @@ namespace QuickEats.API.Repositories
                 TotalOrders = await _context.Orders
                     .CountAsync(o => ownerRestaurantIds.Contains(o.RestaurantId)),
 
-                TotalUsers = 0,
+                TotalUsers = await _context.Orders
+                    .Where(o => ownerRestaurantIds.Contains(o.RestaurantId))
+                    .Select(o => o.UserId)
+                    .Distinct()
+                    .CountAsync(),
 
                 TotalRevenue = await _context.Orders
                     .Where(o => ownerRestaurantIds.Contains(o.RestaurantId))

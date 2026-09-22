@@ -1,11 +1,9 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { ReviewService } from '../../../core/services/review.service';
-import { RestaurantService } from '../../../core/services/restaurant.service';
-import { Review } from '../../../core/models/review.model';
-import { Restaurant } from '../../../core/models/restaurant.model';
+import { Review, EligibleReviewOrder, CreateReviewRequest, UpdateReviewRequest } from '../../../core/models/review.model';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastrService } from 'ngx-toastr';
 
@@ -16,181 +14,314 @@ import { ToastrService } from 'ngx-toastr';
   templateUrl: './reviews.html',
   styleUrl: './reviews.scss'
 })
-export class ReviewsComponent {
+export class ReviewsComponent implements OnInit {
+  activeTab: 'my-reviews' | 'write-review' | 'all-reviews' = 'my-reviews';
 
-  reviews = signal<Review[]>([]);
-  restaurants = signal<Restaurant[]>([]);
+  myReviews = signal<Review[]>([]);
+  allReviews = signal<Review[]>([]);
+  eligibleOrders = signal<EligibleReviewOrder[]>([]);
+
   isLoading = signal(true);
-
-  averageRating = 0;
-  reviewCount = 0;
-  ratingDistribution: number[] = [0, 0, 0, 0, 0];
-
+  isSubmitting = signal(false);
   isLoggedIn = false;
-  currentUserId = 0;
+  isCustomer = false;
 
+  // New Review Form State
+  selectedOrderId: number | null = null;
+  selectedRestaurantId = 0;
+  selectedRestaurantName = '';
+  selectedRestaurantImage = '';
   newRating = 5;
   newComment = '';
-  selectedRestaurantId = 0;
-  stars = [1, 2, 3, 4, 5];
-  commentError = '';
-  reviewSuccess = false;
+  hoverRating = 0;
+  formError = '';
 
-  showForm = signal(false);
+  // Filter state for all reviews
+  allReviewsSearch = signal('');
+  selectedFilterRating = signal<number | null>(null);
+
+  // Edit Review State
+  editingReviewId: number | null = null;
+  editRating = 5;
+  editComment = '';
+  editHoverRating = 0;
+  editError = '';
+  isSavingEdit = signal(false);
+
+  filteredAllReviews = computed(() => {
+    let list = this.allReviews();
+    const query = this.allReviewsSearch().toLowerCase().trim();
+    const filter = this.selectedFilterRating();
+
+    if (query) {
+      list = list.filter(r =>
+        r.restaurantName.toLowerCase().includes(query) ||
+        r.customerName.toLowerCase().includes(query) ||
+        r.comment.toLowerCase().includes(query)
+      );
+    }
+
+    if (filter !== null) {
+      list = list.filter(r => Math.round(r.rating) === filter);
+    }
+
+    return list;
+  });
+
+  unreviewedOrders = computed(() => {
+    return this.eligibleOrders().filter(o => !o.alreadyReviewed);
+  });
 
   constructor(
     private reviewService: ReviewService,
-    private restaurantService: RestaurantService,
     private authService: AuthService,
-    private toastr: ToastrService
-  ) {
+    private toastr: ToastrService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
+
+  ngOnInit(): void {
     this.isLoggedIn = this.authService.isLoggedIn();
-    const userId = localStorage.getItem('userId');
-    this.currentUserId = userId ? parseInt(userId, 10) : 0;
-    this.loadReviews();
-    this.loadRestaurants();
+    this.isCustomer = this.isLoggedIn && this.authService.getRole() === 'Customer';
+
+    const requestedTab = this.route.snapshot.queryParamMap.get('tab');
+    if (requestedTab === 'write' && this.isCustomer) {
+      this.activeTab = 'write-review';
+    }
+
+    if (this.isCustomer) {
+      this.loadMyReviews();
+      this.loadEligibleOrders();
+    } else {
+      // Owners/Admins/Delivery Partners and logged-out visitors only see the
+      // public community reviews on this page.
+      this.activeTab = 'all-reviews';
+      this.loadAllReviews();
+    }
   }
 
-  loadReviews(): void {
+  loadMyReviews(): void {
     this.isLoading.set(true);
-    this.reviewService.getReviews().subscribe({
+    this.reviewService.getMyReviews().subscribe({
       next: (data) => {
-        this.reviews.set(data);
-        this.reviewCount = data.length;
-        this.computeStats(data);
+        this.myReviews.set(data || []);
         this.isLoading.set(false);
       },
       error: () => {
         this.isLoading.set(false);
+        this.toastr.error('Failed to load your reviews.');
       }
     });
   }
 
-  loadRestaurants(): void {
-    this.restaurantService.getRestaurants().subscribe({
-      next: (data) => this.restaurants.set(data),
+  loadEligibleOrders(): void {
+    this.reviewService.getEligibleOrders().subscribe({
+      next: (data) => {
+        this.eligibleOrders.set(data || []);
+        if (data && data.length > 0 && !this.selectedOrderId) {
+          const firstUnreviewed = data.find(o => !o.alreadyReviewed) || data[0];
+          this.selectOrder(firstUnreviewed);
+        }
+      },
       error: () => {}
     });
   }
 
-  computeStats(data: Review[]): void {
-    if (data.length === 0) {
-      this.averageRating = 0;
-      this.ratingDistribution = [0, 0, 0, 0, 0];
-      return;
-    }
-    const total = data.reduce((sum, r) => sum + r.rating, 0);
-    this.averageRating = total / data.length;
-    this.ratingDistribution = [0, 0, 0, 0, 0];
-    data.forEach(r => {
-      if (r.rating >= 1 && r.rating <= 5) {
-        this.ratingDistribution[r.rating - 1]++;
+  loadAllReviews(): void {
+    this.isLoading.set(true);
+    // Only publicly-visible (approved/published) reviews are shown here.
+    this.reviewService.getPublicReviews().subscribe({
+      next: (data) => {
+        this.allReviews.set(data || []);
+        this.isLoading.set(false);
+      },
+      error: () => {
+        this.allReviews.set([]);
+        this.isLoading.set(false);
+        this.toastr.error('Failed to load community reviews.');
       }
     });
   }
 
-  getRatingPercent(star: number): number {
-    if (this.reviewCount === 0) return 0;
-    return (this.ratingDistribution[star - 1] / this.reviewCount) * 100;
+  selectOrder(order: EligibleReviewOrder): void {
+    this.selectedOrderId = order.orderId;
+    this.selectedRestaurantId = order.restaurantId;
+    this.selectedRestaurantName = order.restaurantName;
+    this.selectedRestaurantImage = order.restaurantImageUrl || '';
+    this.formError = '';
   }
 
-  getRatingLabel(star: number): string {
-    return `${star} star`;
-  }
-
-  isStarFilled(star: number, rating: number): boolean {
-    return star <= Math.round(rating);
+  onOrderDropdownChange(): void {
+    if (!this.selectedOrderId) return;
+    const order = this.eligibleOrders().find(o => o.orderId === +this.selectedOrderId!);
+    if (order) {
+      this.selectOrder(order);
+    }
   }
 
   setRating(rating: number): void {
     this.newRating = rating;
   }
 
-  validateComment(): boolean {
-    if (!this.newComment.trim()) {
-      this.commentError = 'Please write a review before submitting.';
-      return false;
-    }
-    if (this.newComment.trim().length < 5) {
-      this.commentError = 'Review must be at least 5 characters.';
-      return false;
-    }
-    this.commentError = '';
-    return true;
+  setHoverRating(rating: number): void {
+    this.hoverRating = rating;
   }
 
-  canSubmitReview(): boolean {
-    return this.selectedRestaurantId > 0 && this.newComment.trim().length > 0;
+  resetHoverRating(): void {
+    this.hoverRating = 0;
   }
 
   submitReview(): void {
-    if (!this.validateComment()) return;
-    this.reviewSuccess = false;
+    if (!this.isLoggedIn) {
+      this.toastr.warning('Please log in to submit a review.');
+      this.router.navigate(['/login']);
+      return;
+    }
 
-    const review: Review = {
-      id: 0,
-      customerId: this.currentUserId,
+    if (!this.selectedRestaurantId || this.selectedRestaurantId <= 0) {
+      this.formError = 'Please select a delivered order to review.';
+      return;
+    }
+
+    if (!this.newComment || this.newComment.trim().length < 5) {
+      this.formError = 'Please write a review with at least 5 characters.';
+      return;
+    }
+
+    if (this.newRating < 1 || this.newRating > 5) {
+      this.formError = 'Please choose a rating between 1 and 5 stars.';
+      return;
+    }
+
+    this.formError = '';
+    this.isSubmitting.set(true);
+
+    const payload: CreateReviewRequest = {
       restaurantId: this.selectedRestaurantId,
-      customerName: '',
-      restaurantName: '',
+      orderId: this.selectedOrderId ?? undefined,
       rating: this.newRating,
-      comment: this.newComment,
-      createdAt: new Date()
+      comment: this.newComment.trim()
     };
 
-    this.reviewService.addReview(review).subscribe({
-      next: () => {
-        this.newRating = 5;
+    this.reviewService.addReview(payload).subscribe({
+      next: (res) => {
+        this.isSubmitting.set(false);
+        this.toastr.success('Your review has been published successfully!', 'Review Submitted');
         this.newComment = '';
-        this.selectedRestaurantId = 0;
-        this.commentError = '';
-        this.reviewSuccess = true;
-        this.showForm.set(false);
-        this.toastr.success('Review submitted successfully!');
-        this.loadReviews();
+        this.newRating = 5;
+        this.activeTab = 'my-reviews';
+        this.loadMyReviews();
+        this.loadEligibleOrders();
       },
-      error: () => {
-        this.toastr.error('Failed to submit review. Please try again.');
+      error: (err) => {
+        this.isSubmitting.set(false);
+        const msg = err.error?.message || (typeof err.error === 'string' ? err.error : 'Failed to submit review.');
+        this.formError = msg;
+        this.toastr.error(msg);
       }
     });
-  }
-
-  toggleForm(): void {
-    this.showForm.update(v => !v);
-    this.reviewSuccess = false;
-    this.commentError = '';
-  }
-
-  isOwnReview(review: Review): boolean {
-    return this.isLoggedIn && review.customerId === this.currentUserId;
   }
 
   deleteReview(reviewId: number): void {
+    if (!confirm('Are you sure you want to delete this review?')) return;
+
     this.reviewService.deleteReview(reviewId).subscribe({
       next: () => {
-        this.toastr.success('Review deleted');
-        this.loadReviews();
+        this.toastr.success('Review deleted successfully.');
+        this.myReviews.update(list => list.filter(r => r.id !== reviewId));
+        this.loadEligibleOrders();
       },
-      error: () => {
-        this.toastr.error('Failed to delete review');
+      error: () => this.toastr.error('Failed to delete review.')
+    });
+  }
+
+  startEdit(review: Review): void {
+    this.editingReviewId = review.id;
+    this.editRating = review.rating || 5;
+    this.editComment = review.comment || '';
+    this.editHoverRating = 0;
+    this.editError = '';
+  }
+
+  cancelEdit(): void {
+    this.editingReviewId = null;
+    this.editComment = '';
+    this.editRating = 5;
+    this.editHoverRating = 0;
+    this.editError = '';
+    this.isSavingEdit.set(false);
+  }
+
+  setEditRating(rating: number): void {
+    this.editRating = rating;
+  }
+
+  setEditHoverRating(rating: number): void {
+    this.editHoverRating = rating;
+  }
+
+  resetEditHoverRating(): void {
+    this.editHoverRating = 0;
+  }
+
+  saveEdit(review: Review): void {
+    if (!this.editingReviewId) return;
+
+    if (!this.editComment || this.editComment.trim().length < 5) {
+      this.editError = 'Please write a review with at least 5 characters.';
+      return;
+    }
+
+    if (this.editRating < 1 || this.editRating > 5) {
+      this.editError = 'Please choose a rating between 1 and 5 stars.';
+      return;
+    }
+
+    this.editError = '';
+    this.isSavingEdit.set(true);
+
+    const payload: UpdateReviewRequest = {
+      rating: this.editRating,
+      comment: this.editComment.trim()
+    };
+
+    this.reviewService.updateReview(review.id, payload).subscribe({
+      next: () => {
+        this.isSavingEdit.set(false);
+        this.toastr.success('Your review has been updated successfully.', 'Review Updated');
+        this.myReviews.update(list =>
+          list.map(r => r.id === review.id
+            ? { ...r, rating: this.editRating, comment: this.editComment.trim() }
+            : r)
+        );
+        this.cancelEdit();
+      },
+      error: (err) => {
+        this.isSavingEdit.set(false);
+        const msg = err.error?.message || (typeof err.error === 'string' ? err.error : 'Failed to update review.');
+        this.editError = msg;
+        this.toastr.error(msg);
       }
     });
   }
 
-  getCustomerInitial(name: string): string {
-    return name ? name.charAt(0).toUpperCase() : '?';
+  switchTab(tab: 'my-reviews' | 'write-review' | 'all-reviews'): void {
+    if ((tab === 'my-reviews' || tab === 'write-review') && !this.isCustomer) {
+      tab = 'all-reviews';
+    }
+    this.activeTab = tab;
+    if (tab === 'all-reviews' && this.allReviews().length === 0) {
+      this.loadAllReviews();
+    }
   }
 
-  getTimeAgo(date: Date): string {
-    const now = new Date();
-    const created = new Date(date);
-    const diffMs = now.getTime() - created.getTime();
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7) return `${diffDays} days ago`;
-    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
-    if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
-    return `${Math.floor(diffDays / 365)} years ago`;
+  getStarsArray(rating: number): number[] {
+    const fullStars = Math.floor(rating || 0);
+    return Array.from({ length: 5 }, (_, i) => i < fullStars ? 1 : 0);
+  }
+
+  getInitials(name: string): string {
+    if (!name) return 'U';
+    return name.split(' ').map(p => p[0]).join('').toUpperCase().substring(0, 2);
   }
 }

@@ -150,7 +150,7 @@ namespace QuickEats.API.Controllers
                 return Forbid();
 
             await _paymentService.CreateAsync(dto);
-            return Ok("Payment created successfully.");
+            return Ok(new { message = "Payment created successfully." });
         }
 
         /// <summary>
@@ -163,7 +163,7 @@ namespace QuickEats.API.Controllers
         public async Task <IActionResult>UpdateStatus(int id,UpdatePaymentStatusDto dto)
         {
             await _paymentService.UpdateStatusAsync(id, dto);
-            return Ok("Payment updated successfully.");
+            return Ok(new { message = "Payment updated successfully." });
         }
 
         /// <summary>
@@ -175,7 +175,7 @@ namespace QuickEats.API.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             await _paymentService.DeleteAsync(id);
-            return Ok("Payment deleted successfully.");
+            return Ok(new { message = "Payment deleted successfully." });
         }
 
         private async Task<bool> IsOrderOfOwner(int restaurantId, int ownerId)

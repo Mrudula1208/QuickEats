@@ -166,8 +166,9 @@ if (jwtConfig.Key.Length < 32)
 
             var app = builder.Build();
 
-            // 1. FORCE THE ERROR PAGE TO SHOW IN PRODUCTION FOR TROUBLESHOOTING
-            app.UseDeveloperExceptionPage();
+            // 1. CUSTOM EXCEPTION MIDDLEWARE: returns proper JSON status codes
+            //    (400/401/403/404/409/500) instead of a 500 HTML error page.
+            app.UseMiddleware<ExceptionMiddleware>();
 
             // 2. EXPOSE SWAGGER EVEN IN PRODUCTION MODE FOR SOMEE
             app.UseSwagger();
@@ -184,6 +185,7 @@ if (jwtConfig.Key.Length < 32)
             }
             
             // Standard middleware setup
+            app.UseStaticFiles();
             app.UseRouting();
             app.UseCors(policy => policy.WithOrigins(allowedOrigins).AllowAnyMethod().AllowAnyHeader());
             app.UseAuthentication();
@@ -197,13 +199,16 @@ if (jwtConfig.Key.Length < 32)
                 try
                 {
                     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                    // Ensure all 4 demo accounts exist with known passwords and roles
+                    // Ensure all demo accounts exist with known passwords and roles
                     var demoAccounts = new[]
                     {
-                        new { Name = "Admin", Email = "admin@gmail.com", Role = "Admin", Password = "Admin@123", Phone = "9999999999" },
-                        new { Name = "Pizza Owner", Email = "owner@gmail.com", Role = "Owner", Password = "Owner@123", Phone = "9888888888" },
-                        new { Name = "Alex Rider", Email = "rider@gmail.com", Role = "DeliveryPartner", Password = "Password@123", Phone = "9876543210" },
-                        new { Name = "John Doe", Email = "customer@gmail.com", Role = "Customer", Password = "Password@123", Phone = "9111111111" }
+                        new { Name = "Admin User", Email = "admin@gmail.com", Role = "Admin", Password = "Admin@123", Phone = "9999999999" },
+                        new { Name = "Amit Joshi", Email = "owner@gmail.com", Role = "Owner", Password = "Owner@123", Phone = "9820114477" },
+                        new { Name = "Sneha Deshmukh", Email = "sneha.owner@gmail.com", Role = "Owner", Password = "Owner@123", Phone = "9819225588" },
+                        new { Name = "Rajesh Kulkarni", Email = "rajesh.owner@gmail.com", Role = "Owner", Password = "Owner@123", Phone = "9821336699" },
+                        new { Name = "Pooja Shetty", Email = "pooja.owner@gmail.com", Role = "Owner", Password = "Owner@123", Phone = "9833447700" },
+                        new { Name = "Rohit Pawar", Email = "rider@gmail.com", Role = "DeliveryPartner", Password = "Password@123", Phone = "9820558811" },
+                        new { Name = "Mrudula More", Email = "customer@gmail.com", Role = "Customer", Password = "Password@123", Phone = "9820112233" }
                     };
 
                     foreach (var acc in demoAccounts)
@@ -276,10 +281,95 @@ if (jwtConfig.Key.Length < 32)
                             db.SaveChanges();
                         }
                     }
+
+                    // Ensure restaurants with known cities have geographic coordinates for "Near You"
+                    var cityCoords = new Dictionary<string, (double Lat, double Lng)>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        { "Mumbai", (19.0760, 72.8777) },
+                        { "Delhi", (28.6139, 77.2090) },
+                        { "Hyderabad", (17.3850, 78.4867) },
+                        { "Jaipur", (26.9124, 75.7873) },
+                        { "Bangalore", (12.9716, 77.5946) },
+                        { "Pune", (18.5204, 73.8567) },
+                        { "Chennai", (13.0827, 80.2707) },
+                        { "Goa", (15.2993, 74.1240) },
+                        { "Kolkata", (22.5726, 88.3639) },
+                        { "Cochin", (9.9312, 76.2673) },
+                        { "Kochi", (9.9312, 76.2673) },
+                        { "Lucknow", (26.8467, 80.9462) }
+                    };
+
+                    var restaurants = db.Restaurants.Where(r => r.Latitude == null || r.Longitude == null).ToList();
+                    bool coordsUpdated = false;
+                    foreach (var rest in restaurants)
+                    {
+                        foreach (var kvp in cityCoords)
+                        {
+                            if (rest.Address != null && rest.Address.Contains(kvp.Key, StringComparison.OrdinalIgnoreCase))
+                            {
+                                rest.Latitude = kvp.Value.Lat;
+                                rest.Longitude = kvp.Value.Lng;
+                                coordsUpdated = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (coordsUpdated)
+                    {
+                        db.SaveChanges();
+                    }
+
+                    // Seed realistic operating hours for all restaurants
+                    var hoursMap = new Dictionary<string, (string Open, string Close)>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        { "Dominos", ("09:00", "23:00") },
+                        { "Burger King", ("09:00", "23:00") },
+                        { "Biryani House", ("11:00", "23:00") },
+                        { "Owner One Pizzeria", ("11:00", "23:00") },
+                        { "Spice Garden", ("10:00", "23:00") },
+                        { "Sushi World", ("11:00", "22:00") },
+                        { "Taco Fiesta", ("18:00", "23:30") },
+                        { "Dragon Wok", ("19:00", "23:30") },
+                        { "Pasta Palace", ("11:00", "23:00") },
+                        { "Burger Barn", ("09:00", "22:00") },
+                        { "Curry House", ("06:00", "11:30") },
+                        { "Grill Master", ("19:00", "23:30") },
+                        { "Owner's Kitchen", ("10:00", "23:00") },
+                        { "Bob's Burgers", ("09:00", "22:00") },
+                        { "Carol's Curry", ("10:00", "23:00") },
+                        { "Owner B Burger Joint", ("09:00", "22:00") }
+                    };
+
+                    bool hoursUpdated = false;
+                    foreach (var rest in db.Restaurants.ToList())
+                    {
+                        if (hoursMap.TryGetValue(rest.Name, out var hours))
+                        {
+                            if (rest.OpeningTime != hours.Open || rest.ClosingTime != hours.Close)
+                            {
+                                rest.OpeningTime = hours.Open;
+                                rest.ClosingTime = hours.Close;
+                                hoursUpdated = true;
+                            }
+                        }
+                        else if (string.IsNullOrWhiteSpace(rest.OpeningTime))
+                        {
+                            rest.OpeningTime = "09:00";
+                            rest.ClosingTime = "23:00";
+                            hoursUpdated = true;
+                        }
+                    }
+                    if (hoursUpdated)
+                    {
+                        db.SaveChanges();
+                    }
+
+                    // Polish test placeholders with authentic Mumbai demo data
+                    DemoDataPolisher.PolishDemoDataAsync(db).GetAwaiter().GetResult();
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"[Startup] Warning: Could not seed rider/deliveries: {ex.Message}");
+                    Console.WriteLine($"[Startup] Warning: Could not seed rider/deliveries/coordinates: {ex.Message}");
                 }
             }
 

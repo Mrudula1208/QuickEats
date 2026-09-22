@@ -71,7 +71,7 @@
                 <img [src]="r.imageUrl || ''" [alt]="r.name" (error)="$any($event.target).src='assets/images/no-image.svg'">
                 <div class="ar-card-badges">
                   <span class="ar-badge" [class.open]="r.isOpenNow" [class.closed]="!r.isOpenNow">
-                    {{ r.isOpenNow ? 'Open Now' : 'Closed' }}
+                    {{ r.isOpenNow ? 'OPEN' : 'CLOSED' }}
                   </span>
                   <span class="ar-badge" [class.active]="r.isActive" [class.inactive]="!r.isActive">
                     {{ r.isActive ? 'Active' : 'Inactive' }}
@@ -92,7 +92,7 @@
                   </div>
                   <div class="ar-info-row">
                     <span class="material-icons">schedule</span>
-                    <span>{{ r.openingTime }} - {{ r.closingTime }}</span>
+                    <span><strong>Hours:</strong> {{ formatTime(r.openingTime) }} – {{ formatTime(r.closingTime) }}</span>
                   </div>
                   <div class="ar-info-row">
                     <span class="material-icons">delivery_dining</span>
