@@ -48,11 +48,15 @@ The API seeds a set of demo users automatically when it starts (take a look at `
 
 ## Screenshots
 
-| Customer | Owner | Delivery Partner | Admin |
-| :---: | :---: | :---: | :---: |
-| ![Customer Homepage](./screenshots/Homepage%20with%20Featured%20Restaurants.png) | ![Owner Dashboard](./screenshots/Owner-Dashboard.png) | ![Rider Deliveries](./screenshots/My%20Assigned%20Deliveries.png) | ![Admin Dashboard](./screenshots/Admin-Dashboard.png) |
-| ![Trending Dishes & Reviews](./screenshots/Trending%20Dishes%20%2B%20Deals%20%2B%20Reviews.png) | ![Orders & Kitchen Workflow](./screenshots/Orders%20%26%20Kitchen%20Workflow.png) | — | ![Admin Order Management](./screenshots/Admin%20Order%20Management%20table.png) |
-| ![Dish Browsing with Filters](./screenshots/Restaurant/Dish%20Browsing%20with%20Filters.png) | | | |
+| | |
+| :--- | :--- |
+| **Customer homepage** | ![Customer homepage](./screenshots/Homepage%20with%20Featured%20Restaurants.png) |
+| **Trending dishes + deals + reviews** | ![Trending dishes + deals + reviews](./screenshots/Trending%20Dishes%20%2B%20Deals%20%2B%20Reviews.png) |
+| **Restaurant browsing with filters** | ![Restaurant browsing with filters](./screenshots/Restaurant/Dish%20Browsing%20with%20Filters.png) |
+| **Orders & Kitchen Workflow** (owner) | ![Orders & Kitchen Workflow](./screenshots/Orders%20%26%20Kitchen%20Workflow.png) |
+| **Executive Dashboard** (admin) | ![Executive Dashboard](./screenshots/Admin-Dashboard.png) |
+| **Order Management table** (admin) | ![Order Management table](./screenshots/Admin%20Order%20Management%20table.png) |
+| **My Assigned Deliveries** (rider) | ![My Assigned Deliveries](./screenshots/My%20Assigned%20Deliveries.png) |
 
 ---
 
