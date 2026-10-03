@@ -7,7 +7,7 @@ When the interviewer asks: **"Tell me about your project"** or **"Walk me throug
 >
 > *What makes QuickEats unique is that it supports four distinct user workflows: Customers who browse restaurants, place orders, and track deliveries; Restaurant Owners who manage menus and live kitchen orders; Delivery Partners who accept assigned orders and navigate doorstep deliveries; and Platform Administrators who oversee transactions, rider dispatch, audit overrides, and analytics.*
 >
-> *Key technical highlights I implemented include: a stateless JWT authentication system with BCrypt password hashing; a deterministic Finite State Machine to enforce legal order transitions; a dual-mode recommendation engine using collaborative customer order affinity and in-memory Haversine geospatial calculations; and an automated test suite comprising 44 backend unit tests with xUnit and Moq, plus 45 frontend test suites running on Vitest."*
+> *Key technical highlights I implemented include: a stateless JWT authentication system with BCrypt password hashing; a deterministic Finite State Machine to enforce legal order transitions; a dual-mode recommendation engine using collaborative customer order affinity and in-memory Haversine geospatial calculations; and an automated test suite comprising 48 backend unit tests with xUnit and Moq, plus 45 frontend test suites running on Vitest."*
 
 ---
 

@@ -73,7 +73,7 @@ Recruiters and hiring managers spend an average of **60 seconds** reviewing a Gi
 ---
 
 ## 🧪 Automated Testing
-- **Backend:** 44 unit tests (`xUnit` + `Moq`) covering crypto helpers, order state machine, and delivery dispatch (`dotnet test QuickEats.API.sln`).
+- **Backend:** 48 unit tests (`xUnit` + `Moq`) covering crypto helpers, order state machine, price tampering protection, and delivery dispatch (`dotnet test QuickEats.API.sln`).
 - **Frontend:** 45 test files / 46 specs (`Vitest`) covering standalone components and guards (`npm test -- --watch=false`).
 
 ---

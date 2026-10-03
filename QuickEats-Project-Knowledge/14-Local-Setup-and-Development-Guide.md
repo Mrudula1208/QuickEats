@@ -45,7 +45,7 @@ Create or edit `QuickEats.API/appsettings.Development.json`:
 dotnet restore
 dotnet test QuickEats.API.sln
 ```
-*(All 44 backend unit tests should pass).*
+*(All 48 backend unit tests should pass).*
 
 ### 2.4 Apply Database Migrations & Run
 ```bash
