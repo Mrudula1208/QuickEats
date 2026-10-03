@@ -5,9 +5,9 @@ When the interviewer asks: **"Tell me about your project"** or **"Walk me throug
 
 > *"QuickEats is a full-stack, multi-role food ordering and delivery web application built using ASP.NET Core 8 Web API on the backend and Angular 21 with Standalone Components and Signals on the frontend. The database is powered by Microsoft SQL Server via Entity Framework Core 8.*
 >
-> *What makes QuickEats unique is that it supports four distinct user workflows: Customers who browse restaurants, place orders, and track deliveries; Restaurant Owners who manage menus and live kitchen orders; Delivery Partners who claim orders and navigate doorstep deliveries; and Platform Administrators who oversee transactions, audit overrides, and analytics.*
+> *What makes QuickEats unique is that it supports four distinct user workflows: Customers who browse restaurants, place orders, and track deliveries; Restaurant Owners who manage menus and live kitchen orders; Delivery Partners who accept assigned orders and navigate doorstep deliveries; and Platform Administrators who oversee transactions, rider dispatch, audit overrides, and analytics.*
 >
-> *Key technical highlights I implemented include: a stateless JWT authentication system with BCrypt password hashing; a deterministic Finite State Machine to enforce legal order transitions; a dual-mode recommendation engine using collaborative customer order affinity and in-memory Haversine geospatial calculations; and an automated test suite comprising 21 backend unit tests with xUnit and Moq, plus 45 frontend test suites running on Vitest."*
+> *Key technical highlights I implemented include: a stateless JWT authentication system with BCrypt password hashing; a deterministic Finite State Machine to enforce legal order transitions; a dual-mode recommendation engine using collaborative customer order affinity and in-memory Haversine geospatial calculations; and an automated test suite comprising 44 backend unit tests with xUnit and Moq, plus 45 frontend test suites running on Vitest."*
 
 ---
 
