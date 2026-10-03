@@ -1,4 +1,4 @@
-﻿namespace QuickEats.API.DTos.Auth
+namespace QuickEats.API.DTos.Auth
 {
     /// <summary>Successful login result: JWT token plus basic profile info.</summary>
     public class LoginResponseDto
@@ -13,6 +13,6 @@
 
         public string Role { get; set; } = string.Empty;
 
-        public string ProfileImageUrl { get; set; } = string.Empty;
+        public string? ProfileImageUrl { get; set; }
     }
 }

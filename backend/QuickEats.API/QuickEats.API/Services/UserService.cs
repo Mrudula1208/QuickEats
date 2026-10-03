@@ -143,29 +143,7 @@ namespace QuickEats.API.Services
 
         public async Task<List<DeliveryPartnerSummaryDto>> GetDeliveryPartnersAsync()
         {
-            var allUsers = await _userRepository.GetAllAsync();
-            var partners = allUsers.Where(u => u.Role == "DeliveryPartner" || u.Role == "Delivery Partner").ToList();
-            var allDeliveries = await _orderDeliveryRepository.GetAllAsync();
-
-            var result = new List<DeliveryPartnerSummaryDto>();
-            foreach (var partner in partners)
-            {
-                var partnerDeliveries = allDeliveries.Where(d => d.DeliveryPartnerId == partner.Id).ToList();
-                result.Add(new DeliveryPartnerSummaryDto
-                {
-                    Id = partner.Id,
-                    Name = partner.Name,
-                    Email = partner.Email,
-                    PhoneNumber = partner.PhoneNumber,
-                    ProfileImageUrl = partner.ProfileImageUrl,
-                    IsActive = partner.IsActive,
-                    ActiveDeliveriesCount = partnerDeliveries.Count(d => d.DeliveryStatus != "Delivered"),
-                    CompletedDeliveriesCount = partnerDeliveries.Count(d => d.DeliveryStatus == "Delivered"),
-                    CreatedAt = partner.CreatedAt
-                });
-            }
-
-            return result;
+            return await _userRepository.GetDeliveryPartnersSummaryAsync();
         }
 
         public async Task<IEnumerable<UserResponseDto>> GetAllAsync()

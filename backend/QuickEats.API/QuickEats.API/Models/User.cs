@@ -10,8 +10,8 @@ namespace QuickEats.API.Models
         [JsonIgnore]
         public string PasswordHash { get;set; }= string.Empty;
         public string PhoneNumber { get; set; } = string.Empty;
-        public string Role { get;set; }=string.Empty; // e.g., "Customer", "Admin","Owner","Delivery Partner"
-        public string ProfileImageUrl { get; set; } = string.Empty;
+        public string Role { get; set; } = string.Empty;
+        public string? ProfileImageUrl { get; set; }
 
         // Optional geographic coordinates for a customer's current/default location.
         // Nullable so existing users without coordinates never break.

@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using QuickEats.API.Common;
 using QuickEats.API.Data;
+using QuickEats.API.DTos.User;
 using QuickEats.API.Models;
 using QuickEats.API.Repositories.Interfaces;
 
@@ -49,6 +50,25 @@ namespace QuickEats.API.Repositories
             return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
         }
 
+        public async Task<List<DeliveryPartnerSummaryDto>> GetDeliveryPartnersSummaryAsync()
+        {
+            return await _context.Users
+                .AsNoTracking()
+                .Where(u => u.Role == "DeliveryPartner" || u.Role == "Delivery Partner")
+                .Select(u => new DeliveryPartnerSummaryDto
+                {
+                    Id = u.Id,
+                    Name = u.Name,
+                    Email = u.Email,
+                    PhoneNumber = u.PhoneNumber,
+                    ProfileImageUrl = u.ProfileImageUrl,
+                    IsActive = u.IsActive,
+                    ActiveDeliveriesCount = _context.OrderDeliveries.Count(d => d.DeliveryPartnerId == u.Id && d.DeliveryStatus != "Delivered"),
+                    CompletedDeliveriesCount = _context.OrderDeliveries.Count(d => d.DeliveryPartnerId == u.Id && d.DeliveryStatus == "Delivered"),
+                    CreatedAt = u.CreatedAt
+                })
+                .ToListAsync();
+        }
 
         public async Task AddAsync(User user)
         {
