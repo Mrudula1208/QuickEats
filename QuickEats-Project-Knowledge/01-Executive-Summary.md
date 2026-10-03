@@ -45,7 +45,7 @@ Traditional food ordering systems struggle with complex role management, stale i
 - **Backend Endpoints:** 97 distinct REST endpoints across 17 controllers.
 - **Database Tables (Entities):** 16 relational entities mapped via EF Core `AppDbContext`.
 - **Frontend Pages/Components:** 30+ standalone views, layouts, and reusable components.
-- **Backend Unit Tests:** 48 automated unit tests across `OrderService`, `OrderDeliveryService`, and `PasswordHasher` (xUnit + Moq).
+- **Backend Unit Tests:** 58 automated unit tests across `OrderService`, `OrderDeliveryService`, `UserService`, and `PasswordHasher` (xUnit + Moq).
 - **Frontend Unit Tests:** 45 test suites (46 tests) verified passing via Vitest.
 - **Build Quality:** Zero compiler warnings, zero build errors.
 

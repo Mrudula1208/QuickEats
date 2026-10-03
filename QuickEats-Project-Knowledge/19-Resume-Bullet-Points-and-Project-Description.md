@@ -9,7 +9,7 @@
   - Designed and implemented a personalized restaurant recommendation engine combining customer order affinity, real review ratings, and in-memory geospatial Haversine distance calculations.
   - Applied Entity Framework Core `.AsNoTracking()` to read-only queries and aggregated recommendation data using grouped LINQ queries, eliminating N+1 roundtrips and ChangeTracker overhead on catalog reads.
   - Developed a reactive frontend using Angular 21 Standalone Components, Angular Signals for zero-overhead cart state management, and functional route guards.
-  - Maintained 100% test pass rate across 48 backend unit tests (xUnit & Moq) and 45 frontend test suites (Vitest).
+  - Maintained 100% test pass rate across 58 backend unit tests (xUnit & Moq) and 45 frontend test suites (Vitest).
 
 ---
 

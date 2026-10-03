@@ -53,11 +53,12 @@ This document tracks the code quality improvements, security refactorings, test 
 - **Refactoring Applied:**
   - Initialized `QuickEats.API.Tests` project (.NET 8, xUnit 2.5.3, Moq 4.21.0).
   - Linked test project to `QuickEats.API.sln`.
-  - Authored 48 unit tests:
+  - Authored 58 unit tests:
     - `Helpers/PasswordHasherTests.cs` (4 methods, 6 test cases)
     - `Services/OrderServiceTests.cs` (15 methods, 21 test cases)
     - `Services/OrderDeliveryServiceTests.cs` (23 test cases)
-- **Verification:** Ran `dotnet test QuickEats.API.sln`. **48/48 tests passed (100% pass rate)**.
+    - `Services/UserServiceTests.cs` (10 test cases)
+- **Verification:** Ran `dotnet test QuickEats.API.sln`. **58/58 tests passed (100% pass rate)**.
 
 ---
 

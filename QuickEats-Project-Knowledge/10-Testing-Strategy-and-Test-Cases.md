@@ -4,7 +4,7 @@
 Software reliability in QuickEats is verified through automated unit testing on both the backend (.NET 8 with xUnit & Moq) and the frontend (Angular 21 with Vitest).
 - **Zero Flakiness:** All tests execute against isolated test doubles (mocks) without touching live databases or network APIs.
 - **100% Pass Verification Baseline:**
-  - **Backend:** 48 / 48 Tests Passing (0 Errors, 0 Warnings).
+  - **Backend:** 58 / 58 Tests Passing (0 Errors, 0 Warnings).
   - **Frontend:** 45 / 45 Test Files Passing (46 / 46 Specs Passing).
 
 ---
@@ -23,7 +23,8 @@ Located in `backend/QuickEats.API/QuickEats.API.Tests/`:
 | `PasswordHasherTests.cs` | `PasswordHasher` | Hash generation, Salt variance, Match verification, Wrong password rejection | 4 (6 cases) | Passed |
 | `OrderServiceTests.cs` | `OrderService` | Order creation, Server-side price tampering protection, Coupon discounts, State transitions, Customer cancellation, Admin override | 15 (21 cases) | Passed |
 | `OrderDeliveryServiceTests.cs` | `OrderDeliveryService` | Admin dispatch, Inactive rider rejection, Reassignment guards, Sequential status progression, Terminal state restrictions | 23 | Passed |
-| **Total** | | | **48** | **100% Pass** |
+| `UserServiceTests.cs` | `UserService` | Partner summary aggregation, DTO password masking, User CRUD, Status toggle, Image update | 10 | Passed |
+| **Total** | | | **58** | **100% Pass** |
 
 ---
 
@@ -123,7 +124,7 @@ dotnet test QuickEats.API.sln
 ```
 **Expected Output:**
 ```text
-Passed!  - Failed: 0, Passed: 48, Skipped: 0, Total: 48, Duration: 2 s
+Passed!  - Failed: 0, Passed: 58, Skipped: 0, Total: 58, Duration: 2 s
 ```
 
 ### Run Frontend Tests:
