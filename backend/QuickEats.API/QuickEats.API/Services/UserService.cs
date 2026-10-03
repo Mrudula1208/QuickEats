@@ -167,5 +167,48 @@ namespace QuickEats.API.Services
 
             return result;
         }
+
+        public async Task<IEnumerable<UserResponseDto>> GetAllAsync()
+        {
+            var users = await _userRepository.GetAllAsync();
+            return users.Select(ToResponseDto).ToList();
+        }
+
+        public async Task<UserResponseDto?> GetByIdAsync(int id)
+        {
+            var user = await _userRepository.GetByIdAsync(id);
+            if (user == null)
+            {
+                return null;
+            }
+            return ToResponseDto(user);
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var user = await _userRepository.GetByIdAsync(id);
+            if (user == null)
+            {
+                throw new NotFoundException("User not found.");
+            }
+
+            await _userRepository.DeleteAsync(user);
+            await _userRepository.SaveChangesAsync();
+        }
+
+        private static UserResponseDto ToResponseDto(User user)
+        {
+            return new UserResponseDto
+            {
+                Id = user.Id,
+                Name = user.Name,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                Role = user.Role,
+                ProfileImageUrl = user.ProfileImageUrl,
+                IsActive = user.IsActive,
+                CreatedAt = user.CreatedAt
+            };
+        }
     }
 }

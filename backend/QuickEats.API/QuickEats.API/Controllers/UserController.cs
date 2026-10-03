@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QuickEats.API.DTos.Auth;
 using QuickEats.API.DTos.User;
-using QuickEats.API.Repositories.Interfaces;
 using QuickEats.API.Services.Interfaces;
 using System.Security.Claims;
 
@@ -17,12 +16,10 @@ namespace QuickEats.API.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IUserRepository _userRepository;
         private readonly IUserService _userService;
 
-        public UserController(IUserRepository userRepository, IUserService userService)
+        public UserController(IUserService userService)
         {
-            _userRepository = userRepository;
             _userService = userService;
         }
 
@@ -33,26 +30,8 @@ namespace QuickEats.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var users = await _userRepository.GetAllAsync();
-
-            var response = new List<UserResponseDto>();
-
-            foreach (var user in users)
-            {
-                response.Add(new UserResponseDto
-                {
-                    Id = user.Id,
-                    Name = user.Name,
-                    Email = user.Email,
-                    PhoneNumber = user.PhoneNumber,
-                    Role = user.Role,
-                    ProfileImageUrl = user.ProfileImageUrl,
-                    IsActive = user.IsActive,
-                    CreatedAt = user.CreatedAt
-                });
-            }
-
-            return Ok(response);
+            var users = await _userService.GetAllAsync();
+            return Ok(users);
         }
 
         /// <summary>
@@ -65,6 +44,7 @@ namespace QuickEats.API.Controllers
             var partners = await _userService.GetDeliveryPartnersAsync();
             return Ok(partners);
         }
+
         [Authorize(Roles = "Admin")]
         [HttpPost("delivery-partner")]
         public async Task<IActionResult> CreateDeliveryPartner([FromBody] CreateDeliveryPartnerDto dto)
@@ -92,13 +72,7 @@ namespace QuickEats.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var user = await _userRepository.GetByIdAsync(id);
-            if (user == null)
-                return NotFound("User not found.");
-
-            await _userRepository.DeleteAsync(user);
-            await _userRepository.SaveChangesAsync();
-
+            await _userService.DeleteAsync(id);
             return Ok(new { message = "User deleted successfully." });
         }
 
@@ -112,23 +86,11 @@ namespace QuickEats.API.Controllers
             var userId = int.Parse(
                 User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
-            var user = await _userRepository.GetByIdAsync(userId);
+            var user = await _userService.GetByIdAsync(userId);
             if (user == null)
                 return NotFound("User not found.");
 
-            var response = new UserResponseDto
-            {
-                Id = user.Id,
-                Name = user.Name,
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber,
-                Role = user.Role,
-                ProfileImageUrl = user.ProfileImageUrl,
-                IsActive = user.IsActive,
-                CreatedAt = user.CreatedAt
-            };
-
-            return Ok(response);
+            return Ok(user);
         }
 
         /// <summary>
