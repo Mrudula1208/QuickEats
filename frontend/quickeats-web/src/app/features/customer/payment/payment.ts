@@ -1,4 +1,4 @@
-// Import Component decorator.
+﻿// Import Component decorator.
 import { Component } from '@angular/core';
 
 // Import CommonModule.
@@ -14,7 +14,7 @@ import { Router } from '@angular/router';
 import { CheckoutDataService } from '../../../core/services/checkout-data.service';
 
 // Order service.
-import { OrderService } from '../../../core/services/order';
+import { OrderService } from '../../../core/services/order.service';
 
 // Payment service.
 import { PaymentService } from '../../../core/services/payment.service';

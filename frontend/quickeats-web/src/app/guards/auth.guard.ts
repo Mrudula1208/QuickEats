@@ -29,20 +29,20 @@ export const authGuard: CanActivateFn = (route, state) => {
 
 // Before opening any protected page
 
-// â†“
+// ↓
 
 // Check Login
 
-// â†“
+// ↓
 
 // If Logged In
 
-// â†“
+// ↓
 
 // Open Page
 
 // Else
 
-// â†“
+// ↓
 
 // Open Login Page

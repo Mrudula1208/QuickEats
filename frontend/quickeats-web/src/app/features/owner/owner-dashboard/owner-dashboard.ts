@@ -1,9 +1,9 @@
-import { Component, signal } from '@angular/core';
+﻿import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { OwnerNavComponent } from '../../../shared/owner-nav/owner-nav';
 import { RestaurantService } from '../../../core/services/restaurant.service';
-import { OrderService } from '../../../core/services/order';
+import { OrderService } from '../../../core/services/order.service';
 import { Restaurant } from '../../../core/models/restaurant.model';
 import { OrderModel } from '../../../core/models/order.model';
 import { ToastrService } from 'ngx-toastr';

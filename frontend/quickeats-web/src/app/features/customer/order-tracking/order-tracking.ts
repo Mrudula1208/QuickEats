@@ -1,7 +1,7 @@
-import { Component, signal, OnDestroy } from '@angular/core';
+﻿import { Component, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { OrderService } from '../../../core/services/order';
+import { OrderService } from '../../../core/services/order.service';
 import { DeliveryService } from '../../../core/services/delivery.service';
 import { RestaurantService } from '../../../core/services/restaurant.service';
 import { OrderModel } from '../../../core/models/order.model';

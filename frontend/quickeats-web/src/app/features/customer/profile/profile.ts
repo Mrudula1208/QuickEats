@@ -1,4 +1,4 @@
-import { Component, signal, OnInit } from '@angular/core';
+﻿import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -8,7 +8,7 @@ import { SavedAddressService } from '../../../core/services/saved-address.servic
 import { SavedAddressModel } from '../../../core/models/saved-address.model';
 import { ImageService } from '../../../core/services/image.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { OrderService } from '../../../core/services/order';
+import { OrderService } from '../../../core/services/order.service';
 import { OrderModel } from '../../../core/models/order.model';
 import { FavoriteService } from '../../../core/services/favorite.service';
 import { FavoriteModel } from '../../../core/models/favorite.model';

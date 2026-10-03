@@ -50,3 +50,34 @@ export interface OrderModel {
   items: OrderItemModel[];
 
 }
+
+// DTO for creating order item
+export interface CreateOrderItemDto {
+  menuItemId?: number;
+  MenuItemId?: number;
+  quantity?: number;
+  Quantity?: number;
+}
+
+// DTO for placing an order
+export interface CreateOrderDto {
+  restaurantId?: number;
+  RestaurantId?: number;
+  deliveryAddress?: string;
+  DeliveryAddress?: string;
+  phoneNumber?: string;
+  PhoneNumber?: string;
+  paymentMethod?: string;
+  PaymentMethod?: string;
+  items?: CreateOrderItemDto[];
+  Items?: CreateOrderItemDto[];
+  couponCode?: string | null;
+  CouponCode?: string | null;
+  totalAmount?: number;
+  TotalAmount?: number;
+}
+
+// Standard response message from order actions
+export interface OrderActionResponse {
+  message: string;
+}

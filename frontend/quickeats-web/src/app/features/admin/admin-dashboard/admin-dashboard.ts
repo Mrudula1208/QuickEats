@@ -1,10 +1,10 @@
-import { Component, signal, computed, OnInit } from '@angular/core';
+﻿import { Component, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { AdminNavComponent } from '../../../shared/admin-nav/admin-nav';
 import { DashboardService } from '../../../core/services/dashboard.service';
-import { OrderService } from '../../../core/services/order';
+import { OrderService } from '../../../core/services/order.service';
 import { RestaurantService } from '../../../core/services/restaurant.service';
 import { UserService } from '../../../core/services/user.service';
 import { MenuService } from '../../../core/services/menu.service';

@@ -1,8 +1,8 @@
-import { Component, signal, computed } from '@angular/core';
+﻿import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OwnerNavComponent } from '../../../shared/owner-nav/owner-nav';
-import { OrderService } from '../../../core/services/order';
+import { OrderService } from '../../../core/services/order.service';
 import { OrderModel } from '../../../core/models/order.model';
 import { ToastrService } from 'ngx-toastr';
 

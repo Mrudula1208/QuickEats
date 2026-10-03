@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+﻿import { Component, signal } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 
@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 
 import { ToastrService } from 'ngx-toastr';
 
-import { OrderService } from '../../../core/services/order';
+import { OrderService } from '../../../core/services/order.service';
 import { WishlistService } from '../../../core/services/wishlist.service';
 import { SavedAddressService } from '../../../core/services/saved-address.service';
 import { CouponService } from '../../../core/services/coupon.service';

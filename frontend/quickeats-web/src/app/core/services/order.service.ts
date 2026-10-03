@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { OrderModel } from '../models/order.model';
+import { OrderModel, CreateOrderDto, OrderActionResponse } from '../models/order.model';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -16,7 +16,7 @@ export class OrderService {
 
   // Create a new order on the Backend.
   // The Backend returns the new order id.
-  createOrder(dto: any): Observable<number> {
+  createOrder(dto: CreateOrderDto): Observable<number> {
 
     // POST
     // Sends the order to ASP.NET Core.
@@ -54,38 +54,38 @@ export class OrderService {
 
   // Update the status of one order (Owner of the order's restaurant ONLY).
   // Owners can only set: Confirmed, Preparing, Ready for Pickup, Cancelled(Pending only).
-  updateOrderStatusApi(id: number, status: string): Observable<any> {
+  updateOrderStatusApi(id: number, status: string): Observable<OrderActionResponse> {
 
-    return this.http.put(`${this.apiUrl}/${id}`, { status: status });
+    return this.http.put<OrderActionResponse>(`${this.apiUrl}/${id}`, { status: status });
 
   }
 
   // Admin cancels an order (only while Pending or Confirmed).
-  adminCancelOrder(id: number): Observable<any> {
+  adminCancelOrder(id: number): Observable<OrderActionResponse> {
 
-    return this.http.post(`${this.apiUrl}/${id}/admin-cancel`, {});
+    return this.http.post<OrderActionResponse>(`${this.apiUrl}/${id}/admin-cancel`, {});
 
   }
 
   // Admin emergency override - requires a reason; recorded in the audit log.
-  adminOverride(id: number, status: string, reason: string): Observable<any> {
+  adminOverride(id: number, status: string, reason: string): Observable<OrderActionResponse> {
 
-    return this.http.post(`${this.apiUrl}/${id}/override`, { status, reason });
+    return this.http.post<OrderActionResponse>(`${this.apiUrl}/${id}/override`, { status, reason });
 
   }
 
   // Delete one order (used by Admin).
-  deleteOrderApi(id: number): Observable<any> {
+  deleteOrderApi(id: number): Observable<OrderActionResponse> {
 
-    return this.http.delete(`${this.apiUrl}/${id}`);
+    return this.http.delete<OrderActionResponse>(`${this.apiUrl}/${id}`);
 
   }
 
   // Cancel an order (used by Customer).
   // Only allowed when status is "Pending" or "Confirmed".
-  cancelOrder(id: number): Observable<any> {
+  cancelOrder(id: number): Observable<OrderActionResponse> {
 
-    return this.http.patch(`${this.apiUrl}/${id}/cancel`, {});
+    return this.http.patch<OrderActionResponse>(`${this.apiUrl}/${id}/cancel`, {});
 
   }
 

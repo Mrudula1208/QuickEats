@@ -1,8 +1,8 @@
-import { Component, signal } from '@angular/core';
+﻿import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { DeliveryService } from '../../../core/services/delivery.service';
-import { OrderService } from '../../../core/services/order';
+import { OrderService } from '../../../core/services/order.service';
 import { Delivery } from '../../../core/models/delivery.model';
 import { OrderModel } from '../../../core/models/order.model';
 

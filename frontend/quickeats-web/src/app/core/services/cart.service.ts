@@ -190,7 +190,7 @@ export class CartService {
 
   }
 
-  // Platform fee is always â‚¹10.
+  // Platform fee is always ₹10.
   getPlatformFee(): number {
 
     return 10;
@@ -272,7 +272,7 @@ export class CartService {
 
           if (this.getFoodTotal() < coupon.minimumOrderAmount) {
 
-            return `Minimum order of â‚¹${coupon.minimumOrderAmount} required. Your cart total is â‚¹${this.getFoodTotal().toFixed(2)}.`;
+            return `Minimum order of ₹${coupon.minimumOrderAmount} required. Your cart total is ₹${this.getFoodTotal().toFixed(2)}.`;
 
           }
 
