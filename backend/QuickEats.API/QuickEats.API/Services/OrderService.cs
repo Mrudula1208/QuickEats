@@ -13,11 +13,18 @@ namespace QuickEats.API.Services
         private readonly IOrderRepository _orderRepository;
         private readonly IMenuRepository _menuRepository;
         private readonly INotificationService _notificationService;
-        public OrderService(IOrderRepository orderRepository, IMenuRepository menuRepository, INotificationService notificationService)
+        private readonly ICouponRepository _couponRepository;
+
+        public OrderService(
+            IOrderRepository orderRepository,
+            IMenuRepository menuRepository,
+            INotificationService notificationService,
+            ICouponRepository couponRepository)
         {
             _orderRepository = orderRepository;
             _menuRepository = menuRepository;
             _notificationService = notificationService;
+            _couponRepository = couponRepository;
         }
 
         public async Task<IEnumerable<OrderResponseDto>> GetAllAsync()
@@ -117,15 +124,41 @@ namespace QuickEats.API.Services
                 {
                     MenuItemId = item.MenuItemId,
                     Quantity = item.Quantity,
-
                     UnitPrice = unitPrice,
-
                     TotalPrice = totalPrice
                 };
 
                 order.OrderItems.Add(orderItem);
             }
-            order.TotalAmount = dto.TotalAmount > 0 ? dto.TotalAmount : totalAmount;
+
+            // Server-side coupon verification and discount application.
+            // Recalculating the order total on the server prevents client-side price tampering.
+            if (!string.IsNullOrWhiteSpace(dto.CouponCode))
+            {
+                var coupon = await _couponRepository.GetByCodeAsync(dto.CouponCode.Trim());
+                if (coupon == null)
+                {
+                    throw new BadRequestException($"Coupon code \"{dto.CouponCode}\" is invalid.");
+                }
+                if (!coupon.IsActive)
+                {
+                    throw new BadRequestException($"Coupon \"{dto.CouponCode}\" is inactive.");
+                }
+                if (coupon.ExpiryDate <= DateTime.UtcNow)
+                {
+                    throw new BadRequestException($"Coupon \"{dto.CouponCode}\" has expired.");
+                }
+                if (totalAmount < coupon.MinimumOrderAmount)
+                {
+                    throw new BadRequestException(
+                        $"Coupon \"{dto.CouponCode}\" requires a minimum order amount of {coupon.MinimumOrderAmount:C}.");
+                }
+
+                totalAmount = Math.Max(0, totalAmount - coupon.DiscountAmount);
+            }
+
+            // Enforce the server-calculated total. Client-supplied TotalAmount is ignored for security.
+            order.TotalAmount = totalAmount;
             await _orderRepository.AddAsync(order);
             await _orderRepository.SaveChangesAsync();
 

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace QuickEats.API.DTos.Order
 {
@@ -24,8 +24,17 @@ namespace QuickEats.API.DTos.Order
         [MinLength(1, ErrorMessage = "Order must contain at least one item")]
         public List<OrderItemDto> Items { get; set; } = new();
 
-        // Grand total calculated by frontend (food + GST + delivery + platform - coupon).
-        // When 0, the backend recalculates server-side from menu item prices.
+        /// <summary>
+        /// Optional coupon code to apply. The server verifies the coupon, checks expiry and
+        /// minimum order requirements, and deducts the discount server-side.
+        /// </summary>
+        [StringLength(50, ErrorMessage = "Coupon code cannot exceed 50 characters")]
+        public string? CouponCode { get; set; }
+
+        /// <summary>
+        /// Client estimated total. The server recalculates and enforces the authentic total server-side
+        /// from database menu prices and verified coupons to prevent client-side price tampering.
+        /// </summary>
         [Range(0, 999999, ErrorMessage = "Total amount must be valid")]
         public decimal TotalAmount { get; set; }
     }

@@ -25,6 +25,8 @@ export class CheckoutDataService {
 
   couponDiscount = 0;
 
+  couponCode = '';
+
   paymentMethod = 'Cash On Delivery';
 
 }

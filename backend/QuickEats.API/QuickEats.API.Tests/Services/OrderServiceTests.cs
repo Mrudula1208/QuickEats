@@ -15,6 +15,7 @@ namespace QuickEats.API.Tests.Services
         private readonly Mock<IOrderRepository> _orderRepoMock;
         private readonly Mock<IMenuRepository> _menuRepoMock;
         private readonly Mock<INotificationService> _notificationServiceMock;
+        private readonly Mock<ICouponRepository> _couponRepoMock;
         private readonly OrderService _orderService;
 
         public OrderServiceTests()
@@ -22,11 +23,13 @@ namespace QuickEats.API.Tests.Services
             _orderRepoMock = new Mock<IOrderRepository>();
             _menuRepoMock = new Mock<IMenuRepository>();
             _notificationServiceMock = new Mock<INotificationService>();
+            _couponRepoMock = new Mock<ICouponRepository>();
 
             _orderService = new OrderService(
                 _orderRepoMock.Object,
                 _menuRepoMock.Object,
-                _notificationServiceMock.Object);
+                _notificationServiceMock.Object,
+                _couponRepoMock.Object);
         }
 
         [Fact]
@@ -308,6 +311,192 @@ namespace QuickEats.API.Tests.Services
 
             // Assert
             Assert.Equal(expected, normalized);
+        }
+
+        [Fact]
+        public async Task CreateAsync_IgnoresClientProvidedTotalAmount_CalculatesServerSideTotal()
+        {
+            // Arrange: Client attempts price tampering by sending TotalAmount = 1.00m
+            int customerId = 1;
+            int restaurantId = 10;
+            var menuItem = new MenuItem
+            {
+                Id = 105,
+                RestaurantId = restaurantId,
+                Name = "Gourmet Pizza",
+                Price = 500m,
+                DiscountPercent = 0
+            };
+
+            _menuRepoMock.Setup(m => m.GetByIdAsync(105)).ReturnsAsync(menuItem);
+
+            var createDto = new CreateOrderDto
+            {
+                RestaurantId = restaurantId,
+                DeliveryAddress = "789 Sea View Road, Mumbai",
+                PhoneNumber = "9820001122",
+                PaymentMethod = "UPI",
+                TotalAmount = 1.00m, // Malicious client attempt to pay 1 rupee
+                Items = new List<OrderItemDto>
+                {
+                    new OrderItemDto { MenuItemId = 105, Quantity = 2 }
+                }
+            };
+
+            // Act
+            int orderId = await _orderService.CreateAsync(createDto, customerId);
+
+            // Assert: Server enforces 500 * 2 = 1000m, ignoring the client-supplied 1.00m
+            _orderRepoMock.Verify(r => r.AddAsync(It.Is<Order>(o =>
+                o.TotalAmount == 1000m &&
+                o.OrderItems.First().TotalPrice == 1000m
+            )), Times.Once);
+        }
+
+        [Fact]
+        public async Task CreateAsync_ValidCoupon_DeductsDiscountAmountFromServerTotal()
+        {
+            // Arrange
+            int customerId = 1;
+            int restaurantId = 10;
+            var menuItem = new MenuItem
+            {
+                Id = 106,
+                RestaurantId = restaurantId,
+                Name = "North Indian Thali",
+                Price = 250m,
+                DiscountPercent = 0
+            };
+
+            var coupon = new Coupon
+            {
+                Id = 1,
+                Code = "WELCOME50",
+                DiscountAmount = 50m,
+                MinimumOrderAmount = 200m,
+                IsActive = true,
+                ExpiryDate = DateTime.UtcNow.AddDays(10)
+            };
+
+            _menuRepoMock.Setup(m => m.GetByIdAsync(106)).ReturnsAsync(menuItem);
+            _couponRepoMock.Setup(c => c.GetByCodeAsync("WELCOME50")).ReturnsAsync(coupon);
+
+            var createDto = new CreateOrderDto
+            {
+                RestaurantId = restaurantId,
+                DeliveryAddress = "10 Downing Road, Pune",
+                PhoneNumber = "9820003344",
+                PaymentMethod = "Card",
+                CouponCode = "WELCOME50",
+                Items = new List<OrderItemDto>
+                {
+                    new OrderItemDto { MenuItemId = 106, Quantity = 2 } // 250 * 2 = 500
+                }
+            };
+
+            // Act
+            int orderId = await _orderService.CreateAsync(createDto, customerId);
+
+            // Assert: 500 - 50 discount = 450
+            _orderRepoMock.Verify(r => r.AddAsync(It.Is<Order>(o =>
+                o.TotalAmount == 450m
+            )), Times.Once);
+        }
+
+        [Fact]
+        public async Task CreateAsync_InvalidOrExpiredCoupon_ThrowsBadRequestException()
+        {
+            // Arrange
+            int customerId = 1;
+            int restaurantId = 10;
+            var menuItem = new MenuItem
+            {
+                Id = 107,
+                RestaurantId = restaurantId,
+                Name = "Masala Dosa",
+                Price = 100m,
+                DiscountPercent = 0
+            };
+
+            var expiredCoupon = new Coupon
+            {
+                Id = 2,
+                Code = "EXPIRED20",
+                DiscountAmount = 20m,
+                MinimumOrderAmount = 50m,
+                IsActive = true,
+                ExpiryDate = DateTime.UtcNow.AddDays(-1) // Expired yesterday
+            };
+
+            _menuRepoMock.Setup(m => m.GetByIdAsync(107)).ReturnsAsync(menuItem);
+            _couponRepoMock.Setup(c => c.GetByCodeAsync("EXPIRED20")).ReturnsAsync(expiredCoupon);
+
+            var createDto = new CreateOrderDto
+            {
+                RestaurantId = restaurantId,
+                DeliveryAddress = "20 MG Road, Bangalore",
+                PhoneNumber = "9820005566",
+                PaymentMethod = "COD",
+                CouponCode = "EXPIRED20",
+                Items = new List<OrderItemDto>
+                {
+                    new OrderItemDto { MenuItemId = 107, Quantity = 1 }
+                }
+            };
+
+            // Act & Assert
+            var ex = await Assert.ThrowsAsync<BadRequestException>(() =>
+                _orderService.CreateAsync(createDto, customerId));
+
+            Assert.Contains("expired", ex.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        public async Task CreateAsync_CouponMinimumOrderNotMet_ThrowsBadRequestException()
+        {
+            // Arrange: Order total 100, but coupon requires minimum 300
+            int customerId = 1;
+            int restaurantId = 10;
+            var menuItem = new MenuItem
+            {
+                Id = 108,
+                RestaurantId = restaurantId,
+                Name = "Cold Coffee",
+                Price = 100m,
+                DiscountPercent = 0
+            };
+
+            var coupon = new Coupon
+            {
+                Id = 3,
+                Code = "BIGSAVER",
+                DiscountAmount = 100m,
+                MinimumOrderAmount = 300m,
+                IsActive = true,
+                ExpiryDate = DateTime.UtcNow.AddDays(5)
+            };
+
+            _menuRepoMock.Setup(m => m.GetByIdAsync(108)).ReturnsAsync(menuItem);
+            _couponRepoMock.Setup(c => c.GetByCodeAsync("BIGSAVER")).ReturnsAsync(coupon);
+
+            var createDto = new CreateOrderDto
+            {
+                RestaurantId = restaurantId,
+                DeliveryAddress = "50 Park Street, Kolkata",
+                PhoneNumber = "9820007788",
+                PaymentMethod = "UPI",
+                CouponCode = "BIGSAVER",
+                Items = new List<OrderItemDto>
+                {
+                    new OrderItemDto { MenuItemId = 108, Quantity = 1 } // Total 100 < 300
+                }
+            };
+
+            // Act & Assert
+            var ex = await Assert.ThrowsAsync<BadRequestException>(() =>
+                _orderService.CreateAsync(createDto, customerId));
+
+            Assert.Contains("minimum order amount", ex.Message, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

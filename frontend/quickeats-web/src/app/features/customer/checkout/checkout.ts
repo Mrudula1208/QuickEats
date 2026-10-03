@@ -202,6 +202,7 @@ export class CheckoutComponent {
     this.checkoutData.deliveryFee = this.customerCheckout.deliveryCharge;
     this.checkoutData.platformFee = this.customerCheckout.platformFee;
     this.checkoutData.couponDiscount = this.customerCheckout.discountAmount;
+    this.checkoutData.couponCode = this.customerCheckout.couponCode;
     this.checkoutData.paymentMethod = this.customerCheckout.paymentMethod;
 
     this.router.navigate(['/payment']);

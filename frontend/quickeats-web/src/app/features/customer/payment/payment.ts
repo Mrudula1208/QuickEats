@@ -140,6 +140,8 @@ export class PaymentComponent {
 
         Items: items,
 
+        CouponCode: this.checkoutData.couponCode || null,
+
         TotalAmount: this.amount
 
       })
