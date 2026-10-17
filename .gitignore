@@ -19,7 +19,9 @@ build-out3.txt
 scratch/
 
 # Local publish artifacts
+QuickEats-Publish/
 QuickEats-Publish.zip
+**/publish/
 
 # Node
 node_modules/
