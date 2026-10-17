@@ -1,17 +1,27 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideRouter } from '@angular/router';
+import { provideToastr } from 'ngx-toastr';
 
-import { CustomerDashboard } from './customer-dashboard';
+import { CustomerDashboardComponent } from './customer-dashboard';
 
-describe('CustomerDashboard', () => {
-  let component: CustomerDashboard;
-  let fixture: ComponentFixture<CustomerDashboard>;
+describe('CustomerDashboardComponent', () => {
+  let component: CustomerDashboardComponent;
+  let fixture: ComponentFixture<CustomerDashboardComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CustomerDashboard],
+      imports: [CustomerDashboardComponent],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideRouter([]),
+        provideToastr()
+      ]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(CustomerDashboard);
+    fixture = TestBed.createComponent(CustomerDashboardComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });
@@ -20,3 +30,4 @@ describe('CustomerDashboard', () => {
     expect(component).toBeTruthy();
   });
 });
+

@@ -1,17 +1,27 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideRouter } from '@angular/router';
+import { provideToastr } from 'ngx-toastr';
 
-import { AdminOrder } from './admin-order';
+import { AdminOrders } from './admin-order';
 
-describe('AdminOrder', () => {
-  let component: AdminOrder;
-  let fixture: ComponentFixture<AdminOrder>;
+describe('AdminOrders', () => {
+  let component: AdminOrders;
+  let fixture: ComponentFixture<AdminOrders>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AdminOrder],
+      imports: [AdminOrders],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideRouter([]),
+        provideToastr()
+      ]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(AdminOrder);
+    fixture = TestBed.createComponent(AdminOrders);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });
@@ -20,3 +30,4 @@ describe('AdminOrder', () => {
     expect(component).toBeTruthy();
   });
 });
+

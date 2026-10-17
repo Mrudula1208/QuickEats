@@ -1,17 +1,25 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideToastr } from 'ngx-toastr';
 
-import { Wishlist } from './wishlist';
+import { WishlistComponent } from './wishlist';
 
-describe('Wishlist', () => {
-  let component: Wishlist;
-  let fixture: ComponentFixture<Wishlist>;
+describe('WishlistComponent', () => {
+  let component: WishlistComponent;
+  let fixture: ComponentFixture<WishlistComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Wishlist],
+      imports: [WishlistComponent],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideToastr()
+      ]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(Wishlist);
+    fixture = TestBed.createComponent(WishlistComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });
@@ -20,3 +28,4 @@ describe('Wishlist', () => {
     expect(component).toBeTruthy();
   });
 });
+

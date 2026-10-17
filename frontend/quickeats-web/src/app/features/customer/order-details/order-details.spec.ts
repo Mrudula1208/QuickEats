@@ -1,17 +1,27 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideRouter } from '@angular/router';
+import { provideToastr } from 'ngx-toastr';
 
-import { OrderDetails } from './order-details';
+import { OrderDetailsComponent } from './order-details';
 
-describe('OrderDetails', () => {
-  let component: OrderDetails;
-  let fixture: ComponentFixture<OrderDetails>;
+describe('OrderDetailsComponent', () => {
+  let component: OrderDetailsComponent;
+  let fixture: ComponentFixture<OrderDetailsComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [OrderDetails],
+      imports: [OrderDetailsComponent],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideRouter([]),
+        provideToastr()
+      ]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(OrderDetails);
+    fixture = TestBed.createComponent(OrderDetailsComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });
@@ -20,3 +30,4 @@ describe('OrderDetails', () => {
     expect(component).toBeTruthy();
   });
 });
+

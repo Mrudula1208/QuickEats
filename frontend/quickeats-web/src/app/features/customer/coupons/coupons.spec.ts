@@ -1,17 +1,27 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideRouter } from '@angular/router';
+import { provideToastr } from 'ngx-toastr';
 
-import { Coupons } from './coupons';
+import { CouponsComponent } from './coupons';
 
-describe('Coupons', () => {
-  let component: Coupons;
-  let fixture: ComponentFixture<Coupons>;
+describe('CouponsComponent', () => {
+  let component: CouponsComponent;
+  let fixture: ComponentFixture<CouponsComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Coupons],
+      imports: [CouponsComponent],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideRouter([]),
+        provideToastr()
+      ]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(Coupons);
+    fixture = TestBed.createComponent(CouponsComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });
@@ -20,3 +30,4 @@ describe('Coupons', () => {
     expect(component).toBeTruthy();
   });
 });
+
