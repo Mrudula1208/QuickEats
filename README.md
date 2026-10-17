@@ -252,20 +252,6 @@ The full documentation lives in Swagger, but here are the ones you'll use most:
 
 ---
 
-## Why I built it this way (the short version)
-
-Three things mattered more than anything else while I was doing this:
-
-1. **Data isolation between roles.** It's terrifying when an owner can see someone else's revenue. So every owner query is scoped at the repository layer (`Restaurant.OwnerId == currentUserId`), and order lookups are role-aware everywhere — customers see their orders, owners see their restaurants' orders, riders see their assigned deliveries. Nobody sees anything else.
-
-2. **A state machine that's actually enforced.** It would've been easy to let the frontend just change a status string, but the backend validates every single transition. The admin override exists for real-world edge cases, but it's additive and fully audited.
-
-3. **Deployment that behaves.** The frontend lives on Netlify and uses reverse-proxy rewrite rules (`netlify.toml`) to forward `/api/*` to the Somee-hosted backend — which kills CORS headaches. Images that come with the app are bundled into the Netlify build and served statically, while user uploads go through the API.
-
-If you spot anything you'd improve, the issues tab is open. Feedback (of the kind, not the angry) is welcome.
-
----
-
 ## License
 
 MIT. See [LICENSE](LICENSE).
