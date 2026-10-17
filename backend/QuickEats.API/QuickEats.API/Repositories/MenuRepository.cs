@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using QuickEats.API.Common;
 using QuickEats.API.Data;
 using QuickEats.API.Models;
@@ -16,7 +16,9 @@ namespace QuickEats.API.Repositories
 
         public async Task<IEnumerable<MenuItem>> GetAllAsync()
         {
-            return await _context.MenuItems.ToListAsync();
+            return await _context.MenuItems
+                .AsNoTracking()
+                .ToListAsync();
         }
 
         public async Task<IEnumerable<MenuItem>> GetTrendingAsync(int count)
@@ -37,6 +39,7 @@ namespace QuickEats.API.Repositories
             if (popularIds.Count == 0)
             {
                 return await _context.MenuItems
+                    .AsNoTracking()
                     .Include(m => m.Restaurant)
                     .Where(m => m.IsAvailable && m.Restaurant.IsActive)
                     .OrderByDescending(m => m.IsBestseller)
@@ -46,6 +49,7 @@ namespace QuickEats.API.Repositories
             }
 
             var menuItems = await _context.MenuItems
+                .AsNoTracking()
                 .Include(m => m.Restaurant)
                 .Where(m => m.IsAvailable && m.Restaurant.IsActive && popularIds.Select(p => p.MenuItemId).Contains(m.Id))
                 .ToListAsync();
@@ -72,7 +76,9 @@ namespace QuickEats.API.Repositories
 
         public async Task<PagedResult<MenuItem>> GetPagedAsync(int page, int pageSize, string? sortBy, bool sortDesc)
         {
-            var query = _context.MenuItems.AsQueryable();
+            var query = _context.MenuItems
+                .AsNoTracking()
+                .AsQueryable();
 
             query = sortBy?.ToLower() switch
             {
@@ -104,7 +110,10 @@ namespace QuickEats.API.Repositories
 
         public async Task<IEnumerable<MenuItem>> GetByRestaurantIdAsync(int restaurantId)
         {
-            return await _context.MenuItems.Where(m => m.RestaurantId == restaurantId).ToListAsync();
+            return await _context.MenuItems
+                .AsNoTracking()
+                .Where(m => m.RestaurantId == restaurantId)
+                .ToListAsync();
         }
         public async Task AddAsync(MenuItem menuItem)
         {

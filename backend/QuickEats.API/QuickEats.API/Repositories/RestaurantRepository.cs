@@ -16,7 +16,9 @@ namespace QuickEats.API.Repositories
 
         public async Task<IEnumerable<Restaurant>> GetAllAsync()
         {
-            return await _context.Restaurants.ToListAsync();
+            return await _context.Restaurants
+                .AsNoTracking()
+                .ToListAsync();
         }
 
         public async Task<IEnumerable<Restaurant>> GetFeaturedAsync(int count)
@@ -28,6 +30,7 @@ namespace QuickEats.API.Repositories
             // This is not "the first rows" - it is a deliberate quality/popularity ranking.
             // If no restaurant is flagged, the section still shows top performers.
             return await _context.Restaurants
+                .AsNoTracking()
                 .Where(r => r.IsActive)
                 .OrderByDescending(r => r.IsFeatured)
                 .ThenByDescending(r => _context.Orders.Count(o => o.RestaurantId == r.Id))
@@ -50,6 +53,7 @@ namespace QuickEats.API.Repositories
             //    - Delivery affordability
             // 3. If guest / no history: fall back to highest rated, most popular active restaurants.
             var activeRestaurants = await _context.Restaurants
+                .AsNoTracking()
                 .Where(r => r.IsActive)
                 .ToListAsync();
 
@@ -123,13 +127,16 @@ namespace QuickEats.API.Repositories
         public async Task<IEnumerable<Restaurant>> GetWithCoordinatesAsync()
         {
             return await _context.Restaurants
+                .AsNoTracking()
                 .Where(r => r.IsActive && r.Latitude != null && r.Longitude != null)
                 .ToListAsync();
         }
 
         public async Task<PagedResult<Restaurant>> GetPagedAsync(int page, int pageSize, string? sortBy, bool sortDesc)
         {
-            var query = _context.Restaurants.AsQueryable();
+            var query = _context.Restaurants
+                .AsNoTracking()
+                .AsQueryable();
 
             query = sortBy?.ToLower() switch
             {
@@ -160,6 +167,7 @@ namespace QuickEats.API.Repositories
         public async Task<IEnumerable<Restaurant>> GetByOwnerIdAsync(int ownerId)
         {
             return await _context.Restaurants
+                .AsNoTracking()
                 .Where(r => r.OwnerId == ownerId)
                 .ToListAsync();
         }

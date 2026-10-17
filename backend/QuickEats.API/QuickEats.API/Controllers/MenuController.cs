@@ -73,13 +73,6 @@ namespace QuickEats.API.Controllers
                 return NotFound($"Menu item with id {id} not found.");  
             }
 
-            // An Owner may only read menu items of their own restaurants.
-            if (User.IsInRole("Owner") &&
-                !await IsOwnerOfRestaurant(menuItems.RestaurantId))
-            {
-                return Forbid();
-            }
-
             return Ok(menuItems);
         }
 
@@ -103,13 +96,6 @@ namespace QuickEats.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task <IActionResult> GetByRestaurantId(int restaurantId)
         {
-            // An Owner may only read the menu of their own restaurants.
-            if (User.IsInRole("Owner") &&
-                !await IsOwnerOfRestaurant(restaurantId))
-            {
-                return Forbid();
-            }
-
             var menuItems = await _menuService.GetByRestaurantIdAsync(restaurantId);
             return Ok(menuItems);
         }

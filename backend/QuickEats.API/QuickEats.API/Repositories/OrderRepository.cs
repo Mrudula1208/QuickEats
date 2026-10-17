@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using QuickEats.API.Common;
 using QuickEats.API.Data;
@@ -20,6 +20,7 @@ namespace QuickEats.API.Repositories
         public async Task<IEnumerable<Order>> GetAllAsync()
         {
             return await _context.Orders
+                .AsNoTracking()
                 .Include(o => o.User)
                 .Include(o => o.Restaurant)
                 .Include(o => o.OrderItems)
@@ -34,6 +35,7 @@ namespace QuickEats.API.Repositories
         public async Task<PagedResult<Order>> GetPagedAsync(int page, int pageSize, string? sortBy, bool sortDesc)
         {
             var query = _context.Orders
+                .AsNoTracking()
                 .Include(o => o.User)
                 .Include(o => o.Restaurant)
                 .Include(o => o.OrderItems)
@@ -83,6 +85,7 @@ namespace QuickEats.API.Repositories
       public async Task<List<Order>> GetByUserIdAsync(int userId)
 {
     return await _context.Orders
+        .AsNoTracking()
         .Where(o => o.UserId == userId)
         .Include(o => o.User)
         .Include(o => o.Restaurant)
@@ -98,6 +101,7 @@ namespace QuickEats.API.Repositories
       public async Task<List<Order>> GetByOwnerIdAsync(int ownerId)
 {
     return await _context.Orders
+        .AsNoTracking()
         .Where(o => o.Restaurant.OwnerId == ownerId)
         .Include(o => o.User)
         .Include(o => o.Restaurant)

@@ -18,6 +18,7 @@ namespace QuickEats.API.Repositories
         public async Task<IEnumerable<Reviews>> GetAllAsync()
         {
             return await _context.Reviews
+                .AsNoTracking()
                 .Include(review => review.Customer)
                 .Include(review => review.Restaurant)
                 .OrderByDescending(r => r.CreatedAt)
@@ -35,6 +36,7 @@ namespace QuickEats.API.Repositories
         public async Task<IEnumerable<Reviews>> GetByRestaurantIdAsync(int restaurantId)
         {
             return await _context.Reviews
+                .AsNoTracking()
                 .Include(review => review.Customer)
                 .Include(review => review.Restaurant)
                 .Where(review => review.RestaurantId == restaurantId)
@@ -45,6 +47,7 @@ namespace QuickEats.API.Repositories
         public async Task<IEnumerable<Reviews>> GetByCustomerIdAsync(int customerId)
         {
             return await _context.Reviews
+                .AsNoTracking()
                 .Include(review => review.Customer)
                 .Include(review => review.Restaurant)
                 .Where(review => review.CustomerId == customerId)
@@ -55,6 +58,7 @@ namespace QuickEats.API.Repositories
         public async Task<IEnumerable<Reviews>> GetByOwnerIdAsync(int ownerId)
         {
             return await _context.Reviews
+                .AsNoTracking()
                 .Include(review => review.Customer)
                 .Include(review => review.Restaurant)
                 .Where(review => review.Restaurant.OwnerId == ownerId)

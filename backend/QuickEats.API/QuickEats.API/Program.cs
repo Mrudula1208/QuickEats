@@ -19,7 +19,7 @@ namespace QuickEats.API
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -115,21 +115,21 @@ namespace QuickEats.API
             builder.Services.AddScoped<IJwtService, JwtService>();
 
             // Fail fast if the JWT secret is missing or too weak.
-           var jwtConfig = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
+            var jwtConfig = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
 
-if (jwtConfig == null || string.IsNullOrWhiteSpace(jwtConfig.Key))
-{
-    throw new InvalidOperationException(
-        "JWT Key is missing..."
-    );
-}
+            if (jwtConfig == null || string.IsNullOrWhiteSpace(jwtConfig.Key))
+            {
+                throw new InvalidOperationException(
+                    "JWT Key is missing. Please configure 'Jwt:Key' via user-secrets or environment variables."
+                );
+            }
 
-if (jwtConfig.Key.Length < 32)
-{
-    throw new InvalidOperationException(
-        "JWT Key must be at least 32 characters long."
-    );
-}
+            if (jwtConfig.Key.Length < 32)
+            {
+                throw new InvalidOperationException(
+                    "JWT Key must be at least 32 characters long for HMAC-SHA256 signing."
+                );
+            }
             builder.Services.AddScoped< IReviewRepository,ReviewRepository>();
             builder.Services.AddScoped< IReviewService,  ReviewService>();
             builder.Services.AddScoped<IWishlistRepository, WishlistRepository>();
@@ -365,7 +365,7 @@ if (jwtConfig.Key.Length < 32)
                     }
 
                     // Polish test placeholders with authentic Mumbai demo data
-                    DemoDataPolisher.PolishDemoDataAsync(db).GetAwaiter().GetResult();
+                    await DemoDataPolisher.PolishDemoDataAsync(db);
                 }
                 catch (Exception ex)
                 {
@@ -373,7 +373,7 @@ if (jwtConfig.Key.Length < 32)
                 }
             }
 
-            app.Run();
+            await app.RunAsync();
         }
     }
 }

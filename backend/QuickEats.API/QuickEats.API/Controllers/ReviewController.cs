@@ -58,13 +58,6 @@ namespace QuickEats.API.Controllers
                 return NotFound(new { message = "Review not found." });
             }
 
-            // An Owner may only read reviews of their own restaurants.
-            if (User.IsInRole("Owner") &&
-                !await IsOwnerOfRestaurant(review.RestaurantId))
-            {
-                return Forbid();
-            }
-
             return Ok(review);
         }
 
@@ -99,13 +92,6 @@ namespace QuickEats.API.Controllers
         [HttpGet("restaurant/{restaurantId}")]
         public async Task<IActionResult> GetByRestaurantId(int restaurantId)
         {
-            // An Owner may only read reviews for their own restaurants.
-            if (User.IsInRole("Owner") &&
-                !await IsOwnerOfRestaurant(restaurantId))
-            {
-                return Forbid();
-            }
-
             var reviews = await _reviewService.GetByRestaurantIdAsync(restaurantId);
             return Ok(reviews);
         }

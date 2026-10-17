@@ -119,11 +119,6 @@ namespace QuickEats.API.Controllers
             if (restaurant == null)
                 return NotFound("Restaurant not found.");
 
-            // An Owner may only view their own restaurant details (even by direct id).
-            // Anonymous customers can still browse any restaurant publicly.
-            if (User.IsInRole("Owner") && !await IsOwnerOfRestaurant(id))
-                return Forbid();
-
             return Ok(restaurant);
         }
 
